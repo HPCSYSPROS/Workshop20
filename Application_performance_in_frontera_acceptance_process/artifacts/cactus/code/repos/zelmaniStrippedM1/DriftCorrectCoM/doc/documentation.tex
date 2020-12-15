@@ -1,0 +1,170 @@
+% *======================================================================*
+%  Cactus Thorn template for ThornGuide documentation
+%  Author: Ian Kelley
+%  Date: Sun Jun 02, 2002
+%  $Header: /numrelcvs/AEIDevelopment/DriftCorrect4/doc/documentation.tex,v 1.2 2005/05/29 09:09:21 schnetter Exp $                                                             
+%
+%  Thorn documentation in the latex file doc/documentation.tex 
+%  will be included in ThornGuides built with the Cactus make system.
+%  The scripts employed by the make system automatically include 
+%  pages about variables, parameters and scheduling parsed from the 
+%  relevant thorn CCL files.
+%  
+%  This template contains guidelines which help to assure that your     
+%  documentation will be correctly added to ThornGuides. More 
+%  information is available in the Cactus UsersGuide.
+%                                                    
+%  Guidelines:
+%   - Do not change anything before the line
+%       % START CACTUS THORNGUIDE",
+%     except for filling in the title, author, date, etc. fields.
+%        - Each of these fields should only be on ONE line.
+%        - Author names should be separated with a \\ or a comma.
+%   - You can define your own macros, but they must appear after
+%     the START CACTUS THORNGUIDE line, and must not redefine standard 
+%     latex commands.
+%   - To avoid name clashes with other thorns, 'labels', 'citations', 
+%     'references', and 'image' names should conform to the following 
+%     convention:          
+%       ARRANGEMENT_THORN_LABEL
+%     For example, an image wave.eps in the arrangement CactusWave and 
+%     thorn WaveToyC should be renamed to CactusWave_WaveToyC_wave.eps
+%   - Graphics should only be included using the graphicx package. 
+%     More specifically, with the "\includegraphics" command.  Do
+%     not specify any graphic file extensions in your .tex file. This 
+%     will allow us to create a PDF version of the ThornGuide
+%     via pdflatex.
+%   - References should be included with the latex "\bibitem" command. 
+%   - Use \begin{abstract}...\end{abstract} instead of \abstract{...}
+%   - Do not use \appendix, instead include any appendices you need as 
+%     standard sections. 
+%   - For the benefit of our Perl scripts, and for future extensions, 
+%     please use simple latex.     
+%
+% *======================================================================* 
+% 
+% Example of including a graphic image:
+%    \begin{figure}[ht]
+% 	\begin{center}
+%    	   \includegraphics[width=6cm]{MyArrangement_MyThorn_MyFigure}
+% 	\end{center}
+% 	\caption{Illustration of this and that}
+% 	\label{MyArrangement_MyThorn_MyLabel}
+%    \end{figure}
+%
+% Example of using a label:
+%   \label{MyArrangement_MyThorn_MyLabel}
+%
+% Example of a citation:
+%    \cite{MyArrangement_MyThorn_Author99}
+%
+% Example of including a reference
+%   \bibitem{MyArrangement_MyThorn_Author99}
+%   {J. Author, {\em The Title of the Book, Journal, or periodical}, 1 (1999), 
+%   1--16. {\tt http://www.nowhere.com/}}
+%
+% *======================================================================* 
+
+% If you are using CVS use this line to give version information
+% $Header: /numrelcvs/AEIDevelopment/DriftCorrect4/doc/documentation.tex,v 1.2 2005/05/29 09:09:21 schnetter Exp $
+
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+% The author of the documentation
+\author{Erik Schnetter \textless schnetter@aei.mpg.de\textgreater}
+
+% The title of the document (not necessarily the name of the Thorn)
+\title{DriftCorrect4}
+
+% the date your document was last changed, if your document is in CVS, 
+% please use:
+\date{$ $Date: 2005/05/29 09:09:21 $ $}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+% Add all definitions used in this documentation here 
+%   \def\mydef etc
+
+% Add an abstract for this thorn's documentation
+\begin{abstract}
+
+\end{abstract}
+
+% The following sections are suggestive only.
+% Remove them or add your own.
+
+\section{Introduction}
+
+(to be written)
+
+
+
+\section{Radial drift correction}
+
+There is a new parameter, \texttt{radial\_correction\_method}, which
+determines the modification that is applied to radial components of
+the shift when \texttt{do\_radial\_correction} is set.
+
+The default value of this parameter is \texttt{linear}, and
+corresponds to the previous behaviour whereby the correction increases
+linearly with radius from the origin.
+
+An alternate method, \texttt{annular}, has been introduced which
+corresponds roughly to the correction used by Br\"ugmann, Tichy,
+Jansen (2004).  The radial rdot is attenuated by a factor
+\begin{equation}
+  detg^n * (c^2 + 1)^s / (\rho_0 (c^2 + \rho^2/\rho_0^2))^s
+\end{equation}
+where
+\begin{description}
+\item[$detg$]
+        is the determinant of the 3-metric
+\item[$n$, $s$]
+        are exponents determined respectively by the parameters
+        \texttt{attenuation\_n} and \texttt{attenuation\_s}
+\item[$c$]
+        s a constant determined by the parameter \texttt{attenuation\_c}
+\item[$\rho$]
+        is the radial distance of a point from the $z$-axis
+\item[$\rho_0$]
+        is the centre of the adjustment
+\end{description}
+
+The effect of these adjustments is to restrict the adjustment to an
+annular region centred around some radius $\rho_0$ from the $z$-axis.
+The value of $\rho_0$ is determined by the \texttt{position\_x} and
+\texttt{position\_y} parameters to this thorn, which determine the
+desired location of the black hole.  The shape and falloff can be
+controlled by the parameters \texttt{c} and \texttt{s}.  BTJ (2004)
+suggest values of \texttt{c=1} and \texttt{s=2}.
+
+I've modified the BTJ correction by the $detg^n$ factor in front.
+This is an experiment to see whether this can help to remove the drift
+correction during the merger phase: For positive values of $n$,
+degenerate values of $detg$ (which might be expected when the BHs are
+coming close together in physical space but not in coordinate space)
+will reduce the effect of the correction.  This is currently being
+tested. The default value, $n=0$, reproduces the BTJ-style
+attenuation.
+
+
+
+\begin{thebibliography}{9}
+
+\end{thebibliography}
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

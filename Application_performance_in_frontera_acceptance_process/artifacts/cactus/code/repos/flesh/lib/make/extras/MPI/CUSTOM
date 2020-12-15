@@ -1,0 +1,18 @@
+#! /bin/sh
+# /*@@
+#   @file      CUSTOM
+#   @date      Wed Jul 21 13:27:07 1999
+#   @author    Tom Goodale
+#   @desc
+#              Configuration options for MPI=CUSTOM
+#   @enddesc
+#   @version $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/extras/MPI/CUSTOM,v 1.2 2003-08-29 15:59:38 tradke Exp $
+# @@*/
+
+
+# Allow the user to completely specify at the command line,
+echo '  Custom MPI selected'
+
+MPI_LIBS="$MPI_LIBS"
+MPI_LIB_DIRS="$MPI_LIB_DIRS"
+MPI_INC_DIRS="$MPI_INC_DIRS"

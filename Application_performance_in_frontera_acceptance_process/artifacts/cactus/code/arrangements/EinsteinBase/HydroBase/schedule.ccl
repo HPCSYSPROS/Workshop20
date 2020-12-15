@@ -1,0 +1,259 @@
+# Schedule definitions for thorn HydroBase
+
+if (timelevels == 1)
+{
+  STORAGE: rho[1]
+  STORAGE: press[1]
+  STORAGE: eps[1]
+  STORAGE: vel[1]
+  STORAGE: w_lorentz[1]
+  if (!CCTK_EQUALS(initial_Y_e, "none"))
+  {
+    STORAGE: Y_e[1]
+  }
+  if (!CCTK_EQUALS(initial_Abar, "none"))
+  {
+    STORAGE: Abar[1]
+  }
+  if (!CCTK_EQUALS(initial_Bvec, "none"))
+  {
+    STORAGE: Bvec[1]
+  }
+  if (!CCTK_EQUALS(initial_Avec, "none"))
+  {
+    STORAGE: Avec[1]
+  }
+  if (!CCTK_EQUALS(initial_Aphi, "none"))
+  {
+    STORAGE: Aphi[1]
+  }
+  if (!CCTK_EQUALS(initial_temperature, "none"))
+  {
+    STORAGE: temperature[1]
+  }
+  if (!CCTK_EQUALS(initial_entropy, "none"))
+  {
+    STORAGE: entropy[1]
+  }
+}
+else if (timelevels == 2)
+{
+  STORAGE: rho[2]
+  STORAGE: press[2]
+  STORAGE: eps[2]
+  STORAGE: vel[2]
+  STORAGE: w_lorentz[2]
+  if (!CCTK_EQUALS(initial_Y_e, "none"))
+  {
+    STORAGE: Y_e[2]
+  }
+  if (!CCTK_EQUALS(initial_Abar, "none"))
+  {
+    STORAGE: Abar[2]
+  }
+  if (!CCTK_EQUALS(initial_Bvec, "none"))
+  {
+    STORAGE: Bvec[2]
+  }
+  if (!CCTK_EQUALS(initial_Avec, "none"))
+  {
+    STORAGE: Avec[2]
+  }
+  if (!CCTK_EQUALS(initial_Aphi, "none"))
+  {
+    STORAGE: Aphi[2]
+  }
+  if (!CCTK_EQUALS(initial_temperature, "none"))
+  {
+    STORAGE: temperature[2]
+  }
+  if (!CCTK_EQUALS(initial_entropy, "none"))
+  {
+    STORAGE: entropy[2]
+  }
+}
+else if (timelevels == 3)
+{
+  STORAGE: rho[3]
+  STORAGE: press[3]
+  STORAGE: eps[3]
+  STORAGE: vel[3]
+  STORAGE: w_lorentz[3]
+  if (!CCTK_EQUALS(initial_Y_e, "none"))
+  {
+    STORAGE: Y_e[3]
+  }
+  if (!CCTK_EQUALS(initial_Abar, "none"))
+  {
+    STORAGE: Abar[3]
+  }
+  if (!CCTK_EQUALS(initial_Bvec, "none"))
+  {
+    STORAGE: Bvec[3]
+  }
+  if (!CCTK_EQUALS(initial_Avec, "none"))
+  {
+    STORAGE: Avec[3]
+  }
+  if (!CCTK_EQUALS(initial_Aphi, "none"))
+  {
+    STORAGE: Aphi[3]
+  }
+  if (!CCTK_EQUALS(initial_temperature, "none"))
+  {
+    STORAGE: temperature[3]
+  }
+  if (!CCTK_EQUALS(initial_entropy, "none"))
+  {
+    STORAGE: entropy[3]
+  }
+}
+
+if (hydro_excision)
+{
+  STORAGE: hydro_excision_mask
+}
+
+schedule group HydroBase_Initial at CCTK_INITIAL    \
+    after (ADMBase_InitialData ADMBase_InitialGauge \
+           IOUtil_RecoverIDFromDatafiles)           \
+    before (ADMBase_PostInitial SetTmunu)
+{
+} "HydroBase initial data group"
+
+schedule HydroBase_StartUp at CCTK_STARTUP
+{
+  LANG: C
+} "Startup banner"
+
+if(CCTK_EQUALS(initial_hydro, "read from file") ||
+   CCTK_EQUALS(initial_Aphi, "read from file") ||
+   CCTK_EQUALS(initial_Avec, "read from file") ||
+   CCTK_EQUALS(initial_Bvec, "read from file") ||
+   CCTK_EQUALS(initial_Y_e, "read from file") ||
+   CCTK_EQUALS(initial_temperature, "read from file") ||
+   CCTK_EQUALS(initial_entropy, "read from file"))
+{
+schedule HydroBase_ParamCheck AT PARAMCHECK
+{
+  LANG: C
+} "check that hydrobase parameters are consistent"
+}
+
+schedule group HydroBase_RHS in MoL_CalcRHS
+{
+} "Groups for scheduling tasks for calculating RHS of hydro variables"
+
+schedule group HydroBase_PostStep in MoL_PostStep before SetTmunu after ADMBase_SetADMVars
+{
+} "Post step tasks for hydro thorns"
+
+# Hydro thorns should not schedule anything in group
+# HydroBase_Boundaries; they should schedule in
+# HydroBase_Select_Boundaries instead.  However, they may refer to
+# HydroBase_Boundaries in order to schedule own routines before or
+# after the boundary treatment, or in order to schedule the whole
+# group.
+schedule group HydroBase_Boundaries in HydroBase_PostStep \
+    before HydroBase_Con2Prim
+{
+} "HydroBase-internal Boundary conditions group"
+
+# This is where hydro thorns schedule functions that select which
+# boundary conditions should be applied to which variables.
+schedule group HydroBase_Select_Boundaries in HydroBase_Boundaries
+{
+} "Group to schedule the boundary condition functions"
+
+# This group actually applies all selected boundary conditions.  Hydro
+# thorns should not need to change anything here.
+schedule group ApplyBCs as HydroBase_ApplyBCs in HydroBase_Boundaries \
+    after HydroBase_Select_Boundaries
+{
+} "Apply the boundary conditions of HydroBase"
+
+# Hydro thorns should schedule their Con2Prim routines in this group.
+# This group is then scheduled at different times during an evolution.
+schedule group HydroBase_Con2Prim in HydroBase_PostStep
+{
+} "Convert from conservative to primitive variables"
+
+schedule group HydroBase_Con2Prim at CCTK_PostPostInitial as Con2Prim \
+    before ADMConstraintsGroup
+{
+} "Convert from conservative to primitive variables (might be redundant)"
+
+# Hydro thorns should schedule their Prim2Con routines in this group.
+# This group is then scheduled at different times during an evolution.
+schedule group HydroBase_Prim2ConInitial at CCTK_INITIAL \
+    after HydroBase_Initial before SetTmunu
+{
+} "Recover the conservative variables from the primitive variables"
+
+
+
+if (CCTK_EQUALS(initial_hydro, "zero"))
+{
+  schedule HydroBase_Zero in HydroBase_Initial
+  {
+    LANG: C
+  } "Set up vacuum hydro initial data"
+}
+
+if (CCTK_Equals(initial_Y_e, "one"))
+{
+  SCHEDULE HydroBase_Y_e_one in HydroBase_Initial
+  {
+    LANG: C
+  } "Set electron fraction to 1"
+}
+
+if (CCTK_Equals(initial_Bvec, "zero"))
+{
+  SCHEDULE HydroBase_Bvec_zero in HydroBase_Initial
+  {
+    LANG: C
+  } "Set magnetic field to 0"
+}
+
+if (CCTK_Equals(initial_Avec, "zero"))
+{
+  SCHEDULE HydroBase_Avec_zero in HydroBase_Initial
+  {
+    LANG: C
+  } "Set vector potential to 0"
+}
+
+if (CCTK_Equals(initial_Aphi, "zero"))
+{
+  SCHEDULE HydroBase_Aphi_zero in HydroBase_Initial
+  {
+    LANG: C
+  } "Set vector potential Phi to 0"
+}
+
+if (hydro_excision)
+{
+  schedule GROUP HydroBase_ExcisionMaskSetup in HydroBase_Initial
+  {
+  } "Set up hydro excision mask"
+  schedule GROUP HydroBase_ExcisionMaskSetup at PostRegridInitial BEFORE MoL_PostStep
+  {
+  } "Set up hydro excision mask"
+  schedule GROUP HydroBase_ExcisionMaskSetup at PostRegrid BEFORE MoL_PostStep
+  {
+  } "Set up hydro excision mask"
+  schedule GROUP HydroBase_ExcisionMaskSetup at Post_Recover_Variables BEFORE MoL_PostStep
+  {
+  } "Set up hydro excision mask"
+
+  schedule HydroBase_InitExcisionMask in HydroBase_ExcisionMaskSetup
+  {
+    LANG: C
+  } "Initialize hydro excision mask to 'no excision everywhere'"
+
+  schedule GROUP HydroBase_ExcisionHasBeenSet at CCTK_PostStep
+  {
+  } "Group to schedule thorns changing the mask before and thorns using the mask after"
+}
+

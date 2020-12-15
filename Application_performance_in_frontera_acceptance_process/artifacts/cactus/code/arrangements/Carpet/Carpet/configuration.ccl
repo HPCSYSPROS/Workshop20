@@ -1,0 +1,11 @@
+# Configuration definitions for thorn Carpet
+
+PROVIDES Carpet
+{
+}
+
+REQUIRES CarpetLib IOUtil MPI Timers
+
+OPTIONAL LoopControl
+{
+}

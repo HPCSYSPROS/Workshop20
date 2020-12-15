@@ -1,0 +1,12 @@
+# Configuration definition for thorn GRHydro
+# $Header$
+
+REQUIRES EOS_Omni Boundary CartGrid3D SpaceMask
+
+OPTIONAL_IFACTIVE Carpet
+{
+}
+
+OPTIONAL EOS_Polytrope
+{
+}

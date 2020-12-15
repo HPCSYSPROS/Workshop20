@@ -1,0 +1,44 @@
+
+CCTK_INT do_every "carry out reduction every n steps" STEERABLE=ALWAYS
+{
+  1:* :: "every now and then"
+  -1  :: "disable"
+} 1
+
+
+CCTK_REAL start_time "Start at time [ms]" STEERABLE=ALWAYS
+{
+   0.0:* :: "Greater then or equal to 0.0, I guess"
+} 0.0
+
+BOOLEAN use_CoM_radius "use individual CoM cut radius" STEERABLE=ALWAYS
+{
+} "yes"
+
+BOOLEAN setup_all_timelevels_after_recovery "do what this says" STEERABLE=ALWAYS
+{
+} "yes"
+
+CCTK_REAL CoM_radius "Carry CoM integration out to this radius" STEERABLE=ALWAYS
+{
+  (0.0:* :: "Better be greater than zero"
+} 2000.0e0
+
+CCTK_REAL CoM_shift_factor "characterstic CoM timescale" STEERABLE=ALWAYS
+{
+  (1.0:* :: "Better be greater than 1.0"
+} 203.0e0
+
+CCTK_INT verbose_level "level to which we want to be verbose" STEERABLE=ALWAYS
+{
+ 0:*   :: "Greater than or equal to zero"
+} 0
+
+
+shares: IO
+
+USES STRING out_dir
+
+shares: grid
+
+USES KEYWORD domain

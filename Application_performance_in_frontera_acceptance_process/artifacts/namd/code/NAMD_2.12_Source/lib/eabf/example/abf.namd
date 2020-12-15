@@ -1,0 +1,54 @@
+
+structure          CH_final.psf
+coordinates        CH_final.pdb
+
+outputName output/abf
+
+paraTypeCharmm	    on
+parameters          CH_cgenff.prm
+
+set temperature    300
+temperature         $temperature
+langevinTemp    $temperature
+
+margin         1
+timestep       0.5
+rigidBonds     none
+
+langevin       on
+
+restartfreq         20000
+dcdfreq             20000
+xstFreq             20000
+outputEnergies      20000
+outputPressure      20000
+firsttimestep      0
+
+colvars   on
+colvarsConfig   co.in
+
+exclude             scaled1-4
+1-4scaling          1.0
+cutoff              12.0
+switching           on
+switchdist          10.0
+pairlistdist        14.0
+
+nonbondedFreq       1
+fullElectFrequency  2
+longSplitting       c1
+stepspercycle       10
+
+
+source ../eabf.tcl
+set eabf_inputname       0                        ;# restart file name or "0"
+set eabf_outputname      output/eabf.restart      ;# restart file
+set eabf_temperature     300
+set eabf_outputfreq     20000
+
+run 10000000
+
+
+
+
+

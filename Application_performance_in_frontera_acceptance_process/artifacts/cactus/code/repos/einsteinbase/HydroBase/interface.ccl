@@ -1,0 +1,51 @@
+# Interface definition for thorn HydroBase
+
+implements: HydroBase
+
+inherits: InitBase
+
+USES INCLUDE: HydroBase.h
+
+INCLUDE HEADER: HydroBase.h in HydroBase.h
+
+public:
+
+# These variables correspond to the Valencia formulation
+
+# HydroBase uses the following conventions:
+#    M = M_sun
+#    c = G = 1
+
+# We also assume the following constants of nature:
+#    c    = 299792458.0 m/s
+#    G    = 6.67428e-11 m^3/kg/s^2
+#    mu0  = 4 pi 1.0e-7 N/A^2
+#    eps0 = 1 / (mu0 c^2)
+#    M_sun = 1.98892e+30 kg
+
+# This corresponds to the following units:
+#    [M] = M_sun
+#    [L] = [M] (G / c^2)
+#    [T] = [L] / c
+#    [B] = 1 / [L] / sqrt(eps0 G / c^2))
+
+CCTK_REAL rho     type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar" interpolator="matter"' "rest mass density"
+CCTK_REAL press   type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar" interpolator="matter"' "gas pressure"
+CCTK_REAL eps     type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar" interpolator="matter"' "specific internal energy"
+
+CCTK_REAL vel[3]  type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="U" interpolator="matter"' "velocity v^i"
+
+CCTK_REAL w_lorentz  type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar" interpolator="matter"' "Lorentz Factor"
+
+CCTK_REAL Y_e         type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar" interpolator="matter"' "Electron Fraction"
+CCTK_REAL Abar        type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar" interpolator="matter"' "Average atomic mass [atomic mass unit]"
+CCTK_REAL temperature type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar" interpolator="matter"' "Temperature [MeV]"
+CCTK_REAL entropy     type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar" interpolator="matter"' "Specific Entropy [k_b/baryon]"
+
+CCTK_REAL Bvec[3] type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="U" tensorparity=-1 interpolator="matter"' "Magnetic field components B^i"
+CCTK_REAL Avec[3] type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="D" jacobian="jacobian" interpolator="matter"' "Vector potential"
+CCTK_REAL Aphi type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar" jacobian="jacobian" interpolator="matter"' "Electric potential for Lorentz Gauge"
+
+
+# This may become CCTK_BYTE when Carpet enables it by default
+CCTK_INT hydro_excision_mask type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"' "Mask for hydro excision"

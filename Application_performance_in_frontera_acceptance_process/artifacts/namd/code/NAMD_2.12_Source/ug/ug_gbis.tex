@@ -1,0 +1,312 @@
+\begin{comment}
+\documentclass[11pt]{article}
+\usepackage{graphicx}
+\usepackage{makeidx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage[stable]{footmisc}
+
+\newcommand{\NAMDCONFWDEF}[5]{%
+%  \addcontentsline{toc}{subparagraph}{#1}%
+  {\bf \tt #1 } $<$ #2 $>$ \index{#1 parameter} \\%
+  {\bf Acceptable Values: } #3 \\%
+  {\bf Default Value: } #4 \\%
+  {\bf Description: } #5%
+}
+
+
+\begin{document}
+\end{comment}
+
+\section{Generalized Born Implicit Solvent}
+\label{section:gbis}
+
+Generalized Born implicit solvent (GBIS) is a fast but approximate method for calculating molecular electrostatics in solvent as described by the Poisson Boltzmann equation which models water as a dielectric continuum.
+GBIS enables the simulation of atomic structures without including explicit solvent water.
+The elimination of explicit solvent greatly accelerates simulations;
+this speedup is lessed by the increased computational complexity of the implicit solvent electrostatic calculation and a longer interaction cutoff.
+These are discussed in greater detail below.
+
+
+%\subsection{Theoretical Background}
+\subsection{Theoretical Background}
+Water has many biologically necessary properties, one of which is as a dielectric.
+As a dielectric, water screens (lessens) electrostatic interactions between charged particles. 
+Water can therefore be crudely modeled as a dielectric continuum.
+In this manner, the electrostatic forces of a biological system can be expressed as a system of differential equations which can be solved for the electric field caused by a collection of charges.
+
+
+%\subsubsection{Poisson Boltzmann Equation}
+\subsubsection{Poisson Boltzmann Equation}
+The Poisson Boltzmann equation (PBE),
+$$
+\vec{\nabla} \cdot \left[ \epsilon (\vec{r}) \vec{\nabla} \Psi(\vec{r})  \right] = -4\pi \rho^f (\vec{r}) - 4 \pi \sum_i c_i^\infty q_i \lambda(\vec{r}) \cdot \exp \left[ \frac{-q_i \Psi(\vec{r})}{k_B T} \right]
+$$
+is a nonlinear equation which solves for the electrostatic field, $\Psi(\vec{r})$, based on
+the position dependent dielectric, $\epsilon(\vec{r})$,
+the position-dependent accessibility of position $\vec{r}$ to the ions in solution, $\lambda(\vec{r})$,
+the solute charge distribution, $\rho^f(\vec{r})$,
+and the bulk charge density, $c_i^\infty$, of ion $q_i$.
+While this equation does exactly solve for the electrostic field of a charge distribution in a dielectric, it is very expensive to solve, and therefore not suitable for molecular dynamics.
+
+
+%\subsubsection{Generalized Born}
+\subsubsection{Generalized Born}
+The Generalized Born (GB) equation is an approximation of the PBE.
+It models atoms as charged spheres whose internal dielectric is lower than that of the environment.
+The screening which each atom, $i$, experiences is determined by the local environment;
+the more atom $i$ is surrounded by other atoms, the less it's electrostatics will be screened since it is more surrounded by low dielectric; this property is called one atom descreening another.
+Different GB models calculate atomic descreening differently.
+Descreening is used to calculate the Born radius, $\alpha_i$, of each atom.
+The Born radius of an atom measures the degree of descreening.
+A large Born radius represents small screening (strong electric field) as if the atom were in vacuum.
+A small Born radius represents large screening (weak electric field) as if the atom were in bulk water.
+The next section describes how the Born radius is calculated and how it is used to calculate electrostatics.
+
+%\subsubsection{Generalized Born OBC}
+\subsubsection{Generalized Born Equations}
+In a GB simulation, the total electrostatic force on an atom, $i$, is the net Coulomb force on atom $i$ (from nearby atoms) minus the GB force on atom $i$ (also caused by nearby atoms):
+$$
+\vec{F}_i = \vec{F}_i^{Coulomb} - \vec{F}_i^{GB}.
+$$
+Forces are contributed by other nearby atoms within a cutoff.
+The GB force on atom $i$ is the derivative of the total GB energy with respect to relative atom distances $r_{ij}$,
+\begin{eqnarray}
+\vec{F}_i^{GB}&=&-\sum_j \left[  \frac{d E_T^{GB}}{d r_{ij}}  \right]  \hat{r}_{ji} \\
+&=&-\sum_j \left[  \sum_k \frac{\partial E_T^{GB}}{\partial \alpha_k}\frac{d \alpha_k}{d r_{ij}} + \frac{\partial E_{ij}^{GB}}{\partial r_{ij}}  \right]  \hat{r}_{ji} \\
+&=&-\sum_j \left[  \frac{\partial E_T^{GB}}{\partial \alpha_i}\frac{d \alpha_i}{d r_{ij}}+\frac{\partial E_T^{GB}}{\partial \alpha_j}\frac{d \alpha_j}{d r_{ij}}+ \frac{\partial E_{ij}^{GB}}{\partial r_{ij}}  \right]  \hat{r}_{ji} \; .
+\end{eqnarray}
+where the partial derivatives are included since the Born radius, $\alpha$, is a function of all relative atom distances.
+The total GB energy of the system is
+\begin{equation}
+E_T^{GB} = \sum_i \sum_{j>i} E_{ij}^{GB} + \sum_{i} E_{ii}^{GB} \; ,
+\end{equation}
+where $E_{ii}^{GB}$ is the Born radius dependent self energy of atom $i$, and the GB energy between atoms $i$ and $j$ is given by
+\begin{equation}
+E^{GB}_{ij} = - k_e D_{ij} \frac{q_i q_j}{f_{ij}} \; .
+\end{equation}
+The dielectric term~\cite{SRIN99} is
+\begin{equation}
+D_{ij} = \left( \frac{1}{\epsilon_p} - \frac{\exp{\left(-\kappa f_{ij}\right)}}{\epsilon_s} \right) \; ,
+\end{equation}
+and the GB function~\cite{STIL90} is
+\begin{equation}
+f_{ij} = \sqrt{r_{ij}^2 + \alpha_i \alpha_j \exp{\left(\frac{-r_{ij}^2}{4 \alpha_i \alpha_j}\right)}} \; .
+\end{equation}
+As the Born radii of atoms $i$ and $j$ decrease (increasing screening), the effective distance between the atoms ($f_{ij}$) increases.
+The implicit solvent implemented in NAMD is the model of Onufriev, Bashford and Case~\cite{ONUF00, ONUF04} which calculates the Born radius as
+\begin{equation}
+\alpha_k = \left[ \frac{1}{\rho_{k0}} - \frac{1}{\rho_k}\textrm{tanh}\left(\delta\psi_k - \beta\psi_k^2 + \gamma\psi_k^3\right)\right]^{-1} 
+\end{equation}
+where
+\begin{equation}
+\psi_k = \rho_{k0} \sum_l H_{kl} \; .
+\end{equation}
+$H_{ij}$ is the piecewise descreening function~\cite{ONUF04,HAWK96,SCHA90}; the seven piecewise regimes are
+\begin{equation}
+\textrm{Regimes} = \left\{
+\begin{array}{r l l}
+\textrm{0} & r_{ij} > r_c + \rho_{js} &(\textrm{sphere}~j~\textrm{beyond cutoff})\\
+\textrm{I} & r_{ij} > r_c - \rho_{js} &(\textrm{sphere}~j~\textrm{partially within cutoff}) \\
+\textrm{II} & r_{ij} > 4\rho_{js} &(\textrm{artificial regime for smoothing})\\
+\textrm{III} & r_{ij} > \rho_{i0} + \rho_{js} &(\textrm{spheres not overlapping})\\
+\textrm{IV} & r_{ij} > \left| \rho_{i0} - \rho_{js} \right| &(\textrm{spheres overlapping}) \\
+\textrm{V} & \rho_{i0} < \rho_{js} &(\textrm{sphere}~i~\textrm{inside~sphere}~j)\\
+\textrm{VI} & \textrm{otherwise} &(\textrm{sphere}~j~\textrm{inside~sphere}~j)\\
+\end{array}\right.
+\end{equation}
+and the values of $H_{ij}$ are
+\begin{equation}
+H_{ij} = \left\{
+\begin{array}{r l}
+\textrm{0} & 0 \\
+\textrm{I} & \frac{1}{8 r_{ij}}\left[ 1 + \frac{2 r_{ij}}{r_{ij}-\rho_{js}} + \frac{1}{r_c^2}\left( r_{ij}^2-4 r_c r_{ij} - \rho_{js}^2\right) +2 \ln \frac{r_{ij}-\rho_{js}}{r_c}\right] \\
+\textrm{II} & \frac{\rho_{js}^2}{r_{ij}^2} \frac{\rho_{js}}{r_{ij}^2} \left[ a+ \frac{\rho_{js}^2}{r_{ij}^2}\left( b+\frac{\rho_{js}^2}{r_{ij}^2}\left( c+\frac{\rho_{js}^2}{r_{ij}^2}\left( d+\frac{\rho_{js}^2}{r_{ij}^2} e \right) \right) \right) \right] \\
+\textrm{III} & \frac{1}{2} \left[\frac{\rho_{js}}{r_{ij}^2-\rho_{js}^2} + \frac{1}{2 r_{ij}} \ln \frac{r_{ij}-\rho_{js}}{r_{ij}+\rho_{js}} \right]\\
+\textrm{IV} & \frac{1}{4} \left[ \frac{1}{\rho_{i0}}\left( 2-\frac{1}{2r_{ij}\rho_{i0}}\left(r_{ij}^2+\rho_{i0}^2-\rho_{js}^2\right)\right) - \frac{1}{r_{ij}+\rho_{js}} + \frac{1}{r_{ij}} \ln \frac{\rho_{i0}}{r_{ij}+\rho_{js}} \right]\\
+\textrm{V} & \frac{1}{2} \left[\frac{\rho_{js}}{r_{ij}^2-\rho_{js}^2} + \frac{2}{\rho_{i0}} + \frac{1}{2 r_{ij}} \ln \frac{\rho_{js}-r_{ij}}{r_{ij}+\rho_{js}} \right]\\
+\textrm{VI} & 0
+\end{array}
+\right.
+\end{equation}
+Below are defined the derivatives of the above functions which are required for force calculations.
+%dEij dr
+\begin{equation}
+\frac{\partial E_{ij}}{\partial r_{ij}} = - k_e \left[
+\frac{q_i q_j}{f_{ij}} \frac{\partial D_{ij}}{\partial r_{ij}}  
+ - 
+ \frac{q_i q_j D_{ij}}{f_{ij}^2} \frac{\partial f_{ij}}{\partial r_{ij}}
+\right]
+\end{equation}
+%d Dij
+\begin{equation}
+\frac{\partial D_{ij}}{\partial r_{ij}} = \frac{\kappa}{\epsilon_s} \exp{\left(-\kappa f_{ij}\right)\frac{\partial f_{ij}}{\partial r_{ij}}}
+\end{equation}
+%d f
+\begin{equation}
+\frac{\partial f_{ij}}{\partial r_{ij}} = \frac{r_{ij}}{f_{ij}} \left[1 - \frac{1}{4} \exp{\left(\frac{-r_{ij}^2}{4 \alpha_i \alpha_j}\right)} \right]
+\end{equation}
+%d alpha sum
+\begin{equation}
+\frac{d \alpha_k}{d r_{ij}} = \frac{\alpha_k^2}{\rho_k}\left(1-\textrm{tanh}^2\left(\delta \psi_k - \beta \psi_k^2 + \gamma \psi_k^3\right)\right)
+\left( \delta - 2\beta\psi_k+3\beta\psi_k^2\right) \frac{d \psi_k}{d r_{ij}}
+\end{equation}
+%d psi
+\begin{eqnarray}
+\frac{d \psi_k}{d r_{ij}}
+&=&\rho_{k0} \sum_l \frac{d H_{kl}}{d r_{ij}} \\
+&=&\rho_{k0} \sum_l \frac{\partial H_{kl}}{\partial r_{kl}}\frac{d r_{kl}}{d r_{ij}}\\
+&=&\rho_{k0} \left[ \frac{\partial H_{kj}}{\partial r_{kj}}\delta_{ki} + \frac{\partial H_{ki}}{\partial r_{ki}}\delta_{kj} \right]
+\end{eqnarray}
+%d alpha 
+\begin{eqnarray}
+\frac{d \alpha_k}{d r_{ij}} =
+& \frac{\alpha_i^2\rho_{i0}}{\rho_i}\left(1-\textrm{tanh}^2\left(\delta \psi_i - \beta \psi_i^2 + \gamma \psi_i^3\right)\right)
+\left( \delta - 2\beta\psi_i+3\beta\psi_i^2\right) \frac{\partial H_{ij}}{\partial r_{ij}} \delta_{ki}\nonumber \\
++ &
+\frac{\alpha_j^2\rho_{j0}}{\rho_j}\left(1-\textrm{tanh}^2\left(\delta \psi_j - \beta \psi_j^2 + \gamma \psi_j^3\right)\right)
+\left( \delta - 2\beta\psi_j+3\beta\psi_j^2\right) \frac{\partial H_{ji}}{\partial r_{ij}} \delta_{kj}
+\end{eqnarray}
+\begin{equation}
+\frac{\partial E_{ij}}{\partial \alpha_i} = -\frac{1}{\alpha_i}\frac{k_e q_i q_j}{2 f_{ij}^2}\left( \frac{\kappa}{\epsilon_s}\exp{\left(-\kappa f_{ij}\right)} - \frac{D_{ij}}{f_{ij}}\right)
+\left(\alpha_i\alpha_j + \frac{r_{ij}^2}{4}\right)\exp{\left(\frac{-r_{ij}^2}{4 \alpha_i \alpha_j}\right)}
+\end{equation}
+\begin{equation}
+\frac{\partial E_{ij}}{\partial \alpha_j} = -\frac{1}{\alpha_j}\frac{k_e q_i q_j}{2 f_{ij}^2}\left( \frac{\kappa}{\epsilon_s}\exp{\left(-\kappa f_{ij}\right)} - \frac{D_{ij}}{f_{ij}}\right)
+\left(\alpha_i\alpha_j + \frac{r_{ij}^2}{4}\right)\exp{\left(\frac{-r_{ij}^2}{4 \alpha_i \alpha_j}\right)}
+\end{equation}
+%d Hij
+\begin{equation}
+\frac{\partial H_{ij}}{\partial r_{ij}} = \left\{
+\begin{array}{r l}
+\textrm{0} & 0 \\
+\textrm{I} &
+\left[-\frac{\left(r_c+\rho_{js}-r_{ij}\right)\left(r_c-\rho_{js}+r_{ij}\right)\left(\rho_{js}^2+r_{ij}^2\right)}{8r_c^2r_{ij}^2\left(\rho_{js}-r_{ij}\right)^2}
+-\frac{1}{4r_{ij}^2}\ln \frac{r_{ij}-\rho_{js}}{r_c}
+\right] \\
+\textrm{II} &
+\left[
+-4a\frac{\rho_{js}^3}{r_{ij}^5}
+-6b\frac{\rho_{js}^5}{r_{ij}^7}
+-8c\frac{\rho_{js}^7}{r_{ij}^9}
+-10d\frac{\rho_{js}^9}{r_{ij}^{11}}
+-12e\frac{\rho_{js}^{11}}{r_{ij}^{13}}
+\right] \\
+\textrm{III} &
+\frac{1}{2}\left[
+-\frac{\rho_{js}\left(r_{ij}^2+\rho_{js}^2\right)}{r_{ij}\left(r_{ij}^2-\rho_{js}^2\right)^2}
+-\frac{1}{2r_{ij}^2} \ln \frac{r_{ij}-\rho_{js}}{r_{ij}+\rho_{js}}
+\right] \\
+\textrm{IV} &
+\frac{1}{4} \left[
+-\frac{1}{2\rho_{i0}^2}
++\frac{r_{ij}^2\left(\rho_{i0}^2-\rho_{js}^2\right)-2 r_{ij}\rho_{js}^3+\rho_{js}^2\left(\rho_{i0}^2-\rho_{js}^2\right)}{2r_{ij}^2\rho_{i0}^2\left(r_{ij}+\rho_{js}\right)^2}
+-\frac{1}{r_{ij}^2}\ln\frac{\rho_{i0}}{r_{ij}+\rho_{js}}
+\right] \\
+\textrm{V} &
+\frac{1}{2}\left[
+-\frac{\rho_{js}\left(r_{ij}^2+\rho_{js}^2\right)}{r_{ij}\left(r_{ij}^2-\rho_{js}^2\right)^2}
+-\frac{1}{2r_{ij}^2} \ln \frac{\rho_{js}-r_{ij}}{r_{ij}+\rho_{js}}
+\right] \\
+\textrm{VI} & 0
+\end{array}
+\right.
+\end{equation}
+Other variables referenced in the above GB equations are
+\begin{list}{}
+\item $r_{ij}$ - distance between atoms i and j; calculated from atom coordinates.
+\item $\kappa$ - debye screening length; calculated from ion concentration, $\kappa^{-1} = \sqrt{\frac{\epsilon_0 \epsilon_p k T}{2 N_A e^2 I}}$; $\kappa^{-1} = 10$~\AA~for 0.1~M monovalent salt.
+\item $\epsilon_s$ - dielectric constant of solvent.
+\item $\epsilon_p$ - dielectric constant of protein.
+\item $\alpha_i$ - Born radius of atom $i$.
+\item $\rho_i$ - intrinsic radius of atom $i$ taken from Bondi~\cite{BOND64}.
+\item $\rho_0$ - intrinsic radius offset; $\rho_0 = 0.09$~\AA~by default~\cite{ONUF04}.
+\item $\rho_{i0} = \rho_i - \rho_0$
+\item $\rho_{is} = \rho_{i0} S_{ij}$
+\item $S_{ij}$ - atom radius scaling factor~\cite{HAWK96,SRIN99}.
+\item $k_e$ - Coulomb's constant, $\frac{1}{4 \pi \epsilon_0}$, 332.063711 kcal~\AA~/ e$^2$.
+\item $\{\delta, \beta, \gamma\} = \{0.8, 0, 2.91\}~\textrm{or}~\{1.0, 0.8, 4.85\}$~\cite{ONUF04}
+\end{list}
+
+
+%\subsubsection{3-Phase Calculation}
+\subsection{3-Phase Calculation}
+
+The GBIS algorithm requires three phases of calculation, with each phase containing an iteration over all atom pairs with the cutoff.
+In phase 1, the screening of atom pairs is summed; at the conclusion of phase 1, the Born radii are calculated.
+In phase 2, the $\frac{\partial E_{ij}^{GB}}{\partial r_{ij}}$ force contribution (hereafter called the dEdr force) is calculated as well as the partial derivative of the Born radii with respect to the atom positions, $\frac{d \alpha_i}{d r_{ij}}$.
+In phase 3, the $\frac{\partial E_T^{GB}}{\partial \alpha_i}\frac{d \alpha_i}{d r_{ij}}$ force contribution (hereafter called the dEda force) is calculated.
+
+
+%\subsubsection{Configuration Parameters}
+\subsection{Configuration Parameters}
+
+When using GBIS, user's should not use {\tt PME} (because it is not compatible with GBIS).
+Periodic boundary conditions are supported but are optional.
+User's will need to increase {\tt cutoff}; 16-18~\AA~is a good place to start but user's will have to check their system's behavior and increase {\tt cutoff} accordingly.
+GBIS interactions are never excluded regardless of the type of force field used, thus user's can choose any value for {\tt exclude} without affecting GBIS; user's should still choose {\tt exclude} based on the force field as if using explicit solvent.
+When using GBIS, multiple timestepping behaves as follows:
+the dEdr force is calculated every {\tt nonbondedFreq} steps (as with explicit solvent, 2 is a reasonable frequency) and
+the dEda force is calculated every {\tt fullElectFrequency} steps (because dEda varies more slowly than dEdr, 4 is a reasonable frequency).
+
+%begin configuration parameter list
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{GBIS}{Use Generalized Born Implicit Solvent?} {{\tt on} or {\tt off}} {{\tt off}} {Turns on GBIS method in NAMD. }
+
+\item
+\NAMDCONFWDEF{solventDielectric}{dielectric of water} {positive decimal} {78.5} {Defines the dielectric of the solvent, usually 78.5 or 80.}
+
+\item
+\NAMDCONFWDEF{intrinsicRadiusOffset}{shrink the intrinsic radius of atoms (\AA)} {positive decimal} {0.09} {This offset shrinks the intrinsic radius of atoms (used only for calculating Born radius) to give better agreement with Poisson Boltzmann calculations. Most users should not change this parameter.}
+
+\item
+\NAMDCONFWDEF{ionConcentration}{concentration of ions in solvent (Molar)} {positive decimal} {0.2} {An ion concentration of 0~M represents distilled water. Increasing the ion concentration increases the electrostatic screening.}
+
+\item
+\NAMDCONFWDEF{GBISDelta}{GB$^{OBC}$ parameter for calculating Born radii} {decimal} {1.0} {Use $\{{\tt GBISDelta}, {\tt GBISBeta},{\tt GBISGamma}\} = \{1.0, 0.8, 4.85\}$ for GB$^{OBC}$II and $\{0.8, 0.0, 2.90912\}$ for GB$^{OBC}$I. See $\{\alpha, \beta, \gamma\}$ in \cite{ONUF04} for more information.}
+
+\item
+\NAMDCONFWDEF{GBISBeta}{GB$^{OBC}$ parameter for calculating Born radii} {decimal} {0.8} {See {\tt GBISDelta}.}
+
+\item
+\NAMDCONFWDEF{GBISGamma}{GB$^{OBC}$ parameter for calculating Born radii} {decimal} {4.85} {See {\tt GBISDelta}.}
+
+\item
+\NAMDCONFWDEF{alphaCutoff}{cutoff used in calculating Born radius and derivatives (phases 1 and 3) (\AA)} {positive decimal} {15} {Cutoff used for calculating Born radius. Only atoms within this cutoff de-screen an atom. Though {\tt alphaCutoff} can bet set to be larger or shorter than {\tt cutoff}, since atom forces are more sensitive to changes in position than changes in Born radius, user's should generally set {\tt alphaCutoff} to be shorter than {\tt cutoff}.}
+
+\item
+\NAMDCONFWDEF{SASA}{whether or not to calculate SASA} {{\tt on} or {\tt off}} {{\tt off}} {The nonpolar / hydrophobic energy contribution from implicit solvent is calculated; it is proportional to the solvent-accessible surface area (SASA) which is calculated by the Linear Combination of Pairwise Overlap (LCPO) method~\cite{WEIS99}. It evaluated every {\tt nonbondedFreq} steps and its energy is added into the reported {\tt ELECT} energy.}
+
+\item
+\NAMDCONFWDEF{surfaceTension}{surface tension of SASA energy} {positive decimal} {0.005~kcal/mol/\AA$^2$} {Surface tension used when calculating hydrophobic {\tt SASA} energy; $E_{\rm nonpolar} = {\rm surfaceTension} \times {\rm surfaceArea}$.}
+
+\end{itemize}
+
+Below is a sample excerpt from a NAMD config file for nonbonded and multistep parameters when using {\tt GBIS} and {\tt SASA}:
+\begin{verbatim}
+#GBIS parameters
+GBIS on
+ionConcentration 0.3
+alphaCutoff 14
+#nonbonded parameters
+switching on
+switchdist 15
+cutoff 16
+pairlistdist 18
+#hydrophobic energy
+sasa on
+surfaceTension 0.006
+#multistep parameters
+timestep 1
+nonbondedFreq 2
+fullElectFrequency 4
+\end{verbatim}
+%\bibliographystyle{unsrt}
+%\bibliography{ug}
+%\bibliography{../../LaTeX/Bibliography/data_base}
+
+\begin{comment}
+\end{document}
+\end{comment}

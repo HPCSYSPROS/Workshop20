@@ -1,0 +1,316 @@
+#include <stdio.h>
+#include <cassert>
+#include <cmath>
+#include <mpi.h>
+#include <cctk.h>
+#include <cctk_Arguments.h>
+#include <cctk_Parameters.h>
+#include <util_Table.h>
+#include <cctk_Functions.h>
+#include <cctk_Faces.h>
+#include <Symmetry.h>
+#include <time.h>
+
+
+#include <gsl/gsl_linalg.h>
+
+#define IND2D(n,i,j) (n*i + j)
+
+extern "C" {
+  void PNSHelper_SolveMetric(CCTK_ARGUMENTS);
+}
+
+double pns_eval_mgrav(int n, double* rad, double* psi, double* rho);
+
+void pns_eval_F(int n, double* psi, double*rho, double* rad,
+            double mout, double dr, double* F);
+
+void pns_eval_F_alp_psi(int n, double* alp, double* psi, double*rho, double* rad,
+            double mout, double dr, double* F);
+
+void pns_eval_jacobian(int n, double* psi, double* rho,double* rad, double dr,
+                   double* jac);
+
+
+void pns_eval_jacobian_alp_psi(int n, double* alp, double* psi, double* rho,double* rad, double dr,
+                   double* jac);
+
+
+void PNSHelper_SolveMetric(CCTK_ARGUMENTS) {
+
+  DECLARE_CCTK_ARGUMENTS;
+  DECLARE_CCTK_PARAMETERS;
+
+  int Num_1D = nrad+nrad_outer;
+
+  for(int i=0;i<Num_1D;i++) {
+    pns_rho_star[i] = (pns_av_rho[i] + pns_av_rho[i]*pns_av_eps[i] 
+		    + pns_av_press[i])*pns_av_w_lorentz[i]*pns_av_w_lorentz[i] 
+      - pns_av_press[i];
+    pns_real_rho_star[i] = pns_rho_star[i];
+    pns_rho_star[i] = pns_real_rho_star[i]*pow(pns_psi[i],6);
+  }
+
+  double err = 1.0;
+  double tol = 1.0e-10;
+  int i = 0;
+  int imax = 50;
+  double* jac = (double*)(malloc(sizeof(double)*Num_1D*Num_1D));
+  double* F = (double*)(malloc(sizeof(double)*Num_1D));
+
+  // find psi
+  while(err > tol && i < imax) {
+    printf("step: %d\n",i);
+    i++;
+
+    *pns_mgrav = pns_eval_mgrav(Num_1D,rad,pns_psi,pns_rho_star);
+
+    pns_eval_F(Num_1D,pns_psi,pns_rho_star,rad,*pns_mgrav,*drad,F);
+    pns_eval_jacobian(Num_1D,pns_psi,pns_rho_star,rad,*drad,jac);
+
+    // make F negative:
+    for(int j=0; j<Num_1D;j++) {
+      F[j] = -F[j];
+    }
+
+    gsl_matrix_view m = gsl_matrix_view_array (jac, Num_1D, Num_1D);
+    gsl_vector_view b = gsl_vector_view_array (F, Num_1D);
+    gsl_vector *dpsi = gsl_vector_alloc (Num_1D);
+
+    int s;
+    gsl_permutation * p = gsl_permutation_alloc (Num_1D);
+
+    // LU decomposition
+    gsl_linalg_LU_decomp (&m.matrix, p, &s);
+    // LU solve
+    gsl_linalg_LU_solve (&m.matrix, p, &b.vector, dpsi);
+    // get array out of vector
+    double *dpsiarray = gsl_vector_ptr (dpsi, 0);
+
+    err = 0.0;
+    for(int j=0;j<Num_1D;j++) {
+      if( fabs(dpsiarray[j]/pns_psi[j]) > err )
+        err = fabs(dpsiarray[j]/pns_psi[j]);
+
+      pns_psi[j] = pns_psi[j] + dpsiarray[j];
+      pns_rho_star[j] = pns_real_rho_star[j]*pow(pns_psi[j],6);
+    }
+
+    // free memory
+    gsl_permutation_free (p);
+    gsl_vector_free (dpsi);
+
+    printf("err: %15.6E\n",err);
+
+  }
+
+  // find alp
+  err = 1.0;
+  tol = 1.0e-10;
+  i = 0;
+  imax = 50;
+  // setup new rho for alp*psi calculation:
+  for(int j=0; j<Num_1D;j++)
+    pns_rho_star[j] = ( pns_av_rho[j] + pns_av_rho[j]*pns_av_eps[j] + pns_av_press[j] ) *
+      (3.0*pns_av_w_lorentz[j]*pns_av_w_lorentz[j] - 2.0) + 5.0*pns_av_press[j];
+
+  while(err > tol && i < imax) {
+    printf("alp step: %d\n",i);
+    i++;
+
+    pns_eval_F_alp_psi(Num_1D,pns_alp,pns_psi,pns_rho_star,rad,*pns_mgrav,*drad,F);
+    pns_eval_jacobian_alp_psi(Num_1D,pns_alp,pns_psi,pns_rho_star,rad,*drad,jac);
+
+    // make F negative:
+    for(int j=0; j<Num_1D;j++)
+      F[j] = -F[j];
+
+    gsl_matrix_view m = gsl_matrix_view_array (jac, Num_1D, Num_1D);
+    gsl_vector_view b = gsl_vector_view_array (F, Num_1D);
+    gsl_vector *dalppsi = gsl_vector_alloc (Num_1D);
+
+    int s;
+    gsl_permutation * p = gsl_permutation_alloc (Num_1D);
+
+    // LU decomposition
+    gsl_linalg_LU_decomp (&m.matrix, p, &s);
+    // LU solve
+    gsl_linalg_LU_solve (&m.matrix, p, &b.vector, dalppsi);
+    // get array out of vector
+    double *dalppsiarray = gsl_vector_ptr (dalppsi, 0);
+
+    err = 0.0;
+    for(int i=0;i<Num_1D;i++) {
+      if( fabs(dalppsiarray[i]/(pns_alp[i]*pns_psi[i])) > err )
+	  err = fabs(dalppsiarray[i]/(pns_alp[i]*pns_psi[i]));
+
+      pns_alp[i] = pns_alp[i] + dalppsiarray[i]/pns_psi[i];
+    }
+
+    // free memory
+    gsl_permutation_free (p);
+    gsl_vector_free (dalppsi);
+
+    printf("alp err: %15.6E\n",err);
+
+  }
+
+  free(F);
+  free(jac);
+
+}
+
+
+
+double pns_eval_mgrav(int n, double* rad, double* psi, double* rho) {
+  double m=0.0;
+  double vol;
+  double dr = rad[1]-rad[0];
+  vol = 4.0/3.0 * M_PI * pow((rad[1] - dr/2.0),3);
+  m = rho[0] * vol / psi[0];
+  for(int i=0;i<n;i++) {
+    vol = 4.0/3.0 * M_PI *
+      ( pow(rad[i]+dr/2.0,3) - pow(rad[i]-dr/2.0,3) );
+    m = m + vol*rho[i]/psi[i];
+  }
+
+  printf("mass: %15.6E\n",m);
+
+  return m;
+}
+
+double pns_linterp(double x1,double x2,double f1,double f2, double x) {
+
+  return (f2-f1)/(x2-x1) * (x-x1) + f1;
+
+}
+
+double pns_map(int n, double* prad, double* pq, double rad) {
+
+  double q = 0.0;
+  int i = 0;
+
+  if(rad < prad[0]) {
+    q = pns_linterp(prad[0],prad[1],pq[0],pq[1],rad);
+  } else {
+    while(rad > prad[i] && i < n) {
+      i++;
+    }
+    q = pns_linterp(prad[i],prad[i-1],pq[i],pq[i-1],rad);
+  }
+
+  return q;
+}
+
+
+void pns_eval_F(int n, double* psi, double*rho, double* rad,
+            double mout, double dr, double* F) {
+  double dri = 1.0/dr;
+  double dri2 = dri*dri;
+  double psiout;
+  int il = n-1;
+  // inner boundary
+  F[0] = (psi[1]-psi[0])*dri2 +
+    (psi[1]-psi[0]) * dri / rad[0] +
+    2.0*M_PI * rho[0] / psi[0];
+
+  for(int i=1;i<(n-1);i++) {
+    F[i] = (psi[i-1]-2.0*psi[i]+psi[i+1])*dri2 +
+      (psi[i+1]-psi[i-1])*dri/rad[i] +
+      2.0*M_PI*rho[i] / psi[i];
+  }
+  psiout = 1.0 + mout / 2.0 / (rad[il]+dr);
+  F[il] = (psi[il-1]- 2*psi[il] + psiout) * dri2 +
+    (psiout - psi[il-1])/rad[il] * dri +
+    2.0*M_PI*rho[il] / psi[il];
+
+  printf("psiout: %15.6E %15.6E\n",psiout,psi[il]);
+
+}
+
+void pns_eval_F_alp_psi(int n, double* alp, double* psi, double*rho, double* rad,
+            double mout, double dr, double* F) {
+  double dri = 1.0/dr;
+  double dri2 = dri*dri;
+  double psiout, alpout;
+  int il = n-1;
+  // inner boundary
+  F[0] = (alp[1]*psi[1]-alp[0]*psi[0])*dri2 +
+    (alp[1]*psi[1]-alp[0]*psi[0]) * dri / rad[0] -
+    2.0*M_PI * rho[0] * alp[0]*pow(psi[0],5);
+
+  for(int i=1;i<(n-1);i++) {
+    F[i] = (alp[i-1]*psi[i-1]-2.0*alp[i]*psi[i]+alp[i+1]*psi[i+1])*dri2 +
+      (alp[i+1]*psi[i+1]-alp[i-1]*psi[i-1])*dri/rad[i] -
+      2.0*M_PI*rho[i]*alp[i]*pow(psi[i],5);
+  }
+  psiout = 1.0 + mout / 2.0 / (rad[il]+dr);
+  alpout = (1.0 - mout / 2.0 / (rad[il]+dr)) / (1.0 + mout / 2.0 / (rad[il]+dr));;
+  F[il] = (alp[il-1]*psi[il-1]- 2*alp[il]*psi[il] + alpout*psiout) * dri2 +
+    (alpout*psiout - alp[il-1]*psi[il-1])/rad[il] * dri -
+    2.0*M_PI*rho[il]*alp[il]*pow(psi[il],5);
+
+  printf("alpout: %15.6E %15.6E\n",alpout,alp[il]);
+
+}
+
+
+void pns_eval_jacobian(int n, double* psi, double* rho, double* rad, double dr, double* jac) {
+  double dri = 1.0/dr;
+  double dri2 = dri*dri;
+
+  // initialize
+  for(int i=0;i< n*n;i++)
+    jac[i] = 0.0;
+
+  for(int i=0;i<n;i++) {
+    for(int j=0;j<n;j++) {
+      int index = IND2D(n,i,j);
+      if(i == 0 && j == 0) {
+          jac[index] = - 1.0 * dri2 - dri / rad[i] -
+            2.0*M_PI / (psi[i]*psi[i]) * rho[i];
+      } else {
+        if (i == j) {
+          jac[index] = - 2.0 * dri2 -
+            2.0*M_PI / (psi[i]*psi[i]) * rho[i];
+        }
+        else if (i+1 == j)
+          jac[index] = dri2 + dri / rad[i];
+        else if (i-1 == j)
+          jac[index] = dri2 - dri / rad[i];
+        else
+          jac[index] = 0.0;
+      } // if
+    } // j loop
+  } // i loop
+} // eval_jacobian
+
+void pns_eval_jacobian_alp_psi(int n, double* alp, double* psi, double* rho, double* rad, double dr, double* jac) {
+  double dri = 1.0/dr;
+  double dri2 = dri*dri;
+
+  // initialize
+  for(int i=0;i< n*n;i++)
+    jac[i] = 0.0;
+
+  for(int i=0;i<n;i++) {
+    for(int j=0;j<n;j++) {
+      int index = IND2D(n,i,j);
+      if(i == 0 && j == 0) {
+          jac[index] = - 1.0 * dri2 - dri / rad[i] -
+            10.0*M_PI * pow(psi[i],4) * rho[i];
+      } else {
+        if (i == j) {
+          jac[index] = - 2.0 * dri2 -
+            10.0*M_PI * pow(psi[i],4) * rho[i];
+        }
+        else if (i+1 == j)
+          jac[index] = dri2 + dri / rad[i];
+        else if (i-1 == j)
+          jac[index] = dri2 - dri / rad[i];
+        else
+          jac[index] = 0.0;
+      } // if
+    } // j loop
+  } // i loop
+} // eval_jacobian

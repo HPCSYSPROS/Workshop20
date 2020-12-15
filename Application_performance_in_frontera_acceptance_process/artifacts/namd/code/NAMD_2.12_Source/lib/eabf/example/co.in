@@ -1,0 +1,71 @@
+colvarsTrajFrequency 200
+colvarsRestartFrequency 20000
+scriptedColvarForces  on
+colvar {
+name CHdihedral
+width 1
+lowerboundary -62
+upperboundary 62
+lowerwallconstant 1.0
+upperwallconstant 1.0
+extendedlagrangian   on
+extendedFluctuation  1
+extendedTimeConstant   200
+dihedral {   
+  componentCoeff 0.3333333333
+  group1 {
+    atomnumbers { 1 }
+    }
+  group2 {
+    atomnumbers { 2 }
+    }
+  group3 {
+    atomnumbers { 4 }
+    }
+  group4 {
+    atomnumbers { 6 }
+    }
+}
+
+
+dihedral {  
+  componentCoeff 0.3333333333
+  group1 {
+    atomnumbers { 4 }
+    }
+  group2 {
+    atomnumbers { 6 }
+    }
+  group3 {
+    atomnumbers { 5 }
+    }
+  group4 {
+    atomnumbers { 3 }
+    }
+}
+
+
+dihedral {  
+  componentCoeff 0.3333333333
+  group1 {
+    atomnumbers { 5 }
+    }
+  group2 {
+    atomnumbers { 3 }
+    }
+  group3 {
+    atomnumbers { 1 }
+    }
+  group4 {
+    atomnumbers { 2 }
+    }
+}
+
+}
+
+abf {
+colvars  CHdihedral   # only 1D and 2D eABF calculations are available now
+fullSamples 5000
+hideJacobian    on    # always on in eABF calculation, but the results include Jacobian
+historyFreq 100000
+}

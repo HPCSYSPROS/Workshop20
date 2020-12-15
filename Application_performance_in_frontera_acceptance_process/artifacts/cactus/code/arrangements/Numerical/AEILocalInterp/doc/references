@@ -1,0 +1,15 @@
+This file contains references which are or might in the future relevant
+to interpolation.
+
+Thermodynamic consistency in EOS interpolation
+@ARTICLE{2000ApJS..126..501T,
+    author = {{Timmes}, F.~X. and {Swesty}, F.~D.},
+    title = "{The Accuracy, Consistency, and Speed of an Electron-Positron Equation of State Based on Table Interpolation of the Helmholtz Free Energy}",
+    journal = {Astrophysical Journal Supplement Series},
+    year = 2000,
+    month = feb,
+    volume = 126,
+    pages = {501--516},
+    url = {http://esoads.eso.org/cgi-bin/nph-bib_query?bibcode=2000ApJS..126..501T&db_key=AST},
+    adsnote = {Provided by the NASA Astrophysics Data System}
+}

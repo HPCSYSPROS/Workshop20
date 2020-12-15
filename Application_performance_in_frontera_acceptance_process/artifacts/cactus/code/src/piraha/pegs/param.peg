@@ -1,0 +1,142 @@
+uses = (?i:uses|)
+
+# The skipper is a crucial sub-pattern
+# that is activated by any whitespace in the
+# grammar file
+skipper = \b([\ \t\n\r\b]|\#[^\n]*|\\[\r\n])*
+
+any = [^]
+name = (?i:[a-z_][a-z0-9_]*)
+accname = {-name}(::{-name})*
+steerable = (?i:never|always|recover)
+accumexpr = \( ([^()]+|{accumexpr}) \)
+
+# Note slop on shared
+access = (?i:global : |restricted : |private : |shares :([\ \t]*{name}|) )
+#access = (?i: global : | restricted : | private : | shares : {name} )
+
+quote = "(\\{any}|[^"])*"
+
+num = [+\-]?[0-9]+
+intbound = (\* | {num} | ) 
+intrange = ([\[\(]?{intbound} :(?!:) {intbound}[\]\)]? | {intbound} )
+
+real = [+\-]?([0-9]+\.[0-9]+|[0-9]+\.|\.[0-9]+|[0-9]+)([eEdD][+\-]?{num}|)
+realbound = (\*|{real}| )
+realrange = [\(\[]?{realbound} :(?!:) {realbound}[\)\]]? | {realbound}
+
+boolraw = (?i:true|t|yes|y|false|f|no|n|1|0)
+bool = {-boolraw}|"{-boolraw}"
+
+string = {quote}|{name}|(\\[^]|[^\\ \t\r\n\b}])+
+
+keyword = {name}|{quote}
+
+intguts = (?i:
+	(CCTK_|)INT {name}( \[{num}\]|)
+	({quote}|)
+    (as {name} |)
+    (steerable = {steerable} |accumulator = {accumexpr} |accumulator-base = {accname} )*
+  )
+  
+uses_or_extends = (?i:uses|extends)
+intpar = (?i:
+	{uses_or_extends} {intguts}
+    ( \{
+    	( {intrange} (:: {quote}|) )*
+    \} |)|
+	{intguts} 
+    ( \{
+    	# some special slop here
+    	#( {intrange} (:: {quote}|:: [a-z][^\n]*|) )*
+    	( {intrange} (:: {quote}|) )*
+    \} {num}|)
+  )
+
+realguts = (?i:
+	(CCTK_|)REAL {name}( \[{num}\]|)
+	({quote}|)
+    (as {name} |)
+    (steerable = {steerable}|)
+    (accumulator = {accumexpr} |)
+    (accumulator-base = {accname} |)
+  )
+  
+realpar = (?i:
+	{uses_or_extends} {realguts} 
+    (\{
+    	( {realrange} (:: {quote} |) )*
+    \}|)|
+	{realguts}
+    (\{
+    	# Note that we allow for lots of slop here
+    	#( {realrange} (:: {quote} | {quote} | :: [a-z][^\n]*) )*
+    	( ("{realrange}"|{realrange}) (:: {quote}|) )*
+    \} {real}|)
+  )
+  
+keywordguts = (?i:
+	(CCTK_|)KEYWORD {name}( \[{num}\]|)
+	({quote}|)
+    (as {name} |)
+    (steerable = {steerable}|)
+    (accumulator = {accumexpr} |)
+    (accumulator-base = {accname} |)
+  )
+  
+keywordpar = (?i:
+	(extends|uses) {keywordguts} 
+    (\{
+    	( {keyword} (, {keyword})* (:: {-quote}|) )*
+    \}|)|
+	{keywordguts} 
+    (\{
+    	( {keyword} (, {keyword})* (:: {-quote}|) )*
+    \} {keyword}|)
+  )
+  
+stringguts = (?i:
+	(CCTK_|)STRING {name}( \[{num}\]|)
+	({quote}|)
+    (as {name} |)
+    (steerable = {steerable} |accumulator = {accumexpr} |accumulator-base = {accname} )*
+  )
+  
+stringpar = (?i:
+	{uses_or_extends} {stringguts} 
+    (\{
+    	( {string} (, {string})* (:: {quote}|) )*
+    \}|)|
+	{stringguts}
+    (\{
+    	# first option is weird
+    	( :: {quote} |{string} (, {string})* (:: {quote}|) )*
+    	#({string} (, {string})* (:: {quote}|) )*
+    	# no default is permitted!
+    \} ({string}|$)|)
+  )
+
+boolguts = (?i:
+	(CCTK_|)BOOLEAN {name}( \[{num}\]|)
+	({quote}|)
+    (as {name} |)
+    (steerable = {steerable}|)
+    (accumulator = {accumexpr} |)
+    (accumulator-base = {accname} |)
+  )
+  
+boolpar = (?i:
+	{uses_or_extends} {boolguts} 
+    (\{
+    ({bool} (:: {quote} |))*
+    \}|)|
+	{boolguts} 
+    (\{
+    # Note the weird slop here
+    #({bool} (:: {quote} |)|: :: {quote}|:: {quote})*
+    (:: {quote}|{bool} (:: {quote} |) )*
+    ( : :: {quote} )*
+    \} {bool}|)
+  )
+  
+pars = ^ ( {access}|{intpar}|{realpar}|{keywordpar}|{stringpar}|{boolpar})* $

@@ -1,0 +1,154 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                          %
+%              (C) Copyright 1995 The Board of Trustees of the             %
+%                          University of Illinois                          %
+%                           All Rights Reserved                            %
+%								  	   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt]{article}
+\usepackage{graphicx}
+\usepackage{makeidx}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{verbatim}
+\usepackage{comment}
+\usepackage[stable]{footmisc}
+%\usepackage{hyperref}  % links in table of contents
+%\usepackage{tocloft}
+\makeindex
+
+% define margins, etc
+\topmargin	0.1in
+\oddsidemargin	0in
+\evensidemargin	0in
+\textheight	8.80in
+\textwidth	6.50in
+\marginparsep	0.25cm
+\headheight	0in
+\headsep	0in
+%\footskip	0.5in
+%\footheight	0in%
+
+% define macros
+\input{namd_macros}
+\input{ug_macros}
+\input{psfgen_macros}
+
+\includecomment{cvnamd}
+\excludecomment{cvlammps}
+\excludecomment{cvrefman}
+\input{ug_colvars_macros}
+
+\setcounter{secnumdepth}{3}
+%% \setcounter{tocdepth}{5} %% very detailed table of contents
+\setcounter{tocdepth}{4}
+
+%
+% the document itself
+%
+
+
+\begin{document}
+
+% strictly enforce margins rather than complaining
+\sloppy
+
+% initial pages for the guide - title, TOC, etc.
+\input{namd_begindoc}
+
+% Introduction
+\input{ug_intro}
+
+% Getting started
+\newpage
+\input{ug_start}
+
+% Input and output files
+\newpage
+\input{ug_io}
+
+% Making PSF files
+\newpage
+\input{ug_psfgen}
+
+% Force field parameters
+\newpage
+\input{ug_forcefield}
+
+% Implicit Solvent Parameters
+\newpage
+\input{ug_gbis}
+
+% Standard minimization and dynamics parameters
+\newpage
+\input{ug_dynamics}
+
+% Performance tuning parameters
+\newpage
+\input{ug_performance}
+
+% User defined forces
+\newpage
+\input{ug_userdef}
+
+% Free energy of conformation change calculations
+% \newpage
+% \input{ug_fenergy}
+
+% Collective variable-based calculations
+\newpage
+\input{ug_colvars}
+
+% Extended adaptive biasing force method - now covered in colvars docs
+% \input{ug_eabf}
+
+% Alchemical free energy perturbation calculations
+\newpage
+\input{ug_alchemy}
+
+% Accelerated sampling methods
+\newpage
+\input{ug_accel}
+
+% Go simulation methods
+\newpage
+\input{ug_go}
+
+% Runtime analysis
+\newpage
+\input{ug_analysis}
+
+% Equivalence with X-PLOR parameters
+\newpage
+\input{ug_xplor}
+
+% Sample configuration files
+\newpage
+\input{ug_sample}
+
+% Description of how to run namd
+\newpage
+\input{ug_runit}
+
+% How to get and install namd
+\newpage
+\input{ug_avail}
+
+\newpage
+%\phantomsection
+%\label{References}
+\addtocontents{toc}{\protect \contentsline {section}{References}{\thepage}} 
+%\addcontentsline{toc}{\protect \contentsline {section}{References}{\thepage}} %\addtocontents{toc}{section}{Bibliography} 
+
+\bibliographystyle{abbrv}
+\bibliography{ug,ug_colvars,ug_eabf}
+
+\newpage
+\addtocontents{toc}{\protect \contentsline {section}{Index}{\thepage}}
+%\addcontentsline{toc}{section}{Index}
+\printindex
+
+% that's all, folks
+\end{document}
+

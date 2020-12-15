@@ -1,0 +1,8 @@
+# Configuration definitions for thorn CartGrid3D
+# $Header$
+
+PROVIDES ADMMacros
+{
+  SCRIPT
+  LANG
+}

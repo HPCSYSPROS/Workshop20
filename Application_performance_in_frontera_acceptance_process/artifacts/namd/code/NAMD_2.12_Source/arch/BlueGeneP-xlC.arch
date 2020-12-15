@@ -1,0 +1,15 @@
+NAMD_ARCH = BlueGeneP
+CHARMARCH = bluegenep-xlc
+# add this to the link line when using -DUSE_HPM=1:
+# /home/bhatele/work/leanCP/src_charm_driver/utility/libhpm.a -lSPI.cna
+
+BGP_INC = -I/bgsys/drivers/ppcfloor/comm/include
+
+CXX = bgxlC -qstaticinline -DNO_SOCKET -DDUMMY_VMDSOCK -DNOHOSTNAME -DNO_CHDIR -DNO_STRSTREAM_H -DNO_GETPWUID $(BGP_INC) -DARCH_POWERPC -DUSE_TOPOMAP=1 -DPOWERPC_TANINT
+
+FLOATOPTS = -O2 -qnoipa -qinline -qarch=450d -qtune=450
+CXXOPTS = $(FLOATOPTS) -qalias=ansi:addrtaken:typeptr:restrict
+CXXNOALIASOPTS = $(FLOATOPTS) -qalias=allptrs
+
+CC = bgxlc 
+COPTS = -O3

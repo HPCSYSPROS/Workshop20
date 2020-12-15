@@ -1,0 +1,9 @@
+Cactus Code Thorn CoordGauge
+Author(s)    : Tom Goodale
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Base thorn to provide the infrastructure for dynamic gauge selection.

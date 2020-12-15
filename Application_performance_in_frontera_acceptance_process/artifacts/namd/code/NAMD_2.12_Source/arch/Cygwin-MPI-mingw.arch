@@ -1,0 +1,8 @@
+NAMD_ARCH = Cygwin
+CHARMARCH = mpi-cygwin
+
+CXX = g++ -I/usr/include/w32api  -mno-cygwin -D_NO_ALLOCA_H -DNAMD_SOCKLEN_T=int
+CXXOPTS = -O3 -Wall -march=pentiumpro -ffast-math
+CC = gcc -mno-cygwin
+COPTS = -O3 -march=pentiumpro -ffast-math
+

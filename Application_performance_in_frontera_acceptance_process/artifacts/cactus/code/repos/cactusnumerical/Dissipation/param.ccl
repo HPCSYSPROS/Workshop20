@@ -1,0 +1,112 @@
+# Parameter definitions for thorn Dissipation
+# $Header$
+
+restricted:
+
+BOOLEAN verbose "produce log output" STEERABLE=always
+{
+} "no"
+
+INT order "Dissipation order" STEERABLE=always
+{
+  1 :: "first order accurate dissipation (using a second derivative)"
+  3 :: "third order accurate dissipation (using a fourth derivative)"
+  5 :: "fifth order accurate dissipation (using a sixth derivative)"
+  7 :: "seventh order accurate dissipation (using an eighth derivative)"
+  9 :: "ninth order accurate dissipation (using a tenth derivative)"
+} 3
+
+REAL epsdis "Dissipation strength" STEERABLE=always
+{
+  *:* :: "0 for no dissipation.  Unstable for epsdis<0 and epsdis>1/3"
+} 0.2
+
+STRING vars "List of evolved grid functions that should have dissipation added" STEERABLE=always
+{
+  .* :: "must be a valid list of grid functions"
+} ""
+
+REAL epsdis_for_level[32] "Alternate epsdis for a specific refinement level" \
+  STEERABLE=always
+{
+  : :: "Negative indicates use default"
+} -1.0
+
+# No dissipation near excision boundary
+
+BOOLEAN use_dissipation_near_excision "Apply excision near the excision boundary (does not work for high orders)"
+{
+} "yes"
+
+
+
+# Extra dissipation in horizons
+
+BOOLEAN extra_dissipation_in_horizons "extra dissipation in horizons" STEERABLE=always
+{
+} "no"
+
+INT update_ah_every "how often to update the AH information for dissipation" STEERABLE=always
+{
+  0:* :: "positive iteration number"
+} 1
+
+REAL ah_slope "Slope inside AH" STEERABLE=always
+{
+  *:* :: "Slope from the outside value to the inside value in AHs"
+} 0.2
+
+REAL ah_radius_offset "Offset to the distance from the AH." STEERABLE=always
+{
+  *:* :: "negative values shift inwards, positive outwards"
+} 0.0
+
+REAL ah_max_epsdis "maximal epsdis" STEERABLE=always
+{
+  *:* :: "<0 for 'off', >=0 for maximal epsdis in horizon"
+} -1.0
+
+INT surface_number[100] "horizon number for extra dissipation in horizons -- SphericalSurface number" STEERABLE=always
+{
+  -1  :: "do not use a spherical surface"
+  0:* :: "surface number (from SphericalSurface); starts from 0"
+} -1
+
+INT horizon_number[100] "horizon number for extra dissipation in horizons -- AHFinderDirect number" STEERABLE=always
+{
+  -1  :: "do not use a horizon"
+  1:* :: "horizon number (from AHFinderDirect); starts from 1"
+} -1
+
+BOOLEAN respect_emask "respect excision mask" STEERABLE=always
+{
+} "no"
+
+
+
+# Extra dissipation at outer boundary
+
+BOOLEAN extra_dissipation_at_outerbound "increase dissipation at outer boundary" STEERABLE=always
+{
+} "no"
+
+INT outer_bound_npoints "number of points in which dissipation should be increased" STEERABLE=always
+{
+  0:* :: "positive number"
+} 3
+
+REAL ob_slope "slope at outer boundary" STEERABLE=always
+{
+  0:* :: "increase dissipation"
+} 5
+
+REAL outer_boundary_max_epsdis "maximal epsdis" STEERABLE=always
+{
+  *:* :: "<0 for 'off', >=0 for maximal epsdis at the outer boundary"
+} -1.0
+
+
+
+shares: SpaceMask
+
+USES BOOLEAN use_mask

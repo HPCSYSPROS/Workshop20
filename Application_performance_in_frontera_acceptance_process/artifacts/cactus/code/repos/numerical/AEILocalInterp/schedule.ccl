@@ -1,0 +1,7 @@
+# Schedule definitions for thorn AEILocalInterp
+# $Header$
+
+Schedule AEILocalInterp_U_Startup at STARTUP after Driver_Startup
+{
+LANG:C
+} "register CCTK_InterpLocalUniform() interpolation operators"

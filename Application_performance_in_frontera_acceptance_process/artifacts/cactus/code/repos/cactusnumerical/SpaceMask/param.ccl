@@ -1,0 +1,8 @@
+# Parameter definitions for thorn SpaceMask
+# $Header$
+
+restricted:
+
+BOOLEAN use_mask "Turn on storage for mask?"
+{
+} "no"

@@ -1,0 +1,128 @@
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+\title{ADMCoupling}
+\author{Ian Hawke, David Rideout}
+\date{$ $Date$ $}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+\begin{abstract}
+This thorn allows seamless coupling of evolution and analysis thorns
+to any thorns which contribute matter terms to the stress energy
+tensor $T_{ab}$.
+\end{abstract} 
+
+\section{Purpose}
+
+This thorn is completely trivial (there's already more words in the
+documentation than in the code). The point is to allow clean coupling
+of matter thorns and spacetime evolution thorns. By making a spacetime
+thorn (such as BSSN) a friend of \texttt{ADMCoupling} it can know about the
+variables of the matter thorns (such as Whisky) as long as they are
+also friends of \texttt{ADMCoupling}, and then the appropriate stress energy
+tensor terms can be included through the {\tt CalcTmunu} interface.
+This avoids explicit dependencies between the spacetime and matter
+evolution thorns. Note that we need to do the same for certain
+analysis thorns, such as \texttt{ADMConstraints}.
+
+\section{CalcTmunu}
+
+\subsection{Background}
+So what is this ``\texttt{CalcTmunu}'', anyway?
+\texttt{CalcTmunu} is a general interface which allows any thorn to
+`declare' that it contains matter variables, by adding terms to the
+components of the stress energy tensor.  This is done using the Cactus
+include file mechanism, which allows thorns to contribute code to
+include files, which can then be included by any thorn which wishes to
+use them.
+For \texttt{CalcTmunu} there are two include files\footnote{There used
+to be a third, \texttt{CalcTmunu\_rfr.inc}, which was a Cactus 3 legacy
+having to do with the rfr scheduling mechanism.  You may safely delete
+any reference to this file.},
+\texttt{CalcTmunu.inc} and \texttt{CalcTmunu\_temps.inc}.  
+%The name ``temps'' is not so great, it would be better to have the
+%one ``source'' and the other ``declarations'', or something.
+
+In \texttt{CalcTmunu.inc}, one can place code of the form
+\begin{verbatim}
+	Ttt = Ttt + ...
+	Ttx = Ttx + ...
+	Tty = Tty + ...
+	Ttz = Ttz + ...
+	Txx = Txx + ...
+	Txy = Txy + ...
+	Txz = Txz + ...
+	Tyy = Tyy + ...
+	Tyz = Tyz + ...
+	Tzz = Tzz + ...
+\end{verbatim}
+to add terms to the components $T_{\mu\nu}$.  Each of these variables
+is of type \texttt{CCTK\_REAL}.  (If you omit the
+\texttt{Ttt \nolinebreak+}, \texttt{Ttx \nolinebreak+}, etc. from the right hand sides of
+these assignment statements then you will be assuming that your thorn
+is the only one which provides matter degrees of freedom, and
+excluding contributions from other matter thorns which may be
+activated.)
+This code will be
+executed for each point on the grid, whose indices will be stored in
+the integers \texttt{i}, \texttt{j}, and \texttt{k}.  Currently it must be 
+`fixed form' Fortran code.
+
+\texttt{CalcTmunu\_temps.inc} will be
+included in the variable declaration section for the block of code
+which contains the
+\nopagebreak
+\begin{verbatim}
+#include "CalcTmunu.inc"
+\end{verbatim}
+One can put local temporary variable declarations needed for the code
+above into this file.  The \texttt{Ttt}, \texttt{Ttx}, etc.~will be
+declared within a macro from \texttt{ADMMacros}.
+
+\subsection{For matter thorns}
+To make use of the {\tt CalcTmunu} interface, simply place the lines
+\begin{verbatim}
+INCLUDES HEADER: <MyThorn_CalcTmunu_temps.inc> in CalcTmunu_temps.inc
+INCLUDES SOURCE: <MyThorn_CalcTmunu.inc> in CalcTmunu.inc
+\end{verbatim}
+in your thorn's \texttt{interface.ccl} file, and declare your thorn to
+be friends with \texttt{ADMCoupling}.  Then provide the files
+\texttt{<MyThorn\_CalcTmunu\_temps.inc>} and
+\texttt{<MyThorn\_CalcTmunu.inc>} somewhere in your thorn's source
+code.
+We expect to add a sample matter thorn to \texttt{CactusEinstein}
+soon, which will illustrate the use of this.
+
+\subsection{For thorns which need the stress energy tensor}
+Spacetime evolution thorns and various analysis thorns (e.g. one which
+computes the constraints) may need to
+know the value of the stress-energy tensor.
+See thorn \texttt{CactusEinstein/ADM} for an example the former.
+%of a thorn which
+%uses the code inserted into the \texttt{CalcTmunu} include files.
+There the macro \texttt{KSOURCES} (see \texttt{KSOURCES\_declare.h}
+and \texttt{KSOURCES\_guts.h}) is called from the various time
+integration source files \texttt{DoubleLeap.F},
+\texttt{IterativeCN.F}, etc., which in turn include the
+\texttt{CalcTmunu\_temps.inc} and \texttt{CalcTmunu.inc} files.  In
+this example, the
+$T_{\mu\nu}$ temporary variables are provided by including
+\texttt{CactusEinstein/ADMMacros/src/macro/TRT\_declare.h}.
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}
+% LocalWords:  ADMCoupling Hawke Whisky CalcTmunu ADMConstraints Ttt Ttx ccl
+% LocalWords:  ADMMacros MyThorn KSOURCES DoubleLeap IterativeCN rfr CCTK

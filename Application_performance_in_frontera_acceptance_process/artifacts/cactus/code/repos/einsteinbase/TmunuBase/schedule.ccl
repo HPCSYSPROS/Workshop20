@@ -1,0 +1,113 @@
+# Schedule definitions for thorn TmunuBase
+
+STORAGE: stress_energy_state
+STORAGE: stress_energy_2_state
+
+
+
+# Initialise stuff
+
+SCHEDULE TmunuBase_SetStressEnergyState AT Wragh BEFORE MoL_Register
+{
+  LANG: Fortran
+  OPTIONS: global
+} "Set the stress_energy_state variable"
+
+
+
+# Do nothing unless storage is requested
+
+if (stress_energy_storage)
+{
+
+  # Storage management
+  
+  if (timelevels == 1)
+  {
+    STORAGE: stress_energy_scalar[1]
+    STORAGE: stress_energy_vector[1]
+    STORAGE: stress_energy_tensor[1]
+  }
+  else if (timelevels == 2)
+  {
+    STORAGE: stress_energy_scalar[2]
+    STORAGE: stress_energy_vector[2]
+    STORAGE: stress_energy_tensor[2]
+  }
+  else if (timelevels == 3)
+  {
+    STORAGE: stress_energy_scalar[3]
+    STORAGE: stress_energy_vector[3]
+    STORAGE: stress_energy_tensor[3]
+  }
+  
+  if (support_old_CalcTmunu_mechanism)
+  {
+    STORAGE: stress_energy_2_scalar
+    STORAGE: stress_energy_2_vector
+    STORAGE: stress_energy_2_tensor
+  }
+  
+  
+  
+  # Calculate T_munu after the initial data
+  
+  SCHEDULE GROUP SetTmunu AT initial AFTER (ADMBase_InitialData ADMBase_InitialGauge Whisky_Initial)
+  {
+  } "Calculate the stress-energy tensor"
+  
+  # Calculate T_munu during evolution;
+  # either within MoL, or (the default) after each time step
+  
+  # if (stress_energy_at_RHS)
+  # {
+  #   SCHEDULE GROUP SetTmunu IN MoL_PostStep AFTER (ADMBase_SetADMVars Whisky_PostStep)
+  #   {
+  #   } "Calculate the stress-energy tensor"
+  # } else {
+  #   SCHEDULE GROUP SetTmunu AT evol AFTER MoL_Evolution
+  #   {
+  #   } "Calculate the stress-energy tensor"
+  # }
+  if (stress_energy_at_RHS)
+  {
+    SCHEDULE GROUP SetTmunu IN MoL_PostStep AFTER ADMBase_SetADMVars
+    {
+    } "Group for calculating the stress-energy tensor"
+  }
+  
+  
+  
+  # This is how T_munu is calculated.
+  # First it is set via the CalcTmunu.inc mechanism,
+  # then other thorns can add to that via the AddToTmunu mechanism.
+  # In the end, the copy T2munu is calculated.
+  
+  if (support_old_CalcTmunu_mechanism)
+  {
+    SCHEDULE TmunuBase_SetTmunu IN SetTmunu
+    {
+      LANG: Fortran
+    } "Calculate the stress-energy tensor using the old CalcTmunu mechanism"
+  }
+  else
+  {
+    SCHEDULE TmunuBase_ZeroTmunu IN SetTmunu
+    {
+      LANG: Fortran
+    } "Initialise the stress-energy tensor to zero"
+  }
+  
+  SCHEDULE GROUP AddToTmunu IN SetTmunu AFTER (TmunuBase_SetTmunu,TmunuBase_ZeroTmunu)
+  {
+  } "Add to the stress-energy tensor here"
+  
+  if (support_old_CalcTmunu_mechanism)
+  {
+    SCHEDULE TmunuBase_CopyTmunu IN SetTmunu AFTER AddToTmunu
+    {
+      LANG: Fortran
+    } "Copy the stress-energy tensor"
+  }
+  
+} /* if stress_energy_storage */

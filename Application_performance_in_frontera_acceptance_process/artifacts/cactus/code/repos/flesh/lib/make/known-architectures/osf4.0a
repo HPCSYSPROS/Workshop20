@@ -1,0 +1,13 @@
+#! /bin/sh
+#  /*@@
+#    @file      osf4.0a
+#    @date      Thu Mar 25 15:38:45 1999
+#    @author    Tom Goodale
+#    @desc 
+#   
+#    @enddesc
+#    @version $Header$
+#  @@*/
+
+. $srcdir/known-architectures/osf
+

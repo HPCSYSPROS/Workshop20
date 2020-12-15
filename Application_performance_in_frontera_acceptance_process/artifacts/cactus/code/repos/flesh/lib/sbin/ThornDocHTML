@@ -1,0 +1,63 @@
+#! /bin/bash
+# Create all thorn documentations
+# (C) 2003/05/24 Erik Schnetter <schnetter@uni-tuebingen.de>
+# (C) 2010-04-21 Barry Wardell <barry.wardell@aei.mpg.de>
+# $Header: /cactusdevcvs/Cactus/lib/sbin/ThornDoc,v 1.5 2009/11/11 22:32:53 schnetter Exp $
+
+echo "Creating thorn documentation (HTML)..."
+
+type -P htlatex &>/dev/null || { echo "htlatex not found.  Aborting." >&2; exit 1; }
+
+# Selected thorn; process all thorns if this is empty
+selection="$1"
+
+abspath=$PWD
+
+for arr in `cd arrangements; echo *`; do
+  if test -d arrangements/$arr; then
+    for th in `cd arrangements/$arr; echo *`; do
+      if test -d arrangements/$arr/$th; then
+        if test -z "$selection" || test "$th" == "$selection"; then
+          if test -e arrangements/$arr/$th/doc/documentation.tex; then
+            echo "  Processing thorn $arr/$th..."
+
+            mkdir -p doc/HTML/ThornDoc/$arr/$th 2> /dev/null
+            (
+              cd doc/HTML/ThornDoc/$arr/$th
+              rm -f documentation.tex documentation.html documentation.css documentation*.png
+              path=$abspath/arrangements/$arr/$th/doc
+              < $path/documentation.tex sed -e 's+\(\\includegraphics.*\){ *\(.*\) *}+\1{'"$path"'/\2}+g' |
+              sed -e 's+\(\\input *\)\(.*\)+\1'"$path"'/\2+g' | 
+              sed -e 's+\\usepackage{../../../../doc/latex/cactus}+\\usepackage{../../../../../doc/latex/cactus}+g' |
+              sed -e 's+\\begin{document}+\\newlength{\\tableWidth} \\newlength{\\maxVarWidth} \\newlength{\\paraWidth} \\newlength{\\descWidth} \\begin{document}+g' |
+              sed -e 's+\\end{document}++g' > documentation.tex
+
+              echo "  Parsing ccl files..."
+              perl -s $abspath/lib/sbin/ParamLatex.pl -cctk_home=$abspath -directory=$abspath/arrangements -thorn=$arr/$th -outdir=$PWD > LOG_PARAMLATEX_MSGS 2>&1
+              perl -s $abspath/lib/sbin/InterLatex.pl -cctk_home=$abspath -directory=$abspath/arrangements -thorn=$arr/$th -outdir=$PWD > LOG_INTERLATEX_MSGS 2>&1
+              perl -s $abspath/lib/sbin/SchedLatex.pl -cctk_home=$abspath -directory=$abspath/arrangements -thorn=$arr/$th -outdir=$PWD > LOG_SCHEDLATEX_MSGS 2>&1
+
+              inter_file=`echo ${arr}_${th}_inter.tex | tr '[:upper:]' '[:lower:]'`
+              cat ${arr}_${th}_param.tex >> documentation.tex
+              cat $inter_file >> documentation.tex
+              cat ${arr}_${th}_schedule.tex >> documentation.tex
+              echo "\\end{document}" >> documentation.tex
+
+              $abspath/lib/sbin/ConvertFigures $path
+
+              echo "  Running htlatex..."
+              {
+                htlatex documentation "xhtml,mathml,charset=utf-8" " -cunihtf -utf8" "" -interaction=nonstopmode  < /dev/null > LATEX_MESSAGES 2>&1
+              } ||
+              echo "    ERROR: Could not create documentation (check for latex errors)"
+            )
+                        
+          fi          # if thorn has documentation
+        fi              # if thorn is enabled
+      fi
+    done                    # for thorns
+  fi
+done                            # for arrangements
+
+echo "  Created thorn documentation in doc/HTML/ThornDoc directory."
+echo "  Done."

@@ -1,0 +1,6 @@
+# Parameter definitions for thorn Fortran
+
+CCTK_INT one "This parameter has the value one"
+{
+  1:1 :: "1"
+} 1

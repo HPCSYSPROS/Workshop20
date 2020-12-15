@@ -1,0 +1,6 @@
+# Schedule definitions for thorn SystemTopology
+
+SCHEDULE ST_system_topology AT startup AFTER hwloc_lstopo BEFORE Driver_Startup
+{
+  LANG: C
+} "Output and/or modify system topology and hardware locality"

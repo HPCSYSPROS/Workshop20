@@ -1,0 +1,12 @@
+#! /bin/sh
+# /*@@
+#   @file    darwin8.4.0
+#   @date    2006-01-12
+#   @author  Erik Schnetter
+#   @desc
+#            Known architecture stuff for MacOS X (Darwin) release 8.4.0
+#   @enddesc
+#   @version $Header$
+# @@*/
+
+. $srcdir/known-architectures/darwin

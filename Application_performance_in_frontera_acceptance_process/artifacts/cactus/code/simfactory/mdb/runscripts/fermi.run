@@ -1,0 +1,25 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+echo "Checking:"
+pwd
+hostname
+date
+
+echo "Environment:"
+env | sort > SIMFACTORY/ENVIRONMENT
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+export OMP_NUM_THREADS 
+runjob --ranks-per-node=@(@PPN@*@NUM_SMT@/@NUM_THREADS@)@  --envs OMP_NUM_THREADS=@NUM_THREADS@ --exe @EXECUTABLE@ --args -L 3 @PARFILE@ 2>@SIMULATION_NAME@.err | tee @SIMULATION_NAME@.out
+
+echo "Stopping:"
+date
+
+echo "Done."

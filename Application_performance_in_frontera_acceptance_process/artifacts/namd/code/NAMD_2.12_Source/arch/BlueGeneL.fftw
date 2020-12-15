@@ -1,0 +1,7 @@
+
+FFTDIR=/usr/local/apps/fftw215s/
+FFTINCL=-I$(FFTDIR)/include
+FFTLIB=-L$(FFTDIR)/lib -lrfftw -lfftw
+FFTFLAGS=-DNAMD_FFTW -DNAMD_FFTW_NO_TYPE_PREFIX
+FFT=$(FFTINCL) $(FFTFLAGS)
+

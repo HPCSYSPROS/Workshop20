@@ -1,0 +1,12 @@
+#! /bin/sh
+#  /*@@
+#    @file      hpux11.11
+#    @date      January 2010
+#    @author    Erik Schnetter
+#    @desc 
+#   
+#    @enddesc
+#    @version $Header$
+#  @@*/
+
+. $srcdir/known-architectures/hp-ux

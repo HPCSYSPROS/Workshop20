@@ -1,0 +1,100 @@
+# Interface definition for thorn CarpetIOHDF5
+
+IMPLEMENTS: IOHDF5
+
+includes header: CarpetIOHDF5.hh in CarpetIOHDF5.hh
+
+uses include header: Timer.hh
+
+uses include header: carpet.hh
+
+uses include header: defs.hh
+
+uses include header: bbox.hh
+uses include header: vect.hh
+
+uses include header: data.hh
+uses include header: gdata.hh
+
+uses include header: ggf.hh
+uses include header: gh.hh
+
+uses include header: typecase.hh
+uses include header: typeprops.hh
+
+
+
+CCTK_INT next_output_iteration TYPE=scalar
+CCTK_REAL next_output_time TYPE=scalar
+CCTK_INT this_iteration TYPE=scalar
+
+CCTK_INT last_output_iteration_slice[4] TYPE=scalar
+CCTK_REAL last_output_time_slice[4] TYPE=scalar
+CCTK_INT this_iteration_slice[4] TYPE=scalar
+
+
+CCTK_INT FUNCTION Coord_GroupSystem    \
+  (CCTK_POINTER_TO_CONST IN GH,        \
+   CCTK_STRING IN groupname)
+USES FUNCTION Coord_GroupSystem
+
+# Specify whether a map uses a Cartesian or a curvilinear coordinate system
+CCTK_INT FUNCTION             \
+    MultiPatch_MapIsCartesian \
+        (CCTK_INT IN map)
+USES FUNCTION MultiPatch_MapIsCartesian
+
+
+# Determine which boundaries are symmetry boundaries
+CCTK_INT FUNCTION \
+    SymmetryTableHandleForGrid (CCTK_POINTER_TO_CONST IN cctkGH)
+REQUIRES FUNCTION SymmetryTableHandleForGrid
+
+CCTK_INT FUNCTION \
+    SymmetryTableHandleForGI (CCTK_POINTER_TO_CONST IN cctkGH, \
+                              CCTK_INT IN group_index)
+REQUIRES FUNCTION SymmetryTableHandleForGI
+
+
+# Check whether existing output files should be truncated or not
+CCTK_INT FUNCTION IO_TruncateOutputFiles \
+  (CCTK_POINTER_TO_CONST IN GH)
+
+REQUIRES FUNCTION IO_TruncateOutputFiles
+
+
+
+# Checkpoint only a restricted set of variables
+# (Set ngroups=-1 to checkpoint all variables.)
+CCTK_INT \
+FUNCTION IO_SetCheckpointGroups(CCTK_INT ARRAY IN groups, \
+                                CCTK_INT       IN ngroups)
+PROVIDES FUNCTION IO_SetCheckpointGroups \
+    WITH CarpetIOHDF5_SetCheckpointGroups \
+    LANGUAGE C
+
+
+
+# Return a pointer to an unmodifiable C string
+# which contains a unique ID for this configuration
+CCTK_POINTER_TO_CONST \
+FUNCTION UniqueConfigID (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION UniqueConfigID
+
+# Return a pointer to an unmodifiable C string
+# which contains a unique ID for this build
+CCTK_POINTER_TO_CONST \
+FUNCTION UniqueBuildID (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION UniqueBuildID
+
+# Return a pointer to an unmodifiable C string
+# which contains a unique ID for this simulation
+CCTK_POINTER_TO_CONST \
+FUNCTION UniqueSimulationID (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION UniqueSimulationID
+
+# Return a pointer to an unmodifiable C string
+# which contains a unique ID for this run
+CCTK_POINTER_TO_CONST \
+FUNCTION UniqueRunID (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION UniqueRunID

@@ -1,0 +1,8 @@
+# make.configuration.deps file for thorn PAPI
+
+# Copy standard PAPI utilities from the install directory
+
+$(UTIL_DIR)/%: $(PAPI_DIR)/bin/%
+	@echo "Copying $* from $< to $(UTIL_DIR)"
+	-$(MKDIR) $(MKDIRFLAGS) $(UTIL_DIR) 2> /dev/null
+	cp $< $@

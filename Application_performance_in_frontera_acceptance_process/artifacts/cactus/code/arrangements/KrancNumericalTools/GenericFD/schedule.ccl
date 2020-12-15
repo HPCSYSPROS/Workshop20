@@ -1,0 +1,10 @@
+# GenericFD/schedule.ccl 
+# Schedule definition for thorn GenericFD
+# author: S. Husa
+
+# $Header$ 
+
+if (allocate_genericfd_jacobian)
+{
+  STORAGE: jacobian, jacobian2
+}

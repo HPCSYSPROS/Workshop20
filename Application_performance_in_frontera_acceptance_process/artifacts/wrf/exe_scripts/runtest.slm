@@ -1,0 +1,32 @@
+#!/bin/bash
+#SBATCH -J SPP-Run               # Job name
+#SBATCH -o wrf-fro.%j.out       # Name of stdout output file (%j expands to jobId)
+#SBATCH -e wrf-fro.%j.err       # Name of stdout output file (%j expands to jobId)
+#SBATCH -p test2              # Queue name
+#SBATCH -N 1680                 # Total number of nodes requested (16 cores/node)
+#SBATCH -n 3360                # Total number of mpi tasks requested
+#SBATCH -t 04:00:00           # Run time (hh:mm:ss) - 1.5 hours
+#SBATCH -A A-ccsc
+
+#Setup for spp
+export NETCDF=/scratch/projects/tacc/spp/cazes/wrf/netcdf_3.6.3
+export PNETCDF=/scratch/projects/tacc/spp/cazes/wrf/pnetcdf_1.8.1
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$NETCDF/lib
+
+source ./sourceme.intel18.sh
+source ./setup_impi.sh
+source ./setup_frontier_run.sh
+
+#Load the modules
+#ml netcdf pnetcdf 
+
+#Correct for crappy collectives
+export I_MPI_ADJUST_GATHER=3
+export I_MPI_ADJUST_GATHERV=3
+export I_MPI_ADJUST_SCATTER=3
+export I_MPI_ADJUST_SCATTERV=2 
+
+env | egrep I_MPI > impi_out.${SLURM_JOBID}
+#Test to dram without mcdram
+#  -- only if non cache queue
+./meta_spp_run.sh

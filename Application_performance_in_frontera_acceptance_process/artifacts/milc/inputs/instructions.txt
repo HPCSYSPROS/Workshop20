@@ -1,0 +1,6 @@
+From the MILC-apex_BW directory, cd to benchmark/lattices.  You will need to
+download the lattice start file for the benchmark you wish to run.  On the
+command line, "source wget_command_BW_36_72" to download the lattice for the
+medium benchmark, or "source wget_command_BW_72_144" to get the large benchmark
+file.  (These files are about 1 GB and 15 GB respectively.)  Leave these files
+in this directory; there are links.

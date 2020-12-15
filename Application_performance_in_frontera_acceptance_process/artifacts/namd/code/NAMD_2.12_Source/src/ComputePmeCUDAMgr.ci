@@ -1,0 +1,145 @@
+module ComputePmeCUDAMgr {
+
+  extern module CudaPmeSolver;
+
+#ifdef NAMD_CUDA
+	message PmeAtomMsg {
+		CudaAtom atoms[];
+	};
+
+  message PmeForceMsg {
+    CudaForce force[];
+  };
+
+  message PmeLaunchMsg;
+
+  message PmeAtomPencilMsg {
+    CudaAtom atoms[];
+  };
+
+  message PmeForcePencilMsg {
+    CudaForce force[];
+  };
+
+  // Used as per-Pe storage
+  group PmeAtomFiler {
+    entry PmeAtomFiler();
+  };
+
+  // Per node, one per device
+  nodegroup ComputePmeCUDADevice {
+    entry ComputePmeCUDADevice(void);
+    entry void recvAtoms(PmeAtomMsg *msg);
+    entry void sendAtomsToNeighbor(int y, int z, int atomIval);
+    entry void recvAtomsFromNeighbor(PmeAtomPencilMsg *msg);
+    entry void gatherForce();
+    entry void recvForcesFromNeighbor(PmeForcePencilMsg *msg);
+    entry void mergeForcesOnPatch(int homePatchIndex);
+    entry void sendForcesToPatch(PmeForceMsg *forceMsg);
+  };
+
+  message RegisterPatchMsg;
+
+  message NumDevicesMsg;
+
+  class CProxy_ComputePmeCUDADevice;
+  message RecvDeviceMsg {
+    CProxy_ComputePmeCUDADevice dev[];
+  };
+#endif // NAMD_CUDA
+
+  // Per node manager
+	nodegroup ComputePmeCUDAMgr {
+#ifdef NAMD_CUDA
+    entry ComputePmeCUDAMgr(void);
+    entry void initialize(CkQdMsg *);
+    entry void initialize_pencils(CkQdMsg *);
+    entry void activate_pencils(CkQdMsg *);
+    entry void recvPencils(CProxy_CudaPmePencilXYZ xyz);
+    entry void recvPencils(CProxy_CudaPmePencilXY xy, CProxy_CudaPmePencilZ z);
+    entry void recvPencils(CProxy_CudaPmePencilX x, CProxy_CudaPmePencilY y, CProxy_CudaPmePencilZ z);
+    entry void recvSelfEnergy(PmeSelfEnergyMsg *msg);
+
+    entry void recvDevices(RecvDeviceMsg* msg);
+    entry void recvAtomFiler(CProxy_PmeAtomFiler filer);
+    entry void skip();
+
+    entry [exclusive] void initializeDevicesAndAtomFiler(NumDevicesMsg *msg) {
+      serial {
+        if (CkMyNode() != 0)
+          NAMD_bug("ComputePmeCUDAMgr::initializeDevicesAndAtomFiler can only be called on root node");
+        numNodesContributed++;
+        numDevicesMax = (numDevicesMax >= msg->numDevices) ? numDevicesMax : msg->numDevices;
+        delete msg;
+        if (numNodesContributed == CkNumNodes()) {
+          createDevicesAndAtomFiler();
+        }
+      }
+    };
+
+    entry [exclusive] void initializePatches() {
+      serial {
+        int i;
+        for (i=0;i < numDevices;i++) {
+          deviceProxy[i][CkMyNode()].ckLocalBranch()->initializePatches(numHomePatchesList[i]);
+        }
+      }
+    };
+
+    // Increase total patch count on node 0
+    entry [exclusive] void incTotalPatchCount() {
+      serial {
+        if (CkMyNode() != 0)
+          NAMD_bug("ComputePmeCUDAMgr::incTotalPatchCount can only be called on root node");
+        numTotalPatches++;
+        if (numTotalPatches == PatchMap::Object()->numPatches()) {
+          // Once all patches are accounted for, we call initializePatches on every node
+          thisProxy.initializePatches();
+        }
+      }
+    };
+
+    entry [exclusive] void registerPatch(RegisterPatchMsg *msg) {
+      serial {
+        int device = getDevice(msg->i, msg->j);
+        numHomePatchesList[device]++;
+        delete msg;
+        thisProxy[0].incTotalPatchCount();
+      }
+    };
+
+    // Registers a neighbor for pencil at (y,z)
+    entry void registerNeighbor(int y, int z) {
+      serial {
+        int device = getDevice(y, z);
+        deviceProxy[device].ckLocalBranch()->registerNeighbor();
+      }
+    };
+
+    // ------------------------------------------------------------------
+
+    entry void recvAtoms(PmeAtomMsg *msg);
+    // entry void recvAtoms(PmeAtomMsg *msg) {
+    //   serial {
+    //     int device = getDevice(msg->i, msg->j);
+    //     deviceProxy[device].ckLocalBranch()->recvAtoms(msg);
+    //   }
+    // };
+
+    entry void recvAtomsFromNeighbor(PmeAtomPencilMsg *msg) {
+      serial {
+        int device = getDevice(msg->y, msg->z);
+        deviceProxy[device].ckLocalBranch()->recvAtomsFromNeighbor(msg);
+      }
+    };
+
+    entry void recvForcesFromNeighbor(PmeForcePencilMsg *msg) {
+      serial {
+        int device = getDevice(msg->y, msg->z);
+        deviceProxy[device].ckLocalBranch()->recvForcesFromNeighbor(msg);
+      }
+    };
+#endif // NAMD_CUDA
+	};
+
+};

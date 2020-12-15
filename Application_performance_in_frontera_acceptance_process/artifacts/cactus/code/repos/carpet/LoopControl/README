@@ -1,0 +1,10 @@
+Cactus Code Thorn LoopControl
+Author(s)    : Erik Schnetter <schnetter@gmail.com>
+Maintainer(s): Erik Schnetter <schnetter@gmail.com>
+Licence      : GPLv2+
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Iterate over multi-dimensional arrays in an efficient manner, using
+OpenMP (if available) and cache-aware loop tiling.

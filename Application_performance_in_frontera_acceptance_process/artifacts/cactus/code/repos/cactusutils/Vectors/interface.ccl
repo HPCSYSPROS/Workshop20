@@ -1,0 +1,5 @@
+# Interface definition for thorn Vectors
+
+IMPLEMENTS: Vectors
+
+INCLUDE HEADER: vectors.h IN vectors.h

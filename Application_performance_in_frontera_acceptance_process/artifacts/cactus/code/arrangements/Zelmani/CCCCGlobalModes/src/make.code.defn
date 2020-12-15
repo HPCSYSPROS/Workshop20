@@ -1,0 +1,9 @@
+# Main make.code.defn file for thorn CCCCGlobalModes
+# $Header: /home/cvs/cccc/CCCCThorns/CCCCGlobalModes/src/make.code.defn,v 1.1 2005/07/08 18:45:30 cott Exp $
+
+# Source files in this directory
+SRCS = Startup.c Init.F90  LocalStuff.c Reductions.c \
+	Output.cc sYlm.c
+
+# Subdirectories containing source files
+SUBDIRS = 

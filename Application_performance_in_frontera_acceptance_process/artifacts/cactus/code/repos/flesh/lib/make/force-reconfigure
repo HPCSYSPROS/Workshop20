@@ -1,0 +1,46 @@
+# /*@@
+#   @file    force-reconfigure
+#   @date    Wed Mar 31 2004
+#   @author  Erik Schnetter
+#   @desc
+#            Timestamp file for forcing reconfiguring configurations
+#   @enddesc
+#   @version $Id: force-reconfigure,v 1.15 2010-03-26 18:23:57 schnetter Exp $
+# @@*/
+
+31 Mar 2004: created
+10 Apr 2004: thorns now check for FFTW, MPI, and PETSc in a more reliable way
+20 Jun 2004: introduce CCTK_HAVE_INT* and CCTK_HAVE_REAL* macros
+26 Jun 2004: renamed CCTK_HAVE_* macros into CCTK_HAVE_*
+02 Aug 2004: introduce HAVE_LAPACK and HAVE_BLAS make variables
+07 Oct 2004: change HDF5 to CCTK_HDF5 in cctk_Config.h
+08 Nov 2004: add HAVE_HDF5_STREAM_VFD and HDF5_LFS_FLAGS makefile variables
+07 Oct 2005: correct definition of CCTK_RESTRICT
+10 Mar 2006: fix order of external/system libs on the linker command line
+19 Jul 2006: detect presence of real*16 in Fortran correctly
+26 May 2007: check for <malloc.h>, mallinfo, mallopt, and M_MMAP_THRESHOLD
+25 Jan 2008: check for system-dependent timing functions
+11 Nov 2009: Detect whether _Pragma is available
+11 Nov 2009: Add CCTK_ATTRIBUTE_* macros and friends
+26 Mar 2010: Add RUNDIR_PREFIX configuration option
+13 Oct 2010: Updated ExternalLibraries/HDF5
+23 Nov 2010: Improve handling of unused variables
+21 Dec 2010: Add new options CPP_*_FLAGS and FPP_*_FLAGS
+04 Jan 2011: Add CCTK_ATTRIBUTE_ALIGNED
+30 Mar 2011: Add variables MAKE, TAR, GZIP_CMD, PATCH, GIT
+26 Apr 2011: Add CCTK_BUILTIN_EXPECT
+27 Jun 2011: Add HAVE_SCHED_H
+01 May 2012: Add OpenCL support
+15 Jul 2012: Correct error in determining make dependencies
+09 Aug 2012: Take CFLAGS/CXXFLAGS into account when determining dependencies
+22 Oct 2012: Check availability of isnan etc. in C++
+15 Jan 2013: Add CCTK_ATTRIBUTE_ALWAYS_INLINE
+15 Nov 2013: Introduce CCTK_REAL16_KIND
+25 Feb 2013: Auto-detect attribute((format)), attribute((noreturn)), and
+	     __builtin_unreachable()
+28 Feb 2013: Add variable XARGS
+20 May 2013: Auto-configure static_assert
+16 Jun 2013: Auto-configure __builtin_assume_aligned
+07 Feb 2014: Change CCTK_REAL8 etc. from #define to typedef
+25 Mar 2014: Disable support for explicitly configuring Fortran 77
+21 Oct 2014: Autoconfigure support for attribute((nonnull))

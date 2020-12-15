@@ -1,0 +1,13 @@
+#! /bin/bash
+#PBS -A @ALLOCATION@
+#PBS -q @QUEUE@
+#PBS -l walltime=@WALLTIME@
+#PBS -l nodes=@NODES@
+#PBS -l pvmem=@(int(20480/@NODE_PROCS@))@MB
+#PBS @('@CHAINED_JOB_ID@' != '' ? '-W depend=afterany:@CHAINED_JOB_ID@' : '')@
+#PBS -N @SIMULATION_NAME@
+#PBS -m abe
+#PBS -o @RUNDIR@/@SIMULATION_NAME@.out
+#PBS -e @RUNDIR@/@SIMULATION_NAME@.err
+cd @SOURCEDIR@
+@SIMFACTORY@ run @SIMULATION_NAME@ --machine=@MACHINE@ --restart-id=@RESTART_ID@ @FROM_RESTART_COMMAND@

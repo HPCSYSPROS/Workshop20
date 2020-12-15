@@ -1,0 +1,5 @@
+# Interface definition for thorn CycleClock
+
+IMPLEMENTS: CycleClock
+
+INCLUDES HEADER: cycleclock.h IN cycleclock.h

@@ -1,0 +1,10 @@
+# Configuration definitions for thorn CoordBase
+# $Header$
+
+# This will disappear once we have a requires for function aliasing
+
+PROVIDES CoordBase
+{
+  SCRIPT
+  LANG
+}

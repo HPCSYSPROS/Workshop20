@@ -1,0 +1,11 @@
+Cactus Code Thorn SetMask_SphericalSurface
+Author(s)    : Frank Löffler
+Maintainer(s): Frank Löffler
+Licence      : GPLv2+
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Sets a given mask according to given spherical surfaces and parameters.
+One example usage is to set the excision mask based on information from
+an apparent horizon finder which is stored as a spherical surface.

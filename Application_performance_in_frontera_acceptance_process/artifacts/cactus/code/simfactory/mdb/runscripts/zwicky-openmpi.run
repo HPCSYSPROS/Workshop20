@@ -1,0 +1,58 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+module list
+
+echo "Checking:"
+pwd
+hostname
+date
+cat "$PBS_NODEFILE" > SIMFACTORY/NODES || true
+
+echo "Environment:"
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export GMON_OUT_PREFIX=gmon.out
+export OMP_NUM_THREADS=@NUM_THREADS@
+export OPENMPI_DIR=/usr/local/openmpi-1.4.2-intel-11.1
+export MPD_NODEFILE=mpd_nodefile
+export MPI_NODEFILE=mpi_nodefile
+env | sort > SIMFACTORY/ENVIRONMENT
+
+uniq ${PBS_NODEFILE} > ${MPD_NODEFILE}
+for node in $(cat ${MPD_NODEFILE}); do
+    for ((proc=0; $proc<@(@PPN_USED@ / @NUM_THREADS@)@; proc=$proc+1)); do
+        echo ${node}
+    done
+done > ${MPI_NODEFILE}
+
+echo "Job setup:"
+echo "   Allocated:"
+echo "      Nodes:                      @NODES@"
+echo "      Cores per node:             @PPN@"
+echo "   Running:"
+echo "      MPI processes:              @NUM_PROCS@"
+echo "      OpenMP threads per process: @NUM_THREADS@"
+echo "      MPI processes per node:     @(1.0*@NUM_PROCS@/@NODES@)@"
+echo "      OpenMP threads per core:    @(1.0*(@NUM_PROCS@*@NUM_THREADS@)/(@NODES@*@PPN@))@"
+echo "      OpenMP threads per node:    @PPN_USED@"
+
+if [ @NUM_PROCS@ % 2 -eq 0 ] ; then # can efficiently tie to socket
+  BIND=-bind-to-socket
+else
+  BIND=-bind-to-none
+fi
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+time $OPENMPI_DIR/bin/mpirun -np @NUM_PROCS@ $BIND -machinefile ${MPI_NODEFILE} @EXECUTABLE@ -L 3 @PARFILE@
+
+echo "Stopping:"
+date
+
+echo "Done."

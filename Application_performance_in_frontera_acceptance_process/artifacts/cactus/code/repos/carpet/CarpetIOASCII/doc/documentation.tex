@@ -1,0 +1,181 @@
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+% The author of the documentation
+\author{Erik Schnetter \textless schnetter@aei.mpg.de\textgreater\\
+        Thomas Radke \textless tradke@aei.mpg.de\textgreater}
+
+% The title of the document (not necessarily the name of the Thorn)
+\title{CarpetIOASCII}
+
+% the date your document was last changed, if your document is in CVS, 
+% please use:
+\date{November 20, 2005}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+\newcommand{\ThisThorn}{{\it CarpetIOASCII}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+  This thorn reproduces thorn IOASCII from arrangement CactusBase but
+  is specifically for the driver thorn Carpet.
+\end{abstract}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+
+This thorn provides ASCII output of data in 1, 2 or 3 dimensions. It
+reproduces most of the functionality of thorn IOASCII from the
+standard CactusBase arrangement. Where possible the names of
+parameters and their use is identical. For most purposes it should be
+sufficient to take a parameter file written for the standard IOASCII
+and just change the active thorn.
+
+However, this thorn outputs considerably more information than the
+standard IOASCII thorn. Information about, e.g., the refinement level
+and the index position of the output are also given. All the output
+can be visualized using gnuplot.
+
+The \ThisThorn\ I/O methods can output any type of CCTK grid variables
+(grid scalars, grid functions, and grid arrays of arbitrary dimension);
+data is written into separate files named {\tt "<varname>.asc"}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\ThisThorn\ Parameters}
+
+The most important parameters to control the \ThisThorn\ I/O methods are listed
+below. Many parameters come as a set of four individuals, one for each
+I/O method, controlling 0, 1, 2, or 3-dimensional ASCII output respectively.
+
+\begin{itemize}
+  \item {\tt IOASCII::out[0-3]D\_every} (steerable)\\
+        How often to do periodic \ThisThorn\ output. If this parameter is set
+        in the parameter file, it will override the setting of the shared
+        {\tt IO::out\_every} parameter. The output frequency can also be set
+        for individual variables using the {\tt out\_every} option in an
+        option string appended to the {\tt IOASCII::out[0-3]D\_vars} parameter.
+  
+  \item {\tt IOASCII::out[0-3]D\_dt} (steerable)\\
+        output in intervals of that much coordinate time (overwrites
+        {\tt IO::out\_dt})
+  
+  \item {\tt IOASCII::out[0-3]D\_criterion} (steerable)\\
+        criterion to select output intervals (overwrites
+        {\tt IO::out\_criterion})
+  
+  \item {\tt IOASCII::out[0-3]D\_vars} (steerable)\\ 
+        The list of variables to output using the \ThisThorn\ I/O method.
+        The variables must be given by their fully qualified variable or group
+        name. The special keyword {\it all} requests \ThisThorn\ output for
+        all variables. Multiple names must be separated by whitespaces.
+
+        Each group/variable name can have an option string attached in which you
+        can specify a different output frequency for that individual variable,
+        or a set of individual refinement levels to be output, eg.
+\begin{verbatim}
+  IOASCII::out1D_vars = "wavetoy::phi{ out_every = 4 refinement_levels = { 1 2 } }"
+\end{verbatim}
+  
+  \item {\tt IOASCII::out[0-3]D\_dir}\\
+        The directory in which to place the \ThisThorn\ output files.
+        If the directory doesn't exist at startup it will be created.\\
+        If this parameter is set to an empty string \ThisThorn\ output will go
+        to the standard output directory as specified in {\tt IO::out\_dir}.
+  
+  \item {\tt IOASCII::out\_precision} (steerable)\\
+        How many digits to output floating-point numbers with (overwrites
+        {\tt IO::out\_precision}).
+
+  \item {\tt IOASCII::one\_file\_per\_group}\\
+        Write one output file per group instead of per variable.
+
+\end{itemize}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Using the flesh I/O API to produce ASCII output}
+
+Periodic output of grid variables is usually specified via I/O parameters
+in the parameter file and then automatically triggered by the flesh scheduler
+at each iteration step after analysis. If output should also be triggered
+at a different time, one can do that from within an application thorn by
+invoking one of the {\tt CCTK\_OutputVar*()} I/O routines provided
+by the flesh I/O API (see chapter B8.2 ``IO'' in the Cactus Users Guide).
+In this case, the application thorn routine which calls {\tt CCTK\_OutputVar*()}
+must be scheduled in level mode.
+
+If output for a variable is required also for intermediate timesteps
+this can be achieved by calling {\tt CCTK\_OutputVarAs*()} with a different
+{\tt alias} name; output for the same variable is then written into
+different ASCII files based on the {\tt alias} argument.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Utilities}
+\label{sec:utils}
+
+For those that prefer other visualization packages than gnuplot there
+are some utilities in the src/util directory. These are
+\begin{itemize}
+\item {\bf carpet2sdf} A program to convert to a format suitable for
+  the {\it ser} program written by M. Choptuik,
+\item {\bf carpet2xgraph} A program to convert to a format suitable
+  for the {\it xgraph} or {\it ygraph} packages of P. Walker and D.
+  Pollney,
+\item {\bf Carpet2ygraph.pl} A perl script to convert to a format
+  suitable for the {\it xgraph} or {\it ygraph} packages of P. Walker
+  and D. Pollney.
+\item {\bf Carpet2ygraph.pl} An improved version of the previous script.
+\item {\bf mergeCarpetIOASCII.pl} A perl script to remove duplicate datasets from file(s).
+\end{itemize}
+
+The first two, written by Scott Hawley, are C codes that require the
+Makefile (building using the -utils flag from the main Cactus
+directory currently does not work). Each output one refinement level,
+either to standard output or to a file.
+
+The third script writes all refinement levels from a given file in a
+given direction to a number of different files given a prefix
+filename, where the number in the output filename is given by the
+refinement level. Usage: {\tt Carpet2ygraph.pl direction Inputfile Outputfile},
+where direction is 0, 1, 2, for x,y and z.
+
+The fourth script is an improved version of the previous one. It reads a 1D .asc file and produces a
+single file containing all the data from all levels, writing points that are in more levels only
+once. The output filename is the original filename with the suffix .asc changed into .xg. The
+direction (x,y or z) of the input file is automatically detected from the filename. It recognizes
+and converts also scalar data, like norms and extrema. Usage: {\tt Carpet2ygraphCat.pl Inputfile}.
+
+The fifth script can be used to merge CarpetIOASCII output written before and after recovery. It
+reads one or more files in CarpetIOASCII format and writes their contents to STDOUT, eliminating
+duplicate datasets (all but the last occurance are discarded), which may be created when a run died
+abruptly without checkpointing at the last output itaration and is recovered from a previous
+checkpoint.  
+Usage: {\tt mergeCarpetIOASCII.pl list of files}. \\
+Example 1: {\tt mergeCarpetIOASCII.pl alp.x.asc > alp.x.asc.merged}.\\ 
+Example 2: {\tt mergeCarpetIOASCII.pl alp.x.asc.firstCHKPT alp.x.asc.secondCHKPT > alp.x.asc.merged}.\\
+This script was written by Thomas Radke.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\begin{thebibliography}{9}
+%
+%\end{thebibliography}
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

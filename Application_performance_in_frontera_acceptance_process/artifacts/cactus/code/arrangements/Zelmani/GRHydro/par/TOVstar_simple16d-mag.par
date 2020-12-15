@@ -1,0 +1,305 @@
+## mclachlan tov_static
+ActiveThorns = "Time MoL"
+ActiveThorns = "Coordbase CartGrid3d Boundary StaticConformal"
+ActiveThorns = "SymBase ADMBase TmunuBase HydroBase InitBase ADMCoupling ADMMacros"
+ActiveThorns = "IOUtil"
+ActiveThorns = "Formaline"
+ActiveThorns = "SpaceMask CoordGauge Constants LocalReduce aeilocalinterp LoopControl"
+ActiveThorns = "Carpet CarpetLib CarpetReduce CarpetRegrid2 CarpetInterp"
+ActiveThorns = "CarpetIOASCII CarpetIOScalar CarpetIOHDF5 CarpetIOBasic"
+
+# grid parameters
+CartGrid3D::type         = "coordbase"
+CartGrid3D::domain       = "full"
+CartGrid3D::avoid_origin = "no"
+CoordBase::domainsize = "minmax"
+CoordBase::xmin =   0.0
+CoordBase::ymin =   0.0
+CoordBase::zmin =   0.0
+CoordBase::xmax = 320.0
+CoordBase::ymax = 320.0
+CoordBase::zmax = 320.0
+CoordBase::dx   =  8 
+CoordBase::dy   =  8
+CoordBase::dz   =  8 
+
+CoordBase::boundary_size_x_lower        = 3
+CoordBase::boundary_size_y_lower        = 3
+CoordBase::boundary_size_z_lower        = 3
+CoordBase::boundary_size_x_upper        = 3
+CoordBase::boundary_size_y_upper        = 3
+CoordBase::boundary_size_z_upper        = 3
+CoordBase::boundary_shiftout_x_lower    = 1
+CoordBase::boundary_shiftout_y_lower    = 1
+CoordBase::boundary_shiftout_z_lower    = 1
+CoordBase::boundary_shiftout_x_upper    = 0
+CoordBase::boundary_shiftout_y_upper    = 0
+CoordBase::boundary_shiftout_z_upper    = 0
+
+ActiveThorns = "Slab ReflectionSymmetry"
+ActiveThorns = "RotatingSymmetry90"
+
+CarpetRegrid2::ensure_proper_nesting = yes
+CarpetRegrid2::symmetry_rotating90 = "yes"
+
+ReflectionSymmetry::reflection_x = "no"
+ReflectionSymmetry::reflection_y = "no"
+ReflectionSymmetry::reflection_z = "yes"
+ReflectionSymmetry::avoid_origin_x = "no"
+ReflectionSymmetry::avoid_origin_y = "no"
+ReflectionSymmetry::avoid_origin_z = "no"
+
+TmunuBase::stress_energy_storage = yes
+TmunuBase::stress_energy_at_RHS  = yes
+TmunuBase::timelevels            =  1
+TmunuBase::prolongation_type     = none
+
+HydroBase::timelevels            = 3
+
+ADMMacros::spatial_order = 4
+
+ADMBase::metric_type     = "physical"
+
+SpaceMask::use_mask      = "yes"
+
+Cactus::terminate           = "time"
+Cactus::cctk_final_time     = 1400
+
+Carpet::domain_from_coordbase = "yes"
+Carpet::enable_all_storage       = no
+Carpet::use_buffer_zones         = "yes"
+Carpet::use_overlap_zones 	 = "yes"
+
+Carpet::poison_new_timelevels    = "yes"
+Carpet::check_for_poison         = "no"
+
+Carpet::init_3_timelevels        = no
+Carpet::init_fill_timelevels     = "yes"
+
+CarpetLib::poison_new_memory = "yes"
+CarpetLib::poison_value      = 114
+
+# system specific Carpet paramters
+Carpet::max_refinement_levels    = 10
+driver::ghost_size               = 3
+Carpet::prolongation_order_space = 5 
+Carpet::prolongation_order_time  = 2
+
+CarpetRegrid2::regrid_every = 0
+CarpetRegrid2::num_centres  = 1
+
+CarpetRegrid2::num_levels_1 = 5
+CarpetRegrid2::radius_1[1]  =120.0
+CarpetRegrid2::radius_1[2]  = 60.0
+CarpetRegrid2::radius_1[3]  = 30.0
+CarpetRegrid2::radius_1[4]  = 15.0
+
+
+time::dtfac = 0.25
+MoL::ODE_Method             = "rk4"
+MoL::MoL_Intermediate_Steps = 4
+MoL::MoL_Num_Scratch_Levels = 1
+
+# check all physical variables for NaNs
+ActiveThorns = "NaNChecker"
+NaNChecker::check_every = 1
+NaNChecker::action_if_found = "terminate" #"terminate", "just warn", "abort"
+NaNChecker::check_vars = "ADMBase::metric ADMBase::lapse ADMBase::shift HydroBase::rho HydroBase::eps HydroBase::press HydroBase::vel HydroBase::Bvec"
+
+## Lapse Condition:  \partial_t alpha = - alpha K
+## Shift Condition:  \partial_t beta^i = 0
+
+# Hydro paramters
+ActiveThorns = "EOS_Omni"
+ActiveThorns = "GRHydro GRHydro_InitData"
+
+
+HydroBase::evolution_method      = "GRHydro"
+HydroBase::Bvec_evolution_method = "GRHydro_Avec"
+
+GRHydro::method_type               = "RSA FV"
+GRHydro::riemann_solver            = "HLLE"
+#GRHydro::GRHydro_eos_type           = "Polytype"
+#GRHydro::GRHydro_eos_table          = "2D_Polytrope"
+GRHydro::recon_method              = "ppm"
+GRHydro::recon_vars                = "primitive"
+GRHydro::GRHydro_stencil            = 3
+#GRHydro::bound                     = "none"
+GRHydro::bound                     = "flat"
+GRHydro::rho_abs_min               = 1.e-10
+#GRHydro::GRHydro = 18 # Tmunu(10), rho,press,eps,w_lorentz,vel, tau
+#GRHydro::GRHydro    = 10    # gij(6), alpha, beta(3)
+
+GRHydro::GRHydro_eos_type          = "General"
+GRHydro::GRHydro_eos_table         = "Ideal_Fluid"
+
+GRHydro::Grhydro_MaxNumConstrainedVars = 33 
+GRHydro::GRHydro_MaxNumEvolvedVars     = 10
+
+#GRHydro::clean_divergence          = "yes"
+#GRHydro::transport_constraints     = "yes"
+#GRHydro::kap_dc                    = 1.0 
+GRHydro::track_divB                = "yes"
+GRHydro::calculate_bcom            = "yes"
+
+GRHydro::c2p_reset_pressure        = "yes"
+#GRHydro::GRHydro_atmo_tolerance    = 1
+
+grhydro::grhydro_c2p_warnlevel         =  0
+grhydro::grhydro_c2p_warn_from_reflevel      =  2
+grhydro::con2prim_oct_hack                      =       yes
+
+ActiveThorns = "GenericFD NewRad"
+ActiveThorns = "ML_BSSN ML_BSSN_Helper"
+ADMBase::evolution_method        = "ML_BSSN"
+ADMBase::lapse_evolution_method  = "ML_BSSN"
+ADMBase::shift_evolution_method  = "ML_BSSN"
+ADMBase::dtlapse_evolution_method= "ML_BSSN"
+ADMBase::dtshift_evolution_method= "ML_BSSN"
+
+TmunuBase::support_old_CalcTmunu_mechanism = "no"
+
+ML_BSSN::timelevels = 3
+
+ML_BSSN::harmonicN           = 1      # 1+log
+ML_BSSN::harmonicF           = 1.0    # 1+log
+ML_BSSN::LapseACoeff         = 1.0
+ML_BSSN::ShiftBCoeff         = 1.0
+ML_BSSN::ShiftGammaCoeff     = 0.0
+ML_BSSN::AlphaDriver         = 0.0
+ML_BSSN::BetaDriver          = 0.0
+ML_BSSN::LapseAdvectionCoeff = 0.0
+ML_BSSN::ShiftAdvectionCoeff = 0.0
+
+ML_BSSN::MinimumLapse        = 1.0e-8
+
+ML_BSSN::my_initial_boundary_condition = "extrapolate-gammas"
+ML_BSSN::my_rhs_boundary_condition     = "NewRad"
+
+ML_BSSN::ML_log_confac_bound = "none"
+ML_BSSN::ML_metric_bound     = "none"
+ML_BSSN::ML_Gamma_bound      = "none"
+ML_BSSN::ML_trace_curv_bound = "none"
+ML_BSSN::ML_curv_bound       = "none"
+ML_BSSN::ML_lapse_bound      = "none"
+ML_BSSN::ML_dtlapse_bound    = "none"
+ML_BSSN::ML_shift_bound      = "none"
+ML_BSSN::ML_dtshift_bound    = "none"
+
+ActiveThorns = "SphericalSurface Dissipation"
+
+SphericalSurface::nsurfaces = 2
+SphericalSurface::maxntheta = 39
+SphericalSurface::maxnphi = 76
+
+SphericalSurface::ntheta      [0] = 39
+SphericalSurface::nphi        [0] = 76
+SphericalSurface::nghoststheta[0] = 2
+SphericalSurface::nghostsphi  [0] = 2
+
+SphericalSurface::ntheta      [1] = 39
+SphericalSurface::nphi        [1] = 76
+SphericalSurface::nghoststheta[1] = 2
+SphericalSurface::nghostsphi  [1] = 2
+
+Dissipation::verbose   = "no"
+Dissipation::epsdis   = 0.1
+Dissipation::vars = "
+        ML_BSSN::ML_log_confac
+        ML_BSSN::ML_metric
+        ML_BSSN::ML_curv
+        ML_BSSN::ML_trace_curv
+        ML_BSSN::ML_Gamma
+        ML_BSSN::ML_lapse
+        ML_BSSN::ML_shift
+	HydroBase::Avec
+"
+
+
+# init parameters
+InitBase::initial_data_setup_method = "init_some_levels"
+
+ActiveThorns = "TOVSolver"
+
+ADMBase::initial_data            = "tov"
+ADMBase::initial_lapse           = "tov"
+ADMBase::initial_shift           = "tov"
+ADMBase::initial_dtlapse         = "zero"
+ADMBase::initial_dtshift         = "zero"
+
+TOVSolver::TOV_Rho_Central[0] = 1.28e-3
+#TOVSolver::TOV_Mass[0]        = 1.4
+TOVSolver::TOV_Gamma[0]       = 2.0
+TOVSolver::TOV_K[0]           = 100
+
+HydroBase::initial_hydro                = "tov"
+HydroBase::initial_Bvec          = "poloidalmagfield"
+HydroBase::initial_Avec          = "poloidalmagfield"
+GRHydro::Avec_gauge		 = "algebraic"
+GRHydro_InitData::poloidal_A_b      =  0.1
+GRHydro_InitData::poloidal_n_p      = 1 
+GRHydro_InitData::poloidal_P_cut    = 1.0e-6
+GRHydro_InitData::poloidal_rho_max  = 1.221209344680609e-03
+
+EOS_Omni::poly_K     = 1.019575500488281e+02
+EOS_Omni::poly_gamma = 2.0
+EOS_Omni::gl_K       = 1.019575500488281e+02
+EOS_Omni::gl_gamma   = 2.0
+GRHydro::initial_Gamma = 2.0
+
+# I/O
+
+IO::out_dir       = $parfile
+
+IOBasic::outInfo_every = 8
+IOBasic::outInfo_vars  = "Carpet::physical_time_per_hour HydroBase::rho ML_BSSN::ML_Ham HydroBase::bvec GRHydro::divb"
+
+IOScalar::outScalar_every    = 8 
+IOScalar::one_file_per_group = yes
+IOScalar::outScalar_vars     = "
+ HydroBase::rho
+ HydroBase::press
+ HydroBase::eps
+ HydroBase::vel
+ ADMBase::lapse
+ ADMBase::metric
+ ADMBase::curv
+ ML_BSSN::ML_Ham
+ ML_BSSN::ML_mom
+ GRHydro::dens
+"
+
+IOASCII::out1D_every        = 64 
+IOASCII::one_file_per_group = yes
+IOASCII::output_symmetry_points = no
+IOASCII::out3D_ghosts           = no
+IOASCII::out3D_outer_ghosts     = no
+IOASCII::out1D_vars         = "
+ HydroBase::rho
+ HydroBase::press
+ HydroBase::eps
+ HydroBase::vel
+ HydroBase::Bvec
+ ADMBase::lapse
+ ADMBase::metric
+ ADMBase::curv
+ ML_BSSN::ML_Ham
+ ML_BSSN::ML_mom
+ GRHydro::divb
+ GRHydro::bcons
+ GRHydro::bcom
+ GRHydro::bcom0
+ GRHydro::bcom_sq
+"
+
+IOHDF5::checkpoint                  = "yes"
+IO::checkpoint_dir                  = $parfile
+IO::checkpoint_ID                   = "yes"
+IO::checkpoint_every                = 2048
+#IO::checkpoint_every_walltime_hours = 6.0
+IO::checkpoint_keep                 = 3
+IO::checkpoint_on_terminate         = "yes"
+
+IO::recover     = "no"
+IO::recover_dir = $parfile
+

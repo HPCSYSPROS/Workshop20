@@ -1,0 +1,8 @@
+# Interface definition for thorn TriggerTermination
+# $Header: /home/cvs/cccc/CCCCThorns/TriggerTerminationManual/interface.ccl,v 1.2 2005/05/30 16:48:41 cott Exp $
+
+IMPLEMENTS: TriggerTerminationManual
+
+
+
+CCTK_REAL watchminutes TYPE=scalar

@@ -1,0 +1,12 @@
+#! /bin/sh
+#  /*@@
+#    @file      hpux10.01
+#    @date      June 1999
+#    @author    Gabrielle Allen 
+#    @desc 
+#   
+#    @enddesc
+#    @version $Header$
+#  @@*/
+
+. $srcdir/known-architectures/hp-ux

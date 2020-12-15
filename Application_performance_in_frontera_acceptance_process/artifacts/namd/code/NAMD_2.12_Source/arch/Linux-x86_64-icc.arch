@@ -1,0 +1,13 @@
+NAMD_ARCH = Linux-x86_64
+CHARMARCH = multicore-linux64-iccstatic
+
+FLOATOPTS = -ip -axAVX
+
+CXX = icpc -std=c++11
+CXXOPTS = -static-intel -O2 $(FLOATOPTS)
+CXXNOALIASOPTS = -O2 -fno-alias $(FLOATOPTS)
+CXXCOLVAROPTS = -O2 -ip
+
+CC = icc
+COPTS = -static-intel -O2 $(FLOATOPTS)
+

@@ -1,0 +1,4 @@
+# Configuration definition for thorn Dissipation
+# $Header$
+
+REQUIRES THORNS: SphericalSurface

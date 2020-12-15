@@ -1,0 +1,17 @@
+CVS info   : $Header: /home/cvs/cccc/CCCCThorns/CCCCGlobalModes/README,v 1.1 2005/07/08 18:45:30 cott Exp $
+
+Cactus Code Thorn CCCCGlobalModes
+Thorn Author(s)     : Christian D. Ott <cott@aei.mpg.de>
+Thorn Maintainer(s) : Christian D. Ott <cott@aei.mpg.de>
+--------------------------------------------------------------------------
+
+Purpose of the thorn:
+
+Global Hydro Mode analysis according to
+
+(1) Saijo ApJ 595:352, 2003
+
+
+(2) Shibata PRD / astro-ph/0412243, 2004
+
+

@@ -1,0 +1,11 @@
+module ComputeCUDAMgr {
+
+  // One per node
+  nodegroup ComputeCUDAMgr {
+#ifdef NAMD_CUDA
+    entry ComputeCUDAMgr(void);
+    entry void initialize(CkQdMsg *);
+#endif
+  };
+
+};

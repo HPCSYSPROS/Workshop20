@@ -1,0 +1,87 @@
+# Schedule definitions for thorn CCCCGlobalModes
+# $Header: /home/cvs/cccc/CCCCThorns/CCCCGlobalModes/schedule.ccl,v 1.6 2006/06/10 17:49:10 cott Exp $
+
+STORAGE: total_mass
+
+if (do_saijo) 
+{
+	STORAGE: saijo_helpers[3]
+	STORAGE: saijo_integrals
+}
+
+if (do_shibata)
+{
+	STORAGE: shibata_helpers[3]
+	STORAGE: shibata_integrals
+}
+
+if (do_CoM)
+{
+	STORAGE: center_of_mass_helpers[3]
+	STORAGE: center_of_mass
+}
+
+if (do_P)
+{
+	STORAGE: total_momentum_helpers[3]
+	STORAGE: total_momentum
+}
+
+if (do_qlm)
+{
+	STORAGE: multipole_moment_helpers[3]
+	STORAGE: multipole_moment
+}
+
+  schedule CCCCGlobalModes_Startup AT STARTUP
+  {
+    LANG: C
+  } "Startup banner"
+
+
+  schedule CCCCGlobalModes_Init AT CCTK_INITIAL
+  {
+    LANG: Fortran
+  } "Initialization"
+
+  schedule group CCCCGlobalModes IN CCTK_POSTINITIAL after MoL_PostStep
+  {
+  } "Perform GlobalModes analysis"
+
+  schedule group CCCCGlobalModes IN CCTK_EVOL after MoL_PseudoEvolution
+  {
+  } "Perform GlobalModes analysis"
+
+  schedule group CCCCGlobalModes IN CCTK_POSTRESTRICT after MoL_PostStep
+  {
+  } "Perform GlobalModes analysis"
+
+  schedule group CCCCGlobalModes IN CCTK_POSTREGRIDINITIAL after MoL_PostStep
+  {
+  } "Perform GlobalModes analysis"
+
+  schedule group CCCCGlobalModes IN CCTK_POSTREGRID after MoL_PostStep
+  {
+  } "Perform GlobalModes analysis"
+
+
+  schedule CCCCGlobalModes_LocalStuff IN CCCCGlobalModes 
+  {
+    LANG: C
+  } "Perform Local Mode operations: Setup Integrands"
+
+
+
+  schedule CCCCGlobalModes_Reductions AT CCTK_ANALYSIS
+  {
+    LANG: C
+    OPTIONS: global
+  } "Evaluate global quantities"
+
+
+  schedule CCCCGlobalModes_Output AT CCTK_ANALYSIS AFTER \
+	CCCCGlobalModes_Reductions
+  {
+    LANG: C
+    OPTIONS: global
+  } "Output Integral quantities"

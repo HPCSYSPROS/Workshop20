@@ -1,0 +1,51 @@
+
+#
+# Save all representations and their complete settings
+#
+# XXX this code is not saving the state of the 6
+# per-rep user-defined clipping planes yet.
+proc clone_reps {} {
+  set srcmol [molinfo top]
+  foreach mol [molinfo list] {
+    if {$mol == $srcmol} continue
+    #delete current representations
+    set numreps [molinfo $mol get numreps]
+    for {set i 0} {$i < $numreps} {incr i} {
+      mol delrep 0 $mol
+    }
+  }
+  for {set i 0} {$i < [molinfo $srcmol get numreps]} {incr i} {
+    set rep [molinfo $srcmol get "{rep $i} {selection $i} {color $i} {material $i}"]
+    lappend rep [mol showperiodic $srcmol $i]
+    lappend rep [mol numperiodic $srcmol $i]
+    lappend rep [mol showrep $srcmol $i]
+    lappend rep [mol selupdate $i $srcmol]
+    lappend rep [mol colupdate $i $srcmol]
+    lappend rep [mol scaleminmax $srcmol $i]
+    lappend rep [mol smoothrep $srcmol $i]
+    lappend rep [mol drawframes $srcmol $i]
+    foreach mol [molinfo list] {
+      if {$mol == $srcmol} continue
+      foreach {r s c m pbc numpbc on selupd colupd colminmax smooth framespec} $rep { break }
+      eval "mol representation $r"
+      eval "mol color $c"
+      eval "mol selection {$s}"
+      eval "mol material $m"
+      eval "mol addrep $mol"
+      if {[string length $pbc]} {
+        eval "mol showperiodic $mol $i $pbc"
+        eval "mol numperiodic $mol $i $numpbc"
+      }
+      eval "mol selupdate $i $mol $selupd"
+      eval "mol colupdate $i $mol $colupd"
+      eval "mol scaleminmax $mol $i $colminmax"
+      eval "mol smoothrep $mol $i $smooth"
+      eval "mol drawframes $mol $i {$framespec}"
+      if { !$on } {
+        eval "mol showrep $mol $i 0"
+      }
+    }
+  }
+}
+
+

@@ -1,0 +1,121 @@
+# Parameter definitions for thorn HydroBase
+
+SHARES: InitBase
+
+USES KEYWORD initial_data_setup_method
+
+SHARES: IO
+
+USES STRING filereader_ID_vars
+
+RESTRICTED:
+
+KEYWORD initial_hydro "The hydro initial data"
+{
+  "zero" :: "hydro variables are set to vacuum (without atmosphere)"
+  "read from file" :: "Read the initial data using the IOUtil file reader.  Note that this only allows you to read the data from a file, it does not actually do it.  You still have to programme the IOUtil file reader accordingly."
+} "zero"
+
+KEYWORD evolution_method "The hydro evolution method"
+{
+  "none" :: "hydro variables are not evolved"
+} "none"
+
+INT timelevels "Number of time levels in evolution scheme" STEERABLE=recover
+{
+  1:3 :: ""
+} 1
+
+STRING prolongation_type "The prolongation operator used by Carpet for HydroBase variables"
+{
+  "ENO"  :: "Third order ENO operators; only third order is implemented"
+  "WENO" :: "Fifth order WENO operators; only fifth order is implemented"
+  ".*"   :: "Anything else"
+} "ENO"
+
+# Settings for electron fraction Y_e
+
+KEYWORD initial_Y_e "Initial value for Y_e"
+{
+  "none" :: "inactive"
+  "one"  :: "initially set to one"
+  "read from file" :: "Read the initial data using the IOUtil file reader.  Note that this only allows you to read the data from a file, it does not actually do it.  You still have to programme the IOUtil file reader accordingly."
+} "none"
+
+KEYWORD initial_Abar "Initial value for Abar"
+{
+  "none" :: "inactive"
+  "zero" :: "initially set to zero"
+  "read from file" :: "Read the initial data using the IOUtil file reader.  Note that this only allows you to read the data from a file, it does not actually do it.  You still have to programme the IOUtil file reader accordingly."
+} "none"
+
+KEYWORD Y_e_evolution_method "Evolution method for Y_e"
+{
+  "none" :: "Evolution for Y_e is disabled"
+} "none"
+
+KEYWORD Abar_evolution_method "Evolution method for Abar"
+{
+  "none" :: "Evolution for Abar is disabled"
+} "none"
+
+KEYWORD temperature_evolution_method "Evolution method for temperature"
+{
+  "none" :: "Evolution for temperature is disabled"
+} "none"
+
+KEYWORD entropy_evolution_method "Evolution method for entropy"
+{
+  "none" :: "Evolution for entropy is disabled"
+} "none"
+
+# Settings for magnetic field B^i
+
+KEYWORD initial_Bvec "Initial value for Bvec"
+{
+  "none" :: "inactive"
+  "zero" :: "initially set to zero"
+  "read from file" :: "Read the initial data using the IOUtil file reader.  Note that this only allows you to read the data from a file, it does not actually do it.  You still have to programme the IOUtil file reader accordingly."
+} "none"
+
+KEYWORD initial_Avec "Initial value for Avec"
+{
+  "none" :: "inactive"
+  "zero" :: "initially set to zero"
+  "read from file" :: "Read the initial data using the IOUtil file reader.  Note that this only allows you to read the data from a file, it does not actually do it.  You still have to programme the IOUtil file reader accordingly."
+} "none"
+
+KEYWORD initial_Aphi "Initial value for Aphi"
+{
+  "none" :: "inactive"
+  "zero" :: "initially set to zero"
+  "read from file" :: "Read the initial data using the IOUtil file reader.  Note that this only allows you to read the data from a file, it does not actually do it.  You still have to programme the IOUtil file reader accordingly."
+} "none"
+
+KEYWORD Bvec_evolution_method "Evolution method for Bvec"
+{
+  "none" :: "Evolution for Bvec is disabled"
+} "none"
+
+INT hydro_excision "Turn on of off (default) storage for hydro excision" ACCUMULATOR = (x+y)
+{
+  0:* :: "Anything else than 0 turns hydro_excision on, added to by other thorns"
+} 0
+
+# Settings for temperature and electron fraction
+
+KEYWORD initial_temperature "Initial value for temperature"
+{
+  "none"  :: "inactive"
+  "zero"  :: "initially set to zero"
+  "read from file" :: "Read the initial data using the IOUtil file reader.  Note that this only allows you to read the data from a file, it does not actually do it.  You still have to programme the IOUtil file reader accordingly."
+} "none"
+
+KEYWORD initial_entropy "Initial value for entropy"
+{
+  "none"  :: "inactive"
+  "zero"  :: "initially set to zero"
+  "read from file" :: "Read the initial data using the IOUtil file reader.  Note that this only allows you to read the data from a file, it does not actually do it.  You still have to programme the IOUtil file reader accordingly."
+} "none"
+
+

@@ -1,0 +1,611 @@
+# Parameter definitions for thorn Carpet
+
+shares: Cactus
+
+USES BOOLEAN terminate_next
+USES KEYWORD terminate
+USES CCTK_INT cctk_itlast
+USES CCTK_REAL cctk_initial_time
+USES CCTK_REAL cctk_final_time
+USES CCTK_REAL max_runtime 
+
+
+shares: InitBase
+
+USES KEYWORD initial_data_setup_method
+
+
+shares: IO
+
+USES STRING out_dir
+
+
+shares: CarpetLib
+
+USES BOOLEAN use_higher_order_restriction
+USES INT restriction_order_space
+
+
+private:
+
+BOOLEAN domain_from_coordbase "Use the domain description from CoordBase"
+{
+} "no"
+
+BOOLEAN domain_from_multipatch "Use the domain description from MultiPatch"
+{
+} "no"
+
+
+
+CCTK_INT global_nx "Grid size in x direction" STEERABLE=recover
+{
+  0:* :: "must be nonnegative"
+} 10
+
+CCTK_INT global_ny "Grid size in y direction" STEERABLE=recover
+{
+  0:* :: "must be nonnegative"
+} 10
+
+CCTK_INT global_nz "Grid size in z direction" STEERABLE=recover
+{
+  0:* :: "must be nonnegative"
+} 10
+
+CCTK_INT global_nsize "Grid size in each spatial direction" STEERABLE=recover
+{
+  0:* :: "must be nonnegative"
+  -1  :: "use the per-dimension parameters"
+} -1
+
+
+
+CCTK_INT ghost_size_x "Ghost zones in x direction"
+{
+  0:* :: "must be nonnegative"
+} 1
+
+CCTK_INT ghost_size_y "Ghost zones in y direction"
+{
+  0:* :: "must be nonnegative"
+} 1
+
+CCTK_INT ghost_size_z "Ghost zones in z direction"
+{
+  0:* :: "must be nonnegative"
+} 1
+
+CCTK_INT ghost_size "Ghost zones in each spatial direction"
+{
+  0:* :: "must be nonnegative"
+  -1  :: "use the per-dimension parameters"
+} -1
+
+STRING ghost_sizes "Number of ghost zones for each refinement level"
+{
+  "^$" :: "Use the value of ghost_size or ghost_size_[xyz]"
+  "^[[:space:]]*\[[[:space:]]*[[:digit:]]+[[:space:]]*(,[[:space:]]*[[:digit:]]+[[:space:]]*)*\][[:space:]]*$" :: "[ <ghost_size>, ... ]"
+} ""
+
+
+
+restricted:
+
+# Carpet ignores all periodic* parameters and aborts in ParamCheck if any is
+# changed to "yes"
+BOOLEAN periodic "do not use this parameter"
+{
+} "no"
+
+BOOLEAN periodic_x "do not use this parameter"
+{
+} "yes"
+
+BOOLEAN periodic_y "do not use this parameter"
+{
+} "yes"
+
+BOOLEAN periodic_z "do not use this parameter"
+{
+} "yes"
+
+
+
+private:
+
+KEYWORD refinement_centering "Centering"
+{
+  "vertex" :: "use a vertex centred grid structure"
+  "cell"   :: "use a cell centred grid structure"
+} "vertex"
+
+KEYWORD eno_interpolation_type "What is represented by values in cells DEPRECATED"
+{
+  "samples"  :: "grid values a sample values of the solution"
+} "samples"
+
+CCTK_INT max_refinement_levels "Maximum number of refinement levels (including the base level)"
+{
+  1:* :: "must be positive"
+} 1
+
+CCTK_INT max_timelevels "Maximum number of time levels (including the current time level)"
+{
+  -1 :: "Set automatically to prolonation_order_time+1"
+  1:* :: "Set this explicitly"
+} -1
+
+CCTK_INT refinement_factor "Refinement factor"
+{
+  1:* :: "must be positive"
+} 2
+
+STRING space_refinement_factors "Spatial refinement factors over the coarsest level"
+{
+  "^$" :: "Use the value of refinement_factor"
+  # V = [SDS(,SDS)*]
+  # L = [SVS(,SVS)*]
+  #   = [S[SDS(,SDS)*]S(,S[SDS(,SDS)*]S)*]
+  "^[[:space:]]*\[[[:space:]]*\[[[:space:]]*[[:digit:]]+[[:space:]]*(,[[:space:]]*[[:digit:]]+[[:space:]]*)*\][[:space:]]*(,[[:space:]]*\[[[:space:]]*[[:digit:]]+[[:space:]]*(,[[:space:]]*[[:digit:]]+[[:space:]]*)*\][[:space:]]*)*\][[:space:]]*$" :: "[ [<ifact>,<jfact>,<kfact>], ... ]"
+} ""
+
+STRING time_refinement_factors "Temporal refinement factors over the coarsest level"
+{
+  "^$" :: "Use the value of refinement_factor"
+  # L = [SDS(,SDS)*]
+  "^[[:space:]]*\[[[:space:]]*[[:digit:]]+[[:space:]]*(,[[:space:]]*[[:digit:]]+[[:space:]]*)*\][[:space:]]*$" :: "[ <tfact>, ... ]"
+} ""
+
+BOOLEAN refine_timestep "Correct Time::dtfac for spacings on finer grids"
+{
+} "no"
+
+
+
+CCTK_INT convergence_level "Convergence level"
+{
+  *:* :: "negative for finer, positive for coarser resolutions"
+} 0
+
+CCTK_INT num_convergence_levels "Number of convergence levels (including the base level)"
+{
+  1:* :: "must be positive"
+} 1
+
+CCTK_INT convergence_factor "Multigrid factor"
+{
+  1:* :: "must be positive"
+} 2
+
+
+
+CCTK_INT num_maps "Number of maps"
+{
+  1:* :: ""
+} 1
+
+
+
+STRING model "Model name for multi-model simulations -- the model name is used to distribute the processors onto the models"
+{
+  ".+" :: ""
+} "world"
+
+
+
+CCTK_INT prolongation_order_space "Order of prolongation operator in space" STEERABLE=recover
+{
+  0:* :: "vertex centred orders must be odd"
+} 1
+
+STRING prolongation_orders_space "Order of prolongation operator in space for each refinement level" STEERABLE=recover
+{
+  "^$" :: "Use the value of prolongation_order_space"
+  "^[[:space:]]*\[[[:space:]]*[[:digit:]]+[[:space:]]*(,[[:space:]]*[[:digit:]]+[[:space:]]*)*\][[:space:]]*$" :: "[ <order>, ... ]"
+} ""
+
+CCTK_INT prolongation_order_time "Order of prolongation operator in time" STEERABLE=recover
+{
+  0:* :: ""
+} 1
+
+
+
+BOOLEAN use_buffer_zones "Use buffer zones"
+{
+} "no"
+
+CCTK_INT additional_buffer_zones "Additional buffer zones"
+{
+  *:* :: ""
+} 0
+
+BOOLEAN use_overlap_zones "Use overlap zones"
+{
+} "no"
+
+CCTK_INT additional_overlap_zones "Additional overlap zones"
+{
+  *:* :: ""
+} 0
+
+BOOLEAN use_tapered_grids "Use tapered grids, avoiding time interpolation during evolution"
+{
+} "no"
+
+CCTK_INT num_integrator_substeps "Number of substeps of the time integrator"
+{
+  -1: :: "Call MoLNumIntegratorSubsteps"
+  0:* :: ""
+} -1
+
+
+
+BOOLEAN sync_during_time_integration "Synchronise during time integration, even when prolongation is switched off"
+{
+} "yes"
+
+
+
+CCTK_STRING base_extents "Extents of base grid components, in grid point units of the finest level"
+{
+  "^$" :: "leave empty for one grid component covering the whole region (default)"
+
+# We want the string to contain a list of bboxes.  Each bbox contains
+# three vectors specifying the lower bound, upper bound, and stride.
+# (The upper bound is inclusive.  All values are nonnegative integers.)
+# The syntax for vectors, bboxes, and lists is described below.
+# All spaces are optional.
+
+# The () parentheses and [] brackets are literals.
+# The {} braces are used for grouping.
+# If you put everything together, you get the tapeworm below.
+# There should be a way to define abbreviations in regexps!
+# Having #defines in param.ccl files would help a lot.
+# VECT := " [ 0 , 0 , 0 ]"
+# BBOX := " ( VECT : VECT : VECT )"
+# LIST := " [ {{ BBOX }* BBOX}? ]"
+
+# Almost human readable explanation follows.
+# The specification is hierarchical.
+
+# The following definitions are generic:
+# VECT3(x) := "[ x, x, x ]"
+#    three x, separated by commas, enclosed in square brackets
+# BBOX3(x) := "( x : x : x )"
+#    three x, separated by colons, enclosed in round parentheses
+# LIST(x) := "[ {{ x, }* x}? ]"
+#    zero or more x, separated by commas, enclosed in square brackets
+
+# A domain is built up as follows:
+# REGION   := BBOX3(VECT3(double))
+# DOMAIN   := LIST(REGION)
+
+  "^[[:space:]]*\[(([[:space:]]*\([[:space:]]*\[[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*\][[:space:]]*:[[:space:]]*\[[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*\][[:space:]]*:[[:space:]]*\[[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*\][[:space:]]*\)[[:space:]]*,)*[[:space:]]*\([[:space:]]*\[[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*\][[:space:]]*:[[:space:]]*\[[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*\][[:space:]]*:[[:space:]]*\[[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*\][[:space:]]*\))?[[:space:]]*\][[:space:]]*$" :: "[ ([<imin>,<jmin>,<kmin>]:[<imax>,<jmax>,<kmax>]:[<istride>,<jstride>,<kstride>]), ... ]"
+} ""
+
+CCTK_STRING base_outerbounds "Outer boundaries of base grid components"
+{
+  "^$" :: "leave empty for using the default, which depends on cctk_gsh"
+
+# See above for an explanation of this syntax, and of the tapeworm below.
+# Each vector element is 0 or 1,
+# where 0 is handled by synchronisation or prolongation,
+# and 1 stands for a user-supplied ("outer") boundary condition.
+
+# BND := " [ 0 , 0 ]"
+# VECT := " [ BND , BND , BND ]"
+# LIST := " [{{VECT ,}*VECT}? ]"
+
+# Almost human readable explanation follows.
+# The specification is hierarchical.
+
+# The following definitions are generic:
+# VECT2(x) := "[ x, x ]"
+#    two x, separated by commas, enclosed in square brackets
+# VECT3(x) := "[ x, x, x ]"
+#    three x, separated by commas, enclosed in square brackets
+# LIST(x) := "[ {{ x, }* x}? ]"
+#    zero or more x, separated by commas, enclosed in square brackets
+
+# A domain is built up as follows:
+# REGION   := VECT3(VECT2(double))
+# DOMAIN   := LIST(REGION)
+
+  "^[[:space:]]*\[(([[:space:]]*\[[[:space:]]*\[[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*\][[:space:]]*,[[:space:]]*\[[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*\][[:space:]]*,[[:space:]]*\[[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*\][[:space:]]*\][[:space:]]*,)*[[:space:]]*\[[[:space:]]*\[[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*\][[:space:]]*,[[:space:]]*\[[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*\][[:space:]]*,[[:space:]]*\[[[:space:]]*[[:digit:]]+[[:space:]]*,[[:space:]]*[[:digit:]]+[[:space:]]*\][[:space:]]*\])?[[:space:]]*\][[:space:]]*$" :: "[ [ [<ilower>,<iupper>], [<jlower>,<jupper>], [<klower>,<kupper>] ], ... ]"
+} ""
+
+
+
+BOOLEAN enable_all_storage "Enable storage for all grid functions" STEERABLE=recover
+{
+} "no"
+
+BOOLEAN enable_no_storage "Exit before beginning to enable storage for grid functions" STEERABLE=recover
+{
+} "no"
+
+
+
+BOOLEAN poison_new_timelevels "Try to catch uninitialised grid elements by setting new timelevels to values that will catch your attention" STEERABLE=always
+{
+} "yes"
+
+BOOLEAN check_for_poison "Explicitely check for the poison value after every time step" STEERABLE=always
+{
+} "no"
+
+CCTK_INT poison_value "UNUSED; use CarpetLib::poison_value instead" STEERABLE=always
+{
+  * :: ""
+} 0
+
+CCTK_INT max_poison_locations "Maximum number of poison locations that are printed to the screen" STEERABLE=always
+{
+  -1  :: "print all locations"
+  0:* :: "print only that many locations"
+} 10
+
+
+
+BOOLEAN checksum_timelevels "Try to catch unintentionally changed timelevels by taking checksums and comparing against these" STEERABLE=always
+{
+} "no"
+
+
+
+BOOLEAN suppress_restriction "Suppress the restriction operations.  This makes the coarser refinement levels independent of the finer ones." STEERABLE=always
+{
+} "no"
+
+
+
+BOOLEAN verbose "Display more info on the screen" STEERABLE=always
+{
+} "no"
+
+BOOLEAN veryverbose "Display a lot of info on the screen" STEERABLE=always
+{
+} "no"
+
+BOOLEAN storage_verbose "Display verbose storage information if veryverbose" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN barriers "Insert barriers at strategic places for debugging purposes (slows down execution)" STEERABLE=always
+{
+} "no"
+
+BOOLEAN schedule_barriers "Insert barriers between scheduled items, so that timer statistics become more reliable (slows down execution)" STEERABLE=always
+{
+} "no"
+
+BOOLEAN sync_barriers "Insert barriers before and after syncs, so that the sync timer is more reliable (slows down execution)" STEERABLE=always
+{
+} "no"
+
+BOOLEAN output_internal_data "Periodically print internal data to the screen for debugging purposes" STEERABLE=always
+{
+} "no"
+
+REAL timing_average_window_minutes "Time interval (in wall time minutes) for calculating the current physics time per hour" STEERABLE=always
+{
+  (0.0:* :: ""
+} 10.0
+
+INT print_timestats_every "Print interesting timing statistics periodically" STEERABLE=always
+{
+  -1  :: "don't report"
+  0   :: "don't report"
+  1:* :: "report every so many iterations"
+} 0
+
+BOOLEAN print_grid_info "Print information about the grids on regridding" STEERABLE=always
+{
+} yes
+
+INT output_timers_every "Print detailed statistics periodically" STEERABLE=always
+{
+  -1  :: "don't report"
+  0   :: "don't report"
+  1:* :: "report every so many iterations"
+} 0
+
+STRING timer_file "File name in which detailed timing statistics are collected" STEERABLE=recover
+{
+  "^$"   :: "empty filename: no file output"
+  "^.+$" :: "file name"
+} "carpet-timing-statistics"
+
+BOOLEAN output_initialise_timer_tree "Output timing information in tree form to standard output for Initialise"
+{
+} "no"
+
+INT output_timer_tree_every "Output timing information in tree form to standard output for Evolve every so many iterations" STEERABLE=always
+{
+  0   :: "don't report"
+  1:* :: "report every so many iterations"
+} 0
+
+BOOLEAN output_xml_timer_tree "Output timing information in tree form as XML" STEERABLE=always
+{
+} "no"
+
+BOOLEAN include_maps_in_mode_timer_tree  "Include a breakdown of time spent on different multipatch maps in the mode timer tree" STEERABLE=always
+{
+} "no"
+
+BOOLEAN include_local_mode_in_mode_timer_tree  "Include a node for the time spent in local mode in the mode timer tree" STEERABLE=always
+{
+} "no"
+
+
+
+BOOLEAN recompose_verbose "Output debug information during recomposing" STEERABLE=ALWAYS
+{
+} "no"
+
+KEYWORD processor_topology "How to determine the processor topology" STEERABLE=recover
+{
+  "manual"    :: "Specified by processor_topology_*"
+  "along-z"   :: "Split the region along the z direction only"
+  "along-dir" :: "Split the region along one direction only"
+  "automatic" :: "Choose the topology automatically"
+  "recursive" :: "Choose the topology automatically, using a different algorithm that may lead to better load balancing"
+  "balanced"  :: "Choose the topology automatically, ensuring a maximum load balance"
+} "automatic"
+
+CCTK_INT processor_topology_3d_x "Number of processors in x-direction" STEERABLE=recover
+{
+  1:* :: "must be positive"
+} 1
+
+CCTK_INT processor_topology_3d_y "Number of processors in y-direction" STEERABLE=recover
+{
+  1:* :: "must be positive"
+} 1
+
+CCTK_INT processor_topology_3d_z "Number of processors in z-direction" STEERABLE=recover
+{
+  1:* :: "must be positive"
+} 1
+
+CCTK_INT split_direction "Direction in which the domain should be split (for processor_topology=along-dir)" STEERABLE=recover
+{
+  0:* :: "0 for x, 1 for y, 2 for z, etc."
+} 2
+
+CCTK_INT no_split_direction "Direction in which the domain must not be split (for processor_topology=automatic)" STEERABLE=recover
+{
+  -1  :: "split in all directions"
+  0:* :: "0 for x, 1 for y, 2 for z, etc."
+} -1
+
+BOOLEAN constant_load_per_processor "Keep the load per processor constant -- this is meant for benchmarks" STEERABLE=recover
+{
+} "no"
+
+CCTK_REAL aspect_ratio_x "Desired aspect ratio for each processor's domain" STEERABLE=always
+{
+  (0:* :: ""
+} 1.0
+
+CCTK_REAL aspect_ratio_y "Desired aspect ratio for each processor's domain" STEERABLE=always
+{
+  (0:* :: ""
+} 1.0
+
+CCTK_REAL aspect_ratio_z "Desired aspect ratio for each processor's domain" STEERABLE=always
+{
+  (0:* :: ""
+} 1.0
+
+CCTK_INT min_points_per_proc "Minimum number of grid points per processor" STEERABLE=always
+{
+  0:* :: "that many"
+} 0
+
+BOOLEAN split_components "Split components onto processes; without this, one needs many components and few processes" STEERABLE=always
+{
+} "yes"
+
+CCTK_INT granularity "When splitting components, create sizes that are multiples of this granularity" STEERABLE=always
+{
+  1:* :: "TODO: query CoordBase or related thorns for this information"
+} 1
+
+CCTK_INT granularity_boundary "When splitting components, assume this many boundary points that don't count towards the granularity" STEERABLE=always
+{
+  0:* :: "TODO: use CoordBase's number of boundary points for this"
+} 0
+
+CCTK_REAL ghost_zone_cost "Relative cost of ghost zones for 'recursive' load balancing" STEERABLE=always
+{
+  0:* :: ""
+} 0.025
+
+CCTK_REAL maximum_imbalance "Maximum load imbalance" STEERABLE=always
+{
+  (0.0:* :: ""
+} 0.1
+
+BOOLEAN same_number_of_components_on_each_process "Ensure that each process has the same number of components, adding empty dummy components if necessary" STEERABLE=always
+{
+} "yes"
+
+
+
+CCTK_INT num_threads "Number of threads per process" STEERABLE=recover
+{
+  -1  :: "use system default, probably influenced by OMP_NUM_THREADS"
+  1:* :: "use this many threads"
+} -1
+
+BOOLEAN set_cpu_affinity "Set the process CPU affinity, overwriting the respective system setting" STEERABLE=recover
+{
+} "no"
+
+
+
+STRING grid_structure_filename "File name to output grid structure to (empty = no output)" STEERABLE=recover
+{
+  ".*" :: "must be a legal file name"
+} ""
+
+STRING grid_coordinates_filename "File name to output grid coordinates to (empty = no output)" STEERABLE=recover
+{
+  ".*" :: "must be a legal file name"
+} ""
+
+
+
+private:
+
+BOOLEAN init_each_timelevel "Call initial data routines once for each timelevel" STEERABLE=always
+{
+} "no"
+
+BOOLEAN init_fill_timelevels "Fill past time levels from current time level after calling initial data routines" STEERABLE=always
+{
+} "no"
+
+BOOLEAN prolongate_initial_data "Prolongate the refined regions during initial data generation" STEERABLE=always
+{
+} "no"
+
+BOOLEAN regrid_during_initialisation "Regrid while initialising" STEERABLE=recover
+{
+} "no"
+
+BOOLEAN regrid_during_recovery "Regrid while recovering" STEERABLE=recover
+{
+} "no"
+
+BOOLEAN regrid_in_level_mode "Regrid in level mode (instead of singlemap mode), enabling more efficient processor distributions when there are multiple maps" STEERABLE=always
+{
+} "yes"
+
+BOOLEAN time_interpolation_during_regridding "Interpolate finer levels in time during regridding" STEERABLE=recover
+{
+} "yes"
+
+BOOLEAN output_after_regridding "Call OutputGH after regridding" STEERABLE=always
+{
+} "no"
+
+
+
+BOOLEAN init_3_timelevels "Set up 3 timelevels of initial data" STEERABLE=always
+{
+} "no"
+
+
+
+BOOLEAN adaptive_stepsize "Allow adaptive timestep sizes"
+{
+} "no"
+
+BOOLEAN use_unusedpoints_mask "Turn on storage and usage of 'unusedpoints_mask'" STEERABLE=recover
+{
+} "no"

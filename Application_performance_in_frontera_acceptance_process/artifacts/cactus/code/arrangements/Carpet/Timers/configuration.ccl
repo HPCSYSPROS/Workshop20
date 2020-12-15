@@ -1,0 +1,8 @@
+# Configuration definitions for thorn Timers
+
+PROVIDES Timers
+{
+}
+
+# This is necessary for some convenient communication routines
+REQUIRES CarpetLib

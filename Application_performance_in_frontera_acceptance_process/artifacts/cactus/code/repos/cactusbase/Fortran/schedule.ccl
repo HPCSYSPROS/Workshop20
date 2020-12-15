@@ -1,0 +1,6 @@
+# Schedule definitions for thorn Fortran
+
+SCHEDULE CheckFortranParameters AT paramcheck
+{
+  LANG: Fortran
+} "Test whether Fortran parameters work correctly"

@@ -1,0 +1,12 @@
+# Interface definition for thorn ADMMacros
+# $Header$
+
+implements: ADMMacros
+
+USES INCLUDE: CalcTmunu_temps.inc
+USES INCLUDE: CalcTmunu.inc
+
+public:
+
+int local_spatial_order type=SCALAR \
+  "Can be set pointwise to change the finite differencing order"

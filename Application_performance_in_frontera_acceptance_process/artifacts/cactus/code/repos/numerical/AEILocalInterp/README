@@ -1,0 +1,95 @@
+CVS info   : $Header$
+
+Cactus Code Thorn AEILocalInterp
+Thorn Author(s)     : Jonathan Thornburg <jthorn@aei.mpg.de>
+Thorn Maintainer(s) : Jonathan Thornburg <jthorn@aei.mpg.de>
+--------------------------------------------------------------------------
+
+Purpose of the thorn
+====================
+
+This thorn does processor-local interpolation of N-dimensional data
+arrays, using the CCTK_InterpLocalUniform() API.  The data arrays
+(in general there may be many of them) must be defined on a uniformly
+spaced grid.
+
+This thorn provides the interpolation operators
+   "Lagrange polynomial interpolation (tensor product)"
+   "Lagrange polynomial interpolation (maximum degree)"
+   "Hermite polynomial interpolation",
+The interpolation operator
+   "Lagrange polynomial interpolation"
+is also accepted as a synonyms
+   "Lagrange polynomial interpolation (tensor product)"
+(So is "generalized polynomial interpolation", but that's deprecated
+and will probably be removed at some point.)
+
+
+Documentation
+=============
+
+There are 3 main sources of user documentation for this thorn:
+- The Cactus Users' Guide, chapter "Application Thorn Writing",
+  section "Cactus Application Interfaces", subsection "Interpolation
+  Operators" (at present this is section B8.3), describes the general
+  Cactus system for interpolation operators.
+- The Cactus Users' Guide, chapter "Function Reference", section
+  "Cactus Functions", has an entry giving a detailed description of
+  the CCTK_InterpLocalUniform() interpolation API which this thorn
+  supports.  This is probably the place to start reading; it also
+  has a simple example.
+- This thorn's Thorn Guide gives a detailed description of the
+  interpolation operators this thorn supports, and their mandatory
+  and optional parameter-table entries.  The Thorn Guide also
+  includes both simple and more complicated examples.
+
+
+History
+=======
+
+This interpolator was written by Jonathan Thornburg in winter 2001-2002.
+Between then and July 2003 it lived in CactusBase/LocalInterp (in the
+ src/GeneralizedPolynomial-Uniform/  subdirectory), but in July 2003 it
+was moved to this (new) thorn so it could stay GPL (Cactus policies forbid
+GPL code in the CactusBase arrangement).  See  CactusBase/LocalInterp/
+for the older CVS history.
+
+
+Copyright & Licensing
+=====================
+
+This thorn is copyright (C) 2001-2003
+by Jonathan Thornburg <jthorn@aei.mpg.de>.
+
+This thorn is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This thorn is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this thorn (see the file COPYING in this directory);
+if not, write to the Free Software Foundation, Inc., 59 Temple
+Place, Suite 330, Boston, MA  02111-1307  USA
+
+See the README files in the individual interpolators' directories
+for more information.
+
+
+Other Interpolation Thorns
+==========================
+
+As well as this thorn, there are some other Cactus thorns that also
+provide interpolation APIs:
+
+CactusBase/LocalInterp
+	This contains an older processor-local interpolator, supporting
+	the interpolation operator
+	   "uniform cartesian"
+
+There are also driver-specific thorns providing global (grid array)
+interpolation, eg. PUGHInterp, CarpetInterp, etc.

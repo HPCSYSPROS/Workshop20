@@ -1,0 +1,9 @@
+# Main make.code.defn file for thorn DriftCorrect4
+# $Header: /numrelcvs/AEIDevelopment/DriftCorrect4/src/make.code.defn,v 1.1 2004/02/12 22:56:33 schnetter Exp $
+
+# Source files in this directory
+SRCS = driftcorrect.F90 driftcorrect.cc
+
+# Subdirectories containing source files
+SUBDIRS = 
+

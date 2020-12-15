@@ -1,0 +1,5 @@
+# Parameter definitions for thorn Vectors
+
+BOOLEAN verbose "Verbose output during vector tests"
+{
+} "no"

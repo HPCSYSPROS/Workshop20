@@ -1,0 +1,775 @@
+To-do items and ideas:
+
+1. Add "move" command to move a simulation from one machine to another
+   (i.e., move checkpoint files).  Also allow moving between different
+   directories on the same machine.
+
+2. Create configurations and simulations in a machine-independent way,
+   or allow them to be moved.
+
+3. List only active / pending / inactive simulations.
+
+4. List simulations on all machines.  List configurations on all
+   machines.
+
+5. Create a database will all jobs submitted via sim, containing all
+   parameter files, scripts, dates and times, machines, users,
+   restarts, etc.  Use Formaline for this?
+
+6. Make delete ask for a checkpoint.  [Done.]
+
+7. Allow patterns with list-simulations.
+
+8. Report used disk space per simulation [done] / per restart; report
+   free disk space.
+
+9. Introduce version numbers of simulations?  Or add version numbers
+   to parameter file names instead?
+
+10. Hide simulations?  (Give them a generic name in the job scripts.)
+    [Done.]
+
+11. Accept multiple simulations for delete and cleanup.  [Done.]  And
+    for rsync.  [Done.]  Accept "all" for cleanup and delete.  And for
+    rsync?  And for list-*; see item 4.
+
+12. Build: check return code of *-config and of build.
+
+13. Add --machine option.  [What for?]  [Done; is called
+    "--hostname".]
+
+14. Check status of all executed commands (build, submit, etc.).
+
+15. Keep a central/local database of all created simulations, not just
+    the machine-local ones.  Similarly for configurations?
+
+16. Store in each simulation the host name of the creator.  This
+    allows sharing simulation directories between different hosts.
+
+17. "Configuration contains no executable" -> "Configuration does not
+    exist", if applicable.  Similarly for simulations.  [Done.]
+
+18. Are jobs classified "finished" too soon?  A job was in state "C"
+    on Peyote, yet classified "finished".  It should have been in
+    state "unknown" instead.  [Done.]
+
+19. Make *.out and *.err files world readable when cleaning up.  [Done.]
+
+20. Record causes of failure in simulation factory:
+    - look for core files
+    - look for assertion failures
+    - record delete commands
+    - look for "signal received" messages
+    - record dates for script start/end, application start/end
+    - look for "nan" messages
+    - have cactus write termination reason
+    - try to ping nodes in script after application exits
+    - run df after application exits
+
+21. Delete incomplete [done] and old [won't do that] checkpoint files
+    during cleanup.
+
+22. Use quotemeta in perl.
+
+23. Calculate used processor time for each job or simulation.
+
+24. When deleting a job, first write to TERMINATE, then use qdel, then
+    use kill on the job's processes.  Record the job's processes
+    before executing qdel.
+
+25. When requesting job deletion, remember that deletion was
+    requested, and remember the time, and what level of deletion was
+    requested.  Tell the user about this in list-simulations [done].
+
+26. Put run time limit into parameter file, minus a certain offset.
+    [Done.]
+
+27. Say "no configurations" for list-conf when the "configs" directory
+    does not exist.  [Done.]
+
+28. Specify default script in machine database.  [Done.]  Specify
+    default thorn list in machine database.  [Done.]
+
+29. Use the ssh option "-o ControlMaster no" since the simfactory
+    connections are short-lived.  Alternatively, set up an explicit
+    control master, keep it running, and reuse it later.
+
+30. Put default queue and queue limits into machine database.  [Done.]
+
+31. Shorten option list and thorn list (and script) file names.  [What
+    did I mean with this?]
+
+32. When creating a new configuration, require an option and a thorn
+    list.  [Done.]
+
+33. When creating or submitting a simulation, ensure that all required
+    options are there, or have sensible defaults.
+
+34. At cleanup time, run (or schedule) certain post-processing
+    methods, depending on which thorns were active and which output
+    files were generated.
+
+35. Add "comment" command to add a comment to a README or to the log
+    file.  [Done.]
+
+36. Link executable into job directory.  [Done.]
+
+37. Use maximum wall time when wall time is not specified.  [Done.]
+
+38. Estimate how full a queue is.  Estimate when a (submitted or
+    unsubmitted) job is going to start.
+
+39. Keep job shells (automatically) on various machines, and fill them
+    on demand ("keep them primed", "keep them hot").
+
+40. Make it possible to submit a job on several machines.  Delete all
+    but one as soon as it starts on one machine.
+
+41. If a job is finished and there is time left in the queue, then do
+    not give up the slot.  Instead start the next job immediately.
+
+42. Amend item 41: Be able to change the jobs that run in a certain
+    slot:
+    a. Interrupt a job for a higher-priority job
+    b. Start another job if the current job exits
+    c. Obtain a longer/better slot, and then move a job over
+    d. (Reserve slots "just in case", then discard them if not needed)
+    e. (Keep a slot after a job has aborted, so that it can be debugged)
+    f. Combine two slots for a bigger one
+    g. (Split a slot into two)
+    h. Exchange a job before it has started
+
+43. Test parameter files when creating or submitting a job.
+
+44. Alert people via IM, not just email.
+
+45. Support job chaining.  Submit a new job before the old one has
+    finished, with the necessary job dependencies.  Set up the restart
+    directory etc. automatically at the later time.  [Done.]
+
+46. Create a web or a portal or an Eclipse interface.  [Jian Tao]
+
+47. Add command to look at stdout [done], stderr [done], or Formaline
+    output [done] of jobs.  Implement this for all of running,
+    finished, and inactive jobs [done].
+
+48. Add a command to block a simulation.  After it has been blocked,
+    it cannot be submitted or restarted any more.  This would be to
+    prevent starting it accitentally after it has been found to be
+    erroneous.
+
+49. Support sets of simulations, i.e., simulations which are very
+    similar and differ only by slight changes in their executables and
+    parameter files.  They could e.g. be numbered sequentially.  See
+    also item 9.
+
+50. Add an "execute" command to execute an arbitrary command at a
+    remote site.  [Done.]
+
+51. When ssh'ing or rsync'ing to loni, ssh and rsync to both ducky and
+    zeke.
+
+52. Combine commands "status" and "list-simulations --verbose".
+
+53. Combine commands "submit" and "restart", or combine at least their
+    implementations.  [Same as 137.]
+
+54. Allow multiple simulations with "status" and "show-output".
+
+55. Show only the head or only the tail for "show-output".  Show only
+    Formaline or only stdout or only stderr.  Use "tail -f".
+
+56. Check for the Cactus pseudo makefile commands "clean",
+    "cleandeps", "realclean", etc.  Make sure that "config" is not
+    appended to them.  Maybe forbid them and provide special commands
+    or options for these action.
+
+57. Copy executables to a safe place (the cache?) after building.
+    This is cheapter than checking them every time when creating a
+    simulation.  Add a quick security test, e.g. comparing file dates
+    and sizes.  [Won't do that.  When building, the simulation
+    directory is not known.]
+
+58. Before building, remove all empty object files and empty
+    libraries.  This can help recover from build errors.  (This should
+    be done by Cactus instead.)
+
+59. When performing a "make *-cleandeps", remove also all "*.ccldeps"
+    files from the scratch directory.  (This should be done by Cactus
+    instead.)
+
+60. Store all source code in a git repository when building; record
+    the git id when running.  [Done.]
+
+61. Add a command to wait until a job has died, to be used e.g. before
+    cleaning up.
+
+62. Clean up automatically, e.g. from cron jobs, or by calling out
+    from the qsub script.
+
+63. Support checkpointing to a local disk.  Copy the files back during
+    cleanup.  Maybe use "many" to parallelise this.
+
+64. Support building on several machines.
+
+65. Support configuring several executables at once.
+
+66. Specify queue on command line when submitting.  [Done.]  Specify script
+    file when submitting.  Override any settings when creating or
+    submitting.
+
+67. Indicate whether termination has been requested in
+    list-simulations.  [Done.]
+
+68. Choose option list automatically.  Expect user input only for
+    DEBUG, OPTIMISE, and PROFILE.  [Done.]
+
+69. Select script file together with configuration.  [Done.]
+
+70. Add a flag to the option files to ensure a complete rebuild, i.e.,
+    a make-realclean.  [Done.]
+
+71. Force a rebuild when the option list changes.  [Done.]
+
+72. Associate a source tree with a simulation.  Make it easy to copy a
+    source tree.  Use git.  [Done.]
+
+73. Handle non-existing top-level directories in rsync.  [Done.]
+
+74. Add ccatie-* and whisky-* thorn lists.
+
+75. Add "--force" option to enforce reconfiguring, rebuilding, or
+    (complete) recompiling.
+
+76. Use stored (mdb) entries for option list, thorn list, and script
+    file iff the user has specified no option and if these are missing
+    in the configuration.  [Done.]
+
+77. Add commands to move data from and to deep storage.
+
+78. With --verbose, build with SILENT=no.
+
+79. Output more analysis quantities with the simulation state,
+    e.g. M/h or what horizons are found or the amplitude of the 2,2
+    mode.
+
+80. Introduce a mechanism to mark a simulation as trash, and to unmark
+    it again.  [This is the same as 48.]
+
+81. Introduce iohosts to speed up transfer.  [Done.]
+
+82. Add command to print latest or active restart.  [Is already done
+    by commnds list-simulation and status.]
+
+83. Add --xml flag to output information in an XML format for easier
+    post-processing.  [Partly done; works for list-machines and
+    list-simulations.]
+
+84. Calculate used CPU hours when displaying status, and write it into
+    a file during cleanup.  (See also 23.)
+
+85. Display estimated start time and elapsed run time when displaying
+    status.
+
+86. Add a command to determine the simulation and restart from a given
+    job id.  [Done.]
+
+87. Idea: Standard names for machine configs, thorn lists, and script
+    files: machine-mpi-compilers.config.  Add include or links.
+
+88. For "execute", quote the command, and read .profile etc. to get
+    the path correct.
+
+89. Add a command to delete the TRASH directory.
+
+90. Add support for spreading simulations onto several data disk and
+    remember this, e.g. by placing the main simulations directory into
+    the home and having symlinks.  This needs to include a facility to
+    prevent creating simulations in the home.  There should also be a
+    way to restart on a different disk.
+
+91. Make Cactus actions like cleandeps, clean, realclean, build,
+    rebuild, reconfig work.  Deal with outdated ccldeps and d files.
+
+92. Add -t options to all intermediate ssh invocations for login.
+    [Done.]
+
+93. Ignore trampoline if it is the local machine.
+
+94. Check that the trampoline is not the remote machine.  Check that
+    it is not cyclic.
+
+95. Submit to a set of machines, choosing dynamically which job should
+    be started.
+
+96. Submit several restarts at once, adding job dependencies.
+
+97. Delay submission of jobs to circumvent queuing limits.
+
+98. Add --bwlimit option for rsync command.
+
+99. Ensure that the requested wall time is not larger than the maximum
+    wall time.
+
+100. Add --verbose option to command list-machines.
+
+101. Test parameter files when creating simulations, e.g. by running
+     with option -x.  Maybe do this in the background?
+
+102. Mark simulations as "trash" or "finished".
+
+103. Keep (local) list of all simulations, restarts, etc.
+
+104. List other users' simulations, runs, e.g. by looking at a list of
+     directories.
+
+105. Add more information to mdb: web page, architecture description,
+     processor type, cache and memory sizes, etc.  [Done.]
+
+106. Archive source code, configuration options, parameter file when
+     the simulation is created, not at run time.
+
+107. Add command "remotes" (or similar) which executes a command on a
+     set of remote machines.
+
+108. Add hook for additional scripts which analyse ongoing or finished
+     simulations.
+
+109. Submit jobs to multiple machines, and let the queuing system
+     choose which one to start.  Abort the others.
+
+110. Rename "BBH Factory", e.g. to "SimFactory".  [Done.]
+
+111. Add a command to create and submit a simulation at the same time.
+     [This is the same as 116.]
+
+112. Store machine name in option lists, thorn lists, and script
+     files, to avoid confusion.  Tie option lists and script files
+     together, so that automatically the correct combination is used.
+
+113. Use default option list, thorn list, and script file for a given
+     machine, but only if there is no such thing in the configuration
+     yet.  [Done.]
+
+114. Add a command to log in to the root compute node.  Maybe modify
+     the "login" command for this.
+
+115. Add a "--force" option to the cleanup command.  It would probably
+     still require that a "delete" command has been issued before.
+     [Done.]
+
+116. Add combined "create-submit" and "delete-cleanup" commands.
+     [Done.]  Maybe also add a combined "delete-cleanup-submit"
+     command, or a "delete-cleanup-restart" command.
+
+117. Handle different output disks.  Allow restarting on different
+     disks.  Maybe use symbolic links for this.
+
+118. Collect metadata from simulations, and build a cache for them
+     (SIMULATION_ID, JOB_ID, etc.)
+
+119. Add a mechanism for forcing a reconfiguration with the existing
+     options file.  [This is the same as 135.]
+
+120. Specify (in the online help) which commands accept which options.
+
+121. Output job state (queued/running) by default with
+     list-simulations, not just with --verbose.
+
+122. Store exact command that was used to create or submit a
+     simulation in the LOG file.
+
+123. Add command "rsync-from".
+
+124. Add command "transfer-to" that transfers a source tree including
+     all repo information to a new machine, useful for seeding a new
+     source tree on that machine.
+
+125. Add pseudo machine name "all" that e.g. rsyncs to or builds on
+     all (production) machines.
+
+126. Submit N jobs depending on each other, restarting automatically.
+
+127. Hold a job in the queue; add a parameter file, then release.
+
+128. Specify number of processors not only directly, but also via
+     memory requirements.  E.g., specify total memory, or total memory
+     plus additional per-process memory.
+
+129. When restarting or re-submitting, use the same processor counts
+     etc. (and allocation etc.?) as for the previous restart.  [Done
+     for processor count and walltime, won't do for allocation.]
+
+130. Add an "application database" (adb), which specifies how to copy,
+     build, run, and manage an application.  Cactus is then only one
+     example of this, and simfactory can be used with other
+     applications as well.
+
+131. Add support for machines: Q (Mac OS X), Big Red (IBM e1350), Big
+     Ben (Cray XT3), TeraGrid Clusters at NCSA, SDSC, UC/ANL
+     (Itanium2), Frost (IBM BlueGene/L), Pople (SGI Altix 4700), bp
+     (p5+, NCSA).
+
+132. Add command for building documentation (would probably only be
+     used locally).
+
+133. Change meaning of "rsynccmd": It should not be the local command
+     that selects the remote command via --rsync-path; it should
+     rather be the remote command, and --rsync-path should be added by
+     the simfactory.  [Done.]
+
+134. Add switch to update option list and script file from simfactory
+     defaults.  Add another switch to update the thorn list.  [Won't
+     do separate switches.]
+
+135. Add switch to force rebuilding (re-running the CST stage).  Add
+     another switch to force reconfiguring (probably including
+     re-running the CST stage).  Maybe these two should be the same
+     switches as for [134], where the option list/script file and
+     thorn list are re-read?  Maybe they should be the same switch
+     "--reconfig"?  [Done.]
+
+136. (From Denis Pollney:) Is there an option in bbhfactory to protect
+     the version control directories rather than delete them
+     (e.g. .git/, CVS/, etc)?  I often do something like bbhfactory
+     rsync code from my workstation to my laptop for the evening, and
+     then bbhfactory rsync it back in the morning.  The result is that
+     neither source tree has version control information.  It would be
+     useful to have an option to specify that those directories should
+     not be deleted during a given rsync.
+     
+     This is close to Ian Hinder's request to place rsync options into
+     the udb.  [Done; can use udb for this.]
+
+137. Unify "submit" and "restart".  By default, if checkpoint files
+     are available, they are used.  An option "--norestart" (is there
+     a better name?  [Yes: "--norecover"]) prevents this.  [Done.]
+
+138. Add commands corresponding to qalter which also update the
+     information in the simulation or restart directory.
+
+139. Add mdb entry to test that the correct compiler version is used.
+
+140. Activate/deactivate restarts with symbolic links instead of
+     renaming the directory.  [Done.]
+
+141. Set return value of "build" according to whether the build
+     completed.
+
+142. Add command to find out how full a remote queue is, how much
+     computing time is left, how much disk space is free, when a job
+     of a given size would start.
+
+143. Visualise output of finished simulations.
+
+144. Check before rsync (a) that there is a local Cactus directory and
+     (b) that there is either a Cactus directory or nothing there
+     remotely.  This prevents errors with wrong source_base_dir
+     settings, which could otherwise destroy much data remotely.
+
+145. Place a global thornlist in the cdb, and a per machine thornlist
+     in the udb.  [Ian Hinder: Done]
+
+146. Creating of existing simulation should rename existing one with a
+     numeric suffix.  These should be easy to delete, either with an
+     easy to glob name (.1, .2) or with a command.  [Ian Hinder -
+     unnecessary now?]
+
+147. Simulation name, if not specified, can be derived from the name
+     of the parameter file (strip leading path and file extension).
+     [Ian Hinder: Done]
+
+148. Killing a simulation job should wait for the job to be killed
+     before returning to the user (overridable by an option, or by
+     interrupting the command).  [Ian Hinder]
+
+149. Have short-form options in addition to long-form options.
+
+150. Implement machine and user databases using config files rather
+     than Perl functions.  [Ian Hinder]
+
+151. Remove the need for the local machine to be added to the user
+     database (how?).
+
+152. Make it possible to use the SimFactory when you are not in the
+     source directory.
+
+153. Remove udb from SVN, provide an example template called
+     udb.pm.example, and try hard to not require much customisation.
+
+154. SimFactory should compute the amount of time a job has run for by
+     creating a file at job run time, and comparing the datestamp with
+     that of the stdout file.
+
+155. Upon restarting a simulation, pre-submit a new restart
+     automatically.  How to prevent endless loops?
+
+156. Store exact simfactory commands in simulation log file (if
+     command is relevant).
+
+157. Mark error messages clearly as errors, e.g. by prepending
+     "ERROR".
+
+158. Add examples for good account setups, e.g. .profile, .bashrc,
+     .soft on Ranger.
+
+159. For active jobs, have list-simulations output the state (queued,
+     running, stopping).
+
+160. Rename 'statuspattern' to 'activepattern' or similar.
+
+161. Implement command to estimate start time for a submitted job.
+
+162. Before stopping a simulation, check that it is either queued or
+     running.
+
+163. Add "get" and "put" commands to send/retrieve data e.g. to
+     simulations or source trees.  The user specifies machine name and
+     simulation name and a relative path name.
+
+164. Incorporate Oleg's visualisation tool.
+
+165. Break "sim" file into libraries, and use them e.g. form
+     "sync-build-all".
+
+166. Change mdb syntax: Replace "%mdb_redshift = ( ... )" with
+     "$mdb_redshift = { ... }".  [Won't do this, doesn't seem to
+     work.]
+
+167. Use a suffix for option files, thorn lists, and script files, so
+     that they don't have identical file names.  [Done.]
+
+168. Detect errors during qsub.
+
+169. Detect erros in qstat.  Add a new field 'finishedpattern', and
+     detect if neither of queuedpattern, runningpattern, or finished
+     pattern matches.
+
+170. Detect errors in qdel.  Add a new field 'stoppattern' for this.
+
+171. Add "mount" command to use sshfs to mount Cactus/simulation/home
+     directory of another machine
+
+172. Add capability to replace executable or parameter file between
+     restarts, or to restart a simulation from checkpoint files from
+     another simulation, or from given checkpoint files on another
+     machine.
+
+173. Add command to create/update .ssh/* files (config,
+     authorized_keys, etc.)
+
+174. Add a lock file that prevents building a configuration multiple
+     times simultaneously.
+
+175. Don't allow --define for variables that are set by the simulation
+     factory itself, e.g. NUM_THREADS.
+
+176. Don't use a configuration if there was a build error before.
+
+177. In script files, factor out the commands to start a simulation
+     (useful e.g. for test suites) and the generic setup (creating
+     directories etc., which is simfactory specific).
+
+178. Add a facility to save old executables (and their associated
+     information), so that they can be reused later.  This should
+     probably save the corresponding source code as well.
+
+179. Check --configuration and --parfile options when given during
+     submitting, or disallow them.
+
+180. Add "SPN" variable (sockets per node); this is required for
+     Kraken's script files.
+
+181. Check whether parameter file is readable before creating
+     simulation.
+
+182. Add options to ssh to enable agent forwarding, add (temporarily
+     or permanently?) authorized_keys on the remote platform, put the
+     keys (locally?) into a keychain, etc.
+
+183. Use grid-proxy-info and grid-proxy-destroy to ensure that the
+     correct proxy is used.
+
+184. Add mdb entry for submitting an interactive job
+
+185. Add mdb entry for starting a simulation in an interactive debugger
+
+186. Redirect listing of environment variables in script file to a
+     file, e.g. "ENV".  [Done.]
+
+187. Maybe redirect simulation output (either Cactus output or the
+     whole script file output) directly, so that it is always in the
+     restart directory.  This would simplify monitoring restarts.
+
+188. Error: When postsubmitting and there is no checkpoint file found,
+     SimFactory aborts with an error message about the number of
+     processors not being set.  This is wrong; it apparently becomes
+     confused during postsubmitting because the checkpoint files are
+     not found.  There should be an explicit check and a better error
+     message for this case.
+
+189. When restarting a simulation: make it possible (or require it by
+     default?) to specify whether this is a restart from scratch or a
+     recovery from a checkpoint file.  The default may be confusing if
+     one forgets to enable checkpointing.
+
+190. If possible, hard-link Formaline tarballs during cleanup to save
+     space.  [Done.]
+
+191. Zeroconf: Ian Hinder says: "I was just [...] wondering if it was
+     possible for the user to omit the udb.pm entirely?  It seems that
+     if you don't have to configure a new machine then there shouldn't
+     be any user-specific configuration required.  [...]"
+
+192. Submit the simfactory script with qsub (with a special option to
+     start Cactus immediately) instead of the various bash scripts.
+     Add a command to start a Cactus simulation directly.  Add mdb
+     entries to describe how to do this.
+
+193. Separate pre- and post-submitting so that these are in two
+     separate routines.  Then incorporate the postsubmission part into
+     the run command.
+
+194. Make thornlist mdb entry required.  Provide good example
+     thornlists for all systems that contain only on Cactus* thorns,
+     and only thos suppored by the default machine configuration.
+
+195. Divide mdb entry description into "purposes".  Domains can be
+     disabled.  If a purpose is disabled, then even required keys do
+     not need to be present.  This allows using machines only for
+     specific purposes, e.g. as trampoline.  Allow disabling purposes
+     of machines either globally (for machines that are e.g. only
+     meant for trampolining), or per user (if a user doesn't have an
+     allocation on a machine).  Or should it be possible to disable
+     machines for users?  Should the default be "disabled", and users
+     have to enable them, at which time these machines' mdb entry is
+     checked?
+
+196. Implement hierarchical structure for mdb.  Have a base mdb, plus
+     an Einstein Toolkit mdb, plus a numrel mdb, etc.
+
+197. Remove or archive outdated machines.
+
+198. Add "report-bug" command that automatically collects version
+     information, package tarballs, and puts them somewhere
+     reasonable.
+
+199. Remember a simulation's disk usage in a global "DU" files.
+     Invalidate this when activating a simulation, and re-calculate it
+     when cleaning it.
+
+200. Maybe store the SimFactory itself with a simulation, similar to
+     the executable?  Then forward SimFactory commands to the stored
+     copy.  Do this.
+
+201. Maintain list of possible queues for each machine, together with
+     a description, and togethe with their limits (nodes, wall time,
+     etc.).
+
+202. "sync" outside of a Cactus source tree (but in the sourcebasedir)
+     does nothing.  It should report an error instead.
+
+203. Replace the many small output files with one large file
+     containing a table, presumably in the inifile format.  Read it
+     into a hash table.
+
+204. Mark output files read-only when creating them.  Mark them
+     read-only during cleanup.
+
+205. Clean up handling machine names.  Don't call get_machine ''
+     everywhere.  Maybe use the --hostname option instead if given?
+     Make sure this works during recovering after presubmitting, where
+     the local machine name should never need to be determined.
+
+206. Add a command to run the test suite, or run it automatically
+     after building (in the background?  or by submitting a job?), or
+     run it automatically regularly (every so many days? via a cron
+     job?).
+
+207. Keep log file of build process.
+
+208. Add commands to update the simfactory in place ("selfupdate"), or
+     to update the machine database, or to check whether it is up to
+     date.  Maybe check automatically, at most once per day?
+
+209. Store parameter files (or, generally, simulation definitions) in
+     a git repository.  Store source code as well, or point to the
+     source code or build version.
+
+210. Add command to run test suites (on the compute nodes, in
+     parallel).
+
+211. Add support for visualisation, starting e.g. VisIt locally
+     connecting to remote simulation data, or even to a remotely
+     running simulation.  This would choose compatible versions of
+     VisIt and plugins, know where they are installed, would set up
+     ssh tunnels, etc.
+
+212. When creating a new simulation, create it under the name of the
+     unique simulation id.  Also create a symbolic link with the
+     simulation name.  Update the symbolic link if the simulation
+     already exists.
+
+213. Sort out how to let ssh/gsissh ask for a password on a trampoline
+     machine.
+
+214. Output simulation time (e.g. grep stdout) with list-simulations
+
+215. Stop simulations that don't use a queueing system reliably
+
+216. Save source code of every created simulation in a git repository
+
+217. Use UUIDs
+     <http://en.wikipedia.org/wiki/Universally_Unique_Identifier>
+     instead of creating the unique identifiers yourself; maybe add
+     some information to the UUIDs.  Do this also in Formaline.
+     Propagate the IDs to images and movies.
+
+218. Use relative locations for symbolic links.  (This makes it
+     possible to copy the directory tree.)
+
+219. Add --track option when building, making the configuration track
+     the corresponding option lists and thorn lists, automatically
+     updating when necessary.  (This could be done via symbolic links
+     instead of copying the file.)
+
+220. Support job chaining in addition to presubmission, in case the
+     queuing system does not allow presubmitting.
+
+221. Add a command to diff source trees, either source trees that
+     exist, or source trees that have been output via Formaline.
+
+222. Add plugin infrastructure where people can easily add their own
+     commands.
+
+223. Prevent several compile commands running at the same time for the
+     same configuration.
+
+224. Add "--overwrite" argument when starting simulations, so that
+     they can write to the same directory (that is presumably deleted
+     before the simulation starts).
+
+225. Create MDB entry environsetup which gets executed each time
+     SimLib.ExecuteCommand() gets run.
+
+226. Collect metadata from remote machines about simulations that have
+     previously been executed.
+
+227. Run Cactus test cases automatically.
+
+228. Change mdb syntax entry "required" from boolean to a list of
+     commands for which this key is required. Ensure (automatically?)
+     that this is consistent with the VerifyKeys calls in the code.
+
+229. Implement "login" command on top of a new "shell" command that
+     only drops the user into a shell. "login M" is then "--remote M
+     shell".
+
+230. "run" should clean up after it finishes.
+
+231. There should be an explicit "cleanup" command, so that it can be
+     run e.g. from a cron job.
+
+232. Cleaning up (which happens automatically) is too slow.
+
+233. Rename option --num-threads to --threads.

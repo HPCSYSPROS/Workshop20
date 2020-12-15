@@ -1,0 +1,2 @@
+! integer coordinate indices
+      integer :: x,y,z,yg,zg,z1,z2,y1,y2,zp,yp,xp

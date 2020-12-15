@@ -1,0 +1,16 @@
+Cactus Code Thorn OpenBLAS
+Author(s)    : Erik Schnetter
+Maintainer(s): Cactus team
+Licence      : GPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Distribute OpenBLAS; see <https://github.com/xianyi/OpenBLAS/wiki>.
+
+
+
+From the web site:
+
+OpenBLAS is an optimized BLAS library based on GotoBLAS2 1.13 BSD
+version.

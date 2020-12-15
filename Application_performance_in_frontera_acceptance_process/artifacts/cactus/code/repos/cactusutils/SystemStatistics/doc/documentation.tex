@@ -1,0 +1,104 @@
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+\title{SystemStatistics}
+\author{Ian Hinder}
+\date{$ $Date: 2010/04/06 11:00:00 $ $}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+\begin{abstract}
+  Thorn {\bf SystemStatistics} collects information about the system
+  on which a Cactus process is running and stores it in Cactus
+  variables.  These variables can then be output and reduced using the
+  standard Cactus methods such as IOBasic and IOScalar.
+\end{abstract}
+
+
+\section{Purpose}
+When running a Cactus simulation, there are often features of the
+system on which it is running which can affect the simulation.  For
+example, Cactus processes take a certain amount of memory, and if
+this exceeds the memory available on the system, the Cactus process
+will either start to swap, significantly reducing performance, or will
+terminate.  It can be useful to determine quantities such as memory
+usage of a Cactus process, and that is the purpose of this thorn.
+%
+The thorn currently provides grid arrays which are filled with
+memory-related information.
+
+\section{{\bf SystemStatistics} Parameters}
+%
+This thorn has no parameters.
+%
+%
+\section{Examples}
+%
+\begin{verbatim}
+IOBasic::outInfo_every                  = 256
+IOBasic::outInfo_reductions             = "minimum maximum"
+IOBasic::outInfo_vars                   = "SystemStatistics::maxrss_mb"
+
+IOScalar::outScalar_every               = 256
+IOScalar::outScalar_reductions          = "minimum maximum average"
+IOScalar::outScalar_vars                = "SystemStatistics::process_memory_mb"
+\end{verbatim}
+
+The resulting screen output would look like this:
+\begin{verbatim}
+-----------------------------------------
+Iteration      Time | *TISTICS::maxrss_mb
+                    |   minimum   maximum
+-----------------------------------------
+        0     0.000 |        52        54
+      256     0.005 |        53        55
+      512     0.010 |        53        55
+      768     0.015 |        53        55
+     1024     0.020 |        53        55
+\end{verbatim}
+%
+and the reduced scalar output in {\tt
+  \verb|systemstatistics::process_memory_mb.maximum.asc|} would look like
+this:
+\begin{verbatim}
+# SYSTEMSTATISTICS::maxrss_mb (systemstatistics::process_memory_mb)
+# 1:iteration 2:time 3:data
+# data columns: 3:maxrss_mb 4:majflt_mb 5:arena_mb 6:ordblks_mb 7:hblks_mb 8:hblkhd_mb 9:uordblks_mb 10:fordblks_mb 11:keepcost_mb
+0 0 54 7 50 0 0 0 39 12 11
+256 0.00498610682309355 55 7 51 0 0 0 39 12 11
+512 0.0099722136461871 55 7 51 0 0 0 39 12 11
+768 0.0149583204692806 55 7 51 0 0 0 39 12 11
+1024 0.0199444272923742 55 7 51 0 0 0 39 12 11
+\end{verbatim}
+
+\section{Comments}
+
+\begin{itemize}
+\item There has been some discussion concerning whether it would be
+  better to use Cactus clocks to store this information.
+\item The current implementation stores memory usage in \verb$CCTK_INT$
+  variables.  Since memory sizes of many gigabytes are common, this
+  could lead to overflow.  It would probably be better to use
+  \verb$CCTK_REAL$ variables instead.  
+\item The thorn currently has variables for bytes, kilobytes and
+  megabytes for each quantity.  It might be better to remove these and
+  let the output mechanism format the variables in an easy to
+  understand form.
+\item This thorn uses information from the /proc filesystem where it
+  is available.  The Resident Set Size (RSS) is also read correctly on
+  Mac OS, where /proc is not available.
+\end{itemize}
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

@@ -1,0 +1,79 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+module ComputeMgr {
+  // message [packed] ComputeGlobalConfigMsg;
+  message [packed] ComputeGlobalDataMsg;
+  message [packed] ComputeGlobalResultsMsg;
+
+  message [packed] ComputeDPMEDataMsg;
+  message [packed] ComputeDPMEResultsMsg;
+
+  message [packed] ComputeConsForceMsg;
+
+  message ComputeEwaldMsg {
+    float eik[];
+  };
+
+  message NonbondedCUDASlaveMsg;
+  message NonbondedCUDASkipMsg;
+  message NonbondedMICSlaveMsg;
+  message NonbondedMICSkipMsg;
+#ifdef NAMD_CUDA
+  message CudaComputeNonbondedMsg;
+#endif
+
+  group ComputeMgr
+  {
+    entry ComputeMgr(void);
+    entry void updateComputes2(CkQdMsg *);
+    entry void updateComputes3(void);
+    entry void splitComputes(void);
+    entry void splitComputes2(CkQdMsg *);
+    entry void updateLocalComputes(void);
+    entry void updateLocalComputes2(CkQdMsg *);
+    entry void updateLocalComputes3(void);
+    entry void updateLocalComputes4(CkQdMsg *);
+    entry void updateLocalComputes5(void);
+    entry void doneUpdateLocalComputes(void);
+
+    // entry void recvComputeGlobalConfig(ComputeGlobalConfigMsg *);
+    entry void recvComputeGlobalData(ComputeGlobalDataMsg *);
+    entry void recvComputeGlobalResults(ComputeGlobalResultsMsg *);
+
+    entry void recvComputeDPMEData(ComputeDPMEDataMsg *);
+    entry void recvComputeDPMEResults(ComputeDPMEResultsMsg *);
+
+    entry void recvComputeConsForceMsg(ComputeConsForceMsg *);
+
+    entry void recvComputeEwaldData(ComputeEwaldMsg *);
+    entry void recvComputeEwaldResults(ComputeEwaldMsg *);
+
+    entry void recvYieldDevice(int pe);
+    entry void recvBuildCudaExclusions();
+    entry void recvBuildCudaForceTable();
+    entry void recvBuildMICForceTable();
+    entry void recvCreateNonbondedCUDASlave(NonbondedCUDASlaveMsg *);
+    entry void recvNonbondedCUDASlaveReady(int, int, int);
+    entry void recvNonbondedCUDASlaveSkip(NonbondedCUDASkipMsg *);
+#ifdef NAMD_CUDA
+    entry void recvAssignPatchesOnPe(CudaComputeNonbondedMsg *msg);
+    entry void recvSkipPatchesOnPe(CudaComputeNonbondedMsg *msg);
+    entry void recvFinishPatchesOnPe(CudaComputeNonbondedMsg *msg);
+    entry void recvFinishPatchOnPe(CudaComputeNonbondedMsg *msg);
+    entry [expedited] void recvOpenBoxesOnPe(CudaComputeNonbondedMsg *msg);
+    entry void recvFinishReductions(CudaComputeNonbondedMsg *msg);
+    entry void recvMessageEnqueueWork(CudaComputeNonbondedMsg *msg);
+    entry void recvLaunchWork(CudaComputeNonbondedMsg *msg);
+    entry [sync] void recvUnregisterBoxesOnPe(CudaComputeNonbondedMsg *msg);
+#endif
+    entry void recvCreateNonbondedMICSlave(NonbondedMICSlaveMsg *);
+    entry void recvNonbondedMICSlaveReady(int, int, int);
+    entry void recvNonbondedMICSlaveSkip(NonbondedMICSkipMsg *);
+    entry void recvMICPEData(int, int);
+  } ;
+}
+

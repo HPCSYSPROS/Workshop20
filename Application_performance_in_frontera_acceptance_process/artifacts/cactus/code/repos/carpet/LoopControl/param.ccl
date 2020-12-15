@@ -1,0 +1,121 @@
+# Parameter definitions for thorn LoopControl
+
+BOOLEAN verbose "Output some loop information at run time" STEERABLE=always
+{
+} "no"
+
+BOOLEAN veryverbose "Output detailed debug information at run time" STEERABLE=always
+{
+} "no"
+
+BOOLEAN selftest "Run a self test with every loop (expensive)" STEERABLE=always
+{
+} "no"
+
+STRING statistics_filename "File name for LoopControl statistics" STEERABLE=always
+{
+  ""   :: "disable statistics output"
+  ".+" :: "file name"
+} "LoopControl-statistics"
+
+REAL statistics_every_seconds "Output statistics every so many seconds" STEERABLE=always
+{
+  -1.0  :: "don't output"
+  0.0:* :: "output every so many seconds"
+} -1.0
+
+SHARES: IO
+
+USES STRING out_dir
+
+PRIVATE:
+
+
+
+KEYWORD initial_setup "Initial configuration" STEERABLE=always
+{
+  "legacy" :: "Like a non-LoopControl loop"
+  "tiled"  :: "Basic LoopControl setup"
+} "tiled"
+
+INT explore_eagerly_before_iteration "Try to explore the parameter space as much as possible before this iteration" STEERABLE=always
+{
+  0:* :: ""
+} 0
+
+INT settle_after_iteration "Do not explore the parameter space any more at or after this iteration" STEERABLE=always
+{
+  -1  :: "always continue exploring"
+  0:* :: ""
+# Setting settle_after_iteration=0 apparently avoids an inefficiency,
+# so make it the default for the time being.
+} 0 # -1
+
+
+
+# NOTE:
+# - Intel chips divide the D1 cache into two, one for each hyperthread.
+#   The cache is thus not shared!
+BOOLEAN use_smt_threads "Place SMT threads close together" STEERABLE=always
+{
+} "yes"
+
+BOOLEAN align_with_cachelines "Align innermost loops with cache line size" STEERABLE=always
+{
+} "yes"
+
+
+
+INT tilesize_i "Tile size in i direction (in grid points) for loop tiling" STEERABLE=always
+{
+  1:* :: ""
+} 4
+
+INT tilesize_j "Tile size in j direction (in grid points) for loop tiling" STEERABLE=always
+{
+  1:* :: ""
+} 4
+
+INT tilesize_k "Tile size in k direction (in grid points) for loop tiling" STEERABLE=always
+{
+  1:* :: ""
+} 4
+
+
+
+INT loopsize_i "Size of each thread's loop in i direction (in grid points) for multithreading" STEERABLE=always
+{
+  1:* :: ""
+} 8
+
+INT loopsize_j "Size of each thread's loop in j direction (in grid points) for multithreading" STEERABLE=always
+{
+  1:* :: ""
+} 8
+
+INT loopsize_k "Size of each thread's loop in k direction (in grid points) for multithreading" STEERABLE=always
+{
+  1:* :: ""
+} 8
+
+
+
+CCTK_INT max_size_factor "Maximum size for modifying loop sizes" STEERABLE=always
+{
+  1:* :: ""
+} 4
+
+CCTK_REAL very_expensive_factor "Params worse than the current-best by more than this factor are ignored more quickly" STEERABLE=always
+{
+  1.0:* :: ""
+} 1.5
+
+CCTK_INT tryout_iterations "Try out new params for this many iterations before judging them" STEERABLE=always
+{
+  1:* :: ""
+} 1
+
+CCTK_REAL random_jump_probability "Probability of a random jump to begin exploring a very different param" STEERABLE=always
+{
+  0.0:1.0 :: ""
+} 0.1

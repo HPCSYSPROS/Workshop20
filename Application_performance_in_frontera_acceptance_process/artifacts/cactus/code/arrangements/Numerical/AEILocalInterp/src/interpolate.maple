@@ -1,0 +1,509 @@
+# interpolate.maple -- compute interpolation formulas/coefficients
+# $Header$
+
+#
+# <<<representation of numbers, data values, etc>>>
+# Lagrange_polynomial_interpolant - compute Lagrange polynomial interpolant
+# Hermite_polynomial_interpolant - compute Hermite polynomial interpolant
+# coeffs_as_lc_of_data - coefficients of ... (linear combination of data)
+#
+# print_coeffs__lc_of_data - print C code to compute coefficients
+# print_load_data - print C code to load input array chunk into struct data
+# print_store_coeffs - print C code to store struct coeffs "somewhere"
+# print_interp_cmpt__lc_of_data - print C code for computation of interpolant
+#
+# coeff_name - name of coefficient of data at a given [m] coordinate
+# data_var_name - name of variable storing data value at a given [m] coordinate
+#
+
+################################################################################
+
+#
+# ***** representation of numbers, data values, etc *****
+#
+# We use RATIONAL(p.0,q.0) to denote the rational number p/q.
+#
+# We use DATA(...) to represent the data values being interpolated at a
+# specified [m] coordinate, where the arguments are the [m] coordinates.
+#
+# We use COEFF(...) to represent the molecule coefficient at a specified
+# [m] coordinate, where the arguments are the [m] coordinates.
+#
+# For example, the usual 1-D centered 2nd order 1st derivative molecule
+# would be written
+#	RATIONAL(-1.0,2.0)*DATA(-1) + RATIONA(1.0,2.0)*DATA(1)
+# and its coefficients as
+#	COEFF(-1) = RATIONAL(-1.0,2.0)
+#	COEFF(1) = RATIONAL(1.0,2.0)
+#
+
+################################################################################
+################################################################################
+################################################################################
+
+#
+# This function computes a Lagrange polynomial interpolant in any
+# number of dimensions.
+#
+# Arguments:
+# fn = The interpolation function.  This should be a procedure in the
+#      coordinates, having the coefficients as global variables.  For
+#      example,
+#	  proc(x,y) c00 + c10*x + c01*y end proc
+# coeff_list = A list of the interpolation coefficients (coefficients in
+#	       the interpolation function), for example [c00, c10, c01].
+# coord_list = A list of the coordinates (independent variables in the
+#	       interpolation function), for example [x,y].
+# posn_list = A list of positions (each a list of numeric values) where the
+#	      interpolant is to use data, for example  hypercube([0,0], [1,1]).
+#	      Any positions may be used; if they're redundant (as in the
+#	      example) the least-squares interpolant is computed.
+#
+# Results:
+# This function returns the interpolating polynomial, in the form of
+# an algebraic expression in the coordinates and the data values.
+#
+Lagrange_polynomial_interpolant :=
+proc(
+      fn::procedure, coeff_list::list(name),
+      coord_list::list(name), posn_list::list(list(numeric))
+    )
+local posn, data_eqns, coeff_eqns;
+
+# coefficients of interpolating polynomial
+data_eqns := {  seq( fn(op(posn))='DATA'(op(posn)) , posn=posn_list )  };
+coeff_eqns := linalg[leastsqrs](data_eqns, {op(coeff_list)});
+if (has(coeff_eqns, '_t'))
+   then error "interpolation coefficients aren't uniquely determined!";
+end if;
+
+# interpolant as a polynomial in the coordinates
+return subs(coeff_eqns, eval(fn))(op(coord_list));
+end proc;
+
+################################################################################
+
+#
+# This function computes a Hermite polynomial interpolant in any
+# number of dimensions.  This is a polynomial which
+# * has values which match the given data DATA() at a specified set of
+#   points, and
+# * has derivatives which match the specified finite-difference derivatives
+#   of the given data DATA() at a specified set of points
+#
+# For the derivative matching, we actually match all possible products
+# of 1st derivatives, i.e. in 2-D we match dx, dy, and dxy, in 3-D we
+# match dx, dy, dz, dxy, dxz, dyz, and dxyz, etc etc.
+#
+# Arguments:
+# fn = The interpolation function.  This should be a procedure in the
+#      coordinates, having the coefficients as global variables.  For
+#      example,
+#		proc(x,y)
+#		+ c03*y^3 + c13*x*y^3 + c23*x^2*y^3 + c33*x^3*y^3
+#		+ c02*y^2 + c12*x*y^2 + c22*x^2*y^2 + c32*x^3*y^2
+#		+ c01*y   + c11*x*y   + c21*x^2*y   + c31*x^3*y
+#		+ c00     + c10*x     + c20*x^2     + c30*x^3
+#		end proc;
+# coeff_set = A set of the interpolation coefficients (coefficients in
+#	       the interpolation function), for example
+#			{
+#			c03, c13, c23, c33,
+#			c02, c12, c22, c32,
+#			c01, c11, c21, c31,
+#			c00, c10, c20, c30
+#			}
+# coord_list = A list of the coordinates (independent variables in the
+#	       interpolation function), for example [x,y].
+# deriv_set = A set of equations of the form
+#		{coords} = proc
+#	      giving the derivatives which are to be matched, and the
+#	      procedures to compute their finite-difference approximations.
+#	      Each procedure should take N_dims integer arguments specifying
+#	      an evaluation point, and return a suitable linear combination
+#	      of the DATA() for the derivative at that point.  For example
+#			{
+#			  {x}   = proc(i::integer, j::integer)
+#				  - 1/2*DATA(i-1,j) + 1/2*DATA(i+1,j)
+#				  end proc
+#			,
+#			  {y}   = proc(i::integer, j::integer)
+#				  - 1/2*DATA(i,j-1) + 1/2*DATA(i,j+1)
+#				  end proc
+#			,
+#			  {x,y} = proc(i::integer, j::integer)
+#				  - 1/4*DATA(i-1,j+1) + 1/4*DATA(i+1,j+1)
+#				  + 1/4*DATA(i-1,j-1) - 1/4*DATA(i+1,j-1)
+#				  end proc
+#			}
+# fn_posn_set = A set of positions (each a list of numeric values)
+#		where the interpolant is to match the given data DATA(),
+#		for example
+#			{[0,0], [0,1], [1,0], [1,1]}
+# deriv_posn_set = A list of positions (each a list of numeric values)
+#		   where the interpolant is to match the derivatives
+#		   specified by  deriv_set , for example
+#			{[0,0], [0,1], [1,0], [1,1]}
+#
+# Results:
+# This function returns the interpolating polynomial, in the form of
+# an algebraic expression in the coordinates and the data values.
+#
+Hermite_polynomial_interpolant :=
+proc(
+      fn::procedure,
+      coeff_set::set(name),
+      coord_list::list(name),
+      deriv_set::set(set(name) = procedure),
+      fn_posn_set::set(list(numeric)),
+      deriv_posn_set::set(list(numeric))
+    )
+local fn_eqnset, deriv_eqnset, coeff_eqns, subs_eqnset;
+
+
+#
+# compute a set of equations
+#	{fn(posn) = DATA(posn)}
+# giving the function values to be matched
+#
+fn_eqnset := map(
+		    # return equation that fn(posn) = DATA(posn)
+		    proc(posn::list(integer))
+		    fn(op(posn)) = 'DATA'(op(posn));
+		    end proc
+		  ,
+		    fn_posn_set
+		);
+
+
+#
+# compute a set of equations
+#	{ diff(fn,coords)(posn) = DERIV(coords)(posn) }
+# giving the derivative values to be matched, where DERIV(coords)
+# is a placeholder for the appropriate derivative
+#
+map(
+       # return set of equations for this particular derivative
+       proc(deriv_coords::set(name))
+       local deriv_fn;
+       fn(op(coord_list));
+       diff(%, op(deriv_coords));
+       deriv_fn := unapply(%, op(coord_list));
+       map(
+	      proc(posn::list(integer))
+	      deriv_fn(op(posn)) = 'DERIV'(op(deriv_coords))(op(posn));
+	      end proc
+	    ,
+	      deriv_posn_set
+	  );
+       end proc
+     ,
+       map(lhs, deriv_set)
+   );
+deriv_eqnset := `union`(op(%));
+
+
+#
+# solve overall set of equations for coefficients
+# in terms of DATA() and DERIV() values
+#
+coeff_eqns := solve[linear](fn_eqnset union deriv_eqnset, coeff_set);
+if (indets(map(rhs,%)) <> {})
+   then error "no unique solution for coefficients -- %1 eqns for %2 coeffs",
+	      nops(fn_eqnset union deriv_eqnset),
+	      nops(coeff_set);
+fi;
+
+
+#
+# compute a set of substitution equations
+#	{'DERIV'(coords) = procedure}
+#
+subs_eqnset := map(
+		      proc(eqn::set(name) = procedure)
+		      'DERIV'(op(lhs(eqn))) = rhs(eqn);
+		      end proc
+		    ,
+		      deriv_set
+		  );
+
+
+#
+# compute the coefficients in terms of the DATA() values
+#
+subs(subs_eqnset, coeff_eqns);
+eval(%);
+
+#
+# compute the interpolant as a polynomial in the coordinates
+#
+subs(%, fn(op(coord_list)));
+end proc;
+
+################################################################################
+
+#
+# This function takes as input an interpolating polynomial, expresses
+# it as a linear combination of the data values, and returns the coefficeints
+# of that form.
+# 
+# Arguments:
+# interpolant = The interpolating polynomial (an algebraic expression
+#		in the coordinates and the data values).
+# posn_list = The same list of data positions used in the interpolant.
+#
+# Results:
+# This function returns the coefficients, as a list of equations of the
+# form   COEFF(...) = value , where each  value  is a polynomial in the
+# coordinates.  The order of the list matches that of  posn_list.
+#
+coeffs_as_lc_of_data :=
+proc(
+      interpolant::algebraic,
+      posn_list::list(list(numeric))
+    )
+local data_list, interpolant_as_lc_of_data;
+
+# interpolant as a linear combination of the data values
+data_list := [ seq( 'DATA'(op(posn)) , posn=posn_list ) ];
+interpolant_as_lc_of_data := collect(interpolant, data_list);
+
+# coefficients of the data values in the linear combination
+return map(
+	      proc(posn::list(numeric))
+	      coeff(interpolant_as_lc_of_data, DATA(op(posn)));
+	      'COEFF'(op(posn)) = %;
+	      end proc
+	    ,
+	      posn_list
+	  );
+end proc;
+
+################################################################################
+################################################################################
+################################################################################
+
+#
+# This function prints C expressions for the coefficients of an
+# interpolating polynomial.  (The polynomial is expressed as linear
+# combinations of the data values with coefficients which are
+# RATIONAL(p,q) calls.)
+#
+# Arguments:
+# coeff_list = A list of the coefficients, as returned from
+#	       coeffs_as_lc_of_data() .
+# coeff_name_prefix = A prefix string for the coefficient names.
+# temp_name_type = The C type to be used for Maple-introduced temporary
+#		   names, eg. "double".
+# file_name = The file name to write the coefficients to.  This is
+#	      truncated before writing.
+#
+print_coeffs__lc_of_data :=
+proc( coeff_list::list(specfunc(numeric,COEFF) = algebraic),
+      coeff_name_prefix::string,
+      temp_name_type::string,
+      file_name::string )
+global `codegen/C/function/informed`;
+local coeff_list2, cmpt_list, temp_name_list;
+
+# convert LHS of each equation from a COEFF() call (eg COEFF(-1,+1))
+# to a Maple/C variable name (eg coeff_I_m1_p1)
+coeff_list2 := map(
+		      proc(coeff_eqn::specfunc(numeric,COEFF) = algebraic)
+		      local posn;
+		      posn := [op(lhs(coeff_eqn))];
+		      coeff_name(posn,coeff_name_prefix);
+		      convert(%, name);	# codegen[C] wants LHS
+					# to be an actual Maple *name*
+		      % = fix_rationals(rhs(coeff_eqn));
+		      end proc
+		    ,
+		      coeff_list
+		  );
+
+#
+# generate the C code
+#
+
+# tell codegen[C] not to warn about unknown RATIONAL() and DATA() "fn calls"
+# via undocumented :( global table
+`codegen/C/function/informed`['RATIONAL'] := true;
+`codegen/C/function/informed`['DATA'] := true;
+
+ftruncate(file_name);
+
+# optimized computation sequence for all the coefficients
+# (may use local variables t0,t1,t2,...)
+cmpt_list := [codegen[optimize](coeff_list2, tryhard)];
+
+# list of the t0,t1,t2,... local variables
+temp_name_list := nonmatching_names(map(lhs,cmpt_list), coeff_name_prefix);
+
+# declare the t0,t1,t2,... local variables (if there are any)
+if (nops(temp_name_list) > 0)
+   then print_name_list_dcl(%, temp_name_type, file_name);
+fi;
+
+# now print the optimized computation sequence
+codegen[C](cmpt_list, filename=file_name);
+
+fclose(file_name);
+
+NULL;
+end proc;
+
+################################################################################
+
+#
+# This function prints a sequence of C expression to assign the data-value
+# variables, eg
+#	data->data_m1_p1 = DATA(-1,1);
+#
+# Arguments:
+# posn_list = The same list of positions as was used to compute the
+#	      interpolating polynomial.
+# data_var_name_prefix = A prefix string for the data variable names.
+# file_name = The file name to write the coefficients to.  This is
+#	      truncated before writing.
+#
+print_load_data :=
+proc(
+      posn_list::list(list(numeric)),
+      data_var_name_prefix::string,
+      file_name::string
+    )
+
+ftruncate(file_name);
+map(
+       proc(posn::list(numeric))
+       fprintf(file_name,
+	       "%s = %a;\n",
+	       data_var_name(posn,data_var_name_prefix),
+	       DATA(op(posn)));
+       end proc
+     ,
+       posn_list
+   );
+fclose(file_name);
+
+NULL;
+end proc;
+
+################################################################################
+
+#
+# This function prints a sequence of C expression to store the interpolation
+# coefficients in  COEFF(...)  expressions, eg
+#	COEFF(1,-1) = factor * coeffs->coeff_p1_m1;
+#
+# Arguments:
+# posn_list = The list of positions in the molecule.
+# coeff_name_prefix = A prefix string for the coefficient names,
+#		      eg "factor * coeffs->coeff_"
+# file_name = The file name to write the coefficients to.  This is
+#	      truncated before writing.
+#
+print_store_coeffs :=
+proc(
+      posn_list::list(list(numeric)),
+      coeff_name_prefix::string,
+      file_name::string
+    )
+
+ftruncate(file_name);
+map(
+       proc(posn::list(numeric))
+       fprintf(file_name,
+	       "%a = %s;\n",
+	       'COEFF'(op(posn)),
+	       coeff_name(posn,coeff_name_prefix));
+       end proc
+     ,
+       posn_list
+   );
+fclose(file_name);
+
+NULL;
+end proc;
+
+################################################################################
+
+#
+# This function prints a C expression to evaluate a molecule, i.e.
+# to compute the molecule as a linear combination of the data values.
+#
+# Arguments:
+# posn_list = The list of positions in the molecule.
+# coeff_name_prefix = A prefix string for the coefficient names.
+# data_var_name_prefix = A prefix string for the data variable names.
+# file_name = The file name to write the coefficients to.  This is
+#	      truncated before writing.
+#
+print_evaluate_molecule :=
+proc(
+      posn_list::list(list(numeric)),
+      coeff_name_prefix::string,
+      data_var_name_prefix::string,
+      file_name::string
+    )
+
+ftruncate(file_name);
+
+# list of "coeff*data_var" terms
+map(
+       proc(posn::list(numeric))
+       sprintf("%s*%s",
+	       coeff_name(posn,coeff_name_prefix),
+	       data_var_name(posn,data_var_name_prefix));
+       end proc
+     ,
+       posn_list
+   );
+
+ListTools[Join](%, "\n  + ");
+cat(op(%));
+fprintf(file_name, "    %s;\n", %);
+
+fclose(file_name);
+
+NULL;
+end proc;
+
+################################################################################
+################################################################################
+################################################################################
+
+#
+# This function computes the name of the coefficient of the data at a
+# given [m] position, i.e. it encapsulates our naming convention for this.
+#
+# Arguments:
+# posn = (in) The [m] coordinates.
+# name_prefix = A prefix string for the coefficient name.
+#
+# Results:
+# The function returns the coefficient, as a Maple string.
+#
+coeff_name :=
+proc(posn::list(numeric), name_prefix::string)
+cat(name_prefix, sprint_numeric_list(posn));
+end proc;
+
+################################################################################
+
+#
+# This function computes the name of the variable in which the C code
+# will store the input data at a given [m] position, i.e. it encapsulates
+# our naming convention for this.
+#
+# Arguments:
+# posn = (in) The [m] coordinates.
+# name_prefix = A prefix string for the variable name.
+#
+# Results:
+# The function returns the variable name, as a Maple string.
+#
+data_var_name :=
+proc(posn::list(numeric), name_prefix::string)
+cat(name_prefix, sprint_numeric_list(posn));
+end proc;

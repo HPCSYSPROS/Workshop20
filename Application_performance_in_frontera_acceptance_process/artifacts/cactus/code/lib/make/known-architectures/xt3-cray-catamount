@@ -1,0 +1,104 @@
+#! /bin/sh
+#  /*@@
+#    @file      catamount
+#    @date      Wed Oct 6 15:35:45 2005
+#    @author    Tom Goodale
+#    @desc
+#               Known-architectures file for Cray XT3 system
+#    @enddesc
+#    @version   $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/known-architectures/xt3-cray-catamount,v 1.1 2007-04-04 01:11:35 jshalf Exp $
+#  @@*/
+
+
+
+if test "$CCTK_CONFIG_STAGE" = 'preferred-compilers' ; then
+
+  if test -z "$CC"; then
+    CC=cc
+    echo Setting C compiler to $CC
+  fi
+
+  if test -z "$CXX"; then
+    CXX=CC
+    echo Setting C++ compiler to $CXX
+  fi
+
+  if test -z "$F77"; then
+    F77=ftn
+    echo Setting F77 compiler to $F77
+  fi
+
+  if test -z "$F90"; then
+    F90=ftn
+    echo Setting F90 compiler to $F90
+  fi
+
+  if test -z "$FPP" ; then
+    FPP='/usr/bin/cpp'
+    FPPFLAGS='-traditional'
+    echo "Setting FPP to $FPP"
+    echo "Setting FPPFLAGS to $FPPFLAGS"
+  fi
+
+  if test -z "$CPP" ; then
+    CPP='/usr/bin/cpp'
+    echo "Setting CPP to $CPP"
+  fi
+
+else
+
+  cross_compiling=yes
+  # Fortran compilers
+  : ${F90FLAGS=""}
+  : ${F77FLAGS=""}
+  : ${F90_OPTIMISE_FLAGS='-O3 -fastsse -Mnontemporal -Mprefetch=distance:8,nta'}
+  : ${F77_OPTIMISE_FLAGS='-O3 -fastsse -Mnontemporal -Mprefetch=distance:8,nta'}
+  : ${F90_DEBUG_FLAGS='-g'}
+  : ${F77_DEBUG_FLAGS='-g'}
+
+  : ${LIBS='pgf90 pgf90rtl pgftnrtl pgf90_rpm1 pghpf2 pgc m'}
+
+  # C/C++ compilers
+  case "$CC" in
+    cc)
+     : ${CFLAGS=""}
+     : ${C_OPTIMISE_FLAGS='-O3 -fastsse -Mnontemporal -Mprefetch=distance:8,nta'}
+     ;;
+    *)
+     ;;
+  esac
+
+  case "$CXX" in
+    CC)
+     : ${CXXFLAGS=""}
+     : ${CXX_OPTIMISE_FLAGS='-O3 -fastsse -Mnontemporal -Mprefetch=distance:8,nta'}
+     ;;
+    *)
+     ;;
+  esac
+
+  if test "x$cross_compiling" = 'xyes' ; then
+    ENDIAN=little
+    SIZEOF_LONG_LONG=8
+    SIZEOF_LONG_INT=8
+    SIZEOF_INT=4
+    SIZEOF_SHORT_INT=2
+
+    SIZEOF_LONG_DOUBLE=8
+    SIZEOF_DOUBLE=8
+    SIZEOF_FLOAT=4
+
+    SIZEOF_POINTER=8
+
+    NULL_DEVICE='/dev/null'
+  fi
+
+  # MPI stuff
+  if test -n "$MPI" ; then
+    NATIVE_MPI_LIBS=' '
+    NATIVE_MPI_LIB_DIRS=' '
+    NATIVE_MPI_INC_DIRS=' '
+  fi
+
+fi
+

@@ -1,0 +1,24 @@
+ActiveThorns = "
+Carpet
+CarpetIOBasic
+CarpetIOHDF5
+CarpetLib
+CartGrid3D
+CoordBase
+IOUtil
+SymBase
+Time
+"
+
+Cactus::cctk_itlast           = 1000000
+Cactus::max_runtime           = 0.1 # 6 seconds
+Cactus::terminate             = "runtime"
+
+Time::dtfac                   = 0.5
+
+CarpetIOHDF5::checkpoint      = yes
+
+IO::checkpoint_on_terminate   = yes
+IO::recover                   = autoprobe
+
+IOBasic::outinfo_every        = 2000

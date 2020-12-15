@@ -1,0 +1,57 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+echo "Checking:"
+pwd
+hostname
+date
+cat ${PBS_NODEFILE} > SIMFACTORY/NODES
+
+echo "Environment:"
+export GMON_OUT_PREFIX=gmon.out
+export OMP_NUM_THREADS=@NUM_THREADS@
+export MPI_DIR=/opt/mvapich2/intel/ib
+export MPD_NODEFILE=mpd_nodefile
+export MV2_SRQ_SIZE=4000        # ???
+#export MV2_USE_RING_STARTUP=0
+export MPI_NODEFILE=mpi_nodefile
+env | sort > SIMFACTORY/ENVIRONMENT
+
+echo "Starting:"
+uniq ${PBS_NODEFILE} > ${MPD_NODEFILE}
+for node in $(cat ${MPD_NODEFILE}); do
+    for ((proc=0; $proc<@(@PPN_USED@/@NUM_THREADS@)@; proc=$proc+1)); do
+        echo ${node}
+    done
+done > ${MPI_NODEFILE}
+export CACTUS_STARTTIME=$(date +%s)
+
+if [ @RUNDEBUG@ -eq 0 ]; then
+    export MV2_ENABLE_AFFINITY=0
+    export OMP_NUM_THREADS=@NUM_THREADS@
+
+    time ${MPI_DIR}/bin/mpirun_rsh -np @NUM_PROCS@ -hostfile ${MPI_NODEFILE} /bin/env MV2_ENABLE_AFFINITY=0 OMP_NUM_THREADS=@NUM_THREADS@ @EXECUTABLE@ -L 3 @PARFILE@
+    
+else
+	export MV2_ENABLE_AFFINITY=0
+	export OMP_NUM_THREADS=@NUM_THREADS@
+	if [ @DEBUGGER@ == "totalview" ]; then
+	    eval `soft-dec sh add +totalview-8.3.0.1`
+	elif [ @DEBUGGER@ == "ddt" ]; then
+	    DDTDIR=/usr/local/packages/license/ddt/2.6/bin
+	    eval `soft-dec sh add +ddt-2.6`
+	    export TOTALVIEW=${DDTDIR}/ddt-debugger-mps
+	fi
+	
+	${MPI_DIR}/bin/mpirun_rsh -tv -np @NUM_PROCS@ -hostfile ${MPI_NODEFILE} @EXECUTABLE@ -L 3 @PARFILE@
+fi
+
+echo "Stopping:"
+date
+
+echo "Done."

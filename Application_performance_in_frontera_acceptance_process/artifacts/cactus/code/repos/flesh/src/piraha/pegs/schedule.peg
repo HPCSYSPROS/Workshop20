@@ -1,0 +1,70 @@
+skipper = \b([\ \t\n\r\b]|{-ccomment}|\#[^\n]*|\\[\r\n])*
+
+any = [^]
+name = (?i:[a-zA-Z_][a-zA-Z0-9_\-]*\b)
+expr = {name}|{num}
+vname = {name}( :: {name})*( \[ {expr} \]|)
+quote = "(\\{any}|[^"])*"
+ccomment = /\*((?!\*/){-any})*\*/
+num = [+\-]?[0-9]+(\.[0-9]+)?
+string = {name}|{quote}
+term = {num}|{name}
+par = \b(?i:as|at|in|while|if|before|after|while)\b
+pararg = ({vname}|\( {vname}( ,? {vname} )* \))
+assign = {name} = {num}
+
+boolpar = \( {boolexpr} \)
+eqfun = (?i:CCTK_Equals)
+actfun = (?i:CCTK_IsThornActive)
+actifun = (?i:CCTK_IsImplementationActive)
+booleq  = {eqfun} \( {string} , {string} \)
+boolact = ({actfun}|{actifun}) \( {string} \)
+boolstar = \* {name}
+boolneg = \! {boolexpr}
+boolterm = (?i:{boolneg}
+         | {boolpar}
+         | {booleq}
+         | {boolact}
+         | {boolstar}
+         | {name} )
+         
+boolop = (&&|\|\|)
+boolcmp = (>=|<=|==|!=|<|>)
+boolexpr = {boolterm} ({boolop} {boolexpr} )+
+	     | {term} {boolcmp} {term} | {boolterm}
+
+lang = (?i:lang(uage|) : {name})
+group = (?i:group)
+nogroup =
+prepositions = ({preposition} )*
+preposition = {par} {pararg}
+sync = (?i:sync) : {vname}( , {vname}|[ \t]{vname})*
+options = (?i:options?) : {vname}( , {vname}|[ \t]{vname})*
+storage = (?i:storage) : {vname}( , {vname}|[ \t]{vname})*
+triggers = (?i:triggers?) : {vname}( , {vname}|[ \t]{vname})*
+reads = (?i:reads) : {qname}( , {qname}|[ \t]{qname})*
+writes = (?i:writes) : {qname}( , {qname}|[ \t]{qname})*
+qname = {vname}(\({region}(;{region})*\))?
+region = (everywhere|interior|boundary_ghostzones|boundary|all_timelevels|all_maps|all_reflevels)
+tags = (?i:tags) : {assign}( , {assign}|[ \t]{assign})*
+schedule = (?i:
+	schedule ({group}|{nogroup}) {name} {prepositions} \{
+		( {storage}
+        | {lang}
+		| {sync}
+		| {options}
+		| {triggers}
+        | {reads}
+        | {writes}
+        | {tags}
+		)*
+	\} {quote}
+  )
+if = (?i:
+	if \( {boolexpr} \) {block} (else {if}|else {block}|)
+  )
+storage = (?i:storage: {vname}( , {vname}|([ \t]|\\\r?\n)+{vname})* )
+block = \{ (({statement}|{block}) )* \} | {statement}
+	
+statement = ({schedule} |{if} |{storage} )
+sched = {-skipper}({statement}|{block})*$

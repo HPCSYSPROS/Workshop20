@@ -1,0 +1,570 @@
+\section{Accelerated Sampling Methods}
+\label{section:accel}
+
+\subsection{Accelerated Molecular Dynamics}
+\label{section:accelmd}
+Accelerated molecular dynamics (aMD)~\cite{HAME2004mc} is an enhanced-sampling method that
+improves the conformational space sampling by 
+reducing energy barriers separating different states of a system.
+The method modifies the potential 
+energy landscape by raising energy wells that are below
+a certain threshold level, while leaving those above this level unaffected.
+As a result, barriers separating adjacent energy basins are reduced, allowing the system to sample
+conformational space that cannot be easily accessed in a classical MD simulation.
+
+Please include the following two references in your work using the NAMD implementation of aMD:
+\begin{itemize}
+  \item {Accelerated Molecular Dynamics: A Promising and Efficient Simulation Method for Biomolecules, D.\,Hamelberg, J.\,Mongan, and J.\,A. McCammon. {\it J. Chem. Phys.}, 120:11919-11929, 2004.}
+  \item{Implementation of Accelerated Molecular Dynamics in NAMD, Y.\,Wang, C.\,Harrison, K.\,Schulten, and J.\,A. McCammon, {\it Comp.~Sci.~Discov.}, 4:015002, 2011.}
+\end{itemize}
+
+\subsubsection{Theoretical background}
+In the original form of aMD~\cite{HAME2004mc}, when the system's potential energy falls       
+below a threshold energy, $E$, a boost potential is added, 
+such that the modified potential, $V^*({\bf r})$, is related to the original
+potential, $V({\bf r})$, via
+\begin{equation}
+V^*({\bf r})= V({\bf r}) + \Delta V({\bf r}),
+\end{equation}
+where $\Delta V({\bf r})$ is the boost potential, 
+\begin{equation} 
+\Delta V({\bf r})= \left \{
+\begin{array}{l l}
+0   & \quad \quad V({\bf r})\geq E \\  
+\frac{(E-V({\bf r}))^2}{\alpha+E-V({\bf r})}  & \quad \quad V({\bf r})<E. \\
+\end{array} \right. 
+\end{equation}
+As shown in the following figure, the threshold energy $E$ controls the portion of 
+the potential surface affected by the boost, while the acceleration factor 
+$\alpha$ determines the shape of the modified potential.
+%as $\alpha$ increases, the modified potential asymptotically approaches the original potential;
+%as $\alpha$ decreases, the energy surface below $E$ begins to resemble a constant potential.
+Note that $\alpha$ cannot be set to zero, otherwise the derivative of the modified potential
+is discontinuous.
+
+\begin{figure}[!ht]
+  \centering
+  \includegraphics[width=7cm]{figures/amd_schematic.jpg}
+  \caption{Schematics of the aMD method. When the original potential (thick line) falls below a threshold energy $E$ (dashed line),
+          a boost potential is added. The modified energy profiles (thin lines) have smaller barriers separating adjacent
+	  energy basins. 
+	  %Two parameters, $E$ and $\alpha$, controls the portion of the affected potential landscape and the
+	  %shape of the modified potential, respectively.
+	  }
+  \label{fig:amd_schematic}
+\end{figure}
+From an aMD simulation, the ensemble average, $\langle A \rangle$, of an observable, $A({\bf r})$, can be calculated
+using the following reweighting procedure:
+\begin{equation}
+\langle A \rangle =\frac{\langle A({\bf r})\,\text{exp} (\beta \Delta V({\bf r})) \rangle^* }
+{\langle \text{exp}  (\beta \Delta V({\bf r})) \rangle^*},
+\end{equation}
+in which $\beta$=$1/k_BT$, and $\langle ... \rangle$ and $\langle...\rangle^*$ represent 
+the ensemble average in the original and the aMD ensembles, respectively. 
+
+Currently, aMD can be applied in three modes in NAMD: aMDd, aMDT, and aMDdual~\cite{WANG2011mc}. The boost energy
+is applied to the dihedral potential in the aMDd mode (the default mode), and to the total potential in the aMDT mode.
+In the dual boost mode (aMDdual)~\cite{HAME2007mc}, two independent boost energies are applied, one on the dihedral potential and the other
+on the (Total - Dihedral) potential.
+
+\subsubsection{NAMD parameters}
+
+The following parameters are used to enable accelerated MD:
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{accelMD}{Is accelerated molecular dynamics active?}{{\tt on} or {\tt
+off}}{{\tt off}}
+{Specifies if accelerated MD is active.}
+
+\item
+\NAMDCONFWDEF{accelMDdihe}{Apply boost to dihedrals?}{{\tt on} or {\tt off}} {{\tt on}} 
+{Only applies boost to the dihedral potential. 
+By default, {\tt accelMDdihe} is turned on and the boost energy is applied to the dihedral potential of the simulated system.
+When {\tt accelMDdihe} is turned off, aMD switches to the {\tt accelMDT} mode, and the boost is applied to the total potential.
+}
+
+\item
+\NAMDCONF{accelMDE}{Threshold energy $E$}
+{Real number}
+{Specifies the threshold energy $E$ in the aMD equations. 
+}
+
+\item
+\NAMDCONF{accelMDalpha}{Acceleration factor $\alpha$}
+{Positive real number}
+{Specifies the acceleration factor $\alpha$ in the aMD equations. 
+}
+
+\item
+\NAMDCONFWDEF{accelMDdual}{Use dual boost mode?}{{\tt on} or {\tt off}}{{\tt off}}
+{When {\tt accelMDdual} is on, aMD switches to the dual boost mode. Two independent boost potentials 
+will be applied: one to the dihedral potential that is controlled by the parameters {\tt accelMDE} and {\tt accelMDalpha},
+and a second to the (Total - Dihedral) potential that is controlled by the  {\tt accelMDTE} and {\tt accelMDTalpha} parameters described below.
+}
+
+\item
+\NAMDCONF{accelMDTE}{Threshold energy $E$ in the dual boost mode}
+{Real number}
+{Specifies the threshold energy $E$ used in the calculation of boost energy for the (Total - Dihedral) potential. 
+This option is only available when {\tt accelMDdual} is turned on.
+}
+
+\item
+\NAMDCONF{accelMDTalpha}{Acceleration factor $\alpha$ in the dual boost mode}
+{Positive real number}
+{Specifies the acceleration factor $\alpha$ used in the calculation of boost energy for the (Total - Dihedral) potential. 
+This option is only available when {\tt accelMDdual} is turned on.
+}
+
+\item
+\NAMDCONFWDEF{accelMDFirstStep}{First accelerated MD step}
+{Zero or positive integer}{0}
+{Accelerated MD will only be performed when the current step is equal to or higher than {\tt accelMDFirstStep}, and equal to or lower than {\tt accelMDLastStep}. Otherwise regular MD will be performed.
+}
+\item
+\NAMDCONFWDEF{accelMDLastStep}{Last accelerated MD step}
+{Zero or positive integer}{0}
+{Accelerated MD will only be performed when the current step is equal to or higher than {\tt accelMDFirstStep}, and equal to or lower than {\tt accelMDLastStep}. Otherwise regular MD will be performed. Note that the accelMDLastStep parameter only has an effect when it is positive. When accelMDLastStep is set to zero (the default), aMD is `open-ended' and will be performed
+till the end of the simulation. 
+}
+
+\item
+\NAMDCONFWDEF{accelMDOutFreq}{Frequency in steps of aMD output}
+{Positive integer}{1}
+{An aMD output line will be printed to the log file at the frequency specified by {\tt accelMDOutFreq}.
+The aMD output will contain the boost potential ($dV$) at the current timestep, 
+the average boost potential ($dVAVG$) since the last aMD output, and various potential energy values at the current timestep.
+The boost potential $dV$ can be used to reconstruct the ensemble average described earlier.
+}
+
+\end{itemize}
+
+\subsection{Adaptive Tempering}
+\label{section:adapttemp}
+Adaptive tempering is akin to a single-copy replica exchange method for dynamically updating the simulation temperature. The temperature $T$ is a new random variable in the range $[Tmin,Tmax]$ that is governed by the equation $dE/dT = E-E(T)-1/T+sqrt(2)T\xi$, where $\xi$ is Gaussian white noise. The effect is that when the potential energy for a given structure is lower than the (so far calculated) average energy, the temperature is lowered. Conversely when the current energy is higher than the average energy, the temperature is raised. The effect is faster conformational sampling to find minimum energy structures. The method is implemented exactly as described by Zhang and Ma in J. Chem. Phys. 132, 244101 (2010) (using Equation 18 of their paper to calculate the average energy at a given temperature from the histogram of energies). 
+
+The dynamic temperature is realized either by changing the temperature of the Langevin thermostat or by velocity rescaling. 
+
+\subsubsection{NAMD parameters}
+
+The following parameters are used to adaptive tempering:
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{adaptTempMD}{Is adaptive tempering active?}{{\tt on} or {\tt
+off}}{{\tt off}}
+{Specifies whether or not adaptive tempering is used. If set to on then the following parameters are required to be set: either all of ({\tt adaptTempTmin}, {\tt adaptTempTmax}, {\tt adaptTempBins}, {\tt adaptTempDt}) or {\tt adaptTempInFile} (but not both).
+}
+
+\item
+\NAMDCONFWDEF{adaptTempFreq}{steps between temperature updates}
+{Positive integers}{10}
+{The number of steps between temperature updates. Note that the potential energy at the current is calculated and added to the temperature-energy histogram at every step.
+}
+
+\item
+\NAMDCONF{adaptTempTmin}{minimum temperature (K)}
+{Positive real number} 
+{Sets the minimum temperature to be used in the simulation.
+}
+
+\item
+\NAMDCONF{adaptTempTmax}{maximum temperature (K)}
+{Positive real number}
+{Sets the maximum temperature to be used in the simulation.
+}
+
+\item
+\NAMDCONFWDEF{adaptTempBins}{number of temperature bins}
+{Positive integer}{1000}
+{Sets the number of bins to subdivide the temperature range. Each bin stores the average energy for the given temperature 
+}
+
+\item
+\NAMDCONFWDEF{adaptTempDt}{stepsize for temperature updates}{Positive real numbers}{$10^{-4}$}
+{Integration timestep for temperature updates. This is unrelated to the simulation timestep and only scales the size of the step taken in temperature space every {\tt adaptTempFreq} steps.
+}
+
+\item
+\NAMDCONF{adaptTempInFile}{adaptive tempering input filename}
+{UNIX filename}
+{The input file containing restart information for adaptive tempering (written out by {\tt adaptTempRestartFile}).
+}
+
+\item
+\NAMDCONF{adaptTempRestartFile}{adaptive tempering restart filename}
+{UNIX filename}
+{The file to write out restart information for adaptive tempering.
+}
+
+\item
+\NAMDCONF{adaptTempRestartFreq}{steps between writing restart file}
+{Positive integer}
+{Frequency of writing restart file.
+}
+
+\item
+\NAMDCONFWDEF{adaptTempLangevin}{send temperature updates to langevin thermostat?}
+{{\tt on} or {\tt off}}{{\tt on}}
+{Setting this to on will cause the langevin thermostat to use the updated temperatures from adaptive tempering. Note that either one of adaptTempLangevin or adaptTempRescaling have to be on.
+}
+
+\item
+\NAMDCONFWDEF{adaptTempRescaling}{send temperature to velocity rescaling thermostat?}
+{{\tt on} or {\tt off}}{{\tt on}}
+{Setting this to on will cause the veloctiy rescaling thermostat to use the updated temperatures from adaptive tempering.  Note that either one of adaptTempLangevin or adaptTempRescaling have to be on.
+}
+
+\item
+\NAMDCONFWDEF{adaptTempOutFreq}{steps between printing adaptive tempering output}
+{Positive integers}{10}
+{The number of timesteps between printing adaptive tempering output to the log file.
+}
+
+\item
+\NAMDCONFWDEF{adaptTempFirstStep}{step to start adaptive tempering}
+{Non-negative integers}{0}
+{The first timestep from which adaptive tempering will be run.}
+
+\item
+\NAMDCONF{adaptTempLastStep}{step to stop adaptive tempering}
+{Positive integers}
+{The last timestep to apply adaptive tempering.}
+
+\item
+\NAMDCONFWDEF{adaptTempCgamma}{dynamic bin averaging constant}
+{Non-negative real number}{0.1}
+{The calculation of the mean energy for a given bin is weighted by a factor of 1 - Cgamma / samples to damp out old statistics. Setting Cgamma to zero restores the use of a standard arithmetic mean to calculate the mean energy for each bin.}
+
+\item
+\NAMDCONFWDEF{adaptTempRandom}{assign random temperature if we step out of range?}
+{{\tt on} or {\tt off}}{{\tt off}}
+{If set to on and the temperature steps out of [{\tt adaptTempTmin}, {\tt adaptTempTmax}], a random temperature in that range is assigned. Otherwise the previous temperature is kept.
+}
+
+%\item
+%\NAMDCONFWDEF{adaptTempDebug}{print debug output?}
+%{{\tt on} or {\tt off}}{{\tt off}}
+%{Print adaptive tempering debug output.
+%}
+
+\end{itemize}
+
+
+\subsection{Locally enhanced sampling}
+\label{section:les}
+
+Locally enhanced sampling (LES)~\cite{ROIT91,SIMM98,SIMM00} increases
+sampling and transition rates for a portion of a molecule by the use of
+multiple non-interacting copies of the enhanced atoms.  These enhanced
+atoms experience an interaction (electrostatics, van der Waals, and
+covalent) potential that is divided by the number of copies present.
+In this way the enhanced atoms can occupy the same space, while the
+multiple instances and reduces barriers increase transition rates.
+
+\subsubsection{Structure generation}
+
+To use LES, the structure and coordinate input files must be modified to
+contain multiple copies of the enhanced atoms.  \PSFGEN\ provides the
+{\tt multiply} command for this purpose.  \NAMD\ supports a maximum of 255
+copies, which should be sufficient.  
+
+Begin by generating the complete molecular structure and guessing
+coordinates as described in Sec.~\ref{section:psfgen}.  As the last
+operation in your script, prior to writing the psf and pdb files, add
+the {\tt multiply} command, specifying the number of copies desired and
+listing segments, residues, or atoms to be multiplied.  For example,
+\verb#multiply 4 BPTI:56 BPTI:57# will create four copies of the last
+two residues of segment BPTI.  You must include all atoms to be
+enhanced in a single {\tt multiply} command in order for the bonded
+terms in the psf file to be duplicated correctly.  Calling {\tt multiply}
+on connected sets of atoms multiple times will produce unpredictable
+results, as may running other commands after {\tt multiply}.
+
+The enhanced atoms are duplicated exactly in the structure---they have
+the same segment, residue, and atom names.  They are distinguished only
+by the value of the B (beta) column in the pdb file, which is 0 for
+normal atoms and varies from 1 to the number of copies created for
+enhanced atoms.  The enhanced atoms may be easily observed in VMD with
+the atom selection \verb#beta != 0#.
+
+\subsubsection{Simulation}
+
+In practice, LES is a simple method used to increase sampling;
+no special output is generated.
+The following parameters are used to enable LES:
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{les}{is locally enhanced sampling active?}{{\tt on} or {\tt
+off}}{{\tt off}}
+{Specifies whether or not LES is active.}
+
+\NAMDCONF{lesFactor}{number of LES images to use}
+{positive integer equal to the number of images present}
+{This should be equal to the factor used in {\tt multiply}
+ when creating the structure.  The interaction potentials for images is
+ divided by {\tt lesFactor}.  
+}
+
+\item
+\NAMDCONFWDEF{lesReduceTemp}{reduce enhanced atom temperature?}{{\tt on} or {\tt
+off}}{{\tt off}}
+{Enhanced atoms experience interaction potentials divided by {\tt lesFactor}.
+This allows them to enter regions that would not normally be thermally
+accessible.  If this is not desired, then the temperature of these atoms
+may be reduced to correspond with the reduced potential.  This option
+affects velocity initialization, reinititialization, reassignment, and
+the target temperature for langevin dynamics.  Langevin dynamics is
+recommended with this option, since in a constant energy simulation energy
+will flow into the enhanced degrees of freedom until they reach thermal
+equilibrium with the rest of the system.  The reduced temperature atoms
+will have reduced velocities as well, unless {\tt lesReduceMass} is also
+enabled.}
+
+\item
+\NAMDCONFWDEF{lesReduceMass}{reduce enhanced atom mass?}{{\tt on} or {\tt off}}{{\tt off}}
+{Used with {\tt lesReduceTemp} to restore velocity distribution to
+enhanced atoms.  If used alone, enhanced atoms would move faster than
+normal atoms, and hence a smaller timestep would be required.}
+
+\item
+\NAMDCONFWDEF{lesFile}{PDB file containing LES flags}{UNIX filename} {{\tt coordinates}}
+{PDB file to specify the LES image number of each atom.
+If this parameter is not specified, then 
+the PDB file containing initial coordinates specified by 
+{\tt coordinates} is used.}
+
+\item
+\NAMDCONFWDEF{lesCol}{column of PDB file containing LES flags}{{\tt X}, {\tt Y}, {\tt Z}, {\tt O}, or {\tt B}}{{\tt B}}
+{Column of the PDB file to specify the LES image number of each atom.
+This parameter may specify any of the floating point fields of the PDB file, 
+either X, Y, Z, occupancy, or beta-coupling (temperature-coupling).  
+A value of 0 in this column indicates that the atom is not enhanced.
+Any other value should be a positive integer less than {\tt lesFactor}.}
+
+\end{itemize}
+
+
+\subsection{Replica exchange simulations}
+
+\index{replica exchange}
+The {\tt lib/replica/}
+directory contains Tcl scripts that implement replica exchange
+both for parallel tempering (temperature exchange) and
+umbrella sampling (exchanging collective variable biases).
+This replaces the old Tcl server and socket connections driving a
+separate NAMD process for every replica used in the simulation.
+
+{\bf A NAMD build based on Charm++ 6.5.0 or later using one of the
+``LRTS'' (low-level runtime system) machine layers is required!}
+Current LRTS machine layers include mpi, netlrts, verbs (for InfiniBand),
+gemini\_gni-crayxe, gni-crayxc, and pamilrts-bluegeneq.
+
+Only temperature-exchange simulations are described below.
+To employ replicas for umbrella sampling you will need to understand
+this material, collective variable-based calculations (Sec.\ \ref{section:colvars}),
+and basic Tcl programming to adapt the examples in {\tt lib/replica/umbrella/}
+and {\tt lib/replica/umbrella2d/} until further
+documentation and a tutorial are available.
+
+This implementation is designed to be modified to implement
+exchanges of parameters other than temperature or via other temperature
+exchange methods.  The scripts should provide a good starting point for
+any simulation method requiring a number of loosely interacting systems.
+
+Replica exchanges and energies are recorded in the .history files
+written in the output directories.  These can be viewed with, e.g.,
+``{\tt xmgrace output/*/*.history}'' and processed via awk or other tools.
+There is also a script to load the output into VMD and color each
+frame according to replica index.  An example simulation folds
+a 66-atom model of a deca-alanine helix in about 10\,ns.
+
+{\tt replica.namd}
+is the master script for replica temperature-exchange simulations.  To run:
+\begin{verbatim}
+          cd example
+          mkdir output
+          (cd output; mkdir 0 1 2 3 4 5 6 7)
+          mpirun namd2 +replicas 8 job0.conf +stdout output/%d/job0.%d.log
+          mpirun namd2 +replicas 8 job1.conf +stdout output/%d/job1.%d.log
+\end{verbatim}
+
+The number of MPI ranks must be a multiple of the number of replicas
+(+replicas).  Be sure to increment jobX for +stdout option on command line.
+
+{\tt show\_replicas.vmd} is a script for loading replicas into VMD;
+first source the replica exchange conf file and then this script, then
+repeat for each restart conf file or for example just do
+``{\tt vmd -e load\_all.vmd}''.
+This script will likely destroy anything else you are doing in VMD at the
+time, so it is best to start with a fresh VMD.
+{\tt clone\_reps.vmd} provides the {\tt clone\_reps} commmand to copy graphical
+representation from the top molecule to all other molecules.
+
+{\tt sortreplicas}, found in the namd2 binary directory, is a program to un-shuffle
+replica trajectories to place same-temperature frames in the same file.
+Usage:
+\begin{verbatim}
+  sortreplicas <job_output_root> <num_replicas> <runs_per_frame> [final_step]
+\end{verbatim}
+where job\_output\_root is the job specific output base path, including
+\%s or \%d for separate directories as in output/\%s/fold\_alanin.job1
+This will be extended with .\%d.dcd .\%d.history for input files and
+.\%d.sort.dcd .\%d.sort.history for output files.  The optional final\_step
+parameter will truncate all output files after the specified step,
+which is useful in dealing with restarts from runs that did not complete.
+Colvars trajectory files are similarly processed if they are found.
+
+A replica exchange config file should define the following Tcl variables:
+\begin{itemize}
+\item {\tt num\_replicas}, the number of replica simulations to use,
+\item {\tt min\_temp}, the lowest replica target temperature,
+\item {\tt max\_temp}, the highest replica target temperature,
+\item {\tt steps\_per\_run}, the number of steps between exchange attempts,
+\item {\tt num\_runs}, the number of runs before stopping
+(should be divisible by {\tt runs\_per\_frame} $\times$ {\tt frames\_per\_restart}).
+\item {\tt runs\_per\_frame}, the number of runs between trajectory outputs,
+\item {\tt frames\_per\_restart}, the number of frames between restart outputs,
+
+\item {\tt namd\_config\_file}, the NAMD config file containing all parameters,
+needed for the simulation except {\tt seed}, {\tt langevin}, 
+{\tt langevinTemp}, {\tt outputEnergies},
+{\tt outputname}, {\tt dcdFreq},
+{\tt temperature}, {\tt bincoordinates}, {\tt binvelocities},
+or {\tt extendedSystem}, which are provided by {\tt replica.namd},
+
+\item {\tt output\_root}, the directory/fileroot for output files,
+optionally including a ``\%s'' that is replaced with the replica index
+to use multiple output directories,
+
+\item {\tt psf\_file}, the psf file for {\tt show\_replicas.vmd}, 
+\item {\tt initial\_pdb\_file}, the initial coordinate pdb file for {\tt show\_replicas.vmd},
+\item {\tt fit\_pdb\_file}, the coodinates that frames are fit to by {\tt show\_replicas.vmd} (e.g., a folded structure),
+\end{itemize}
+
+The {\tt lib/replica/example/} directory contains
+all files needed to fold a 66-atom model of a deca-alanine helix:
+\begin{itemize}
+\item {\tt alanin\_base.namd}, basic config options for NAMD,
+\item {\tt alanin.params}, parameters,
+\item {\tt alanin.psf}, structure,
+\item {\tt unfolded.pdb}, initial coordinates,
+\item {\tt alanin.pdb}, folded structure for fitting in {\tt show\_replicas.vmd},
+\item {\tt fold\_alanin.conf}, config file for {\tt replica\_exchange.tcl} script,
+\item {\tt job0.conf}, config file to start alanin folding for 10\,ns,
+\item {\tt job1.conf}, config file to continue alanin folding another 10\,ns, and
+\item {\tt load\_all.vmd}, load all output into VMD and color by replica index.
+\end{itemize}
+
+The {\tt fold\_alanin.conf} config file contains the following settings:
+\begin{verbatim}
+set num_replicas 8
+set min_temp 300
+set max_temp 600
+set steps_per_run 1000
+set num_runs 10000
+# num_runs should be divisible by runs_per_frame * frames_per_restart
+set runs_per_frame 10
+set frames_per_restart 10
+set namd_config_file "alanin_base.namd"
+set output_root "output/%s/fold_alanin" ; # directories must exist
+
+# the following used only by show_replicas.vmd
+set psf_file "alanin.psf"
+set initial_pdb_file "unfolded.pdb"
+set fit_pdb_file "alanin.pdb"
+\end{verbatim}
+
+\subsection{Random acceleration molecular dynamics simulations}
+
+The "lib/ramd" directory stores the tcl scripts and the example files for the implementation of the Random Acceleration Molecular Dynamics (RAMD) simulation method in NAMD. 
+The RAMD method can be used to carry out molecular dynamics (MD) simulations with an additional randomly oriented acceleration applied to the center of mass of one group of atoms (referred below as "ligand") in the system. 
+It can, for example, be used to identify egress routes for a ligand from a buried protein binding site. 
+Since its original implementation in the ARGOS (ref 1, 2) program, the method has been also implemented in AMBER 8 (ref 3), and CHARMM (ref 4). 
+The first implementation of RAMD in NAMD using a tcl script (available as supplementary material in ref 6) provided only limited functionality compared to the AMBER 8 implementation. 
+
+In the current implementation, the RAMD method can be performed in 2 flavors: (i) "pure RAMD simulations" in which the randomly-oriented acceleration is applied continuously, and (ii) "combined RAMD-MD simulations" in which RAMD steps alternate with standard MD steps. 
+Additional information is found in the README file in the "lib/ramd" directory. 
+The user is encouraged to carefully read this information before starting production runs.
+
+The three required scripts are stored in "lib/ramd/scripts": (i) ramd--4.0.tcl defines the simulation parameters and passes them from the NAMD configuration file to the main script, (ii) "ramd--4.0\_script.tcl" adds the randomly oriented force and performs all related computations, and  (iii) "vectors.tcl" was borrowed from VMD and defines the vector operations used.
+
+Two examples for running the scripts are included in the directory "lib/ramd/examples".  
+The user is encouraged to read the "README.examples" file provided in the same directory.
+
+In order to turn RAMD on, the line "source /path/to/your/files/ramd--4.0.tcl" should be included in the NAMD configuration file. 
+Unless the user decides to store the scripts at a different location, the path 
+"/path/to/your/files" should point to the "lib/ramd/scripts" directory. 
+Otherwise, the user should make sure that the directory "/path/to/your/files" stores all three scripts described above. 
+
+The specific RAMD simulation parameters to be provided in the NAMD configuration file (listed below) should be preceded by the keyword "ramd". 
+The default values for these parameters are only given as guidance. 
+They are likely not to be suitable for other systems than those the scripts were tested on. 
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{ramd debugLevel}{ Set debug level of RAMD} {\tt integer value } {0} { Activates verbose output if set to an integer greater than 0. Should be used only for testing purposes because the very dense output is full of information only relevant for debugging.}
+
+\NAMDCONFWDEF{ramd mdStart}{ Start RAMD-MD with MD or RAMD?} {{\tt yes} or {\tt no}} {{\tt no}} { Specifies if combined RAMD-MD simulation starts with MD or RAMD steps; ignored if pure RAMD simulation is performed.  Should be set to "yes" if initial MD steps are desired.}
+
+\item
+\NAMDCONFWDEF{ramd ramdSteps} { Set number steps in RAMD block} {{\tt positive integer}} {{\tt 50}} {Specifies the number of steps in 1 RAMD block; the simulations are evaluated every 'ramdSteps' steps.} 
+ 
+\item
+\NAMDCONFWDEF{ramd mdSteps} { Set number steps in MD block} {{\tt positive integer}} {{\tt 0}} {Specifies the number of steps in 1 standard MD block; in combined RAMD-MD simulations, the RAMD blocks are evaluated every 'ramdSteps', the MD blocks every 'mdSteps' steps. Default of 0 gives pure RAMD simulation.}
+
+\item
+\NAMDCONFWDEF{ramd accel} {Set acceleration energy} {{\tt positive decimal}} {{\tt 0.25}} {Specifies acceleration in kcal/mol*A*amu to be applied during RAMD step.}
+
+\item
+\NAMDCONFWDEF{ramd rMinRamd} {Set threshold for distance traveled RAMD} {{\tt positive decimal}} {{\tt 0.01}} {Specifies a threshold value for the distance in Angstroms traveled by the ligand in 1 RAMD block. In pure RAMD simulations the direction of the acceleration is changed if the ligand traveled less than 'rMinRamd' \AA in the evaluated block. In combined RAMD-MD simulations, a switch from a RAMD block to a standard MD block is applied if the ligand traveled more than 'rMinRamd' \AA in the evaluated block.}
+
+\item
+\NAMDCONF{ramd rMinMd} {Set threshold for distance traveled in MD} {{\tt positive decimal}} {Specifies a threshold value for the distance, in Angstroms, traveled by accelerated atoms in 1 standard MD block.  In combined RAMD-MD simulations, a switch from a standard MD block to a RAMD block is applied according to the criteria described in the note below.  Required if 'mdStep' is not 0; ignored if 'mdSteps' is 0.}
+ 
+\item
+\NAMDCONFWDEF{ramd forceOutFreq}{Set frequency of RAMD forces output} {{\tt positive integer}, Must be divisor of both {\tt ramdSteps} and {\tt mdSteps}} {{\tt 0}} { Every 'forceOutFreq' steps, detailed output of forces will be written.} 
+
+\item
+\NAMDCONFWDEF{ramd maxDist} {Set center of mass separation} {{\tt positive decimal}} {{\tt 50}} { Specifies the distance in Angstroms between the the centers of mass of the ligand and the protein when the simulation is stopped.}
+ 
+\item
+\NAMDCONFWDEF{ramd firstProtAtom} {First index of protein atom} {{\tt positive integer}} {{\tt 1}} { Specifies the index of the first protein atom.}
+ 
+\item
+\NAMDCONF{ramd lastProtAtom} {Last index of protein atom} {{\tt positive atom}} { Specifies the index of the last protein atom. } 
+
+\item
+\NAMDCONF{ramd firstRamdAtom}{ First index of ligand atom } {{\tt positive integer}} {Specifies the index of the first ligand atom.}
+
+\item
+\NAMDCONF{ramd lastRamdAtom}{ Last index of ligand atom } {{\tt positive integer}} {Specifies the index of the last ligand atom. }
+
+\item
+\NAMDCONFWDEF{ramd ramdSeed}{Set RAMD seed} {{\tt positive integer}} {{\tt 14253}} {Specifies seed for the random number generator for generation of acceleration directions. Change this parameter if you wish to run different trajectories with identical parameters.}
+
+\end{itemize}
+
+Note: 
+In combined RAMD-MD simulations, RAMD blocks alternate with standard MD blocks ('ramdSteps' and 'mdSteps' input parameters). The switches between RAMD and MD blocks are decided based on the following parameters: (i) 'd' =  the distance between the protein and ligand centers of mass, (ii) 'dr' = the distance traveled by the ligand in 1 RAMD block, and (iii) 'dm' = the distance traveled by the ligand in 1 MD block. A switch from RAMD to MD is applied if 'dr' $>$ 'rRamdMin'. A switch from MD to RAMD is applied if: (i) 'dm' $<$ 'rMdMin' and 'd' $>$ 0 (acceleration direction is kept from previous RAMD block), (ii) if 'dm' $<$ 'rMdMin' and 'd' $<$ 0 (acceleration direction is changed), (iii) if 'dm' $>$ 'rMdMin' and 'd' $<$ 0 (acceleration direction is changed). In all other case, a switch is not applied.
+ 
+%References:
+%Luedemann, S.K., Lounnas, V. and R. C. Wade. How do Substrates Enter and Products Exit the Buried Active Site of Cytochrome P450cam ? 1. Random Expulsion Molecular Dynamics Investigation of Ligand Access Channels and Mechanisms. J Mol Biol, 303:797-811 (2000). 
+%Winn,P., Luedemann, S.K., Gauges,R., Lounnas, V. and R. C. Wade. Comparison of the dynamics of substrate access channels in three cytochrome P450s reveals different opening mechanisms and a new functional role for a buried arginine PNAS, 99, 5361-5366 (2002). 
+%Schleinkofer, K., Sudarko, Winn,P., Luedemann, S.K. and R. C. Wade. Do mammalian cytochrome P450s show multiple ligand access pathways and ligand channelling? EMBO Reports, 6, 584-589 (2005).
+%Carlsson, P., Burendahl, S., Nilsson, L. Unbinding of retinoic acid from the retinoic acid receptor by random expulsion molecular dynamics. Biophys. J. 91, 3151-3161 (2006).
+%Wang, T., Duan, Y. Chromophore channeling in the G-protein coupled receptor rhodopsin. J. Am. Chem. Soc. 129, 6970-6971 (2007).
+%Vashisth, H., Abrams, C.F. Ligand escape pathways and (un)binding free energy calculations for the hexameric insulin-phenol complex. Biophys. J. 95, 4193-4204 (2008).
+%Perakyla, M. Ligand unbinding pathways from the vitamin D receptor studied by molecular dynamics simulations. 38, 185-198 (2009).doi:10.1007/s00249-008-0369-x 
+%Klvana, M. et al. Pathways and Mechanisms for Product Release in the Engineered Haloalkane Dehalogenases Explored Using Classical and Random Acceleration Molecular Dynamics Simulations  J. Mol. Biol. 392, 1339-1356 (2009).
+%Pavlova, M. et al. Redesigning dehalogenase access tunnels as a strategy for degrading an anthropogenic substrate Nature Chem. Biol. 5, 727-733 (2009).
+%Wang, T., Duan, Y. Ligand entry and exit pathways in the beta2-adrenergic receptor. J. Mol. Biol. 392, 1102-1115 (2009).
+
+
+

@@ -1,0 +1,4878 @@
+% /*@@
+%   @file      UtilReference.tex
+%   @date      Sat Nov  3 18:47:53 MET 2001
+%   @author    Jonathan Thornburg <jthorn@aei.mpg.de>
+%   @desc
+%   Utility Functions Reference for the Cactus User's Guide
+%   (this was briefly part of FunctionReference.tex in this directory,
+%   before that this was part of ../UsersGuide/FunctionReference.tex;
+%   see there for older cvs history)
+%   @enddesc
+%   @version $Header$
+% @@*/
+
+\begin{cactuspart}{\code{Util\_*} Functions Reference}{}{$Revision$}
+\label{part:UtilReference}
+\renewcommand{\thepage}{\Alph{part}\arabic{page}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+In this chapter all \code{Util\_*()} Cactus utility functions are
+described.  These are low-level functions mainly for more complicated
+programming, which are used by the rest of Cactus, but don't depend
+heavily on it.  Some of them are callable from Fortran or C, but
+many are C-only.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Functions Alphabetically}
+
+Here the functions are listed alphabetically within each section.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Miscellaneous Functions}
+
+\begin{Lentry}
+
+\item[\code{Util\_CurrentDate}] [\pageref{Util-CurrentDate}]
+  Fills string with current local date
+
+\item[\code{Util\_CurrentDateTime}] [\pageref{Util-CurrentDateTime}]
+  Returns the current datetime in a machine-processable format
+  as defined in ISO 8601 chapter 5.4.
+
+\item[\code{Util\_CurrentTime}] [\pageref{Util-CurrentTime}]
+  Fills string with current local time
+
+\item[\code{Util\_snprintf}]
+     [\pageref{Util-snprintf}]
+Deprecated; use \code{snprintf} instead.
+
+\item[\code{Util\_vsnprintf}]
+     [\pageref{Util-vsnprintf}]
+Deprecated; use \code{vsnprintf} instead.
+
+\item[\code{Util\_asprintf}]
+     [\pageref{Util-asprintf}]
+Sprintf with memory allocation.  On input
+the buffer should point to a NULL area of memory.
+
+%%\item[\code{Util\_BinTreeFindNode}]
+%%     [\pageref{Util-BinTreeFindNode}]
+
+%%\item[\code{Util\_BinTreePrintNodes}]
+%%     [\pageref{Util-BinTreePrintNodes}]
+
+%%\item[\code{Util\_BinTreeStoreData}]
+%%     [\pageref{Util-BinTreeStoreData}]
+
+%%\item[\code{Util\_BinTreeTraverseInorder}]
+%%     [\pageref{Util-BinTreeTraverseInorder}]
+
+%%\item[\code{Util\_BinTreeTraversePostorder}]
+%%     [\pageref{Util-BinTreeTraversePostorder}]
+
+%%\item[\code{Util\_BinTreeTraversePreorder}]
+%%     [\pageref{Util-BinTreeTraversePreorder}]
+
+%%\item[\code{Util\_DeleteHandle}]
+%%     [\pageref{Util-DeleteHandle}]
+
+%%\item[\code{Util\_DoubleInRange}]
+%%     [\pageref{Util-DoubleInRange}]
+
+%%\item[\code{Util\_DoubleInRangeList}]
+%%     [\pageref{Util-DoubleInRangeList}]
+
+%%\item[\code{Util\_GetHandle}]
+%%     [\pageref{Util-GetHandle}]
+
+%%\item[\code{Util\_GetHandleName}]
+%%     [\pageref{Util-GetHandleName}]
+
+%%\item[\code{Util\_GetHandledData}]
+%%     [\pageref{Util-GetHandledData}]
+
+%%\item[\code{Util\_GetHostName}]
+%%     [\pageref{Util-GetHostName}]
+
+%%\item[\code{Util\_HashAdd}]
+%%     [\pageref{Util-HashAdd}]
+
+%%\item[\code{Util\_HashCreate}]
+%%     [\pageref{Util-HashCreate}]
+
+%%\item[\code{Util\_HashData}]
+%%     [\pageref{Util-HashData}]
+
+%%\item[\code{Util\_HashDelete}]
+%%     [\pageref{Util-HashDelete}]
+
+%%\item[\code{Util\_HashDestroy}]
+%%     [\pageref{Util-HashDestroy}]
+
+%%\item[\code{Util\_HashHash}]
+%%     [\pageref{Util-HashHash}]
+
+%%\item[\code{Util\_HashStore}]
+%%     [\pageref{Util-HashStore}]
+
+%%\item[\code{Util\_InList}]
+%%     [\pageref{Util-InList}]
+
+%%\item[\code{Util\_IntInRange}]
+%%     [\pageref{Util-IntInRange}]
+
+%%\item[\code{Util\_IntInRangeList}]
+%%     [\pageref{Util-IntInRangeList}]
+
+%%\item[\code{Util\_NewHandle}]
+%%     [\pageref{Util-NewHandle}]
+
+%%\item[\code{Util\_NullTerminateString}]
+%%     [\pageref{Util-NullTerminateString}]
+
+%%\item[\code{Util\_SplitFilename}]
+%%     [\pageref{Util-SplitFilename}]
+
+%%\item[\code{Util\_SplitString}]
+%%     [\pageref{Util-SplitString}]
+
+%%\item[\code{Util\_StringListAdd}]
+%%     [\pageref{Util-StringListAdd}]
+
+%%\item[\code{Util\_StringListCreate}]
+%%     [\pageref{Util-StringListCreate}]
+
+%%\item[\code{Util\_StringListDestroy}]
+%%     [\pageref{Util-StringListDestroy}]
+
+%%\item[\code{Util\_StringListNext}]
+%%     [\pageref{Util-StringListNext}]
+
+\end{Lentry}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{String Functions}
+
+\begin{Lentry}
+
+\item[\code{Util\_StrCmpi}]
+     [\pageref{Util-StrCmpi}]
+Compare two strings, ignoring upper/lower case.
+
+\item[\code{Util\_Strdup}]
+     [\pageref{Util-Strdup}]
+Deprecated; use \code{strdup} instead.
+
+\item[\code{Util\_Strlcat}]
+     [\pageref{Util-Strlcat}]
+Concatenate two strings safely.
+
+\item[\code{Util\_Strlcpy}]
+     [\pageref{Util-Strlcpy}]
+Copy a string safely.
+
+\item[\code{Util\_StrSep}]
+     [\pageref{Util-StrSep}]
+Separate first token from a string.
+
+\end{Lentry}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Table Functions}
+
+\begin{Lentry}
+
+\item[\code{Util\_TableClone}]
+     [\pageref{Util-TableClone}]
+Create a new table which is a ``clone'' (exact copy) of an existing
+table
+
+\item[\code{Util\_TableCreate}]
+     [\pageref{Util-TableCreate}]
+Create a new (empty) table
+
+\item[\code{Util\_TableCreateFromString}]
+     [\pageref{Util-TableCreateFromString}]
+Create a new table (with the case-insensitive flag set) and sets
+values in it based on a string argument (interpreted with
+``parameter-file'' semantics)
+
+\item[\code{Util\_TableDeleteKey}]
+     [\pageref{Util-TableDeleteKey}]
+Delete a specified key/value entry from a table
+
+\item[\code{Util\_TableDestroy}]
+     [\pageref{Util-TableDestroy}]
+Destroy a table
+
+\item[\code{Util\_TableGet*}]
+     [\pageref{Util-TableGet*}]
+This is a family of functions, one for each Cactus data type,
+to get the single (1-element array) value, or more generally the
+first array element of the value, associated with a specified key
+in a key/value table.
+
+\item[\code{Util\_TableGet*Array}]
+     [\pageref{Util-TableGet*Array}]
+This is a family of functions, one for each Cactus data type,
+to get a copy of the value associated with a specified key, and store
+it (more accurately, as much of it as will fit) in a specified array
+
+\item[\code{Util\_TableGetGeneric}]
+     [\pageref{Util-TableGetGeneric}]
+Get the single (1-element array) value, or more generally the
+first array element of the value, associated with a specified key
+in a key/value table; the value's data type is generic
+
+\item[\code{Util\_TableGetGenericArray}]
+     [\pageref{Util-TableGetGenericArray}]
+Get a copy of the value associated with a specified key, and store
+it (more accurately, as much of it as will fit) in a specified array;
+the array's data type is generic
+
+\item[\code{Util\_TableGetString}]
+     [\pageref{Util-TableGetString}]
+Gets a copy of the character-string value associated with a specified
+key in a table, and stores it (more accurately, as much of it as will fit)
+in a specified character string
+
+\item[\code{Util\_TableItAdvance}]
+     [\pageref{Util-TableItAdvance}]
+Advance a table iterator to the next entry in the table
+
+\item[\code{Util\_TableItClone}]
+     [\pageref{Util-TableItClone}]
+Creates a new table iterator which is a ``clone'' (exact copy) of an
+existing table iterator
+
+\item[\code{Util\_TableItCreate}]
+     [\pageref{Util-TableItCreate}]
+Create a new table iterator
+
+\item[\code{Util\_TableItDestroy}]
+     [\pageref{Util-TableItDestroy}]
+Destroy a table iterator
+
+\item[\code{Util\_TableItQueryIsNonNull}]
+     [\pageref{Util-TableItQueryIsNonNull}]
+Query whether a table iterator is {\em not\/} in the ``null-pointer'' state
+
+\item[\code{Util\_TableItQueryIsNull}]
+     [\pageref{Util-TableItQueryIsNull}]
+Query whether a table iterator is in the ``null-pointer'' state
+
+\item[\code{Util\_TableItQueryKeyValueInfo}]
+     [\pageref{Util-TableItQueryKeyValueInfo}]
+Query the key and the type and number of elements of the value
+corresponding to that key, of the table entry to which an iterator points
+
+\item[\code{Util\_TableItQueryTableHandle}]
+     [\pageref{Util-TableItQueryTableHandle}]
+Query what table a table iterator iterates over
+
+\item[\code{Util\_TableItResetToStart}]
+     [\pageref{Util-TableItResetToStart}]
+Reset a table iterator to point to the starting table entry
+
+\item[\code{Util\_TableItSetToKey}]
+     [\pageref{Util-TableItSetToKey}]
+Set a key/value iterator to point to a specified entry in the table.
+
+\item[\code{Util\_TableItSetToNull}]
+     [\pageref{Util-TableItSetToNull}]
+Set a key/value iterator to the ``null-pointer'' state.
+
+\item[\code{Util\_TableQueryFlags}]
+     [\pageref{Util-TableQueryFlags}]
+Query a table's flags word
+
+\item[\code{Util\_TableQueryValueInfo}]
+     [\pageref{Util-TableQueryValueInfo}]
+Query whether or not a specified key is in the table, and optionally
+the type and/or number of elements of the value corresponding to this key
+
+\item[\code{Util\_TableQueryMaxKeyLength}]
+     [\pageref{Util-TableQueryMaxKeyLength}]
+Query the maximum key length in a table
+
+\item[\code{Util\_TableQueryNKeys}]
+     [\pageref{Util-TableQueryNKeys}]
+Query the number of key/value entries in a table
+
+\item[\code{Util\_TableSet*}]
+     [\pageref{Util-TableSet*}]
+This is a family of functions, one for each Cactus data type,
+to set the value associated with a specified key to be a specified
+single (1-element array) value
+
+\item[\code{Util\_TableSet*Array}]
+     [\pageref{Util-TableSet*Array}]
+This is a family of functions, one for each Cactus data type,
+to set the value associated with a specified key to be a copy
+of a specified array
+
+\item[\code{Util\_TableSetFromString}]
+     [\pageref{Util-TableSetFromString}]
+Sets values in a table based on a string argument (interpreted with
+``parameter-file'' semantics)
+
+\item[\code{Util\_TableSetGeneric}]
+     [\pageref{Util-TableSetGeneric}]
+Set the value associated with a specified key to be a specified
+single (1-element array) value, whose data type is generic
+
+\item[\code{Util\_TableSetGenericArray}]
+     [\pageref{Util-TableSetGenericArray}]
+Set the value associated with a specified key to be a copy of a
+specified array, whose data type is generic
+
+\item[\code{Util\_TableSetString}]
+     [\pageref{Util-TableSetString}]
+Sets the value associated with a specified key in a table, to be
+a copy of a specified C-style null-terminated character string
+
+\item[\code{Util\_TablePrint}]
+     [\pageref{Util-TablePrint}]
+Print out a table and its data structures, using a verbose internal
+format meant for debugging
+
+\item[\code{Util\_TablePrintAll}]
+     [\pageref{Util-TablePrintAll}]
+Print out all tables and their data structures, using a verbose
+internal format meant for debugging
+
+\item[\code{Util\_TablePrintAllIterators}]
+     [\pageref{Util-TablePrintAllIterators}]
+Print out all table iterators and their data structures, using a
+verbose internal format meant for debugging
+
+\item[\code{Util\_TablePrintPretty}]
+     [\pageref{Util-TablePrintPretty}]
+Print out a table, using a human-readable format similar to the one
+accepted by Util\_TableCreateFromString
+
+\end{Lentry}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Full Descriptions of Miscellaneous Functions}
+
+\begin{FunctionDescription}{Util\_CurrentDate}
+\label{Util-CurrentDate}
+Fills string with current local date
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "cctk.h"
+#include "cctk_Misc.h.h"
+
+int retval = Util_CurrentDate (int len, char *now);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{len}
+length of the user-supplied string buffer 
+\end{Parameter}
+\begin{Parameter}{now}
+user-supplied string buffer to write the date stamp to
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{ResultSection}
+\begin{Result}{retval}
+length of the string returned in {\code now}, or 0 if the string was truncated
+\end{Result}
+\end{ResultSection}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2}{Util\_CurrentTime}{Util-CurrentTime}
+  Fills string with current local time
+\end{SeeAlso2}
+\begin{SeeAlso2}{Util\_CurrentDateTime}{Util-CurrentDateTime}
+  Returns the current datetime in a machine-processable format
+  as defined in ISO 8601 chapter 5.4.
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\end{FunctionDescription}
+
+
+\begin{FunctionDescription}{Util\_CurrentDateTime}
+\label{Util-CurrentDateTime}
+Returns the current datetime in a machine-processable format
+as defined in ISO 8601 chapter 5.4.
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "cctk.h"
+#include "cctk_Misc.h.h"
+
+char *current_datetime = Util_CurrentDateTime ();
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{current\_datetime}
+Pointer to an allocated formatted string containing the current datetime stamp.
+The pointer should be freed by the caller.
+\end{Result}
+\end{ResultSection}
+
+\begin{Discussion}
+The formatted string returned contains the current datetime in a
+machine-processable format as defined in ISO 8601 chapter 5.4:
+{\code "YYYY-MM-DDThh:mm:ss+hh:mm"}
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2}{Util\_CurrentDate}{Util-CurrentDate}
+  Fills string with current local date
+\end{SeeAlso2}
+\begin{SeeAlso2}{Util\_CurrentTime}{Util-CurrentTime}
+  Fills string with current local time
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\end{FunctionDescription}
+
+\begin{FunctionDescription}{Util\_CurrentTime}
+\label{Util-CurrentTime}
+Fills string with current local time
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "cctk.h"
+#include "cctk_Misc.h.h"
+
+int retval = Util_CurrentTime (int len, char *now);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{len}
+length of the user-supplied string buffer
+\end{Parameter}
+\begin{Parameter}{now}
+user-supplied string buffer to write the time stamp to
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{ResultSection}
+\begin{Result}{retval}
+length of the string returned in {\code now}, or 0 if the string was truncated
+\end{Result}
+\end{ResultSection}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2}{Util\_CurrentDate}{Util-CurrentDate}
+  Fills string with current local date
+\end{SeeAlso2}
+\begin{SeeAlso2}{Util\_CurrentDateTime}{Util-CurrentDateTime}
+  Returns the current datetime in a machine-processable format
+as defined in ISO 8601 chapter 5.4.
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\end{FunctionDescription}
+
+
+%Entering a function descrpition for Util\_snprintf
+\begin{FunctionDescription}{Util\_snprintf}
+\label{Util-snprintf}
+Deprecated; use \code{snprintf} instead.
+\end{FunctionDescription}
+
+%Entering a function descrpition for Util\_vsnprintf
+\begin{FunctionDescription}{Util\_vsnprintf}
+\label{Util-vsnprintf}
+Deprecated; use \code{vsnprintf} instead.
+\end{FunctionDescription}
+
+%Entering a function descrpition for Util\_asprintf
+\begin{FunctionDescription}{Util\_asprintf}
+\label{Util-asprintf}
+   Sprintf with memory allocation.  On input
+   the buffer should point to a NULL area of memory.
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_String.h"
+int count = Util_asprintf(char** buffer, const char* format,
+                           va_list arg)
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{buffer}
+Buffer to which to print the string.
+
+\verb|*buffer| should be NULL on entry.  The routine
+allocates the memory, so the previous contents of
+the pointer are lost.
+On exit the buffer size will be \verb|count+1| (i.e
+the length of the string plus the \verb|\0|).
+\end{Parameter}
+\begin{Parameter}{format}
+A (non-NULL pointer to a) C-style NUL-terminated string describing
+how to format any further arguments
+\end{Parameter}
+\begin{Parameter}{...}
+Zero or more further arguments, with types as specified by the
+\verb|format| argument.
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+This function is identical to \verb|sprintf()|, except that it allocates a
+buffer large enough to hold the output including the terminating null byte,
+and returns a pointer to it via the first argument. This pointer should be
+passed to \verb|free()| to release the allocated storage when it is no longer
+needed.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso}{asprintf()}
+GNU/BSD C library function which this function tries to clone.
+\end{SeeAlso}
+\begin{SeeAlso}{sprintf()}
+Unsafe and dangerous C library function similar to \verb|snprintf()|,
+which doesn't check the buffer length.
+\end{SeeAlso}
+\end{SeeAlsoSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Full Descriptions of String Functions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_StrCmpi
+\begin{FunctionDescription}{Util\_StrCmpi}
+\label{Util-StrCmpi}
+Compare two strings, ignoring upper/lower case.
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_String.h"
+int cmp = Util_StrCmpi(const char *str1, const char *str2);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{cmp}
+An integer which is:\\
+\begin{tabular}{@{}rl}
+$<0$	& if $\code{str1} < \code{str2}$ in lexicographic order
+	  ignoring upper/lower case distinctions			\\
+$0$	& if $\code{str1} = \code{str2}$
+	  ignoring upper/lower case distinctions			\\
+$>0$	& if $\code{str1} > \code{str2}$ in lexicographic order
+	  ignoring upper/lower case distinctions			%%%\\
+\end{tabular}
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{str1}
+A non-NULL pointer to a (C-style NUL-terminated) string to be compared.
+\end{Parameter}
+\begin{Parameter}{str2}
+A non-NULL pointer to a (C-style NUL-terminated) string to be compared.
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+The standard C library \code{strcmp()} function does a {\em case-sensitive\/}
+string comparison, i.e.\ \code{strcmp("cactus", "Cactus")} will find the
+two strings not equal.  Sometimes it's useful to do {\em case-insensitive\/}
+string comparison, where upper/lower case distinctions are ignored.
+Many systems provide a \code{strcasecmp()} or \code{strcmpi()}
+function to do this, but some systems don't, and even on those that do,
+the name isn't standardised.  So, Cactus provides its own version,
+\code{Util\_StrCmpi()}.
+
+Notice that the return value of \code{Util\_StrCmpi()}, like that of
+\code{strcmp()}, is zero (logical ``false'' in C) for equal strings,
+and nonzero (logical ``true'' in C) for non-equal strings.
+Code of the form
+\begin{verbatim}
+if (Util_StrCmpi(str1, str2))
+        { /* strings differ */ }
+\end{verbatim}
+or
+\begin{verbatim}
+if (!Util_StrCmpi(str1, str2))
+        { /* strings are identical apart from case distinctions */ }
+\end{verbatim}
+may be confusing to readers, because the sense of the comparison
+isn't immediately obvious.  Writing an explicit comparison against zero
+make make things clearer:
+\begin{verbatim}
+if (Util_StrCmpi(str1, str2) != 0)
+        { /* strings differ */ }
+\end{verbatim}
+or
+\begin{verbatim}
+if (Util_StrCmpi(str1, str2) == 0)
+        { /* strings are identical apart from case distinctions */ }
+\end{verbatim}
+
+Unfortunately, the basic concept of ``case-insensitive'' string
+operations doesn't generalize well to non-English character sets,%%%
+\footnote{%%%
+	 Hawaiian and Swahili are apparently the only
+	 other living languages that use solely the
+	 26-letter ``English'' Latin alphabet.
+	 }%%%
+{} where lower-case $\leftrightarrow$ upper-case mappings may be
+context-dependent, many-to-one, and/or time-dependent.%%%
+\footnote{%%%
+	 For example, the (lower-case) German ``\ss''
+	 doesn't have a unique upper-case equivalent:
+	 ``\ss'' usually maps to ``SS''
+	 (for example ``gro\ss'' $\leftrightarrow$ ``GROSS''),
+	 {\em but\/} if that would conflict
+	 with another word, then ``\ss'' maps to ``SZ''
+	 (for example ``ma\ss{}e'' $\leftrightarrow$ ``MASZE''
+	 because there's a different word ``MASSE'').
+	 Or at least that's the way it was prior to 1998.
+	 The 1998 revisions to German orthography
+	 removed the SZ rule, so now (post-1998) the two
+	 distinct German words ``masse'' (English ``mass'')
+	 and ``ma\ss{}e'' (``measures'') have identical
+	 upper-case forms ``MASSE''.  To further complicate
+	 matters, (the German-speaking parts of) Switzerland
+	 have a slightly different orthography, which never
+	 had the SZ rule.
+
+	 French provides another tricky example:
+	 In France ``\'e'' $\leftrightarrow$ ``\'E'' and
+	 ``\`e'' $\leftrightarrow$ ``\`E'',
+	 whereas in (the French-speaking parts of) Canada
+	 there are no accents on upper-case letters, so
+	 ``\'e'' $\leftrightarrow$ ``E'' and
+	 ``\`e'' $\leftrightarrow$ ``E''.
+	 }%%%
+{}  At present Cactus basically ignores these issues. :(
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso}{strcmp()}
+Standard C library function (prototype in \code{<string.h>})
+to compare two strings.
+\end{SeeAlso}
+\end{SeeAlsoSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_String.h"
+
+/* does the Cactus parameter  driver  specify the PUGH driver? */
+/* (Cactus parameters are supposed to be case-insensitive) */
+if (Util_StrCmpi(driver, "pugh") == 0)
+        { /* PUGH code */ }
+else
+        { /* non-PUGH code */ }
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_Strdup
+\begin{FunctionDescription}{Util\_Strdup}
+\label{Util-Strdup}
+Depredcated; use \code{strdup} instead.
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_Strlcat
+\begin{FunctionDescription}{Util\_Strlcat}
+\label{Util-Strlcat}
+Concatenate strings safely.
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_String.h"
+size_t result_len = Util_Strlcat(char *dst, const char *src, size_t size);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{result\_len}
+The size of the string the function tried to create, i.e.\
+the initial \code{strlen(dst)} plus \code{strlen(src)}.
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{dst}
+A non-NULL pointer to the (C-style NUL-terminated) destination string.
+\end{Parameter}
+\begin{Parameter}{src}
+A non-NULL pointer to the (C-style NUL-terminated) source string.
+\end{Parameter}
+\begin{Parameter}{size}
+The size of the destination buffer.
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+The standard \code{strcat()} and \code{strcpy()} functions provide
+no way to specify the size of the destination buffer, so code using
+these functions is often vulnerable to buffer overflows.  The standard
+\code{strncat()} and \code{strncpy()} functions can be used to write
+safe code, but their API is cumbersome, error-prone, and sometimes
+surprisingly inefficient:
+\begin{itemize}
+\item	Their \code{size} arguments are the number of characters
+	{\em remaining\/} in the destination buffer, which must
+	often be calculated at run-time, and is prone to off-by-one
+	errors.
+\item	\code{strncpy()} doesn't always NUL-terminate the destination string.
+\item	\code{strncpy()} NUL-fills the remainder of the buffer not
+	used for the source string; this NUL-filling can be {\em very\/}
+	expensive.
+\end{itemize}
+
+To solve these problems, the OpenBSD project developed the
+\code{strlcat()} and \code{strlcpy()} functions.  See
+\url{http://www.openbsd.org/papers/strlcpy-paper.ps}
+for a history and general discussion of these functions.
+Some other Unix systems (notably Solaris) now provide these,
+but many don't, so Cactus provides its own versions,
+\code{Util\_Strlcat()} and \code{Util\_Strlcpy()}.
+
+\code{Util\_Strlcat()} appends the NUL-terminated string \code{src} to the
+end of the NUL-terminated string \code{dst}.  It will append at most
+\code{size - strlen(dst) - 1} characters (hence it never overflows the
+destination buffer), and it always leaves \code{dst} string NUL-terminated.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso}{strcat()}
+Standard C library function (prototype in \code{<string.h>})
+to concatenate two strings.
+{\em This does not check that the buffer is big enough to hold the result,
+and is thus very dangerous.  Use \code{Util\_Strlcat()} instead!}
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_Strlcpy()} {Util-Strlcpy}
+Safely copy a string.
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_String.h"
+
+/*
+ * safely concatenate strings s1,s2,s3 into buffer:
+ * ... this code is safe (it will never overflow the buffer), but
+ *     quick-n-dirty in that it doesn't give any error indication
+ *     if the result is truncated to fit in the buffer
+ */
+#define BUFFER_SIZE     1024
+char buffer[BUFFER_SIZE];
+
+Util_Strlcpy(buffer, s1, sizeof(buffer));
+Util_Strlcat(buffer, s2, sizeof(buffer));
+Util_Strlcat(buffer, s3, sizeof(buffer));
+\end{verbatim}
+\end{Example}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_String.h"
+
+#define OK              0
+#define ERROR_TRUNC     1
+
+/*
+ * safely concatenate strings s1,s2,s3 into buffer[N_buffer];
+ * return OK if ok, ERROR_TRUNC if result was truncated to fit in buffer
+ */
+int cat3(int N_buffer, char buffer[],
+         const char s1[], const char s2[], const char s3[])
+{
+int length;
+
+length = Util_Strlcpy(buffer, s1, N_buffer);
+if (length >= N_buffer)
+        return ERROR_TRUNC;                   /*** ERROR EXIT ***/
+
+length = Util_Strlcat(buffer, s2, N_buffer);
+if (length >= N_buffer)
+        return ERROR_TRUNC;                   /*** ERROR EXIT ***/
+
+length = Util_Strlcat(buffer, s3, N_buffer);
+if (length >= N_buffer)
+        return ERROR_TRUNC;                   /*** ERROR EXIT ***/
+
+return OK;                                    /*** NORMAL RETURN ***/
+}
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_Strlcpy
+\begin{FunctionDescription}{Util\_Strlcpy}
+\label{Util-Strlcpy}
+Copies a string safely.
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_String.h"
+size_t result_len = Util_Strlcpy(char *dst, const char *src, size_t size);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{result\_len}
+The size of the string the function tried to create, i.e.\
+\code{strlen(src)}.
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{dst}
+A non-NULL pointer to the (C-style NUL-terminated) destination string.
+\end{Parameter}
+\begin{Parameter}{src}
+A non-NULL pointer to the (C-style NUL-terminated) source string.
+\end{Parameter}
+\begin{Parameter}{size}
+The size of the destination buffer.
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+The standard \code{strcat()} and \code{strcpy()} functions provide
+no way to specify the size of the destination buffer, so code using
+these functions is often vulnerable to buffer overflows.  The standard
+\code{strncat()} and \code{strncpy()} functions can be used to write
+safe code, but their API is cumbersome, error-prone, and sometimes
+surprisingly inefficient:
+\begin{itemize}
+\item	Their \code{size} arguments are the number of characters
+	{\em remaining\/} in the destination buffer, which must
+	often be calculated at run-time, and is prone to off-by-one
+	errors.
+\item	\code{strncpy()} doesn't always NUL-terminate the destination string.
+\item	\code{strncpy()} NUL-fills the remainder of the buffer not
+	used for the source string; this NUL-filling can be {\em very\/}
+	expensive.
+\end{itemize}
+
+To solve these problems, the OpenBSD project developed the
+\code{strlcat()} and \code{strlcpy()} functions.  See
+\url{http://www.openbsd.org/papers/strlcpy-paper.ps}
+for a history and general discussion of these functions.
+Some other Unix systems (notably Solaris) now provide these,
+but many don't, so Cactus provides its own versions,
+\code{Util\_Strlcat()} and \code{Util\_Strlcpy()}.
+
+\code{Util\_Strlcpy()} copies up to \code{size-1} characters from the
+source string to the destination string, followed by a NUL character
+(so \code{dst} is always NUL-terminated).  Unlike \code{strncpy()},
+\code{Util\_Strlcpy()} does {\em not\/} fill any left-over space at
+the end of the destination buffer with NUL characters.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso}{strcpy()}
+Standard C library function (prototype in \code{<string.h>})
+to copy a string to a buffer.
+{\em This does not check that the buffer is big enough to hold the string,
+and is thus very dangerous.  Use \code{Util\_Strlcpy()} instead!}
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_Strlcat()} {Util-Strlcat}
+Safely concatenates two strings.
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_String.h"
+
+/*
+ * safely concatenate strings s1,s2,s3 into buffer:
+ * ... this code is safe (it will never overflow the buffer), but
+ *     quick-n-dirty in that it doesn't give any error indication
+ *     if the result is truncated to fit in the buffer
+ */
+#define BUFFER_SIZE     1024
+char buffer[BUFFER_SIZE];
+
+Util_Strlcpy(buffer, s1, sizeof(buffer));
+Util_Strlcat(buffer, s2, sizeof(buffer));
+Util_Strlcat(buffer, s3, sizeof(buffer));
+\end{verbatim}
+\end{Example}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_String.h"
+
+#define OK              0
+#define ERROR_TRUNC     1
+
+/*
+ * safely concatenate strings s1,s2,s3 into buffer[N_buffer];
+ * return OK if ok, ERROR_TRUNC if result was truncated to fit in buffer
+ */
+int cat3(int N_buffer, char buffer[],
+         const char s1[], const char s2[], const char s3[])
+{
+int length;
+
+length = Util_Strlcpy(buffer, s1, N_buffer);
+if (length >= N_buffer)
+        return ERROR_TRUNC;                   /*** ERROR EXIT ***/
+
+length = Util_Strlcat(buffer, s2, N_buffer);
+if (length >= N_buffer)
+        return ERROR_TRUNC;                   /*** ERROR EXIT ***/
+
+length = Util_Strlcat(buffer, s3, N_buffer);
+if (length >= N_buffer)
+        return ERROR_TRUNC;                   /*** ERROR EXIT ***/
+
+return OK;                                    /*** NORMAL RETURN ***/
+}
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_StrSep
+\begin{FunctionDescription}{Util\_StrSep}
+\label{Util-StrSep}
+Separate off the first token from a string.
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_String.h"
+char* token = Util_StrSep(const char** string_ptr, const char* delim_set);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{token}
+This function returns the original value of \verb|*string_ptr|,
+or NULL if the end of the string is reached.
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{string\_ptr}
+A non-NULL pointer to a (modifyable) non-NULL pointer to the
+(C-style NUL-terminated) string to operate on.
+\end{Parameter}
+\begin{Parameter}{delim\_set}
+A non-NULL pointer to a (C-style NUL-terminated) string representing a
+set of delimiter characters (the order of these characters doesn't matter).
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+Many Unix systems define a function \verb|strsep()| which provides
+a clean way of splitting a string into ``words''.  However, some
+systems only provide the older (and inferior-in-several-ways)
+\verb|strtok()| function, so Cactus implements its own \verb|strsep()|
+function, \verb|Util_StrSep()|.
+
+\verb|Util_StrSep()| finds the first occurence in the string pointed
+to by \verb|*string_ptr| of any character in the string pointed to by
+\verb|delim_set| (or the terminating NUL if there is no such character),
+and replaces this by NUL.  The location of the next character after the
+NUL character just stored (or NULL, if the end of the string was reached)
+is stored in \verb|*string_ptr|.
+
+An ``empty'' field, i.e.\ one caused by two adjacent delimiter characters,
+can be detected (after \verb|Util_StrSep()| returns) by the test
+\verb|**string_ptr == '\0'|, or equivalently \verb|strlen(*string_ptr) == 0|.
+
+See the example section below for the typical usage of \verb|Util_StrSep()|.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso}{strsep()}
+Some systems provide this in the standard C library
+(prototype in \code{<string.h>}); \verb|Util_StrSep()| is a clone of this.
+\end{SeeAlso}
+\begin{SeeAlso}{strtok()}
+Inferior API for splitting a string into tokens
+(defined by the ANSI/ISO C standard).
+\end{SeeAlso}
+\end{SeeAlsoSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "util_String.h"
+
+/* prototypes */
+int parse_string(char* string,
+                 int N_argv, char* argv[]);
+
+/*
+ * Suppose we have a Cactus parameter  gridfn_list  containing a
+ * whitespace-separated list of grid functions.  This function
+ * "processes" (here just prints the name of) each grid function.
+ */
+void process_gridfn_list(const char* gridfn_list)
+{
+#define MAX_N_GRIDFNS   100
+int N_gridfns;
+int i;
+char* copy_of_gridfn_list;
+char* gridfn[MAX_N_GRIDFNS];
+
+copy_of_gridfn_list = strdup(gridfn_list);
+N_gridfns = parse_string(copy_of_gridfn_list,
+                         MAX_N_GRIDFNS, gridfn);
+
+        for (i = 0 ; i < N_gridfns ; ++i)
+        {
+        /* "process" (here just print the name of) each gridfn */
+        printf("grid function %d is \"%s\"\n", i, gridfn[i]);
+        }
+
+free(copy_of_gridfn_list);
+}
+
+/*
+ * This function parses a string containing whitespace-separated
+ * tokens into a main()-style argument vector (of size  N_argv ).
+ * This function returns the number of pointers stored into  argv[] .
+ *
+ * Adjacent sequences of whitespace are treated the same as single
+ * whitespace characters.
+ *
+ * Note that this function this modifies its input string.
+ */
+int parse_string(char* string,
+                 int N_argv, char* argv[])
+{
+int i;
+
+        for (i = 0 ; i < N_argv ; )
+        {
+        argv[i] = Util_StrSep(&string, " \t\n\r\v");
+        if (argv[i] == NULL)
+                { break; }      /* reached end-of-string */
+
+        if (*argv[i] == '\0')
+                {
+                /*
+                 * found a 0-length "token" (a sequence of
+                 * two or more adjacent whitespace characters)
+                 * ==> skip this "token" (don't store it)
+                 * ==> no-op here
+                 */
+                }
+           else {
+                /* token has length > 0 ==> store it */
+                ++i;
+                }
+        }
+
+return i;
+}
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Full Descriptions of Table Functions}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableClone
+\begin{FunctionDescription}{Util\_TableClone}
+\label{Util-TableClone}
+Creates a new table which is a ``clone'' (exact copy) of an existing
+table
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int clone_handle = Util_TableClone(int handle);
+\end{verbatim}
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableClone(clone_handle, handle)
+integer clone_handle, handle
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{clone\_handle ($\ge 0$)}
+A handle to the clone table
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle}
+Handle to the table to be cloned
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+Viewing a table as a set of key/value pairs, this function creates
+a new table (with the same flags word as the original) containing
+copies of all the original table's key/value pairs.  The two tables
+are completely independent, i.e.\ future changes to one won't affect
+the other.
+
+Note that if there are any \code{CCTK\_POINTER} and/or \code{CCTK\_FPOINTER}
+values in the table, they are ``shallow copied'', i.e.\ the (pointer)
+values in the table are copied.  This results in the clone table's
+pointer values pointing to the same places as the original table's
+pointer values.  Be careful with this!  In particular,
+if you're using pointer values in the table to keep track of
+\code{malloc()} memory, be careful not to \code{free()}
+the same block of memory twice!
+
+Note that table iterators are {\em not\/} guaranteed to sequence
+through the original and clone tables in the same order.  (This
+is a special case of the more general ``non-guarantee'' in
+the Section of table iterators in the Users' Guide:
+the order of table iterators may differ even between different
+tables with identical key/value contents.)
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableCreate()} {Util-TableCreate}
+create a table
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableCreateFromString()} {Util-TableCreateFromString}
+convenience routine to create a table and set key/value entries
+in it based on a parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableDestroy()} {Util-TableDestroy}
+destroy a table
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_NO\_MEMORY}
+unable to allocate memory
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_BAD\_FLAGS}
+flags word is negative in the to-be-cloned table
+(this indicates an internal error in the table routines,
+and should never happen)
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+/*
+ * This function is passed (a handle to) a table containing some entries.
+ * It needs to set some additional entries and pass the table to some
+ * other function(s), but it also needs to leave the original table
+ * intact for other use by the caller.  The solution is to clone the
+ * original table and work on the clone, leaving the original table
+ * unchanged.
+ */
+int my_function(int handle, int x, int y)
+{
+int status;
+
+/* clone the table */
+const int clone_handle = Util_TableClone(handle)
+if (clone_handle < 0)
+        return clone_handle;               /* error in cloning table */
+
+/* now set our entries in the clone table */
+status = Util_TableSetInt(clone_handle, x, "x");
+if (status < 0)
+        return status;                     /* error in setting x */
+status = Util_TableSetInt(clone_handle, y, "y");
+if (status < 0)
+        return status;                     /* error in setting y */
+
+/* ... code to use the clone table ... */
+/* ... eg pass clone_handle to other functions ... */
+
+/* we're done with the clone now */
+Util_TableDestroy(clone_handle);
+return 0;
+}
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableCreate
+\begin{FunctionDescription}{Util\_TableCreate}
+\label{Util-TableCreate}
+Creates a new (empty) table
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int handle = Util_TableCreate(int flags);
+\end{verbatim}
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableCreate(handle, flags)
+integer handle, flags
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{handle ($\ge 0$)}
+A handle to the newly-created table
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{flags ($\ge 0$)}
+A flags word for the table.  This should be the inclusive-or of zero
+or more of the \code{UTIL\_TABLE\_FLAGS\_*} bit masks (defined in
+\code{"util\_Table.h"}).  For Fortran users, note that inclusive-or
+is the same as sum here, since the bit masks are all disjoint.
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+We require the flags word to be non-negative so that other
+functions can distinguish flags from (negative) error codes.
+
+Any User-defined flag words should use only bit positions at or above\\
+\code{UTIL\_TABLE\_FLAGS\_USER\_DEFINED\_BASE}, i.e.\ all bit positions
+below this are reserved for present of future Cactus use.
+
+At present there is only a single flags-word bit mask defined
+in \code{"util\_Table.h"}:
+\begin{description}
+\item[\code{UTIL\_TABLE\_FLAGS\_CASE\_INSENSITIVE}]\mbox{}\\
+        By default keys are treated as C-style character strings,
+        and the table functions compare them with the standard C
+        \code{strcmp} function.
+        However, by setting the\\
+        \code{UTIL\_TABLE\_FLAGS\_CASE\_INSENSITIVE}
+        bit in the flags word, this table's keys may be made
+        case-insensitive, i.e.\ the table routines then compare
+        this table's keys with \code{Util\_StrCmpi()}.
+        Note that keys are still {\em stored\/} exactly as
+        the caller specifies them (i.e.\ they are {\em not\/}
+        forced into a canonical case); it's only their
+        {\em comparison\/} that's affected by this flag.
+\end{description}
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_StrCmpi()} {Util-StrCmpi}
+compare two strings, ignoring upper/lower case
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableClone()} {Util-TableClone}
+create a new table which is a ``clone'' (exact copy) of an existing
+table
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableCreateFromString()} {Util-TableCreateFromString}
+convenience routine to create a table and set key/value entries
+in it based on a parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableDestroy()} {Util-TableDestroy}
+destroy a table
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_NO\_MEMORY}
+unable to allocate memory
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_BAD\_FLAGS}
+flags word is negative
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+/* create a table, simplest case */
+int handle = Util_TableCreate(UTIL_TABLE_FLAGS_DEFAULT);
+
+/* create a table whose keys will be treated as case-insensitive */
+int handle2 = Util_TableCreate(UTIL_TABLE_FLAGS_CASE_INSENSITIVE);
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableCreateFromString
+\begin{FunctionDescription}{Util\_TableCreateFromString}
+\label{Util-TableCreateFromString}
+Creates a new table (with the case-insensitive flag set) and sets
+values in it based on a string argument (interpreted with
+``parameter-file'' semantics)
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int handle = Util_TableCreateFromString(const char *string);
+\end{verbatim}
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableCreateFromString(handle, string)
+integer       handle
+character*(*) string
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{handle ($\ge 0$)}
+a handle to the newly-created table
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{string}
+a pointer to a C-style null-terminated string specifying the table
+contents; see the description for \code{Util\_TableSetFromString()}
+for a full description of the syntax and semantics of this string
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableClone()} {Util-TableClone}
+Create a new table which is a ``clone'' (exact copy) of an existing
+table
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableCreate()} {Util-TableCreate}
+create a table
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetFromString()} {Util-TableSetFromString}
+sets values in a table based on a string argument
+\end{SeeAlso2}
+%\begin{SeeAlso2} {Util\_TableSetInt()} {Util-TableSetInt}
+%store a \code{CCTK\_INT} value in a table
+%\end{SeeAlso2}
+%\begin{SeeAlso2} {Util\_TableSetReal()} {Util-TableSetReal}
+%store a \code{CCTK\_REAL} value in a table
+%\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_NO\_MEMORY}
+unable to allocate memory
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_BAD\_KEY}
+invalid input: key contains invalid character
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_BAD\_INPUT}
+invalid input: can't parse input string
+\end{Error}
+\begin{Error}{\rm other error codes}
+this function may also return any error codes returned by
+\code{Util\_TableCreate()} or \code{Util\_TableSetFromString()}
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+int handle = Util_TableCreateFromString("order = 3\t"
+                                        "myreal = 42.314159\t"
+                                        "mystring = 'hello'\t"
+                                        "myarray = { 0 1 2 3 }");
+
+/* equivalent code to the above */
+int handle = Util_TableCreate(UTIL_TABLE_FLAGS_CASE_INSENSITIVE);
+Util_TableSetFromString(handle, "order = 3\t"
+                                "myreal = 42.314159\t"
+                                "mystring = 'hello'"
+                                "myarray = { 0 1 2 3 }");
+
+/* also equivalent to the above */
+int handle = Util_TableCreate(UTIL_TABLE_FLAGS_CASE_INSENSITIVE);
+CCTK_INT array[] = {0, 1, 2, 3};
+
+Util_TableSetInt(handle, 3, "order");
+Util_TableSetReal(handle, 42.314159, "myreal");
+Util_TableSetString(handle, "hello", "mystring");
+Util_TableSetIntArray(handle, 4, array, "myarray");
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableDeleteKey
+\begin{FunctionDescription}{Util\_TableDeleteKey}
+\label{Util-TableDeleteKey}
+Deletes a specified key/value entry from a table
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int key_exists = Util_TableDeleteKey(int handle, const char *key);
+\end{verbatim}
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableDeleteKey(key_exists, handle, key)
+integer        key_exists, handle
+character*(*)  key
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{\rm 0}
+ok (key existed before this call, and has now been deleted)
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\begin{Parameter}{key}
+a pointer to the key (a C-style null-terminated string)
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+This function invalidates any iterators for the table which are
+not in the ``null-pointer'' state.
+\end{Discussion}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+handle is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_BAD\_KEY}
+key contains '/' character
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_NO\_SUCH\_KEY}
+no such key in table
+\end{Error}
+\end{ErrorSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{FunctionDescription}{Util\_TableDestroy}
+\label{Util-TableDestroy}
+Destroys a table
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int status = Util_TableDestroy(int handle);
+\end{verbatim}
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableDestroy(status, handle)
+integer status, handle
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{\rm 0}
+ok
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+Of course, this function invalidates any and all iterators for the table. :)
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableClone()} {Util-TableClone}
+Create a new table which is a ``clone'' (exact copy) of an existing
+table
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableCreate()} {Util-TableCreate}
+create a table
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableCreateFromString()} {Util-TableCreateFromString}
+convenience routine to create a table and set key/value entries
+in it based on a parameter-file--like character string
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+handle is invalid
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+/* create a table */
+int handle = Util_TableCreate(UTIL_TABLE_FLAGS_DEFAULT);
+
+/* do things with the table: put values in it, */
+/* pass its handle to other functions, etc etc */
+/* ... */
+
+/* at this point we (and all other functions we */
+/* may call in the future) are done with the table */
+Util_TableDestroy(handle);
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableGet*
+\begin{FunctionDescription}{Util\_TableGet*}
+\label{Util-TableGet*}
+This is a family of functions, one for each Cactus data type,
+to get the single (1-element array) value, or more generally the
+first array element of the value, associated with a specified key
+in a key/value table.
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int N_elements = Util_TableGetXxx(int handle,
+                                  CCTK_XXX *value,
+                                  const char *key);
+\end{verbatim}
+where \code{XXX} is one of
+   \code{POINTER}, \code{FPOINTER}%%%
+\footnote{%%%
+	 For backwards compatability the function
+	 \code{Util\_TableGetFnPointer()} is also provided
+	 as an alias for \code{Util\_TableGetFPointer()}.
+	 This is deprecated as of Cactus 4.0 beta 13.
+	 }%%%
+,
+   \code{CHAR}, \code{BYTE},
+   \code{INT}, \code{INT1}, \code{INT2}, \code{INT4}, \code{INT8},
+   \code{REAL}, \code{REAL4}, \code{REAL8}, \code{REAL16},
+   \code{COMPLEX}, \code{COMPLEX8}, \code{COMPLEX16}, \code{COMPLEX32}
+(not all of these may be supported on any given system)
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableGetXxx(N_elements, handle, value, key)
+integer        N_elements, handle
+CCTK_XXX       value
+character*(*)  key
+\end{verbatim}
+where \code{CCTK\_XXX} may be any data type supported by C (above)
+except \code{CCTK\_CHAR} (Fortran doesn't have a separate ``character''
+data type; use \code{CCTK\_BYTE} instead)
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{N\_elements}
+the number of array elements in the value
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\begin{Parameter}{value}
+a pointer to where this function should store a copy of the value
+(or more generally the first array element of the value) associated
+with the specified key,
+or NULL pointer to skip storing this
+\end{Parameter}
+\begin{Parameter}{key}
+a pointer to the key (a C-style null-terminated string)
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+Note that it is {\em not\/} an error for the value to actually have
+$> 1$ array elements; in this case only the first element is stored.
+The rationale for this design is that the caller may know or suspect
+that the value is a large array, but may only want the first array
+element; in this case this design avoids the caller having to allocate
+a large buffer unnecessarily.
+
+In contrast, it {\em is\/} an error for the value to actually be an
+empty (0-length) array, because then there is no ``first array element''
+to get.
+
+It is also an error for the value to actually have a different type
+than \code{CCTK\_XXX}.
+
+If any error code is returned, the user's value buffer
+(pointed to by \code{value} if this is non-NULL) is unchanged.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableCreateFromString()} {Util-TableCreateFromString}
+convenience routine to create a table and set key/value entries
+in it based on a parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableGet*Array()}
+get an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableGetString()} {Util-TableGetString}
+get a character-string value
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableSet*()}
+set a single (1-element array) value
+\end{SeeAlso}
+\begin{SeeAlso}{Util\_TableSet*Array()}
+set an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableSetGeneric()} {Util-TableSetGeneric}
+set a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetGenericArray()} {Util-TableSetGenericArray}
+set an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetFromString()} {Util-TableSetFromString}
+convenience routine to set key/value entries in a table based on a
+parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetString()} {Util-TableSetString}
+set a character-string value
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+handle is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_BAD\_KEY}
+key contains '/' character
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_NO\_SUCH\_KEY}
+no such key in table
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_WRONG\_DATA\_TYPE}
+value has data type other than \code{CCTK\_TYPE}
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_VALUE\_IS\_EMPTY}
+value is an empty (0-element) array
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+#define N_DIGITS        5
+static const CCTK_INT pi_digits[N_DIGITS] = {3, 14, 159, 2653, 58979};
+
+int N;
+CCTK_INT x;
+int handle = Util_TableCreate(UTIL_TABLE_FLAGS_DEFAULT);
+
+Util_TableSetIntArray(handle, N_DIGITS, pi_digits, "digits of pi");
+Util_TableSetIntArray(handle, 0, pi_digits, "empty array");
+
+/* gets N = 5, x = 3 */
+N = Util_TableGetInt(handle, &x, "digits of pi");
+
+/* gets N = UTIL_ERROR_TABLE_VALUE_IS_EMPTY */
+N = Util_TableGetInt(handle, &x, "empty array");
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableGet*Array
+\begin{FunctionDescription}{Util\_TableGet*Array}
+\label{Util-TableGet*Array}
+This is a family of functions, one for each Cactus data type,
+to get a copy of the value associated with a specified key, and store
+it (more accurately, as much of it as will fit) in a specified array
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int N_elements = Util_TableGetXxxArray(int handle,
+                                       int N_array, CCTK_XXX array[],
+                                       const char *key);
+\end{verbatim}
+where \code{XXX} is one of
+   \code{POINTER}, \code{FPOINTER}%%%
+\footnote{%%%
+	 For backwards compatability the function
+	 \code{Util\_TableGetFnPointerArray()} is also provided
+	 as an alias for \code{Util\_TableGetFPointerArray()}.
+	 This is deprecated as of Cactus 4.0 beta 13.
+	 }%%%
+,
+   \code{CHAR}, \code{BYTE},
+   \code{INT}, \code{INT1}, \code{INT2}, \code{INT4}, \code{INT8},
+   \code{REAL}, \code{REAL4}, \code{REAL8}, \code{REAL16},
+   \code{COMPLEX}, \code{COMPLEX8}, \code{COMPLEX16}, \code{COMPLEX32}
+(not all of these may be supported on any given system)
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableGetXxxArray(N_elements, handle, N_array, array, key)
+integer        N_elements, handle, N_array
+CCTK_XXX(*)    array
+character*(*)  key
+\end{verbatim}
+where \code{CCTK\_XXX} may be any data type supported by C (above)
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{N\_elements}
+the number of array elements in the value
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\begin{Parameter}{N\_array}
+the number of array elements in \code{array[]}
+(must be $\ge 0$ if \code{array != NULL})
+\end{Parameter}
+\begin{Parameter}{array}
+a pointer to where this function should store (up to \code{N\_array}
+elements of) a copy of the value associated with the specified key,
+or NULL pointer to skip storing this
+\end{Parameter}
+\begin{Parameter}{key}
+a pointer to the key (a C-style null-terminated string)
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+Note that it is {\em not\/} an error for the value to actually have
+$> \code{N\_array}$ array elements; in this case only the first \code{N\_array}
+elements are stored.  The caller can detect this by comparing the
+return value with \code{N\_array}.
+The rationale for this design is that the caller may know or suspect
+that the value is a large array, but may only want the first few array
+elements; in this case this design avoids the caller having to allocate
+a large buffer unnecessarily.
+
+It is also {\em not\/} an error for the value to actually have
+$< \code{N\_array}$ array elements; again the caller can detect this by
+comparing the return value with \code{N\_array}.
+
+It {\em is\/} an error for the value to actually have a different type
+than \code{CCTK\_XXX}.
+
+If any error code is returned, the user's value buffer
+(pointed to by \code{array} if this is non-NULL) is unchanged.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableCreateFromString()} {Util-TableCreateFromString}
+convenience routine to create a table and set key/value entries
+in it based on a parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableGet*()}
+get a single (1-element array) value,
+or more generally the first array element of an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableGetGeneric()} {Util-TableGetGeneric}
+get a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetGenericArray()} {Util-TableGetGenericArray}
+get an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetString()} {Util-TableGetString}
+get a character-string value
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableSet*()}
+set a single (1-element array) value
+\end{SeeAlso}
+\begin{SeeAlso}{Util\_TableSet*Array()}
+set an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableSetGeneric()} {Util-TableSetGeneric}
+set a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetGenericArray()} {Util-TableSetGenericArray}
+set an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetFromString()} {Util-TableSetFromString}
+convenience routine to set key/value entries in a table based on a
+parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetString()} {Util-TableSetString}
+set a character-string value
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+handle is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_BAD\_KEY}
+key contains '/' character
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_BAD\_INPUT}
+\code{array != NULL} and \code{N\_array} $< 0$
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_NO\_SUCH\_KEY}
+no such key in table
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_WRONG\_DATA\_TYPE}
+value has data type other than \code{CCTK\_TYPE}
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+#define N_STUFF         3
+static const CCTK_REAL stuff[N_STUFF] = {42.0, 69.0, 105.5};
+
+#define N_OUTPUT        2
+CCTK_INT output[N_OUTPUT];
+
+int N;
+int handle = Util_TableCreate(UTIL_TABLE_FLAGS_DEFAULT);
+
+Util_TableSetRealArray(handle, N_STUFF, stuff, "blah blah blah");
+
+/* gets N = 3, output[0] = 42.0, output[1] = 69.0 */
+N = Util_TableGetRealArray(handle, N_OUTPUT, output, "blah blah blah");
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableGetGeneric
+\begin{FunctionDescription}{Util\_TableGetGeneric}
+\label{Util-TableGetGeneric}
+Get the single (1-element array) value, or more generally the
+first array element of the value, associated with a specified key
+in a key/value table; the value's data type is generic.  That
+is, the value is specified by a \code{CCTK\_VARIABLE\_*} type code
+and a \code{void *} pointer.
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int N_elements = Util_TableGetGeneric(int handle,
+                                      int type_code,
+                                      void *value,
+                                      const char *key);
+\end{verbatim}
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableGetGeneric(N_elements, handle, type_code, value, key)
+integer        N_elements, handle, type_code
+CCTK_POINTER   value
+character*(*)  key
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{N\_elements}
+the number of array elements in the value
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\begin{Parameter}{type\_code}
+the value's type code
+(one of the \code{CCTK\_VARIABLE\_*} constants from \code{"cctk\_Constants.h"})
+\end{Parameter}
+\begin{Parameter}{value}
+a pointer to where this function should store a copy of the value
+(or more generally the first array element of the value) associated
+with the specified key,
+or NULL pointer to skip storing this
+\end{Parameter}
+\begin{Parameter}{key}
+a pointer to the key (a C-style null-terminated string)
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+Note that it is {\em not\/} an error for the value to actually have
+$> 1$ array elements; in this case only the first element is stored.
+The rationale for this design is that the caller may know or suspect
+that the value is a large array, but may only want the first array
+element; in this case this design avoids the caller having to allocate
+a large buffer unnecessarily.
+
+In contrast, it {\em is\/} an error for the value to actually be an
+empty (0-length) array, because then there is no ``first array element''
+to get.
+
+It is also an error for the value to actually have a different type
+than that specified by \code{type\_code}.
+
+If any error code is returned, the user's value buffer
+(pointed to by \code{value} if this is non-NULL) is unchanged.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableCreateFromString()} {Util-TableCreateFromString}
+convenience routine to create a table and set key/value entries
+in it based on a parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableGet*()}
+get a single (1-element array) value
+\end{SeeAlso}
+\begin{SeeAlso}{Util\_TableGet*Array()}
+get an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableGetString()} {Util-TableGetString}
+get a character-string value
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableQueryValueInfo()} {Util-TableQueryValueInfo}
+query key present/absent in table, and optionally type and/or number
+of elements
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableSet*()}
+set a single (1-element array) value
+\end{SeeAlso}
+\begin{SeeAlso}{Util\_TableSet*Array()}
+set an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableSetGeneric()} {Util-TableSetGeneric}
+set a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetGenericArray()} {Util-TableSetGenericArray}
+set an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetFromString()} {Util-TableSetFromString}
+convenience routine to set key/value entries in a table based on a
+parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetString()} {Util-TableSetString}
+set a character-string value
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+handle is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_BAD\_KEY}
+key contains '/' character
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_NO\_SUCH\_KEY}
+no such key in table
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_WRONG\_DATA\_TYPE}
+value has data type other than \code{CCTK\_TYPE}
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_VALUE\_IS\_EMPTY}
+value is an empty (0-element) array
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+#include "cctk_Constants.h"
+
+#define N_DIGITS        5
+static const CCTK_INT pi_digits[N_DIGITS] = {3, 14, 159, 2653, 58979};
+
+int N;
+CCTK_INT x;
+void *xptr = (void *) &x;
+int handle = Util_TableCreate(UTIL_TABLE_FLAGS_DEFAULT);
+
+Util_TableSetIntArray(handle, N_DIGITS, pi_digits, "digits of pi");
+Util_TableSetIntArray(handle, 0, pi_digits, "empty array");
+
+/* gets N = 5, x = 3 */
+N = Util_TableGetGeneric(handle, CCTK_VARIABLE_INT, &x, "the answer");
+
+/* gets N = UTIL_ERROR_TABLE_VALUE_IS_EMPTY, leaves x unchanged */
+N = Util_TableGetGeneric(handle, CCTK_VARIABLE_INT, &x, "empty array");
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableGetGenericArray
+\begin{FunctionDescription}{Util\_TableGetGenericArray}
+\label{Util-TableGetGenericArray}
+Get a copy of the value associated with a specified key, and store
+it (more accurately, as much of it as will fit) in a specified array;
+the array's data type is generic.  That is the array is specified by
+a \code{CCTK\_VARIABLE\_*} type code, a count of the number of array
+elements, and a \code{void *} pointer.
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int N_elements = Util_TableGetGenericArray(int handle,
+                                           int type_code,
+                                           int N_array, void *array,
+                                           const char *key);
+\end{verbatim}
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableGetGenericArray(N_elements,
+.                              handle,
+.                              type_code,
+.                              N_array, array,
+.                              key)
+integer        N_elements, handle, type_code, N_array
+CCTK_POINTER   array
+character*(*)  key
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{N\_elements}
+the number of array elements in the value
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\begin{Parameter}{type\_code}
+the value's type code
+(one of the \code{CCTK\_VARIABLE\_*} constants from \code{"cctk\_Constants.h"})
+\end{Parameter}
+\begin{Parameter}{N\_array}
+the number of array elements in \code{array[]}
+(must be $\ge 0$ if \code{array != NULL})
+\end{Parameter}
+\begin{Parameter}{array}
+a pointer to where this function should store (up to \code{N\_array}
+elements of) a copy of the value associated with the specified key,
+or NULL pointer to skip storing this
+\end{Parameter}
+\begin{Parameter}{key}
+a pointer to the key (a C-style null-terminated string)
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+Note that it is {\em not\/} an error for the value to actually have
+$> \code{N\_array}$ array elements; in this case only the first \code{N\_array}
+elements are stored.  The caller can detect this by comparing the
+return value with \code{N\_array}.
+The rationale for this design is that the caller may know or suspect
+that the value is a large array, but may only want the first few array
+elements; in this case this design avoids the caller having to allocate
+a large buffer unnecessarily.
+
+It is also {\em not\/} an error for the value to actually have
+$< \code{N\_array}$ array elements; again the caller can detect this by
+comparing the return value with \code{N\_array}.
+
+It {\em is\/} an error for the value to actually have a different type
+than that specified by \code{type\_code}.
+
+If any error code is returned, the user's value buffer
+(pointed to by \code{array} if this is non-NULL) is unchanged.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableCreateFromString()} {Util-TableCreateFromString}
+convenience routine to create a table and set key/value entries
+in it based on a parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableGet*()}
+get a single (1-element array) value,
+or more generally the first array element of an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableGetGeneric()} {Util-TableGetGeneric}
+get a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetGenericArray()} {Util-TableGetGenericArray}
+get an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetString()} {Util-TableGetString}
+get a character-string value
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableQueryValueInfo()} {Util-TableQueryValueInfo}
+query key present/absent in table, and optionally type and/or number
+of elements
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableSet*()}
+set a single (1-element array) value
+\end{SeeAlso}
+\begin{SeeAlso}{Util\_TableSet*Array()}
+set an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableSetGeneric()} {Util-TableSetGeneric}
+set a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetGenericArray()} {Util-TableSetGenericArray}
+set an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetFromString()} {Util-TableSetFromString}
+convenience routine to set key/value entries in a table based on a
+parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetString()} {Util-TableSetString}
+set a character-string value
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+handle is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_BAD\_KEY}
+key contains '/' character
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_BAD\_INPUT}
+\code{array != NULL} and \code{N\_array} $< 0$
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_NO\_SUCH\_KEY}
+no such key in table
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_WRONG\_DATA\_TYPE}
+value has data type other than \code{CCTK\_TYPE}
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+#define N_STUFF         3
+static const CCTK_REAL stuff[N_STUFF] = {42.0, 69.0, 105.5};
+
+#define N_OUTPUT        2
+CCTK_INT output[N_OUTPUT];
+
+int N;
+int handle = Util_TableCreate(UTIL_TABLE_FLAGS_DEFAULT);
+
+Util_TableSetRealArray(handle, N_STUFF, stuff, "stuff");
+
+/* gets N = UTIL_ERROR_TABLE_WRONG_DATA_TYPE, output[] unchanged */
+N = Util_TableGetGenericArray(handle,
+                              CCTK_VARIABLE_INT,
+                              N_OUTPUT, output,
+                              "stuff");
+/* gets N = 3, output[0] = 42.0, output[1] = 69.0 */
+N = Util_TableGetGenericArray(handle,
+                              CCTK_VARIABLE_REAL,
+                              N_OUTPUT, output,
+                              "stuff");
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableGetString
+\begin{FunctionDescription}{Util\_TableGetString}
+\label{Util-TableGetString}
+Gets a copy of the character-string value associated with a specified
+key in a table, and stores it (more accurately, as much of it as will fit)
+in a specified character string
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int length = Util_TableGetString(int handle,
+                                 int buffer_length, char buffer[],
+                                 const char *key);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{ResultNote}
+Results are the same as all the other \code{Util\_TableGet*()} functions:
+\end{ResultNote}
+\begin{Result}{length}
+the length of the string
+(C \code{strlen} semantics, i.e.\ {\em not\/} including
+the terminating null character)
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\begin{Parameter}{buffer\_length}
+the length (\code{sizeof}) of \code{buffer[]}
+(must be $\ge 1$ if \code{buffer != NULL})
+\end{Parameter}
+\begin{Parameter}{buffer}
+a pointer to a buffer into which this function should store
+(at most \code{buffer\_length-1}  characters of) the value,
+terminated by a null character as usual for C strings,
+or NULL pointer to skip storing this
+\end{Parameter}
+\begin{Parameter}{key}
+a pointer to the key (a C-style null-terminated string)
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+This function assumes that the string is stored as an array of
+\code{CCTK\_CHAR}s, {\em not\/} including a terminating null character.
+
+This function differs from \code{Util\_TableGetCharArray()} in two ways:
+It explicitly provides a terminating null character for C-style strings,
+and it explicitly checks for the string being too long to fit in the buffer
+(in which case it returns \code{UTIL\_ERROR\_TABLE\_STRING\_TRUNCATED}).
+
+If the error code \code{UTIL\_ERROR\_TABLE\_STRING\_TRUNCATED} is returned,
+then the first \code{buffer\_length-1} characters of the string are
+returned in the user's buffer (assuming \code{buffer} is non-NULL),
+followed by a null character to properly terminate the string in the
+buffer.  If any other error code is returned, the user's value buffer
+(pointed to by \code{buffer} if this is non-NULL) is unchanged.
+
+To find out how long the string is (and thus how big of a buffer you
+need to allocate to avoid having the string truncated), you can call
+this function with $\code{buffer\_length} = 0$ and $\code{buffer} = \code{NULL}$
+(or actually anything you want); the return result will give the
+string length.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableCreateFromString()} {Util-TableCreateFromString}
+convenience routine to create a table and set key/value entries
+in it based on a parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableGet*()}
+get a single (1-element array) value,
+or more generally the first array element of an array value
+\end{SeeAlso}
+\begin{SeeAlso}{Util\_TableGet*Array()}
+get an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableGetCharArray()} {Util-TableGet*Array}
+get an array-of-\code{CCTK\_CHAR} value
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetGeneric()} {Util-TableGetGeneric}
+get a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetGenericArray()} {Util-TableGetGenericArray}
+get an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableSet*()}
+set a single (1-element array) value
+\end{SeeAlso}
+\begin{SeeAlso}{Util\_TableSet*Array()}
+set an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableSetGeneric()} {Util-TableSetGeneric}
+set a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetGenericArray()} {Util-TableSetGenericArray}
+set an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetString()} {Util-TableSetString}
+set a character-string value
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetFromString()} {Util-TableSetFromString}
+convenience routine to set key/value entries in a table based on a
+parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetCharArray()} {Util-TableSet*Array}
+set an array-of-\code{CCTK\_CHAR} value
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+handle is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_BAD\_KEY}
+key contains '/' character
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_BAD\_INPUT}
+\code{buffer != NULL} and \code{buffer\_length} $\le 0$
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_NO\_SUCH\_KEY}
+no such key in table
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_WRONG\_DATA\_TYPE}
+value has data type other than \code{CCTK\_CHAR}
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_STRING\_TRUNCATED}
+\quad
+\code{buffer != NULL} and value was truncated to fit in \code{buffer[]}
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+#define N_BUFFER        100
+char buffer[N_BUFFER];
+
+int handle = Util_TableCreate(UTIL_TABLE_FLAGS_DEFAULT);
+Util_TableSetString(handle, "relativity", "Einstein");
+
+/* get length of string (= 10 here) */
+int length = Util_TableGetString(handle, 0, NULL, "Einstein");
+
+/* get null-terminated string into buffer, also returns 10 */
+Util_TableGetString(handle, N_BUFFER, buffer, "Einstein");
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableItAdvance
+\begin{FunctionDescription}{Util\_TableItAdvance}
+\label{Util-TableItAdvance}
+Advance a table iterator to the next entry in the table
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int is_nonnull = Util_TableItAdvance(int ihandle);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{\rm 1}
+ok (iterator now points to some table entry)
+\end{Result}
+\begin{Result}{\rm 0}
+ok (iterator has just advanced past the last table entry,
+    and is now in the "null-pointer" state)
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{ihandle ($\ge 0$)}
+handle to the table iterator
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+If we view an iterator as an abstraction of a pointer into the table,
+then this function is the abstraction of the C ``\code{++}'' operation
+applied to the pointer, except that this function automagically sets
+the iterator to the "null-pointer" state when it advances past the
+last table entry.
+
+Note that bad things (garbage results, core dumps) may happen if
+you call this function on an iterator which has been invalidated
+by a change in the table's contents.
+\end{Discussion}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+iterator handle is invalid
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+/* walk through all entries of a table */
+int ihandle;
+
+        for ( ihandle = Util_TableItCreate(handle) ;
+              Util_TableItQueryIsNonNull(ihandle) > 0 ;
+              Util_TableItAdvance(ihandle) )
+        {
+        /* do something with the table entry */
+        }
+
+Util_TableItDestroy(ihandle);
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{FunctionDescription}{Util\_TableItClone}
+\label{Util-TableItClone}
+Creates a new table iterator which is a ``clone'' (exact copy) of an
+existing table iterator
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int clone_ihandle = Util_TableItClone(int ihandle);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{clone\_ihandle ($\ge 0$)}
+A handle to the clone table iterator
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{ihandle}
+handle to the table iterator to be cloned
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+This function creates a new iterator which points to the same place
+in the same table as the original iterator.  If the original iterator
+is in the ``null-pointer'' state, then the clone is also in this state.
+
+Note that bad things (garbage results, core dumps) may happen if
+you call this function on an iterator which has been invalidated
+by a change in the table's contents.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableClone()} {Util-TableClone}
+create a new table which is a ``clone'' (exact copy) of an existing
+table
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableItCreate()} {Util-TableItCreate}
+create a table iterator
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableItDestroy()} {Util-TableItDestroy}
+destroy a table iterator
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+iterator handle to be cloned, is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_NO\_MEMORY}
+unable to allocate memory
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+/*
+ * Apart from efficiency and slight differences in error return codes,
+ * Util_TableItClone() could be simulated by the following code.
+ */
+int Util_TableItClone(int ihandle)
+{
+int status;
+
+/* to what table does the to-be-cloned iterator point? */
+const int handle = Util_TableQueryTableHandle(ihandle);
+if (handle < 0)
+        return handle;                /* error in querying table handle */
+
+/* create the to-be-cloned iterator */
+/* (pointing into the same table as the original iterator) */
+  {
+const int clone_ihandle = Util_TableItCreate(handle);
+if (clone_ihandle < 0)
+        return clone_ihandle;       /* error in creating clone iterator */
+
+/* how long is the key to which the to-be-cloned iterator points? */
+  {
+const int key_length = Util_TableItQueryKeyValueInfo(ihandle,
+                                                     0, NULL,
+                                                     NULL, NULL);
+if (key_length == UTIL_TABLE_ITERATOR_IS_NULL)
+        {
+        /* to-be-cloned iterator is in "null-pointer" state */
+        Util_TableItSetToNull(clone_ihandle);
+        return clone_ihandle;                          /* normal return */
+        }
+if (key_length < 0)
+        return key_length;   /* error in querying to-be-cloned iterator */
+
+/* to what key does the to-be-cloned iterator point? */
+  {
+const int key_buffer_length = key_length + 1;
+char *const key_buffer = (char *) malloc(key_buffer_length);
+if (key_buffer == NULL)
+        return UTIL_ERROR_NO_MEMORY;
+status = Util_TableItQueryKeyValueInfo(ihandle,
+                                       key_buffer_length, key_buffer);
+if (status < 0)
+        return status;       /* error in querying to-be-cloned iterator */
+
+/* set the clone iterator to point to the same key as the original */
+status = Util_TableItSetToKey(clone_ihandle, key_buffer);
+free(key_buffer);
+return clone_ihandle;                                  /* normal return */
+  }
+  }
+  }
+}
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableItCreate
+\begin{FunctionDescription}{Util\_TableItCreate}
+\label{Util-TableItCreate}
+Create a new table iterator
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int ihandle = Util_TableItCreate(int handle);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{ihandle ($\ge 0$)}
+handle to the table iterator
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table over which the iterator should iterate
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+This function creates a new table iterator.  The iterator initially
+points at the starting table entry.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableItDestroy()} {Util-TableItDestroy}
+destroy a table iterator
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+table handle is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_NO\_MEMORY}
+unable to allocate memory
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+/* walk through all entries of a table */
+int ihandle;
+
+        for ( ihandle = Util_TableItCreate(handle) ;
+              Util_TableItQueryIsNonNull(ihandle) > 0 ;
+              Util_TableItAdvance(ihandle) )
+        {
+        /* do something with the table entry */
+        }
+
+Util_TableItDestroy(ihandle);
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableItDestroy
+\begin{FunctionDescription}{Util\_TableItDestroy}
+\label{Util-TableItDestroy}
+Destroy a table iterator
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int status = Util_TableItDestroy(int ihandle);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{\rm 0}
+ok
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{ihandle ($\ge 0$)}
+handle to the table iterator
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableItCreate()} {Util-TableItCreate}
+create a table iterator
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+iterator handle is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_NO\_MEMORY}
+unable to allocate memory
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+/* walk through all entries of a table */
+int ihandle;
+
+        for ( ihandle = Util_TableItCreate(handle) ;
+              Util_TableItQueryIsNonNull(ihandle) > 0 ;
+              Util_TableItAdvance(ihandle) )
+        {
+        /* do something with the table entry */
+        }
+
+Util_TableItDestroy(ihandle);
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableItQueryIsNonNull
+\begin{FunctionDescription}{Util\_TableItQueryIsNonNull}
+\label{Util-TableItQueryIsNonNull}
+Query whether a table iterator is {\em not\/} in the ``null-pointer'' state
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int status = Util_TableItQueryIsNonNull(int ihandle);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{\rm 1}
+iterator is {\em not\/} in the ``null-pointer'' state,
+i.e.\ iterator points to some table entry
+\end{Result}
+\begin{Result}{\rm 0}
+iterator is in the ``null-pointer'' state
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{ihandle ($\ge 0$)}
+handle to the table iterator
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+If no errors occur,
+\code{Util\_TableItQueryIsNonNull(ihandle)}
+is the same as\\
+\code{1 - Util\_TableItQueryIsNull(ihandle)}.
+
+Note that bad things (garbage results, core dumps) may happen if
+you call this function on an iterator which has been invalidated
+by a change in the table's contents.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableItQueryIsNull()} {Util-TableItQueryIsNull}
+query whether a table iterator is in the ``null-pointer'' state
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+iterator handle is invalid
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+/* walk through all entries of a table */
+int ihandle;
+
+        for ( ihandle = Util_TableItCreate(handle) ;
+              Util_TableItQueryIsNonNull(ihandle) > 0 ;
+              Util_TableItAdvance(ihandle) )
+        {
+        /* do something with the table entry */
+        }
+
+Util_TableItDestroy(ihandle);
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableItQueryIsNull
+\begin{FunctionDescription}{Util\_TableItQueryIsNull}
+\label{Util-TableItQueryIsNull}
+Query whether a table iterator is in the ``null-pointer'' state
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int status = Util_TableItQueryIsNull(int ihandle);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{\rm 1}
+iterator is in the ``null-pointer'' state
+\end{Result}
+\begin{Result}{\rm 0}
+iterator is {\em not\/} in the ``null-pointer'' state,
+i.e.\ iterator points to some table entry
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{ihandle ($\ge 0$)}
+handle to the table iterator
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+If no errors occur,
+\code{Util\_TableItQueryIsNull(ihandle)}
+is the same as
+\code{1 - Util\_TableItQueryIsNonNull(ihandle)}.
+
+Note that bad things (garbage results, core dumps) may happen if
+you call this function on an iterator which has been invalidated
+by a change in the table's contents.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableItQueryIsNonNull()} {Util-TableItQueryIsNonNull}
+query whether a table iterator is {\em not\/} in the ``null-pointer'' state,
+i.e.\ whether the iterator points to some table entry
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+iterator handle is invalid
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+/* variant code to walk through all entries of a table */
+int ihandle;
+
+        for ( ihandle = Util_TableItCreate(handle) ;
+              Util_TableItQueryIsNull(ihandle) == 0 ;
+              Util_TableItAdvance(ihandle) )
+        {
+        /* do something with the table entry */
+        }
+
+Util_TableItDestroy(ihandle);
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableItQueryKeyValueInfo
+\begin{FunctionDescription}{Util\_TableItQueryKeyValueInfo}
+\label{Util-TableItQueryKeyValueInfo}
+Query the key and the type and number of elements of the value
+corresponding to that key, of the table entry to which an iterator points
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int key_length =
+ Util_TableItQueryKeyValueInfo(int ihandle,
+                               int key_buffer_length, char key_buffer[],
+                               CCTK_INT *type_code, CCTK_INT *N_elements)
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{key\_length}
+The string length of the key
+(this has C \code{strlen} semantics, i.e.\ it does {\em not\/}
+include a terminating null character)
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{ihandle ($\ge 0$)}
+handle to the table iterator
+\end{Parameter}
+\begin{Parameter}{key\_buffer\_length}
+\quad
+the length (\code{sizeof}) of \code{key\_buffer[]}
+(must be $\ge 1$ if \code{key\_buffer != NULL})
+\end{Parameter}
+\begin{Parameter}{key\_buffer}
+a pointer to a buffer into which this function should store
+(at most \code{key\_buffer\_length-1} characters of) the key,
+terminated by a null character as usual for C strings,
+or NULL pointer to skip storing this
+\end{Parameter}
+\begin{Parameter}{type\_code}
+a pointer to where this function should store the value's type code
+(one of the \code{CCTK\_VARIABLE\_*} constants from \code{"cctk\_Constants.h"}),
+or a NULL pointer to skip storing this.
+\end{Parameter}
+\begin{Parameter}{N\_elements}
+a pointer to where this function should store
+the number of array elements in the value,
+or a NULL pointer to skip storing this.
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+The usual use of an iterator is to iterate through all the entries
+of a table, calling this function on each entry, then taking further
+action based on the results.
+
+Note that bad things (garbage results, core dumps) may happen if
+you call this function on an iterator which has been invalidated
+by a change in the table's contents.
+
+If the error code \code{UTIL\_ERROR\_TABLE\_STRING\_TRUNCATED} is returned,
+then the first \code{key\_buffer\_length-1} characters of the key are
+returned in the user's key buffer (assuming \code{key\_buffer} is non-NULL),
+followed by a null character to properly terminate the string in the
+buffer.  If any other error code is returned, the user's key buffer
+(pointed to by \code{key\_buffer} if this is non-NULL) is unchanged.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableQueryValueInfo()} {Util-TableQueryValueInfo}
+query key present/absent in table, and optionally type and/or number
+of elements, but using the key instead of an iterator
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+handle is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_ITERATOR\_IS\_NULL}
+\quad
+iterator is in "null-pointer" state
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_STRING\_TRUNCATED}
+\quad
+\code{key\_buffer != NULL} and key was truncated to fit in \code{key\_buffer}
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+/* print out all entries in a table */
+/* return 0 for ok, type code for any types we can't handle, */
+/*                  -ve for other errors */
+#include <stdio.h>
+#include <stdlib.h>
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+#include "cctk.h"
+
+int print_table(int handle)
+{
+int max_key_length, N_key_buffer, ihandle;
+char *key_buffer;
+
+max_key_length = Util_TableQueryMaxKeyLength(handle);
+if (max_key_length < 0)
+        return max_key_length;
+
+N_key_buffer = max_key_length + 1;
+key_buffer = (char *) malloc(N_key_buffer);
+if (key_buffer == NULL)
+        return UTIL_ERROR_NO_MEMORY;
+
+        for ( ihandle = Util_TableItCreate(handle) ;
+              Util_TableItQueryIsNonNull(ihandle) > 0 ;
+              Util_TableItAdvance(ihandle) )
+        {
+        CCTK_INT type_code, N_elements;
+        CCTK_INT value_int;
+        CCTK_REAL value_real;
+
+        Util_TableItQueryKeyValueInfo(ihandle,
+                                      N_key_buffer, key_buffer,
+                                      &type_code, &N_elements);
+        printf("key = \"%s\"\n", key_buffer);
+
+        switch  (type_code)
+                {
+        case CCTK_VARIABLE_INT:
+                Util_TableGetInt(handle, &value_int, key_buffer);
+                printf("value[int] = %d\n", (int)value_int);
+                break;
+        case CCTK_VARIABLE_REAL:
+                Util_TableGetReal(handle, &value_real, key_buffer);
+                printf("value[real] = %g\n", (double)value_real);
+                break;
+        default:
+                /* we don't know how to handle this type */
+                Util_TableItDestroy(ihandle);
+                free(key_buffer);
+                return type_code;
+                }
+        }
+
+Util_TableItDestroy(ihandle);
+free(key_buffer);
+return 0;
+}
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableItQueryTableHandle
+\begin{FunctionDescription}{Util\_TableItQueryTableHandle}
+\label{Util-TableItQueryTableHandle}
+Query what table a table iterator iterates over
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int handle = Util_TableItQueryTableHandle(int ihandle);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{handle ($\ge 0$)}
+handle to the table over which the iterator iterates
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{ihandle ($\ge 0$)}
+handle to the table iterator
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+Note that it is always ok to call this function, regardless of
+whether or not the iterator is in the ``null-pointer'' state.
+
+It's also ok to call this function even when the iterator has been
+invalidated by a change in the table's contents.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableItCreate()} {Util-TableItCreate}
+create an iterator (which iterates over a specified table)
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+iterator handle is invalid
+\end{Error}
+\end{ErrorSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableItResetToStart
+\begin{FunctionDescription}{Util\_TableItResetToStart}
+\label{Util-TableItResetToStart}
+Reset a table iterator to point to the starting table entry
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int status = Util_TableItResetToStart(int ihandle);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{ResultNote}
+Results are the same as calling \code{Util\_TableItQueryIsNonNull()}
+on the iterator after the reset:
+\end{ResultNote}
+\begin{Result}{\rm 1}
+iterator is {\em not\/} in the ``null-pointer'' state,
+i.e.\ iterator points to some table entry
+\end{Result}
+\begin{Result}{\rm 0}
+iterator is in the ``null-pointer'' state
+(this happens if and only if the table is empty)
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{ihandle ($\ge 0$)}
+handle to the table iterator
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+Note that it is always ok to call this function, regardless of
+whether or not the iterator is in the ``null-pointer'' state.
+
+It's also ok to call this function even when the iterator has been
+invalidated by a change in the table's contents.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableItSetToNull()} {Util-TableItSetToNull}
+set an iterator to the ``null-pointer'' state
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableItSetToKey()} {Util-TableItSetToKey}
+set an iterator to point to a specified table entry
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+iterator handle is invalid
+\end{Error}
+\end{ErrorSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableItSetToKey
+\begin{FunctionDescription}{Util\_TableItSetToKey}
+\label{Util-TableItSetToKey}
+Set a table iterator to point to a specified table entry
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int status = Util_TableItSetToKey(int ihandle, const char *key);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{\rm 0}
+ok
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{ihandle ($\ge 0$)}
+handle to the table iterator
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+This function has the same effect as calling \code{Util\_TableItResetToStart()}
+followed by calling \code{Util\_TableItAdvance()} zero or more times
+to make the iterator point to the desired table entry.  However, this
+function will typically be (much) more efficient than that sequence.
+
+Note that it is always ok to call this function, regardless of
+whether or not the iterator is in the ``null-pointer'' state.
+
+It's also ok to call this function even when the iterator has been
+invalidated by a change in the table's contents.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableItResetToStart()} {Util-TableItResetToStart}
+reset an iterator to point to the starting table entry
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableItSetToNull()} {Util-TableItSetToNull}
+set a table iterator to the "null-pointer" state
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+iterator handle is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_BAD\_KEY}
+key contains '/' character
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_NO\_SUCH\_KEY}
+no such key in table
+\end{Error}
+\end{ErrorSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableItSetToNull
+\begin{FunctionDescription}{Util\_TableItSetToNull}
+\label{Util-TableItSetToNull}
+Set a table iterator to the "null-pointer" state
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int handle = Util_TableItSetToNull(int ihandle);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{\rm 0}
+ok
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{ihandle ($\ge 0$)}
+handle to the table iterator
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+Note that it is always ok to call this function, regardless of
+whether or not the iterator is already in the ``null-pointer'' state.
+
+It's also ok to call this function even when the iterator has been
+invalidated by a change in the table's contents.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableItResetToStart()} {Util-TableItResetToStart}
+reset an iterator to point to the starting table entry
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableItSetToKey()} {Util-TableItSetToKey}
+set an iterator to point to a specified table entry
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+iterator handle is invalid
+\end{Error}
+\end{ErrorSection}
+\end{FunctionDescription}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableQueryFlags
+\begin{FunctionDescription}{Util\_TableQueryFlags}
+Query a table's flags word
+\label{Util-TableQueryFlags}
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int flags = Util_TableQueryFlags(int handle);
+\end{verbatim}
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableQueryFlags(flags, handle)
+integer  flags, handle
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{flags ($\ge 0$)}
+the flags word
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+See \code{Util\_TableCreate()} for further discussion of the semantics
+of flag words.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableClone()} {Util-TableClone}
+create a new table which is a ``clone'' (exact copy) of an existing
+table
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableCreate()} {Util-TableCreate}
+create a table (flags word specified explicitly)
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableCreateFromString()} {Util-TableCreateFromString}
+convenience routine to create a table (with certain default flags)
+and set key/value entries in it based on a parameter-file--like
+character string
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+handle is invalid
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include <string.h>
+#include "util_ErrorCodes.h"
+#include "util_String.h"
+#include "util_Table.h"
+
+/* compare two strings, doing the comparison with the same */
+/* case-sensitive/insensitive semantics as a certain table uses */
+int compare_strings(int handle, const char *str1, const char *str2)
+{
+int flags = Util_TableQueryFlags(handle);
+return (flags & UTIL_TABLE_FLAGS_CASE_INSENSITIVE)
+       ? Util_StrCmpi(str1, str2)
+       :      strcmp (str1, str2);
+}
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableQueryValueInfo
+\begin{FunctionDescription}{Util\_TableQueryValueInfo}
+\label{Util-TableQueryValueInfo}
+Query whether or not a specified key is in the table, and optionally
+the type and/or number of elements of the value corresponding to this key
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int key_exists =
+ Util_TableQueryValueInfo(int handle,
+                          CCTK_INT *type_code, CCTK_INT *N_elements,
+                          const char *key);
+\end{verbatim}
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableQueryValueInfo(key_exists,
+.                             handle,
+.                             type_code, N_elements,
+.                             key)
+integer        key_exists, handle
+CCTK_INT       type_code, N_elements
+character*(*)  key
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{\rm 1}
+ok (key is in table)
+\end{Result}
+\begin{Result}{\rm 0}
+ok (no such key in table)\\
+(in this case nothing is stored in \code{*type\_code} and \code{*N\_elements})
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\begin{Parameter}{type\_code}
+a pointer to where this function should store the value's type code
+(one of the \code{CCTK\_VARIABLE\_*} constants from \code{"cctk\_Constants.h"}),
+or a NULL pointer to skip storing this.
+\end{Parameter}
+\begin{Parameter}{N\_elements}
+a pointer to where this function should store
+the number of array elements in the value,
+or a NULL pointer to skip storing this.
+\end{Parameter}
+\begin{Parameter}{key}
+a pointer to the key (a C-style null-terminated string)
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+Unlike all the other table query functions, this function returns
+0 for ``no such key in table''.  The rationale for this design is that
+by passing NULL pointers for \code{type\_code} and \code{N\_elements}, this
+function is then a Boolean ``is key in table?'' predicate.
+
+If any error code is returned, the user's buffers (pointed to by
+\code{type\_code} and \code{N\_elements} if these are non-NULL) are
+unchanged.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableItQueryKeyValueInfo()} {Util-TableItQueryKeyValueInfo}
+query key present/absent in table, and optionally type and/or number
+of elements, but using an iterator instead of the key
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+handle is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_BAD\_KEY}
+key contains `/' character
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include <stdio.h>
+#include <assert.h>
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+static const int data[] = {314, 159, 265};
+#define N_DATA  (sizeof(data) / sizeof(data[0]))
+
+CCTK_INT type_code, N_elements;
+
+/* see whether or not "key" is in table */
+if (Util_TableQueryValueInfo(handle, NULL, NULL, "key"))
+        {
+        /* key is in the table */
+        }
+   else {
+        /* key is not in the table */
+        }
+
+/* put "data" in table as 3-element integer array */
+Util_TableSetIntArray(handle, N_DATA, data, "data");
+
+/* query info about "data" value */
+assert( Util_TableQueryValueInfo(handle,
+                                 &type_code, &N_elements,
+                                 "data") == 1 );
+assert( type_code == CCTK_VARIABLE_INT );
+assert( N_elements == N_DATA );
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableQueryMaxKeyLength
+\begin{FunctionDescription}{Util\_TableQueryMaxKeyLength}
+\label{Util-TableQueryMaxKeyLength}
+Query the maximum key length in a table
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int max_key_length = Util_TableQueryMaxKeyLength(int handle);
+\end{verbatim}
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableQueryMaxKeyLength(max_key_length, handle)
+integer  max_key_length, handle
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{max\_key\_length ($\ge 0$)}
+The string length of the longest key in the table
+(this has C \code{strlen} semantics, i.e.\ it does {\em not\/}
+include a terminating null character)
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+This function is useful if you're going to iterate through a table,
+and you want to allocate a buffer which is guaranteed to be big enough
+to hold any key in the table.
+\end{Discussion}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+handle is invalid
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include <stdlib.h>
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+#include "cctk.h"
+
+int max_key_length = Util_TableQueryMaxKeyLength(handle);
+int N_buffer = max_key_length + 1;
+char *const buffer = (char *) malloc(N_buffer);
+if (buffer == NULL)
+        {
+        CCTK_WARN(CCTK_WARN_ABORT, "couldn't allocate memory for table key buffer!");
+        abort();        /* CCTK_Abort() would be better */
+                        /* if we have a cGH* available */
+        }
+
+/* now buffer is guaranteed to be */
+/* big enough for any key in the table */
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{FunctionDescription}{Util\_TableQueryNKeys}
+\label{Util-TableQueryNKeys}
+Query the number of key/value entries in a table
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int N_Keys = Util_TableQueryNKeys(int handle);
+\end{verbatim}
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableQueryNKeys(N_Keys, handle)
+integer  N_Keys, handle
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{N\_Keys ($\ge 0$)}
+the number of key/value entries in the table
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+handle is invalid
+\end{Error}
+\end{ErrorSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{FunctionDescription}{Util\_TableSet*}
+\label{Util-TableSet*}
+This is a family of functions, one for each Cactus data type,
+to set the value associated with a specified key to be a specified
+single (1-element array) value
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int status = Util_TableSetXxx(int handle,
+                              CCTK_XXX value,
+                              const char *key);
+\end{verbatim}
+where \code{XXX} is one of
+   \code{POINTER}, \code{FPOINTER}%%%
+\footnote{%%%
+	 For backwards compatability the function
+	 \code{Util\_TableSetFnPointer()} is also provided
+	 as an alias for \code{Util\_TableSetFPointer()}.
+	 This is deprecated as of Cactus 4.0 beta 13.
+	 }%%%
+,
+   \code{CHAR}, \code{BYTE},
+   \code{INT}, \code{INT1}, \code{INT2}, \code{INT4}, \code{INT8},
+   \code{REAL}, \code{REAL4}, \code{REAL8}, \code{REAL16},
+   \code{COMPLEX}, \code{COMPLEX8}, \code{COMPLEX16}, \code{COMPLEX32}
+(not all of these may be supported on any given system)
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableSetXxx(status, handle, value, key)
+integer        status, handle
+CCTK_XXX       value
+character*(*)  key
+\end{verbatim}
+where \code{CCTK\_XXX} may be any data type supported by C (above)
+except \code{CCTK\_CHAR} (Fortran doesn't have a separate ``character''
+data type; use \code{CCTK\_BYTE} instead)
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{\rm 1}
+ok (key was already in table before this call, old value was replaced)\\
+   (it doesn't matter what the old value's \code{type\_code} and
+    \code{N\_elements} were, i.e.\ these do {\em not\/} have to match
+    the new value)
+\end{Result}
+\begin{Result}{\rm 0}
+ok (key was not in table before this call)
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\begin{Parameter}{value}
+the value to be associated with the key
+\end{Parameter}
+\begin{Parameter}{key}
+a pointer to the key (a C-style null-terminated string)
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+The key may be any C character string which does not contain a slash
+character (\code{'/'}).
+
+The value is stored as a 1-element array.
+
+This function invalidates any iterators for the table which are
+not in the ``null-pointer'' state.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableCreateFromString()} {Util-TableCreateFromString}
+convenience routine to create a table and set key/value entries
+in it based on a parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableGet*()}
+get a single (1-element array) value,
+or more generally the first array element of an array value
+\end{SeeAlso}
+\begin{SeeAlso}{Util\_TableGet*Array()}
+get an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableGetGeneric()} {Util-TableGetGeneric}
+get a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetGenericArray()} {Util-TableGetGenericArray}
+get an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetString()} {Util-TableGetString}
+get a character-string value
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableSet*Array()}
+set an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableSetGeneric()} {Util-TableSetGeneric}
+set a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetGenericArray()} {Util-TableSetGenericArray}
+set an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetFromString()} {Util-TableSetFromString}
+convenience routine to set key/value entries in a table based on a
+parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetString()} {Util-TableSetString}
+set a character-string value
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+handle is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_BAD\_KEY}
+key contains '/' character
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_NO\_MEMORY}
+unable to allocate memory
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include <math.h>
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+CCTK_COMPLEX16 z;
+int handle = Util_TableCreate(UTIL_TABLE_FLAGS_DEFAULT);
+
+Util_TableSetInt(handle, 42, "the answer");
+Util_TableSetReal(handle, 299792458.0, "speed of light");
+
+z.Re = cos(0.37);       z.Im = sin(0.37);
+Util_TableSetComplex16(handle, z, "my complex number");
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableSet*Array
+\begin{FunctionDescription}{Util\_TableSet*Array}
+\label{Util-TableSet*Array}
+This is a family of functions, one for each Cactus data type,
+to set the value associated with a specified key to be a copy
+of a specified array
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int status = Util_TableSetXxxArray(int handle,
+                                   int N_elements,
+                                   const CCTK_XXX array[],
+                                   const char *key);
+\end{verbatim}
+where \code{XXX} is one of
+   \code{POINTER}, \code{FPOINTER}%%%
+\footnote{%%%
+	 For backwards compatability the function
+	 \code{Util\_TableSetFnPointerArray()} is also provided
+	 as an alias for \code{Util\_TableSetFPointerArray()}.
+	 This is deprecated as of Cactus 4.0 beta 13.
+	 }%%%
+,
+   \code{CHAR}, \code{BYTE},
+   \code{INT}, \code{INT1}, \code{INT2}, \code{INT4}, \code{INT8},
+   \code{REAL}, \code{REAL4}, \code{REAL8}, \code{REAL16},
+   \code{COMPLEX}, \code{COMPLEX8}, \code{COMPLEX16}, \code{COMPLEX32}
+(not all of these may be supported on any given system)
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableSetXxxArray(status, handle, N_elements, array, key)
+integer        status, handle, N_elements
+CCTK_XXX(*)    array
+character*(*)  key
+\end{verbatim}
+where \code{CCTK\_XXX} may be any data type supported by C (above)
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{\rm 1}
+ok (key was already in table before this call, old value was replaced)\\
+   (it doesn't matter what the old value's \code{type\_code} and
+    \code{N\_elements} were, i.e.\ these do {\em not\/} have to match
+    the new value)
+\end{Result}
+\begin{Result}{\rm 0}
+ok (key was not in table before this call)
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\begin{Parameter}{N\_elements ($\ge 0$)}
+the number of array elements in \code{array[]}
+\end{Parameter}
+\begin{Parameter}{array}
+a pointer to the array (a copy of which) is to be associated with the key
+\end{Parameter}
+\begin{Parameter}{key}
+a pointer to the key (a C-style null-terminated string)
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+The key may be any C character string which does not contain a slash
+character (\code{'/'}).
+
+Note that empty (0-element) arrays are ok.
+
+This function invalidates any iterators for the table which are
+not in the ``null-pointer'' state.
+
+Note that the table makes (stores) a \emph{copy} of the array
+you pass in, so it's somewhat inefficient to store a large array
+(e.g.~a grid function) this way.  If this is a problem, consider
+storing a \verb|CCTK_POINTER| (pointing to the array) in the table
+instead.  (Of course, this requires that you ensure that the pointed-to
+data is still valid whenever that \verb|CCTK_POINTER| is used.)
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableCreateFromString()} {Util-TableCreateFromString}
+convenience routine to create a table and set key/value entries
+in it based on a parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableGet*()}
+get a single (1-element array) value,
+or more generally the first array element of an array value
+\end{SeeAlso}
+\begin{SeeAlso}{Util\_TableGet*Array()}
+get an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableGetGeneric()} {Util-TableGetGeneric}
+get a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetGenericArray()} {Util-TableGetGenericArray}
+get an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetString()} {Util-TableGetString}
+get a character-string value
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableSet*()}
+set a single (1-element array) value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableSetGeneric()} {Util-TableSetGeneric}
+set a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetGenericArray()} {Util-TableSetGenericArray}
+set an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetFromString()} {Util-TableSetFromString}
+convenience routine to set key/value entries in a table based on a
+parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetString()} {Util-TableSetString}
+set a character-string value
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+handle is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_BAD\_KEY}
+key contains '/' character
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_BAD\_INPUT}
+\code{N\_elements} $< 0$
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_NO\_MEMORY}
+unable to allocate memory
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+#define N_DIGITS        5
+static const CCTK_INT pi_digits[N_DIGITS] = {3, 14, 159, 2653, 58979};
+int handle = Util_TableCreate(UTIL_TABLE_FLAGS_DEFAULT);
+
+Util_TableSetIntArray(handle, N_DIGITS, pi_digits, "digits of pi");
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableSetFromString
+\begin{FunctionDescription}{Util\_TableSetFromString}
+\label{Util-TableSetFromString}
+Sets values in a table based on a string argument, which is interpreted
+with ``parameter-file'' semantics
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int count = Util_TableSetFromString(int handle, const char *string);
+\end{verbatim}
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableSetFromString(count, handle, string)
+integer        count, handle
+character*(*)  string
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{count ($\ge 0$)}
+the number of key/value entries set
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{string}
+a pointer to a C-style null-terminated string specifying the table
+entries to be set (see below for details on the string contents)
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+The string should contain a sequence of zero or more \code{key=value}
+``assignments'', separated by whitespace.  This function processes
+these assignments in left-to-right order, setting corresponding key/value
+entries in the table.
+
+The present implementation only recognises integer, real, and character-string
+values (not complex), and integer and real arrays.
+To be precise, the string must match the following BNF:\\
+\quad
+\begin{tabular}{l@{\quad$\rightarrow$\quad}p{9cm}}
+string  & assign*                                                       \\
+assign  & whitespace*                                                   \\
+assign  & whitespace* key whitespace* = whitespace* value delimiter     \\
+key     & any string not containing \code{'/'} or \code{'='} or whitespace\\
+value   & array $\big|$ int\_value $\big|$ real\_value $\big|$ string\_value\\
+array   & \{ int\_value* \} $\big|$ \{ real\_value \}                   \\
+int\_value      & anything recognized as a valid integer by strtol(3)
+                  in base 10                                            \\
+real\_value     & anything not recognized as a valid integer by strtol(3)
+                  but recognized as valid by strdod(3)                  \\
+string\_value   & a C-style string enclosed in "double quotes"
+                  (C-style character escape codes are allowed,
+                  i.e.\ bell~(\code{'\textbackslash a'}),
+                  backspace~(\code{'\textbackslash b'}),
+                  form-feed~(\code{'\textbackslash f'}),
+                  newline~(\code{'\textbackslash n'}),
+                  carriage-return~(\code{'\textbackslash r'}),
+                  tab~(\code{'\textbackslash t'}),
+                  vertical-tab~(\code{'\textbackslash v'}),
+                  backslash~(\code{'\textbackslash \textbackslash'}),
+                  single-quote~(\code{'\textbackslash ''}),
+                  double-quote~(\code{'\textbackslash "'}),
+                  question-mark~(\code{'\textbackslash ?'}))            \\
+string\_value   & a C-style string enclosed in 'single quotes'
+                  (C-style character escape codes are {\bf not} allowed,
+                  i.e.\ every character within the string is interpreted
+                  literally)                                            \\
+delimiter       & end-of-string $\big|$ whitespace                      \\
+whitespace      & blank~(\code{' '})
+                  $\big|$ tab~(\code{'\textbackslash t'})
+                  $\big|$ newline~(\code{'\textbackslash n'})
+                  $\big|$ carriage-return~(\code{'\textbackslash r'})
+                  $\big|$ form-feed~(\code{'\textbackslash f'})
+                  $\big|$ vertical-tab~(\code{'\textbackslash v'})                    %%%\\
+\end{tabular}\\
+where * denotes 0 or more repetitions and $\big|$ denotes logical or.
+
+Notice also that the keys allowed by this function are somewhat more
+restricted than those allowed by the other \code{Util\_TableSet*()}
+functions, in that this function disallows keys containing \code{'='}
+and/or whitespace.
+
+If any error code is returned, assignments lexicographically earlier
+in the input string than where the error was detected will already
+have been made in the table.  Unfortunately, there is no easy way to
+find out where the error was detected. :(
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableCreateFromString()} {Util-TableCreateFromString}
+convenience routine to create a table and set key/value entries
+in it based on a parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableGet*()}
+get a single (1-element array) value,
+or more generally the first array element of an array value
+\end{SeeAlso}
+\begin{SeeAlso}{Util\_TableGet*Array()}
+get an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableGetGeneric()} {Util-TableGetGeneric}
+get a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetGenericArray()} {Util-TableGetGenericArray}
+get an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetString()} {Util-TableGetString}
+get a character-string value
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableSet*()}
+set a single (1-element array) value
+\end{SeeAlso}
+\begin{SeeAlso}{Util\_TableSet*Array()}
+set an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableSetGeneric()} {Util-TableSetGeneric}
+set a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetGenericArray()} {Util-TableSetGenericArray}
+set an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetString()} {Util-TableSetString}
+set a character-string value
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_NO\_MEMORY}
+unable to allocate memory
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_BAD\_KEY}
+invalid input: key contains invalid character
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_BAD\_INPUT}
+invalid input: can't parse input string
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_NO\_MIXED\_TYPE\_ARRAY}
+invalid input: different array values have different datatypes
+\end{Error}
+\begin{Error}{\rm other error codes}
+this function may also return any error codes returned by
+\code{Util\_TableSetString()}, \code{Util\_TableSetInt()},
+\code{Util\_TableSetReal()}, \code{Util\_TableSetIntArray()},
+or \code{Util\_TableSetRealArray()}.
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+/* suppose we have a table referred to by  handle */
+
+/* then the call... */
+int count = Util_TableSetFromString(handle, "n = 6\t"
+                                            "dx = 4.0e-5\t"
+                                            "pi = 3.1\t"
+                                            "s = 'my string'\t"
+                                            "array = { 1 2 3 }");
+/* ... will return count=5 ... */
+
+/* ... and is otherwise equivalent to the five calls ... */
+CCTK_INT array[] = {1, 2, 3};
+
+Util_TableSetInt(handle, 6, "n");
+Util_TableSetReal(handle, 4.0e-5, "dx");
+Util_TableSetReal(handle, 3.1, "pi");
+Util_TableSetString(handle, "my string", "s");
+Util_TableSetIntArray(handle, 3, array, "array");
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableSetGeneric
+\begin{FunctionDescription}{Util\_TableSetGeneric}
+\label{Util-TableSetGeneric}
+Set the value associated with a specified key to be a specified
+single (1-element array) value, whose data type is generic.  That
+is, the value is specified by a \code{CCTK\_VARIABLE\_*} type code
+and a \code{void *} pointer.
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int status = Util_TableSetGeneric(int handle,
+                                  int type_code, const void *value,
+                                  const char *key);
+\end{verbatim}
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableSetGeneric(status, handle, type_code, value, key)
+integer        status, handle, type_code
+CCTK_POINTER   value
+character*(*)  key
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{\rm 1}
+ok (key was already in table before this call, old value was replaced)\\
+   (it doesn't matter what the old value's \code{type\_code} and
+    \code{N\_elements} were, i.e.\ these do {\em not\/} have to match
+    the new value)
+\end{Result}
+\begin{Result}{\rm 0}
+ok (key was not in table before this call)
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\begin{Parameter}{type\_code}
+the array elements' type code
+(one of the \code{CCTK\_VARIABLE\_*} constants from \code{"cctk\_Constants.h"})
+\end{Parameter}
+\begin{Parameter}{value\_ptr}
+a pointer to the value to be associated with the key
+\end{Parameter}
+\begin{Parameter}{key}
+a pointer to the key (a C-style null-terminated string)
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+The key may be any C character string which does not contain a slash
+character (\code{'/'}).
+
+The value is stored as a 1-element array.
+
+This function invalidates any iterators for the table which are
+not in the ``null-pointer'' state.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableCreateFromString()} {Util-TableCreateFromString}
+convenience routine to create a table and set key/value entries
+in it based on a parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableGet*()}
+get a single (1-element array) value,
+or more generally the first array element of an array value
+\end{SeeAlso}
+\begin{SeeAlso}{Util\_TableGet*Array()}
+get an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableGetGeneric()} {Util-TableGetGeneric}
+get a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetGenericArray()} {Util-TableGetGenericArray}
+get an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetString()} {Util-TableGetString}
+get a character-string value
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableSet*()}
+set a single (1-element array) value
+\end{SeeAlso}
+\begin{SeeAlso}{Util\_TableSet*Array()}
+set an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableSetGeneric()} {Util-TableSetGeneric}
+set a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetGenericArray()} {Util-TableSetGenericArray}
+set an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetFromString()} {Util-TableSetFromString}
+convenience routine to set key/value entries in a table based on a
+parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetString()} {Util-TableSetString}
+set a character-string value
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+handle is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_BAD\_INPUT}
+\verb|type_code| is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_BAD\_KEY}
+key contains '/' character
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_NO\_MEMORY}
+unable to allocate memory
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_Table.h"
+#include "cctk_Constants.h"
+
+const CCTK_INT i = 42;
+const void *iptr = (void *) &i;
+CCTK_INT icopy;
+
+const CCTK_REAL x = 299792458.0;
+const void *xptr = (void *) &x;
+CCTK_REAL xcopy;
+
+const int handle = Util_TableCreate(UTIL_TABLE_FLAGS_DEFAULT);
+
+Util_TableSetGeneric(handle, CCTK_VARIABLE_INT, iptr, "the answer");
+Util_TableSetGeneric(handle, CCTK_VARIABLE_REAL, xptr, "speed of light");
+
+/* gets icopy to 42 */
+Util_TableGetInt(handle, &icopy, "the answer");
+
+/* gets xcopy to 299792458.0 */
+Util_TableGetReal(handle, &xcopy, "speed of light");
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableSetGenericArray
+\begin{FunctionDescription}{Util\_TableSetGenericArray}
+\label{Util-TableSetGenericArray}
+Set the value associated with a specified key to be a copy of a
+specified array, whose data type is generic.  That is, the array
+is specified by a \code{CCTK\_VARIABLE\_*} type code, a count of
+the number of array elements, and a \code{void *} pointer.
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int status = Util_TableSetGenericArray(int handle,
+                                       int type_code,
+                                       int N_elements, const void *array,
+                                       const char *key);
+\end{verbatim}
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableSetGenericArray(status,
+.                              handle,
+.                              type_code,
+.                              N_elements, array,
+.                              key)
+integer           status, handle, type_code, N_elements
+CCTK_POINTER(*)   array
+character*(*)     key
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{\rm 1}
+ok (key was already in table before this call, old value was replaced)\\
+   (it doesn't matter what the old value's \code{type\_code} and
+    \code{N\_elements} were, i.e.\ these do {\em not\/} have to match
+    the new value)
+\end{Result}
+\begin{Result}{\rm 0}
+ok (key was not in table before this call)
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\begin{Parameter}{type\_code}
+the array elements' type code
+(one of the \code{CCTK\_VARIABLE\_*} constants from \code{"cctk\_Constants.h"})
+\end{Parameter}
+\begin{Parameter}{N\_elements ($\ge 0$)}
+the number of array elements in \code{array[]}
+\end{Parameter}
+\begin{Parameter}{value\_ptr}
+a pointer to the value to be associated with the key
+\end{Parameter}
+\begin{Parameter}{key}
+a pointer to the key (a C-style null-terminated string)
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+The key may be any C character string which does not contain a slash
+character (\code{'/'}).
+
+The value is stored as a 1-element array.
+
+This function invalidates any iterators for the table which are
+not in the ``null-pointer'' state.
+
+Note that the table makes (stores) a \emph{copy} of the array
+you pass in, so it's somewhat inefficient to store a large array
+(e.g.~a grid function) this way.  If this is a problem, consider
+storing a \verb|CCTK_POINTER| (pointing to the array) in the table
+instead.  (Of course, this requires that you ensure that the pointed-to
+data is still valid whenever that \verb|CCTK_POINTER| is used.)
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableCreateFromString()} {Util-TableCreateFromString}
+convenience routine to create a table and set key/value entries
+in it based on a parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableGet*()}
+get a single (1-element array) value,
+or more generally the first array element of an array value
+\end{SeeAlso}
+\begin{SeeAlso}{Util\_TableGet*Array()}
+get an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableGetGeneric()} {Util-TableGetGeneric}
+get a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetGenericArray()} {Util-TableGetGenericArray}
+get an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetString()} {Util-TableGetString}
+get a character-string value
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableSet*()}
+set a single (1-element array) value
+\end{SeeAlso}
+\begin{SeeAlso}{Util\_TableSet*Array()}
+set an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableSetGeneric()} {Util-TableSetGeneric}
+set a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetFromString()} {Util-TableSetFromString}
+convenience routine to set key/value entries in a table based on a
+parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetString()} {Util-TableSetString}
+set a character-string value
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+handle is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_BAD\_INPUT}
+\verb|type_code| is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_BAD\_KEY}
+key contains '/' character
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_NO\_MEMORY}
+unable to allocate memory
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_Table.h"
+#include "cctk_Constants.h"
+
+#define N_IARRAY    3
+const CCTK_INT iarray[N_IARRAY] = {42, 69, 105};
+const void *iarray_ptr = (void *) iarray;
+CCTK_INT iarray2[N_IARRAY];
+
+#define N_XARRAY    2
+const CCTK_REAL xarray[N_XARRAY] = {6.67e-11, 299792458.0};
+const void *xarray_ptr = (void *) xarray;
+CCTK_REAL xarray2[N_XARRAY];
+
+const int handle = Util_TableCreate(UTIL_TABLE_FLAGS_DEFAULT);
+
+Util_TableSetGenericArray(handle,
+                          CCTK_VARIABLE_INT,
+                          N_IARRAY, iarray_ptr,
+                          "my integer array");
+Util_TableSetGenericArray(handle,
+                          CCTK_VARIABLE_REAL,
+                          N_XARRAY, xarray_ptr,
+                          "my real array");
+
+/* gets iarray2[0] = 42, iarray2[1] = 69, iarray2[2] = 105 */
+Util_TableGetIntArray(handle, N_IARRAY, iarray2, "my integer array");
+
+/* gets xarray2[0] = 6.67e-11, xarray2[1] = 299792458.0 */
+Util_TableGetRealArray(handle, N_XARRAY, xarray2, "my real array");
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Entering a function descrpition for Util\_TableSetString
+\begin{FunctionDescription}{Util\_TableSetString}
+\label{Util-TableSetString}
+Sets the value associated with a specified key in a table, to be
+a copy of a specified C-style null-terminated character string
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int status = Util_TableSetString(int handle,
+                                 const char *string,
+                                 const char *key);
+\end{verbatim}
+\end{Synopsis}
+\begin{Synopsis}{Fortran}
+\begin{verbatim}
+call Util_TableSetString(status, handle, string, key)
+integer           status, handle
+character*(*)     string, key
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{ResultNote}
+Results are the same as all the other \code{Util\_TableSet*()} functions:
+\end{ResultNote}
+\begin{Result}{\rm 1}
+ok (key was already in table before this call, old value was replaced)\\
+   (it doesn't matter what the old value's \code{type\_code} and
+    \code{N\_elements} were, i.e.\ these do {\em not\/} have to match
+    the new value)
+\end{Result}
+\begin{Result}{\rm 0}
+ok (key was not in table before this call)
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\begin{Parameter}{string}
+a pointer to the string (a C-style null-terminated string)
+\end{Parameter}
+\begin{Parameter}{key}
+a pointer to the key (a C-style null-terminated string)
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+The key may be any C character string which does not contain a slash
+character (\code{'/'}).
+
+The string is stored as an array of \code{strlen(string)}
+\code{CCTK\_CHAR}s.  It does {\em not\/} include a terminating
+null character.
+
+This function is very similar to \code{Util\_TableSetCharArray()}.
+
+This function invalidates any iterators for the table which are
+not in the ``null-pointer'' state.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2} {Util\_TableCreateFromString()} {Util-TableCreateFromString}
+convenience routine to create a table and set key/value entries
+in it based on a parameter-file--like character string
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableGet*()}
+get a single (1-element array) value,
+or more generally the first array element of an array value
+\end{SeeAlso}
+\begin{SeeAlso}{Util\_TableGet*Array()}
+get an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableGetGeneric()} {Util-TableGetGeneric}
+get a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetGenericArray()} {Util-TableGetGenericArray}
+get an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableGetString()} {Util-TableGetString}
+get a character-string value
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetCharArray()} {Util-TableSet*Array}
+get an array-of-\code{CCTK\_CHAR} value
+\end{SeeAlso2}
+\begin{SeeAlso}{Util\_TableSet*()}
+set a single (1-element array) value
+\end{SeeAlso}
+\begin{SeeAlso}{Util\_TableSet*Array()}
+set an array value
+\end{SeeAlso}
+\begin{SeeAlso2} {Util\_TableSetGeneric()} {Util-TableSetGeneric}
+set a single (1-element array) value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetGenericArray()} {Util-TableSetGenericArray}
+set an array value with generic data type
+\end{SeeAlso2}
+\begin{SeeAlso2} {Util\_TableSetCharArray()} {Util-TableSet*Array}
+set an array-of-\code{CCTK\_CHAR} value
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+\begin{ErrorSection}
+\begin{Error}{UTIL\_ERROR\_BAD\_HANDLE}
+handle is invalid
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_TABLE\_BAD\_KEY}
+key contains '/' character
+\end{Error}
+\begin{Error}{UTIL\_ERROR\_NO\_MEMORY}
+unable to allocate memory
+\end{Error}
+\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+static const CCTK_CHAR array[]
+        = {'r', 'e', 'l', 'a', 't', 'i', 'v', 'i', 't', 'y'};
+#define N_ARRAY (sizeof(array) / sizeof(array[0]))
+int handle = Util_TableCreate(UTIL_TABLE_FLAGS_DEFAULT);
+
+Util_TableSetString(handle, "relativity", "Einstein");
+
+/* this produces the same table entry as the Util_TableSetString() */
+Util_TableSetCharArray(handle, N_ARRAY, array, "Einstein");
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{FunctionDescription}{Util\_TablePrint}
+\label{Util-TablePrint}
+Print out a table and its data structures, using a verbose internal
+format meant for debugging
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include <stdio.h>
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int status = Util_TablePrint(FILE *stream,
+                             int handle);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{\rm 0}
+ok
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{stream ($\ne 0$)}
+output stream, e.g.\ \code{stdout}
+\end{Parameter}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+\code{stream} may be any output stream, e.g.\ \code{stdout} or
+\code{stderr}, or a file that has been opened for writing.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2}{Util\_TablePrintAll()}{Util-TablePrintAll}
+Print out all tables and their data structures, using a verbose
+internal format meant for debugging
+\end{SeeAlso2}
+\begin{SeeAlso2}{Util\_TablePrintAllIterators()}{Util-TablePrintAllIterators}
+Print out all table iterators and their data structures, using a
+verbose internal format meant for debugging
+\end{SeeAlso2}
+\begin{SeeAlso2}{Util\_TablePrintPretty()}{Util-TablePrintPretty}
+Print out a table, using a human-readable format similar to the one
+accepted by Util\_TableCreateFromString
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+%\begin{ErrorSection}
+%\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include <stdio.h>
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+int handle = Util_TableCreateFromString("ipar=1 dpar=2.0 spar='three'");
+Util_TablePrint(stdout, handle);
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{FunctionDescription}{Util\_TablePrintAll}
+\label{Util-TablePrintAll}
+Print out all tables and their data structures, using a verbose
+internal format meant for debugging
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include <stdio.h>
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int status = Util_TablePrintAll(FILE *stream);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{\rm 0}
+ok
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{stream ($\ne 0$)}
+output stream, e.g.\ \code{stdout}
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+\code{stream} may be any output stream, e.g.\ \code{stdout} or
+\code{stderr}, or a file that has been opened for writing.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2}{Util\_TablePrint()}{Util-TablePrint}
+Print out a table and its data structures, using a verbose internal
+format meant for debugging
+\end{SeeAlso2}
+\begin{SeeAlso2}{Util\_TablePrintAllIterators()}{Util-TablePrintAllIterators}
+Print out all table iterators and their data structures, using a
+verbose internal format meant for debugging
+\end{SeeAlso2}
+\begin{SeeAlso2}{Util\_TablePrintPretty()}{Util-TablePrintPretty}
+Print out a table, using a human-readable format similar to the one
+accepted by Util\_TableCreateFromString
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+%\begin{ErrorSection}
+%\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include <stdio.h>
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+int handle = Util_TableCreateFromString("ipar=1 dpar=2.0 spar='three'");
+Util_TablePrintAll(stdout);
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{FunctionDescription}{Util\_TablePrintAllIterators}
+\label{Util-TablePrintAllIterators}
+Print out all table iterators and their data structures, using a
+verbose internal format meant for debugging
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include <stdio.h>
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int status = Util_TablePrintAllIterators(FILE *stream);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{\rm 0}
+ok
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{stream ($\ne 0$)}
+output stream, e.g.\ \code{stdout}
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+\code{stream} may be any output stream, e.g.\ \code{stdout} or
+\code{stderr}, or a file that has been opened for writing.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2}{Util\_TablePrint()}{Util-TablePrint}
+Print out a table and its data structures, using a verbose internal
+format meant for debugging
+\end{SeeAlso2}
+\begin{SeeAlso2}{Util\_TablePrintAll()}{Util-TablePrintAll}
+Print out all tables and their data structures, using a verbose
+internal format meant for debugging
+\end{SeeAlso2}
+\begin{SeeAlso2}{Util\_TablePrintPretty()}{Util-TablePrintPretty}
+Print out a table, using a human-readable format similar to the one
+accepted by Util\_TableCreateFromString
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+%\begin{ErrorSection}
+%\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include <stdio.h>
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+int handle = Util_TableCreateFromString("ipar=1 dpar=2.0 spar='three'");
+Util_TablePrintAllIterators(stdout);
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{FunctionDescription}{Util\_TablePrintPretty}
+\label{Util-TablePrintPretty}
+Print out a table, using a human-readable format similar to the one
+accepted by Util\_TableCreateFromString
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+#include <stdio.h>
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+int status = Util_TablePrintPretty(FILE *stream,
+                                   int handle);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{\rm 0}
+ok
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{stream ($\ne 0$)}
+output stream, e.g.\ \code{stdout}
+\end{Parameter}
+\begin{Parameter}{handle ($\ge 0$)}
+handle to the table
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+\code{stream} may be any output stream, e.g.\ \code{stdout} or
+\code{stderr}, or a file that has been opened for writing.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso2}{Util\_TableCreateFromString()}{Util-TableCreateFromString}
+Create a new table (with the case-insensitive flag set) and set values
+in it based on a string argument (interpreted with ``parameter-file''
+semantics)
+\end{SeeAlso2}
+\begin{SeeAlso2}{Util\_TablePrint()}{Util-TablePrint}
+Print out a table and its data structures, using a verbose internal
+format meant for debugging
+\end{SeeAlso2}
+\begin{SeeAlso2}{Util\_TablePrintAll()}{Util-TablePrintAll}
+Print out all tables and their data structures, using a verbose
+internal format meant for debugging
+\end{SeeAlso2}
+\begin{SeeAlso2}{Util\_TablePrintAllIterators()}{Util-TablePrintAllIterators}
+Print out all table iterators and their data structures, using a
+verbose internal format meant for debugging
+\end{SeeAlso2}
+\end{SeeAlsoSection}
+
+%\begin{ErrorSection}
+%\end{ErrorSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+\begin{verbatim}
+#include <stdio.h>
+#include "util_ErrorCodes.h"
+#include "util_Table.h"
+
+int handle = Util_TableCreateFromString("ipar=1 dpar=2.0 spar='three'");
+Util_TablePrintPretty(stdout, handle);
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+\end{FunctionDescription}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{cactuspart}

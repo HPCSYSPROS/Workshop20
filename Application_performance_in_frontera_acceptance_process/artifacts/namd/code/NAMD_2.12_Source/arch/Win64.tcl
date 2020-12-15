@@ -1,0 +1,12 @@
+
+TCLDIR = $(HOME)/tcl8.5.9-win64-threaded
+TCLINCL = -I$(TCLDIR)/include
+TCLLIB = -L$(TCLDIR)/lib -ltcl85t
+TCLDLL = tcl85t.dll
+TCLFLAGS = -DNAMD_TCL
+TCL = $(TCLINCL) $(TCLFLAGS)
+
+$(TCLSENTINEL)$(TCLDLL):
+	$(COPY) $(TCLDIR)/bin/$(TCLDLL) $(TCLDLL)
+TCLSENTINEL = not_$(TCLSENTIEL)
+

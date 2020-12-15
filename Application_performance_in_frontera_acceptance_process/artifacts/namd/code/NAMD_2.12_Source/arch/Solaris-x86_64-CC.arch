@@ -1,0 +1,11 @@
+NAMD_ARCH = Solaris-x86_64
+CHARMARCH = net-sol-x86_64-smp
+CHARMOPTS = -thread context -memory os
+COMPILERRUNTIMELIBS = /opt/SUNWspro/lib/stlport4/amd64/libstlport.so.1
+
+CXX = CC -DSOLARIS -DMEMUSAGE_USE_SBRK -library=stlport4 -features=extensions,zla -D__restrict=
+CXXOPTS = -fast -xO5 -xtarget=native -m64 -fsimple=2
+CXXTHREADOPTS = -fns -ftrap=%none -xlibmil -xlibmopt -xO5 -xtarget=native -m64 -fsimple=2
+CC = cc -DSOLARIS
+COPTS = -fast -xO5 -xtarget=native -m64
+

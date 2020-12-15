@@ -1,0 +1,8 @@
+NAMD_ARCH = Linux-x86
+CHARMARCH = net-linux
+
+CXX = g++
+CXXOPTS = -O3 -march=pentiumpro -ffast-math
+CC = gcc
+COPTS = -O3 -march=pentiumpro -ffast-math
+

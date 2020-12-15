@@ -1,0 +1,12 @@
+# Interface definition for thorn Slab
+
+IMPLEMENTS: Slab
+
+INCLUDES HEADER: slab.h IN Slab.h
+INCLUDES HEADER: slab.inc IN Slab.inc
+
+USES INCLUDE HEADER: loopcontrol.h
+
+CCTK_POINTER_TO_CONST \
+FUNCTION GetMPICommWorld (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION GetMPICommWorld

@@ -1,0 +1,21 @@
+# Schedule definitions for thorn TimerReport
+# $Header$
+
+
+SCHEDULE TimerReport_OutputEvery AS zzz_TimerReport_Output AT CCTK_ANALYSIS
+{
+  LANG: C
+  OPTIONS: global
+} "Print the timer report"
+
+SCHEDULE TimerReport_OutputTerminate AS zzz_TimerReport_Output AT CCTK_TERMINATE BEFORE Driver_Terminate
+{
+  LANG: C
+  OPTIONS: global
+} "Print the timer report"
+
+SCHEDULE TimerReport_Checkpoint AS zzz_TimerReport_Checkpoint AT CCTK_CHECKPOINT
+{
+  LANG: C
+  OPTIONS: global
+} "Print the timer report"

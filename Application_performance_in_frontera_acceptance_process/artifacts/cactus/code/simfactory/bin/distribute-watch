@@ -1,0 +1,160 @@
+#!/usr/bin/python
+
+import os
+import re
+import sys
+import time
+
+
+
+# TODO:
+# 1. Examine testsuite status
+
+
+
+logdir = "log"
+
+
+
+def ifthen(cond, val1, val2, val0=None):
+    if cond:
+        return val1
+    if cond == None:
+        return val0
+    return val2
+
+def age_string(age):
+    if age<60:
+        return "%d s" % age
+    if age<3600:
+        return "%d m" % (age/60.0)
+    if age<86400:
+        return "%d h" % (age/3600.0)
+    return "%d d" % (age/86400.0)
+
+
+
+def start_time(lines):
+    timepat = re.compile(r"^DISTRIBUTE: \[(\d+-\d+-\d+ \d+:\d+:\d+)\]")
+    for line in lines:
+        match = timepat.search(line)
+        if match:
+            try:
+                return time.mktime(time.strptime(match.group(1), "%Y-%m-%d %H:%M:%S"))
+            except:
+                return 0
+    return 0
+
+def end_time(lines):
+    timepat = re.compile(r"^DISTRIBUTE: \[(\d+-\d+-\d+ \d+:\d+:\d+)\]")
+    for line in reversed(lines):
+        match = timepat.search(line)
+        if match:
+            try:
+                return time.mktime(time.strptime(match.group(1), "%Y-%m-%d %H:%M:%S"))
+            except:
+                return 0
+    return 0
+
+def build_state(lines, configuration):
+    builtpat      = re.compile(r"^ *%s +\[built .*\]"   % configuration)
+    incompletepat = re.compile(r"^ *%s +\[incomplete\]" % configuration)
+    for line in reversed(lines):
+        if builtpat.search(line):
+            return True
+        if incompletepat.search(line):
+            return False
+    return None    
+
+def run_state(lines):
+    successpat = re.compile(r"^DISTRIBUTE: Simulation finished successfully")
+    failpat    = re.compile(r"^DISTRIBUTE: Simulation aborted")
+    for line in reversed(lines):
+        if successpat.search(line):
+            return True
+        if failpat.search(line):
+            return False
+    return None
+
+def distribute_state(lines):
+    donepat    = re.compile(r"^DISTRIBUTE: Done")
+    abortedpat = re.compile(r"^DISTRIBUTE: Aborted")
+    for line in reversed(lines):
+        if donepat.search(line):
+            return True
+        if abortedpat.search(line):
+            return False
+    return None
+
+def error_state(lines):
+    crashpat = re.compile(r"^Traceback")
+    errorpat = re.compile(r"^Aborting Simfactory")
+    for line in reversed(lines):
+        if crashpat.search(line):
+            return True         # A crash (severe error)
+        if errorpat.search(line):
+            return False        # A fatal error
+    return None                 # No error
+
+
+
+# Show all tasks have completed
+
+while True:
+    print
+    files = os.listdir(logdir)
+    files = filter(lambda file: re.match(r".*\.out$", file), files)
+    outputs = []
+    num_done = num_aborted = num_working = 0
+    for file in files:
+        (machine, ext) = os.path.splitext(file)
+        path = os.path.join(logdir, file)
+        f = open(path, "r")
+        lines = f.readlines()
+        # Consider only last 100k lines to speed things up
+        lines = lines[:100] + lines[-100000:]
+        f.close()
+        #duration = end_time(lines[-10]) - start_time(lines[:10])
+        duration = os.path.getmtime(path) - start_time(lines[:10])
+        age      = time.time() - os.path.getmtime(path)
+        size = os.path.getsize(path)
+        good_conf = (build_state(lines, "sim-debug"  ) and
+                     build_state(lines, "sim"        ) and
+                     build_state(lines, "sim-aligned"))
+        good_sim = run_state(lines)
+        error    = error_state(lines)
+        done     = distribute_state(lines[-2:])
+        if done:
+            num_done += 1
+        elif done == None:
+            num_working += 1
+        else:
+            num_aborted += 1
+        output = (machine, age, duration, size,
+                  good_conf, good_sim, error, done)
+        outputs.append(output)
+        sys.stdout.write(".")
+        sys.stdout.flush()
+    sys.stdout.write("\r" + " "*len(files) + "\r")
+    sys.stdout.flush()
+    print ("%s: %d machines (%d working, %d done, %d aborted)" %
+           (time.strftime("%Y-%m-%d %H:%M:%S"), len(files), num_working, num_done, num_aborted))
+    print ("   %-12s   %5s %5s %10s   %s" %
+           ("Machine", "age", "dur'n", "size", "state"))
+    print "   ============================================================================"
+    # sort by age
+    outputs.sort(key=lambda output: output[1])
+    for output in outputs:
+        (machine, age, duration, size,
+         good_conf, good_sim, error, done) = output
+        age_str      = age_string(age)
+        duration_str = age_string(duration)
+        good_conf_str = ifthen(good_conf, " [conf]", "", "")
+        good_sim_str  = ifthen(good_sim, " [success]", " [failure]", "")
+        error_str = ifthen(error, " [CRASH]", " [ERROR]", "")
+        done_str  = ifthen(done, " [done]", " [aborted]", " working...")
+        state_str = "".join([good_conf_str, good_sim_str,
+                             error_str, done_str])
+        print ("   %-12s   %5s %5s %10d  %s" %
+               (machine[:12], age_str, duration_str, size, state_str))
+    time.sleep(60)

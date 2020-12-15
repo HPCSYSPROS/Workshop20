@@ -1,0 +1,57 @@
+# Schedule definitions for thorn SphericalSurface
+
+STORAGE: sf_active
+STORAGE: sf_valid
+STORAGE: sf_info
+STORAGE: sf_radius sf_origin
+STORAGE: sf_coordinate_descriptors
+STORAGE: sf_coordinate_estimators
+STORAGE: sf_shape_descriptors
+STORAGE: sf_minreflevel
+STORAGE: sf_maxreflevel
+
+
+
+SCHEDULE SphericalSurface_SetupRes AT basegrid BEFORE SphericalSurface_Setup AFTER SpatialCoordinates AFTER CorrectCoordinates
+{
+  LANG: C
+  OPTIONS: global loop-local
+} "Set surface resolution automatically"
+
+SCHEDULE SphericalSurface_Setup AT basegrid
+{
+  LANG: C
+  OPTIONS: global
+} "Calculate surface coordinate descriptors"
+
+
+
+SCHEDULE SphericalSurface_Set AT basegrid BEFORE SphericalSurface_HasBeenSet
+{
+  LANG: C
+  OPTIONS: global
+} "Set surface radii to be used for initial setup in other thorns"
+
+SCHEDULE GROUP SphericalSurface_HasBeenSet AT basegrid
+{
+} "Set the spherical surfaces before this group, and use it afterwards"
+
+
+
+SCHEDULE SphericalSurface_Set AT poststep BEFORE SphericalSurface_HasBeenSet
+{
+  LANG: C
+  OPTIONS: global
+} "Set surface radii"
+
+SCHEDULE GROUP SphericalSurface_HasBeenSet AT poststep
+{
+} "Set the spherical surfaces before this group, and use it afterwards"
+
+
+
+SCHEDULE SphericalSurface_CheckState IN SphericalSurface_HasBeenSet
+{
+  LANG: C
+  OPTIONS: global
+} "Test the state of the spherical surfaces"

@@ -1,0 +1,63 @@
+# Schedule definitions for thorn SpaceMask
+# $Header$
+
+if (use_mask)
+{
+  STORAGE: space_mask_group
+
+  schedule MaskZero at CCTK_BASEGRID
+  {
+    LANG: C
+  } "Initialise mask to zero"
+
+  schedule MaskSym at CCTK_WRAGH
+  {
+    LANG: C
+    OPTIONS: global
+  } "Set grid symmetries for mask"
+
+#Initialize the mask again for mesh refinement
+  schedule MaskZero at CCTK_POSTREGRIDINITIAL
+  {
+    LANG: C
+  } "Initialise mask to zero"
+
+  schedule MaskZero at CCTK_POSTREGRID
+  {
+    LANG: C
+  } "Initialise mask to zero"
+
+  #
+  # The following is for compatibility with current excision routines,
+  # and will be removed once they are up-to-date with the new mask
+  # scheme.
+  #
+  STORAGE: mask
+  schedule MaskSym_emask at CCTK_WRAGH
+  {
+    LANG: C
+    OPTIONS: global
+  } "Set grid symmetries for emask (compatibility mode)"
+
+  schedule MaskOne at CCTK_BASEGRID
+  {
+    LANG: C
+  } "Set old style mask to one"
+
+  schedule CheckMask at CCTK_POSTSTEP
+  {
+    LANG: C
+  } "Ensure that all mask values are legal"
+
+#Initialize the mask again for mesh refinement
+  schedule MaskOne at CCTK_POSTREGRIDINITIAL
+  {
+    LANG: C
+  } "Set mask to one"
+
+  schedule MaskOne at CCTK_POSTREGRID
+  {
+    LANG: C
+  } "Set mask to one"
+
+}

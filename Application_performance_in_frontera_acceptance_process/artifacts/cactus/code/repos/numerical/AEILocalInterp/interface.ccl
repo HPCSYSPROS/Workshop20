@@ -1,0 +1,7 @@
+# Interface definition for thorn AEILocalInterp
+# $Header$
+
+implements: AEILocalInterp
+inherits:
+
+# this thorn doesn't define or use any Cactus grid variables or grid arrays

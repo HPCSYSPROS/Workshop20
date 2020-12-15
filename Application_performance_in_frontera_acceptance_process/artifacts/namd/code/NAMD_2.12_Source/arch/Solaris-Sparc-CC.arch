@@ -1,0 +1,10 @@
+NAMD_ARCH = Solaris-Sparc
+CHARMARCH = net-sol-cc
+
+CXX = CC -DSOLARIS -DMEMUSAGE_USE_SBRK
+CXXOPTS = -fast -xO5 -xtarget=native -xarch=v8plusa -fsimple=2
+#CXXNOALIASOPTS = -fast -xO5 -xtarget=native -xarch=v8plusa -fsimple=2 -xrestrict
+CXXTHREADOPTS = -fns -ftrap=%none -xlibmil -xlibmopt -xO5 -xtarget=native -xarch=v8plusa -fsimple=2
+CC = cc -DSOLARIS
+COPTS = -fast -xO5 -xtarget=native -xarch=v8plusa
+

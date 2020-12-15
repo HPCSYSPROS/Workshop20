@@ -1,0 +1,808 @@
+# Parameter definitions for thorn CarpetRegrid2
+
+BOOLEAN verbose "Display regridding information on the terminal" STEERABLE=always
+{
+} "no"
+
+BOOLEAN veryverbose "Display much regridding information on the terminal" STEERABLE=always
+{
+} "no"
+
+
+
+CCTK_INT min_distance "Minimum distance (in grid points) between coarse and fine grid boundaries" STEERABLE=always
+{
+  0:* :: ""
+} 4
+
+BOOLEAN ensure_proper_nesting "Ensure proper nesting automatically" STEERABLE=always
+{
+} "yes"
+
+BOOLEAN freeze_unaligned_levels "Do not change refinement levels that do not exist at this time" STEERABLE=always
+{
+} "no"
+
+BOOLEAN freeze_unaligned_parent_levels "Do not change refinement levels where the parent does not exist at this time" STEERABLE=always
+{
+} "no"
+
+
+
+CCTK_REAL min_fraction "Minimum fraction of required refined points that need to be present in a refined region" STEERABLE=always
+{
+  0:* :: ""
+} 0.9
+
+BOOLEAN snap_to_coarse "Ensure that the fine grid extent coincides with coarse grid points" STEERABLE=always
+{
+} "no"
+
+CCTK_INT boundary_shiftout "Number of grid points added to the refinement boundary radius" STEERABLE=always
+{
+  *:* :: ""
+} 0
+
+
+
+CCTK_INT regrid_every "Regrid every n time steps" STEERABLE=always
+{
+  -1   :: "regrid never"
+   0   :: "regrid during initial data calculation only"
+   1:* :: "regrid every n time steps"
+} 0
+
+
+
+BOOLEAN symmetry_rotating90 "Ensure a 90 degree rotating symmetry about the z axis"
+{
+} no
+
+BOOLEAN symmetry_rotating180 "Ensure a 180 degree rotating symmetry about the z axis"
+{
+} no
+
+BOOLEAN symmetry_parity "parity "
+{
+} no
+
+
+BOOLEAN symmetry_periodic_x "Ensure a periodicity symmetry in the x direction"
+{
+} no
+
+BOOLEAN symmetry_periodic_y "Ensure a periodicity symmetry in the y direction"
+{
+} no
+
+BOOLEAN symmetry_periodic_z "Ensure a periodicity symmetry in the z direction"
+{
+} no
+
+
+
+BOOLEAN expect_symmetric_grids "Expect a grid structure that is symmetric about the origin, and abort if it is not"
+{
+} "no"
+
+
+
+BOOLEAN adaptive_refinement "Use level_mask for adaptive refinement" STEERABLE=always
+{
+} "no"
+
+CCTK_INT adaptive_block_size "Block size for adaptive refinement" STEERABLE=always
+{
+  1:* :: ""
+} 8
+
+CCTK_INT adaptive_block_size_x "Block size in x direction for adaptive refinement" STEERABLE=always
+{
+  -1 :: "use adaptive_block_size"
+  1:* :: ""
+} -1
+CCTK_INT adaptive_block_size_y "Block size in y direction for adaptive refinement" STEERABLE=always
+{
+  -1 :: "use adaptive_block_size"
+  1:* :: ""
+} -1
+CCTK_INT adaptive_block_size_z "Block size in z direction for adaptive refinement" STEERABLE=always
+{
+  -1 :: "use adaptive_block_size"
+  1:* :: ""
+} -1
+
+
+
+CCTK_INT num_centres "Number of refinement centres"
+{
+  0:10 :: ""
+} 0
+
+
+
+################################################################################
+
+BOOLEAN add_levels_automatically "Automatically add a new refinement level at each regrid" STEERABLE=always
+{
+} "no"
+
+
+
+################################################################################
+
+CCTK_INT num_levels_1 "Number of refinement levels for this centre"
+{
+  1:30 :: ""
+} 1
+
+BOOLEAN active_1 "Is this region active?"
+{
+} "yes"
+
+
+
+CCTK_REAL position_x_1 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_y_1 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_z_1 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+
+
+CCTK_REAL radius_1[30] "Radius of refined region for this level of this centre"
+{
+  -1 :: "illegal"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_x_1[30] "x-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_y_1[30] "y-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_z_1[30] "z-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+
+
+CCTK_REAL movement_threshold_1 "Minimum movement to trigger a regridding" STEERABLE=always
+{
+  0:* :: ""
+} 0.0
+
+CCTK_REAL radius_rel_change_threshold_1 "Minimum RELATIVE change in radius to trigger a regridding" STEERABLE=always
+{
+  0.0:* :: ""
+} 0.0
+
+
+
+################################################################################
+
+CCTK_INT num_levels_2 "Number of refinement levels for this centre"
+{
+  1:30 :: ""
+} 1
+
+BOOLEAN active_2 "Is this region active?"
+{
+} "yes"
+
+
+
+CCTK_REAL position_x_2 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_y_2 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_z_2 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+
+
+CCTK_REAL radius_2[30] "Radius of refined region for this level of this centre"
+{
+  -1 :: "illegal"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_x_2[30] "x-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_y_2[30] "y-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_z_2[30] "z-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+
+
+CCTK_REAL movement_threshold_2 "Minimum movement to trigger a regridding" STEERABLE=always
+{
+  0:* :: ""
+} 0.0
+
+CCTK_REAL radius_rel_change_threshold_2 "Minimum change in radius to trigger a regridding" STEERABLE=always
+{
+  0.0:* :: ""
+} 0.0
+
+
+
+################################################################################
+
+CCTK_INT num_levels_3 "Number of refinement levels for this centre"
+{
+  1:30 :: ""
+} 1
+
+BOOLEAN active_3 "Is this region active?"
+{
+} "yes"
+
+
+
+CCTK_REAL position_x_3 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_y_3 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_z_3 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+
+
+CCTK_REAL radius_3[30] "Radius of refined region for this level of this centre"
+{
+  -1 :: "illegal"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_x_3[30] "x-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_y_3[30] "y-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_z_3[30] "z-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+
+
+CCTK_REAL movement_threshold_3 "Minimum movement to trigger a regridding" STEERABLE=always
+{
+  0:* :: ""
+} 0.0
+
+CCTK_REAL radius_rel_change_threshold_3 "Minimum change in radius to trigger a regridding" STEERABLE=always
+{
+  0.0:* :: ""
+} 0.0
+
+
+
+################################################################################
+
+CCTK_INT num_levels_4 "Number of refinement levels for this centre"
+{
+  1:30 :: ""
+} 1
+
+BOOLEAN active_4 "Is this region active?"
+{
+} "yes"
+
+
+
+CCTK_REAL position_x_4 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_y_4 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_z_4 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+
+
+CCTK_REAL radius_4[30] "Radius of refined region for this level of this centre"
+{
+  -1 :: "illegal"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_x_4[30] "x-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_y_4[30] "y-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_z_4[30] "z-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+
+
+CCTK_REAL movement_threshold_4 "Minimum movement to trigger a regridding" STEERABLE=always
+{
+  0:* :: ""
+} 0.0
+
+CCTK_REAL radius_rel_change_threshold_4 "Minimum change in radius to trigger a regridding" STEERABLE=always
+{
+  0.0:* :: ""
+} 0.0
+
+
+
+################################################################################
+
+CCTK_INT num_levels_5 "Number of refinement levels for this centre"
+{
+  1:30 :: ""
+} 1
+
+BOOLEAN active_5 "Is this region active?"
+{
+} "yes"
+
+
+
+CCTK_REAL position_x_5 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_y_5 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_z_5 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+
+
+CCTK_REAL radius_5[30] "Radius of refined region for this level of this centre"
+{
+  -1 :: "illegal"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_x_5[30] "x-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_y_5[30] "y-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_z_5[30] "z-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+
+
+CCTK_REAL movement_threshold_5 "Minimum movement to trigger a regridding" STEERABLE=always
+{
+  0:* :: ""
+} 0.0
+
+CCTK_REAL radius_rel_change_threshold_5 "Minimum change in radius to trigger a regridding" STEERABLE=always
+{
+  0.0:* :: ""
+} 0.0
+
+
+
+################################################################################
+
+CCTK_INT num_levels_6 "Number of refinement levels for this centre"
+{
+  1:30 :: ""
+} 1
+
+BOOLEAN active_6 "Is this region active?"
+{
+} "yes"
+
+
+
+CCTK_REAL position_x_6 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_y_6 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_z_6 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+
+
+CCTK_REAL radius_6[30] "Radius of refined region for this level of this centre"
+{
+  -1 :: "illegal"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_x_6[30] "x-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_y_6[30] "y-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_z_6[30] "z-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+
+
+CCTK_REAL movement_threshold_6 "Minimum movement to trigger a regridding" STEERABLE=always
+{
+  0:* :: ""
+} 0.0
+
+CCTK_REAL radius_rel_change_threshold_6 "Minimum change in radius to trigger a regridding" STEERABLE=always
+{
+  0.0:* :: ""
+} 0.0
+
+
+
+################################################################################
+
+CCTK_INT num_levels_7 "Number of refinement levels for this centre"
+{
+  1:30 :: ""
+} 1
+
+BOOLEAN active_7 "Is this region active?"
+{
+} "yes"
+
+
+
+CCTK_REAL position_x_7 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_y_7 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_z_7 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+
+
+CCTK_REAL radius_7[30] "Radius of refined region for this level of this centre"
+{
+  -1 :: "illegal"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_x_7[30] "x-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_y_7[30] "y-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_z_7[30] "z-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+
+
+CCTK_REAL movement_threshold_7 "Minimum movement to trigger a regridding" STEERABLE=always
+{
+  0:* :: ""
+} 0.0
+
+CCTK_REAL radius_rel_change_threshold_7 "Minimum change in radius to trigger a regridding" STEERABLE=always
+{
+  0.0:* :: ""
+} 0.0
+
+
+
+################################################################################
+
+CCTK_INT num_levels_8 "Number of refinement levels for this centre"
+{
+  1:30 :: ""
+} 1
+
+BOOLEAN active_8 "Is this region active?"
+{
+} "yes"
+
+
+
+CCTK_REAL position_x_8 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_y_8 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_z_8 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+
+
+CCTK_REAL radius_8[30] "Radius of refined region for this level of this centre"
+{
+  -1 :: "illegal"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_x_8[30] "x-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_y_8[30] "y-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_z_8[30] "z-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+
+
+CCTK_REAL movement_threshold_8 "Minimum movement to trigger a regridding" STEERABLE=always
+{
+  0:* :: ""
+} 0.0
+
+CCTK_REAL radius_rel_change_threshold_8 "Minimum change in radius to trigger a regridding" STEERABLE=always
+{
+  0.0:* :: ""
+} 0.0
+
+
+
+################################################################################
+
+CCTK_INT num_levels_9 "Number of refinement levels for this centre"
+{
+  1:30 :: ""
+} 1
+
+BOOLEAN active_9 "Is this region active?"
+{
+} "yes"
+
+
+
+CCTK_REAL position_x_9 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_y_9 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_z_9 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+
+
+CCTK_REAL radius_9[30] "Radius of refined region for this level of this centre"
+{
+  -1 :: "illegal"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_x_9[30] "x-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_y_9[30] "y-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_z_9[30] "z-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+
+
+CCTK_REAL movement_threshold_9 "Minimum movement to trigger a regridding" STEERABLE=always
+{
+  0:* :: ""
+} 0.0
+
+CCTK_REAL radius_rel_change_threshold_9 "Minimum change in radius to trigger a regridding" STEERABLE=always
+{
+  0.0:* :: ""
+} 0.0
+
+
+
+################################################################################
+
+CCTK_INT num_levels_10 "Number of refinement levels for this centre"
+{
+  1:30 :: ""
+} 1
+
+BOOLEAN active_10 "Is this region active?"
+{
+} "yes"
+
+
+
+CCTK_REAL position_x_10 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_y_10 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL position_z_10 "Position of this centre"
+{
+  *:* :: ""
+} 0.0
+
+
+
+CCTK_REAL radius_10[30] "Radius of refined region for this level of this centre"
+{
+  -1 :: "illegal"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_x_10[30] "x-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_y_10[30] "y-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+CCTK_REAL radius_z_10[30] "z-radius of refined region for this level of this centre"
+{
+  -1  :: "ignore this radius"
+  0:* :: ""
+} -1.0
+
+
+
+CCTK_REAL movement_threshold_10 "Minimum movement to trigger a regridding" STEERABLE=always
+{
+  0:* :: ""
+} 0.0
+
+CCTK_REAL radius_rel_change_threshold_10 "Minimum change in radius to trigger a regridding" STEERABLE=always
+{
+  0.0:* :: ""
+} 0.0

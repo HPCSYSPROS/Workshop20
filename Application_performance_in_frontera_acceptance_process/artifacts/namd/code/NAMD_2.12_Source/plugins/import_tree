@@ -1,0 +1,36 @@
+#!/bin/csh
+
+if ( $#argv == 0 ) then
+  echo "Imports VMD plugin files from external source tree into NAMD tree."
+  echo "usage: $0 <plugins tree>"
+  exit -1
+endif
+
+set dest=$0
+set dest=$dest:h
+if ( $dest == $0 ) set dest="."
+
+set base=$1
+
+echo Importing from $base to $dest
+
+foreach file ( molfile_plugin.h vmdplugin.h )
+  set dir=include
+  set f=$base/$dir/$file
+  echo $f
+  \cp -f $f $dest/$dir
+end
+
+foreach file ( dcdplugin.c pdbplugin.c psfplugin.c jsplugin.c namdbinplugin.c \
+               hash.h hash.c endianswap.h fastio.h largefiles.h \
+               readpdb.h periodic_table.h fortread.h )
+  set dir=molfile_plugin/src
+  set f=$base/$dir/$file
+  echo $f
+  \cp -f $f $dest/$dir
+end
+
+set header=include/libmolfile_plugin.h
+/bin/rm $header
+$base/create_static_header.sh MOLFILE molfile $header dcdplugin jsplugin pdbplugin psfplugin namdbinplugin
+

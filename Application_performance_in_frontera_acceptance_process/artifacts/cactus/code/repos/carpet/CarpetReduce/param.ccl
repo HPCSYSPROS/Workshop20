@@ -1,0 +1,13 @@
+# Parameter definitions for thorn CarpetReduce
+
+BOOLEAN verbose "Produce screen output while running" STEERABLE=always
+{
+} "no"
+
+BOOLEAN debug_iweight "Allow debugging iweight grid function by keeping it allocated" STEERABLE=recover
+{
+} "no"
+
+BOOLEAN min_max_time_interpolation "Interpolate in time for min/max reductions" STEERABLE=always
+{
+} "yes"

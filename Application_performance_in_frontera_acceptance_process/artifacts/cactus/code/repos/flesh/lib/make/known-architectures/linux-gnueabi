@@ -1,0 +1,11 @@
+#! /bin/sh
+# /*@@
+#   @file      linux-gnueabi
+#   @date      Thu Oct 03 10:26:54 2013
+#   @author    Frank Löffler
+#   @desc 
+#   
+#   @enddesc 
+# @@*/
+
+. $srcdir/known-architectures/linux

@@ -1,0 +1,61 @@
+# /*@@
+#   @file    CarpetWaveToy-TwoComponents.par
+#   @date    Wednesday 1 December 2005
+#   @author  Thomas Radke
+#   @desc
+#            WaveToy parameter file demonstrating manual Carpet regridding
+#            on a WaveBinarySource example
+#   @enddesc
+# @@*/
+
+ActiveThorns = "Boundary Time CartGrid3D CoordBase InitBase SymBase"
+ActiveThorns = "IOUtil"
+ActiveThorns = "Carpet CarpetLib CarpetRegrid CarpetReduce LoopControl GSL"
+ActiveThorns = "HDF5 CarpetIOHDF5 CarpetIOBasic"
+ActiveThorns = "IDScalarWaveC WaveToyC WaveBinarySource"
+
+####################
+# Driver parameters
+####################
+Driver::global_nsize = 40
+
+Carpet::max_refinement_levels   = 4
+CarpetRegrid::refinement_levels = 4
+CarpetRegrid::refined_regions   = "manual-gridpoint-list"
+CarpetRegrid::gridpoints        = "[
+                                     [ ([ 60, 60, 60]:[260,260,260]:[4,4,4]) ],
+                                     [ ([ 80,110, 80]:[150,210,160]:[2,2,2]),
+                                       ([170,110, 80]:[240,210,160]:[2,2,2]) ],
+                                     [ ([ 90,135,100]:[140,185,140]:[1,1,1]), 
+                                       ([180,135,100]:[230,185,140]:[1,1,1]) ]
+                                                                              ]"
+
+#########################
+# Application parameters
+#########################
+Cactus::cctk_itlast = 80
+
+Grid::type   = "BySpacing"
+Grid::domain = "full"
+Grid::dxyz   = 0.005
+
+Time::dtfac = 0.5
+
+InitBase::initial_data_setup_method = "init_all_levels"
+
+WaveToy::bound = "radiation"
+
+WaveBinarySource::binary_omega  = 26 
+WaveBinarySource::binary_charge = 0.00001
+WaveBinarySource::binary_radius = 0.07
+WaveBinarySource::binary_size   = 0.04
+
+####################
+# output parameters
+####################
+IO::out_every     = 1
+IO::out_dir       = "scratch"
+IO::parfile_write = "no"
+
+IOBasic::outInfo_vars = "wavetoy::phi"
+IOHDF5::out_vars      = "wavetoy::phi"

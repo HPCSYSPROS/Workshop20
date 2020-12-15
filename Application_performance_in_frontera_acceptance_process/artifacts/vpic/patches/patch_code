@@ -1,0 +1,16 @@
+diff -aur original_code/src/util/mp/dmp/mp_dmp.c skx_code/vpic-407/src/util/mp/dmp/mp_dmp.c
+--- original_code/src/util/mp/dmp/mp_dmp.c	2016-01-22 18:53:58.000000000 -0600
++++ skx_code/vpic-407/src/util/mp/dmp/mp_dmp.c	2017-11-14 14:35:06.000000000 -0600
+@@ -261,9 +261,9 @@
+ 
+   mp->sreq_size[send_buf] = msg_size;
+ 
+-  TRAP( MPI_Issend( mp->sbuf[send_buf], msg_size, MPI_BYTE,
+-                    receiver,	msg_tag, MPI_COMM_WORLD,
+-                    &mp->sreq[send_buf] ) );
++  TRAP( MPI_Isend( mp->sbuf[send_buf], msg_size, MPI_BYTE,
++                   receiver,	msg_tag, MPI_COMM_WORLD,
++                   &mp->sreq[send_buf] ) );
+ }
+ 
+ void

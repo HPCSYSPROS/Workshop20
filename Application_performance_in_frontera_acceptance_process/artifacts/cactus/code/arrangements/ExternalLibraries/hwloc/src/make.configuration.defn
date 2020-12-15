@@ -1,0 +1,5 @@
+# make.configuration.defn file for thorn hwloc
+
+# Define the hwloc utilities
+STD_HWLOC_UTILS = hwloc-assembler hwloc-assembler-remote hwloc-bind hwloc-calc hwloc-distances hwloc-distrib hwloc-info hwloc-ls hwloc-ps lstopo lstopo-no-graphics
+ALL_UTILS += $(filter $(STD_HWLOC_UTILS), $(notdir $(wildcard $(HWLOC_DIR)/bin/*)))

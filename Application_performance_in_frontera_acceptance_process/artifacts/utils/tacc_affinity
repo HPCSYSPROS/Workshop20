@@ -1,0 +1,423 @@
+#!/bin/bash
+# -*- shell-script -*-
+# ---------------------------------------------------------------------
+# Affinity convenicence script. Designed to be used with ibrun
+# on TACC HPC systems.
+# ---------------------------------------------------------------------
+
+function debug_print {
+
+  if [ "$TACC_AFFINITY_DEBUG" == "1" ]; then
+    echo "DEBUG - ${my_rank}:  $@ "
+  fi
+}
+
+function distribute  {
+
+  things=$1
+  buckets=$2
+  
+  tpb=$(( $things/$buckets))
+  
+  extras=$(( $things % $buckets ))
+  
+  for bucket in `seq 0 $(( buckets -1 ))` ; do
+    if [[ $bucket -lt $extras ]]; then 
+      extra=$bucket
+    else
+      extra=$extras
+    fi 
+    starts[$bucket]=$(( $bucket*$tpb + $extra )) 
+    if [[ $((bucket+1)) -lt $extras ]]; then 
+      extra=$((bucket+1))
+    else
+      extra=$extras
+    fi 
+    ends[$bucket]=$(( ($bucket + 1)*$tpb + $extra - 1 )) 
+  done
+  
+  return
+}
+
+function get_range {
+
+  thing=$1
+  things=$2
+  buckets=$3
+  
+  tpb=$(( $things/$buckets))
+  
+  extras=$(( $things % $buckets ))
+  
+  for bucket in `seq 0 $(( buckets -1 ))` ; do
+    if [[ $bucket -lt $extras ]]; then 
+      extra=$bucket
+    else
+      extra=$extras
+    fi 
+    start=$(( $bucket*$tpb + $extra )) 
+    if [[ $thing -lt $start ]]; then
+      continue ;
+    fi
+    if [[ $((bucket+1)) -lt $extras ]]; then 
+      extra=$((bucket+1))
+    else
+      extra=$extras
+    fi 
+    end=$(( ($bucket + 1)*$tpb + $extra - 1 )) 
+   
+    return 0
+  
+  done
+  
+  echo "Error:  Range not found !"
+  return 1
+}
+
+#Disable affinity 
+export TACC_AFFINITY_ENABLED=1
+export MV2_USE_AFFINITY=0
+export MV2_ENABLE_AFFINITY=0
+export VIADEV_USE_AFFINITY=0
+export VIADEV_ENABLE_AFFINITY=0
+
+
+#Check to see if Intel Pinning is enabled
+if [ "$I_MPI_PIN" == "enable" ] || [ "$I_MPI_PIN" == "on" ] || [ "$I_MPI_PIN" == "1" ]; then 
+  echo "Exiting: Intel MPI pinning is enabled.  This disables tacc_affinity. " 
+  exit
+fi
+
+
+
+#Determine local MPI rank
+my_rank=$(( ${PMI_RANK-0} + ${PMI_ID-0} + ${MPIRUN_RANK-0} + ${OMPI_COMM_WORLD_RANK-0} + ${OMPI_MCA_ns_nds_vpid-0} + ${SLURM_PROCID-0} + ${ibrun_o_option-0} ))
+
+#set -x 
+SCHEDULER=SLURM
+if [ "$SCHEDULER" == "SGE" ];then
+    myway=`builtin echo $PE | /bin/sed s/way//`
+elif [ "$SCHEDULER" == "SLURM" ];then
+  # Figure out number of MPI tasks per node.   Added by McCalpin 2012-12-05
+  # If running under "ibrun", NODE_TASKS_PPN_INFO will already be set
+  # else get info from SLURM_TASKS_PER_NODE (not propagated by "ibrun" due to illegal characters)
+  if [ -z "$NODE_TASKS_PPN_INFO" ]
+  then
+    myway=`echo $SLURM_TASKS_PER_NODE | awk -F '(' '{print $1}'`
+  else
+    #Because slurm will spread tasks evenly across nodes, the wayness of each node 
+    # may be different.  The env variable NODE_TASKS_PPN_INFO propagates the wayness 
+    # per node cluster with this format:
+    #"{# of tasks per node},{#initial task id}_[repeats if necessary]"
+    NODE_TASKS_PPN_INFO=`echo $NODE_TASKS_PPN_INFO | sed -e's/_/ /g'`
+    for cluster in $NODE_TASKS_PPN_INFO ; do 
+        way=`echo $cluster | awk -F ',' '{print $1}'` ; 
+        task_cutoff=`echo $cluster | awk -F ',' '{print $2}'`; 
+	if [ $my_rank -ge $task_cutoff ] ; then
+           myway=$way
+           mytask_cutoff=$task_cutoff
+        fi
+    done 
+  fi
+ 
+else
+    echo "ERROR: Unknown batch system"
+    exit 1
+fi
+
+#Calculate local MPI rank 
+local_rank=$(( ( $my_rank - $mytask_cutoff) % $myway ))
+debug_print "my_rank = $my_rank  myway = $myway local_rank = $local_rank "
+
+#Get the hardware specifics from lscpu
+spn=`lscpu | egrep 'Socket\(s\):' | awk '{print $2}'`
+npn=`lscpu | egrep 'NUMA node\(s\):' | awk '{print $3}'`
+cps=`lscpu | egrep 'Core\(s\) per socket:' | awk '{print $4}'`
+tpc=`lscpu | egrep 'Thread\(s\) per core:' | awk '{print $4}'`
+cpn=$(( cps * spn ))
+
+#Calculate threads of execution per node assuming OMP_NUM_THREADS is set
+# to number of threads per core
+toepn=$(( myway*OMP_NUM_THREADS ))
+debug_print " toepn : Toe      per node   = $toepn "
+
+#If more tasks of execution than physical cores
+# automatically enable hyperthreading
+if [ $myway -gt $cpn ]; then
+  debug_print "$my_rank:  myway = $myway cpn = $cpn toepn = $toepn "
+  export TACC_AFFINITY_ENABLE_HT=1
+fi
+
+if [ x$TACC_AFFINITY_ENABLE_HT != "x1" ]; then
+  cpubind_unit="core"
+else
+  cpubind_unit="pu"
+fi
+
+#Calculate total logical cores per socket and node 
+tps=$(( tpc * cps ))
+tpn=$(( tps * spn ))
+
+#If there are more tasks than cores do not set affinity
+if [ $toepn -gt $tpn ]; then
+  echo "WARNING: More threads of execution per node($toepn) than available logical cores($tps) "
+  echo "WARNING: --  No affinity set "
+  exec $* 
+  exit
+fi
+
+#Print out node configuration
+debug_print " spn   : Sockets  per node   = $spn "
+debug_print " npn   : Numanodes per node   = $npn "
+debug_print " cps   : Cores    per socket = $cps "
+debug_print " tpc   : HThreads per core   = $tpc "
+debug_print " tps   : HThreads per socket = $tps "
+debug_print " tpn   : HThreads per node   = $tpn "
+
+#Determine core layout from lscpu
+#Looking for hbm
+hbm_offset=0
+# This will be changed to "hbm" if hbm present
+membind_unit="node"
+
+#Cycle over numa nodes to get core layout
+node_start=0
+node_end=0
+nnode_physical_cores_min=1000
+nnode_physical_cores_max=0
+for nnode in `seq 0 $(( npn -1 ))` ; do
+   core_layout[$nnode]=`numactl -H  | egrep "node ${nnode} cpus:" | cut -d\  -f4- `
+   logical_cores=`echo ${core_layout[$nnode]} |  wc -w `
+   physical_cores=$(( logical_cores / tpc ))
+   debug_print " nnode : core_layout              : $nnode : ${core_layout[${nnode}]} "
+   debug_print " nnode : logical_cores            : $nnode : $logical_cores "
+   debug_print " nnode : physical_cores           : $nnode : $physical_cores "
+
+   #If there are physical cores, assume that they are connected to ddr.
+   #  Calculate the number of cores in each numanode
+   #  And starting and ending physical core number in each numanode
+   #  Important for KNL since numanodes are unequal in core count.
+   #  Have to walk through all numa nodes to determine if there are special
+   #    memory only numanodes 
+   if [[ physical_cores -gt 0 ]]; then 
+      nnode_start[$nnode]=$node_start
+      node_end=$(( node_start + physical_cores - 1 ))
+      nnode_end[$nnode]=$node_end
+
+      #Set up for next numanode
+      node_start=$(( node_start + physical_cores ))
+
+      #Save # of cores for this numanode
+      #  Necessary since numanodes on KNL are of unequal size
+      nnode_num_logical_cores[$nnode]=$logical_cores
+      nnode_num_physical_cores[$nnode]=$physical_cores
+
+      #Gather numanode min/max
+      nnode_physical_cores_min=$(( physical_cores < nnode_physical_cores_min ? physical_cores : nnode_physical_cores_min ))
+      nnode_physical_cores_max=$(( physical_cores > nnode_physical_cores_max ? physical_cores : nnode_physical_cores_max ))
+
+      #Simplify core range
+      core_layout[${nnode}]="${nnode_start[$nnode]},${nnode_end[$nnode]}"
+
+   else
+   #Otherwise assume that this is an hbm numa node
+     #Assume hbm is never interleaved with normal dram
+     # and appears as a numanode AFTER the numanodes that contain cores
+     #Set the hbm offset equal to the number of numanodes with cores 
+     # UNLESS the user chooses not to use hbm
+     #  task binding will still occur
+     if [ $hbm_offset -eq 0 ]; then
+          hbm_offset=$nnode
+          membind_unit="hbm"
+     fi
+     debug_print " nnode : hbm_offset            : $nnode : $hbm_offset "
+   fi
+   
+   debug_print " nnode : nnode_num_logical_cores  : $nnode : ${nnode_num_logical_cores[${nnode}]} "
+   debug_print " nnode : nnode_num_physical_cores : $nnode : ${nnode_num_physical_cores[${nnode}]} "
+   debug_print " nnode : nnode_start              : $nnode : ${nnode_start[${nnode}]} "
+   debug_print " nnode : nnode_end                : $nnode : ${nnode_end[${nnode}]} "
+   debug_print " nnode : final core_layout        : $nnode : ${core_layout[${nnode}]} "
+   debug_print " "
+
+done
+
+debug_print " nnode_physical_cores_min         : $nnode_physical_cores_min "
+debug_print " nnode_physical_cores_max         : $nnode_physical_cores_max "
+
+#debug_print "DEBUG: ${my_rank}: ${core_layout[*]} "
+
+
+#Determine how to pin tasks
+#First adjust npn to reflect hbm numanodes.
+npn_actual=$((npn - hbm_offset ))
+debug_print " npn : npn_actual : hbm_offset : $npn : ${npn_actual} : $hbm_offset "
+
+#Disable hbm if the user chooses to ignore it
+  # Default is to use it
+  if [ x$HBM_DISABLE == "x1" ]; then 
+    hbm_offset=0
+    membind_unit="node"
+    debug_print " HBM disabled | hbm_offset : membind_unit | $hbm_offset : $membind_unit "
+  fi
+
+#Determine which numanode or numanodes each task will run on 
+
+#Check special cases first
+#  1.  Fewer tasks than numanodes
+#  2.  nnode_physical_cores_min * npn < # of tasks  <= cpn
+#  3.  More tasks than minimum numanode core count x # numanodes
+#      total tasks >  ( minimum numanode core count) x (# numa nodes )
+#      e.g. on a KNL
+#      65 tasks >  ( 16 cores ) x (4 numa nodes )
+#  3.  More tasks than minimum logical numanode core count x # numanodes
+#      be distributed evenly
+#      total tasks >  ( minimum logical numanode core count) x (# numa nodes )
+#      e.g. on a KNL
+#      260 tasks >  ( 64 cores ) x (4 numa nodes )
+if [ $npn_actual -gt $myway ]; then
+
+  # Get the range of actual nnodes per task
+  debug_print " Choice 1 --   # tasks < npn_actual "
+  debug_print " distribute $npn_actual $myway  "
+  distribute $npn_actual $myway
+
+  numnode_start=${starts[$myrank]} 
+  numnode_end=${ends[$myrank]} 
+  debug_print "numnode_start | numnode_end : ${numnode_start} | ${numnode_end} "
+
+  #Pin explicitly to core or hyperthreads
+  thread_start=${nnode_start[$numnode_start]}
+  thread_end=${nnode_end[$numnode_end]} 
+  debug_print "thread_start | thread_end : ${thread_start} | ${thread_end} "
+
+  # Can't use offset with hwloc-bind -- only works with numactl
+  ## mem_numnode_start=$(( numnode_start + hbm_offset ))
+  ## mem_numnode_end=$(( numnode_start + hbm_offset ))
+  mem_numnode_start=$numnode_start
+  mem_numnode_end=$numnode_end
+  debug_print "mem_numnode_start | mem_numnode_end : ${mem_numnode_start} | ${mem_numnode_end} "
+
+# 
+elif [ $myway -le $cpn ] && [ $myway -gt $(( npn_actual*nnode_physical_cores_min  )) ] ; then
+  debug_print " Choice 2 --  cpn <= # tasks < npn*nnode_physical_cores_min "
+
+  thread_start=$local_rank
+  thread_end=$local_rank
+
+  #Find which numanode this task is on
+  for nnode in `seq 0 $(( npn_actual -1 ))` ; do
+    mem_numnode=$nnode
+    if [[ "$local_rank" -ge "${nnode_start[$nnode]}" && "$local_rank" -le "${nnode_end[$nnode]}" ]]; then
+      break;
+    fi
+  done
+
+  # Can't use offset with hwloc-bind -- only works with numactl
+  ## mem_numnode_start=$(( nnode + hbm_offset ))
+  ## mem_numnode_end=$(( nnode + hbm_offset ))
+  mem_numnode_start=$nnode
+  mem_numnode_end=$nnode
+  debug_print "mem_numnode_start | mem_numnode_end : ${mem_numnode_start} | ${mem_numnode_end} "
+  
+#Number of tasks > number of physical cores
+ # All of the task threads should be on one physical core
+elif [[ $myway -gt $cpn ]] ; then
+  debug_print " Choice 3 --  # tasks > cpn  "
+
+  #Get a logical core per task count by dividing the number of logical cores by number of tasks
+  core_per_task=$(( tpn/myway ))
+  #Ensure this is a divisor of tpc  
+  for thread in `seq 0 $(( tpc - 1 ))` ; do 
+     if [ $(( tpc % core_per_task )) -eq 0 ] ; then
+        break
+     fi
+     core_per_task=$(( core_per_task - 1 ))
+  done
+
+  thread_start=$(( local_rank*core_per_task ))
+  thread_end=$(( (local_rank + 1 )*core_per_task - 1 ))
+
+  #Find which numanode this task is on
+   #Reduce rank to physical core by dividing by hw threads/core
+  for nnode in `seq 0 $(( npn_actual -1 ))` ; do
+    mem_numnode=$nnode
+    if [[ "$((thread_start/tpc))" -ge "${nnode_start[$nnode]}" && "$((thread_end/tpc))" -le "${nnode_end[$nnode]}" ]]; then
+      break;
+    fi
+  done
+
+  # Can't use offset with hwloc-bind -- only works with numactl
+  ## mem_numnode_start=$(( nnode + hbm_offset ))
+  ## mem_numnode_end=$(( nnode + hbm_offset ))
+  mem_numnode_start=$nnode
+  mem_numnode_end=$nnode
+  debug_print "mem_numnode_start | mem_numnode_end : ${mem_numnode_start} | ${mem_numnode_end} "
+  
+
+#Otherwise, tasks will be spread evenly across numanodes
+#  and the unequal numanodes should not be a problem
+else
+
+  debug_print " Choice 4 --  # tasks < npn_actual*nnode_physical_cores_min "
+  #Get range of tasks per numanode
+  debug_print " distribute $myway $npn_actual "
+  distribute $myway $npn_actual 
+
+
+  #Find which nnode this task is on
+  for nnode in `seq 0 $(( npn_actual -1 ))` ; do
+    if [[ "$local_rank" -le "${ends[$nnode]}" ]]; then
+      task_start=${starts[$nnode]}
+      task_end=${ends[$nnode]}
+      break;
+    fi
+  done
+  
+  
+  #Get range of cores within numanode that task will be bound to
+  tasks_per_nnode=$(( task_end - task_start + 1 ))
+  local_nnode_rank=$(( local_rank - task_start ))
+  debug_print "     : local_nnode_rank          = $local_nnode_rank "
+  debug_print "     : tasks_per_nnode    = $tasks_per_nnode "
+  debug_print " distribute ${nnode_num_physical_cores[$nnode]} $tasks_per_nnode "
+  distribute ${nnode_num_physical_cores[$nnode]} $tasks_per_nnode 
+
+  thread_start=$(( ${starts[$local_nnode_rank]} + ${nnode_start[$nnode]} ))
+  thread_end=$(( ${ends[$local_nnode_rank]} + ${nnode_start[$nnode]} ))
+  
+  debug_print "thread_start | thread_end : ${thread_start} | ${thread_end} "
+
+  # Can't use offset with hwloc-bind -- only works with numactl
+  ## mem_numnode_start=$(( nnode + hbm_offset ))
+  ## mem_numnode_end=$(( nnode + hbm_offset ))
+  mem_numnode_start=$nnode
+  mem_numnode_end=$nnode
+  debug_print "mem_numnode_start | mem_numnode_end : ${mem_numnode_start} | ${mem_numnode_end} "
+  
+fi
+
+#Enable anti-affinity for numa nodes
+if [ x$ANTIAFFINITY == "x1" ] && [ $myway -gt 0 ] ; then
+  mem_numnode_start=$(( (mem_numnode_start + npn_actual/2 ) % npn_actual ))
+  mem_numnode_end=$(( (mem_numnode_end + npn_actual/2 ) % npn_actual  ))
+  if [ $mem_numnode_start -gt $mem_numnode_end ]; then
+    tmp=$mem_numnode_start
+    mem_numnode_start=$mem_numnode_end
+    mem_numnode_end=$tmp
+  fi
+  debug_print "ANTIAFFINITY : mem_numnode_start | mem_numnode_end : ${mem_numnode_start} | ${mem_numnode_end} "
+fi
+
+#Enable hyper threads per core if  total threads of execution per node exceeds cores per node
+if [ x$TACC_AFFINITY_ENABLE_HT != "x1" ] && [ $toepn -gt $cpn ]; then
+  debug_print " exec hwloc-bind --cpubind ${cpubind_unit}:${thread_start}-${thread_end}.pu:0-$(( tpc - 1 )) --membind ${membind_unit}:${mem_numnode_start}-${mem_numnode_end} $*  "
+  exec hwloc-bind --cpubind ${cpubind_unit}:${thread_start}-${thread_end}.pu:0-$(( tpc - 1 )) --membind ${membind_unit}:${mem_numnode_start}-${mem_numnode_end} $* 
+elif [ x$TACC_AFFINITY_ENABLE_HT != "x1" ] ; then
+  debug_print " exec hwloc-bind --cpubind ${cpubind_unit}:${thread_start}-${thread_end}.pu:0-0 --membind ${membind_unit}:${mem_numnode_start}-${mem_numnode_end} $*  "
+  exec hwloc-bind --cpubind ${cpubind_unit}:${thread_start}-${thread_end}.pu:0-0 --membind ${membind_unit}:${mem_numnode_start}-${mem_numnode_end} $* 
+else
+  debug_print " exec hwloc-bind --cpubind ${cpubind_unit}:${thread_start}-${thread_end} --membind ${membind_unit}:${mem_numnode_start}-${mem_numnode_end} $*  "
+  exec hwloc-bind --cpubind ${cpubind_unit}:${thread_start}-${thread_end} --membind ${membind_unit}:${mem_numnode_start}-${mem_numnode_end} $*  
+fi
+

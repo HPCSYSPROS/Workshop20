@@ -1,0 +1,91 @@
+# Schedule definitions for thorn CarpetReduce
+
+schedule CarpetReduceStartup at STARTUP
+{
+  LANG: C
+} "Startup routine"
+
+
+
+# Should this move to a new thorn MaskBase?
+STORAGE: weight
+STORAGE: excised_cells
+
+
+
+SCHEDULE GROUP MaskBase_SetupMask AT basegrid AFTER (SpatialCoordinates SphericalSurface_Setup)
+{
+} "Set up the weight function"
+
+SCHEDULE GROUP MaskBase_SetupMask AT postregridinitial AFTER SpatialCoordinates
+{
+} "Set up the weight function"
+
+SCHEDULE GROUP MaskBase_SetupMask AT postregrid AFTER SpatialCoordinates
+{
+} "Set up the weight function"
+
+SCHEDULE GROUP MaskBase_SetupMask AT post_recover_variables
+{
+} "Set up the weight function"
+
+
+
+SCHEDULE GROUP MaskBase_SetupMaskAll IN MaskBase_SetupMask
+{
+  # Note: Storage for iweight and one is managed manually
+} "Set up the weight function"
+
+
+
+SCHEDULE MaskBase_AllocateMask IN MaskBase_SetupMaskAll
+{
+  LANG: C
+  OPTIONS: global
+} "Allocate the weight function"
+
+SCHEDULE MaskBase_InitMask IN MaskBase_SetupMaskAll AFTER MaskBase_AllocateMask
+{
+  LANG: C
+  OPTIONS: global loop-local
+} "Initialise the weight function"
+
+SCHEDULE GROUP SetupIMaskInternal IN MaskBase_SetupMaskAll AFTER MaskBase_InitMask
+{
+} "Set up the integer weight function (schedule other routines in here)"
+
+SCHEDULE GROUP SetupIMask IN MaskBase_SetupMaskAll AFTER SetupIMaskInternal
+{
+} "Set up the integer weight function (schedule other routines in here)"
+
+SCHEDULE MaskBase_SetMask IN MaskBase_SetupMaskAll AFTER SetupIMask
+{
+  LANG: C
+  OPTIONS: global loop-local
+} "Set the weight function"
+
+SCHEDULE GROUP SetupMask IN MaskBase_SetupMaskAll AFTER MaskBase_SetMask
+{
+} "Set up the real weight function (schedule other routines in here)"
+
+SCHEDULE MaskBase_TestMask IN MaskBase_SetupMaskAll AFTER SetupMask
+{
+  LANG: C
+  OPTIONS: global
+} "Test the weight function"
+
+
+
+# Should this move to CoordBase?
+SCHEDULE CoordBase_SetupMask IN SetupIMaskInternal
+{
+  LANG: C
+  OPTIONS: global loop-local
+} "Set up the outer boundaries of the weight function"
+
+# Should this move to CarpetMask?
+SCHEDULE CarpetMaskSetup IN SetupIMaskInternal
+{
+  LANG: C
+  OPTIONS: global loop-singlemap
+} "Set up the weight function for the restriction regions"

@@ -1,0 +1,6 @@
+# Parameter definitions for thorn SymBase
+# $Header$
+
+BOOLEAN verbose "Output symmetry boundary face descriptions after registration"
+{
+} "yes"

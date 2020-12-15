@@ -1,0 +1,44 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+module unload mvapich2
+module load impi
+module list
+
+echo "Checking:"
+pwd
+hostname
+date
+
+echo "Environment:"
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export GMON_OUT_PREFIX=gmon.out
+#export I_MPI_FABRICS=shm:ofa
+#export I_MPI_MIC=1
+#export I_MPI_OFA_ADAPTER_NAME=mlx4_0
+
+export MY_NSLOTS=0
+export OMP_NUM_THREADS=1
+export MIC_MY_NSLOTS=@NUM_PROCS@
+export MIC_PPN=@NODE_PROCS@
+export MIC_OMP_NUM_THREADS=@NUM_THREADS@
+
+env | sort > SIMFACTORY/ENVIRONMENT
+echo ${SLURM_NODELIST} > NODES
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+#time /opt/apps/intel13/impi/4.1.0.024/intel64/bin/mpiexec.hydra -host mic0 -np @NUM_PROCS@ @EXECUTABLE@ -L 3 @PARFILE@
+#time mpiexec.hydra -host mic0 -np @NUM_PROCS@ @EXECUTABLE@ -L 3 @PARFILE@
+time ibrun.symm -m "@EXECUTABLE@ -L 3 @PARFILE@"
+
+echo "Stopping:"
+date
+
+echo "Done."

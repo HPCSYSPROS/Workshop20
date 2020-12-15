@@ -1,0 +1,60 @@
+#! /bin/sh
+#  /*@@
+#    @file    solaris
+#    @date    Mon May 8 11:56:45 2000
+#    @author  Tom Goodale
+#    @desc
+#             General architecture options for Solaris machines
+#    @enddesc
+#    @version $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/known-architectures/solaris,v 1.14 2007-06-23 23:14:11 schnetter Exp $
+#  @@*/
+
+if test "$CCTK_CONFIG_STAGE" = "preferred-compilers" ; then
+
+  : ${CC='cc'}
+  : ${CXX='CC'}
+
+else
+
+#  if test "x$F90" = 'xf90'; then
+    f90_path="`which  $F90 | sed -e 's:/bin/f90::'`"
+    SOLARIS_F90_LIBDIR="`find $f90_path -name 'libfsu.*' -follow -print | tail -1 | grep lib/libfsu | sed -e 's:/libfsu.*::'`"
+    if test -n "$SOLARIS_F90_LIBDIR"; then
+       if  [ `uname -m` -eq 'i86pc' ]
+       then
+         SOLARIS_F90_LIBS='fsu fai fui sunmath mvec'      
+       else
+         SOLARIS_F90_LIBS='fsu fsumai fminvai fmaxvai fai sunmath mvec'
+       fi
+    fi
+#  fi
+
+  : ${LIBS="socket nsl $SOLARIS_F90_LIBS m ucb"}
+  if test -d /usr/ucblib ; then
+    : ${LIBDIRS="/usr/ucblib $SOLARIS_F90_LIBDIR"}
+  else
+    : ${LIBDIRS="/usr/ucb $SOLARIS_F90_LIBDIR"}
+  fi
+
+
+  : ${C_DEPEND='$(CPP) -M $(CPPFLAGS) $(CFLAGS)'}
+  : ${CXX_DEPEND='$(CPP) -M $(CPPFLAGS) $(CXXFLAGS)'}
+
+  if test "`basename $CC`" = 'cc' ; then
+    : ${C_OPTIMISE_FLAGS='-fast'}
+  fi
+  if test "`basename $CXX`" = 'CC' ; then
+    : ${CXX_OPTIMISE_FLAGS='-fast'}
+  fi
+  : ${F90_OPTIMISE_FLAGS='-fast'}
+  : ${F77_OPTIMISE_FLAGS='-fast'}
+
+# MPI stuff
+
+  if test -n "$MPI" ; then
+    NATIVE_MPI_LIBS='mpi'
+    NATIVE_MPI_LIB_DIRS='/opt/SUNWhpc/lib'
+    NATIVE_MPI_INC_DIRS='/opt/SUNWhpc/include'
+  fi
+
+fi

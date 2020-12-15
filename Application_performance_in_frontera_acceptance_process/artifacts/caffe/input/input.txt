@@ -1,0 +1,5 @@
+The input files are about ~26 GB big. They are at
+
+/scratch/00946/zzhang/stampede2/caffe-knl/caffe-intel-mkldnn-mpi/examples/imagenet/ilsvrc12_train_small_lmdb/data.mdb
+/scratch/00946/zzhang/stampede2/caffe-knl/caffe-intel-mkldnn-mpi/examples/imagenet/ilsvrc12_val_small_lmdb/data.mdb 
+/scratch/00946/zzhang/stampede2/caffe-knl/caffe-intel-mkldnn-mpi/data/ilsvrc12/imagenet_mean_small.binaryproto 

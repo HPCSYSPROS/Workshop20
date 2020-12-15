@@ -1,0 +1,65 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+echo "Checking:"
+pwd
+hostname
+date
+
+# This is necessary for the HDF5 installation, which requires that libimf be found
+export LD_LIBRARY_PATH=/cluster/Compiler/Intel/ics_2013.1.039/lib/intel64:$LD_LIBRARY_PATH
+echo "Environment:"
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export GMON_OUT_PREFIX=gmon.out
+export OMP_NUM_THREADS=@NUM_THREADS@
+export MPIDIR=/cluster/openmpi/SL6/1.7.2/intel14
+
+if [ ! -z "$MPI_NODEFILE" ]; then
+    cat ${MPI_NODEFILE} > SIMFACTORY/NODES
+    export MPI_NODEFILE=${TMPDIR}/machines
+
+    uniq ${MPI_NODEFILE} > PROC_NODES
+
+    for node in $(cat PROC_NODES); do
+        for (( proc=0; $proc<@(@PPN_USED@/@NUM_THREADS@)@; proc=$proc+1)); do
+            echo ${node}
+        done
+    done > ${MPI_NODEFILE}
+fi
+
+env | sort > SIMFACTORY/ENVIRONMENT
+
+echo "Job setup:"
+echo "   Allocated:"
+echo "      Nodes:                      @NODES@"
+echo "      Cores per node:             @PPN@"
+echo "   Running:"
+echo "      MPI processes:              @NUM_PROCS@"
+echo "      OpenMP threads per process: @NUM_THREADS@"
+echo "      MPI processes per node:     @(1.0*@NUM_PROCS@/@NODES@)@"
+echo "      OpenMP threads per core:    @(1.0*(@NUM_PROCS@*@NUM_THREADS@)/(@NODES@*@PPN@))@"
+echo "      OpenMP threads per node:    @PPN_USED@"
+
+#case '@PPN_USED@:@NUM_THREADS@' in
+#    (12:12|6:6|4:4|3:3|2:2|1:1) options='-npernode 1 -bind-to-none';;
+#    (12:6|6:3|4:2|2:1)          options='-npersocket 1 -bind-to-socket';;
+#    (12:3|4:1)                  options='-npersocket 2 -bind-to-socket';;
+#    (12:2|6:1)                  options='-npersocket 3 -bind-to-socket';;
+#    (12:1|*)                    options='-npersocket 6 -bind-to-core';;
+#esac
+
+export CACTUS_STARTTIME=$(date +%s)
+echo "Starting:"
+#time ${MPIDIR}/bin/mpirun -v --mca btl openib,self --mca mpi_leave_pinned 0 -np @NUM_PROCS@ $options -display-map -report-bindings @EXECUTABLE@ -L 3 @PARFILE@
+time ${MPIDIR}/bin/mpirun -v --mca btl openib,self --mca mpi_leave_pinned 0 -np @NUM_PROCS@ -npernode @(@PPN_USED@/@NUM_THREADS@)@ @EXECUTABLE@ -L 3 @PARFILE@
+
+echo "Stopping:"
+date
+
+echo "Done."

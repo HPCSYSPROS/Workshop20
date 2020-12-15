@@ -1,0 +1,664 @@
+* CHARMM27 Custom Topology File
+* Heme for Cytochrome c
+* Felix Autenrieth, Emad Tajkhorshid, Jerome Baudry, Zan Luthey-Schulten; last update 12/19/2005
+* Classical force field parameters for the heme prosthetic group of cytochrome c. 
+* Journal of Computational Chemistry, 25, 1613-1622 (2004)
+* Journal of Physical Chemistry B, 108, 20376-20387 (2004)
+
+31  1
+
+! HEMR contains reduced scaled Mulliken charge set and HEMO contains oxidized scaled Mulliken charge
+! set. Note that these residues are only valid when used in conjunction with one of the patches
+! below to covalently attach the heme to a Cytochrome c molecule. Note: fractional charges are due
+! to charge distribution across the cytochrome covalent linkages. After application of a patch
+! the net charge on the reduced heme/ligand system will be -2 and the next charge on the oxidized
+! heme/ligand system will be -1. 
+
+MASS    90 FE    55.84700 Fe ! heme iron 56
+MASS    60 NPH   14.00700 N ! heme pyrrole N
+MASS    34 CPA   12.01100 C ! heme alpha-C
+MASS    35 CPB   12.01100 C ! heme beta-C
+MASS    36 CPM   12.01100 C ! heme meso-C
+MASS     3 HA     1.00800 H ! nonpolar H
+MASS    22 CT1   12.01100 C ! aliphatic sp3 C for CH
+MASS    23 CT2   12.01100 C ! aliphatic sp3 C for CH2
+MASS    24 CT3   12.01100 C ! aliphatic sp3 C for CH3
+MASS    72 OC    15.99900 O ! carboxylate oxygen
+MASS    32 CC    12.01100 C ! carbonyl C, asn,asp,gln,glu,cter,ct2
+MASS    51 NR1   14.00700 N ! neutral his protonated ring nitrogen
+MASS    25 CPH1  12.01100 C ! his CG and CD2 carbons
+MASS     1 H      1.00800 H ! polar H
+MASS    51 NR1   14.00700 N ! neutral his protonated ring nitrogen
+MASS    52 NR2   14.00700 N ! neutral his unprotonated ring nitrogen
+MASS    53 NR3   14.00700 N ! charged his ring nitrogen
+MASS     7 HR1    1.00800 H ! his he1, (+) his HG,HD2
+MASS     8 HR2    1.00800 H ! (+) his HE1
+MASS     9 HR3    1.00800 H ! neutral his HG, HD2
+MASS    10 HS     1.00800 H ! thiol hydrogen
+MASS    81 S     32.06000 S ! sulphur
+MASS    82 SM    32.06000 S ! sulfur C-S-S-C type
+MASS    83 SS    32.06000 S ! thiolate sulfur
+MASS     3 HA     1.00800 H ! nonpolar H
+
+!AUTO ANGLES DIHE
+
+RESI HEMR        -2.20 ! 6-liganded planar heme in reduced state.
+GROUP   
+ATOM FE   FE      1.20 !       O2A   O1A             O2D  O1D
+ATOM NA   NPH    -0.76 !         \\ //                 \\ //
+ATOM NB   NPH    -0.76 !          CGA                   CGD
+ATOM NC   NPH    -0.76 !           |                     |
+ATOM ND   NPH    -0.76 !    HBA1--CBA--HBA2  HA   HBD1--CBD--HBD2
+ATOM C1A  CPA     0.32 !           |          |          |
+ATOM C2A  CPB     0.07 !    HAA1--CAA-HAA2  _CHA_ HAD1--CAD--HAD2
+ATOM C3A  CPB     0.07 !           |       /     \       |
+ATOM C4A  CPA     0.32 !          C2A---C1A       C4D---C3D
+ATOM C1B  CPA     0.32 !           |     |         |     |
+ATOM C2B  CPB     0.07 !HMA1\      |     |         |     |      /HMD1
+ATOM C3B  CPB     0.07 !HMA2-CMA--C3A    NA       ND    C2D--CMD-HMD2
+ATOM C4B  CPA     0.32 !HMA3/       \   / \       / \   /       \HMD3
+ATOM C1C  CPA     0.32 !             C4A   \     /   C1D
+ATOM C2C  CPB     0.07 !            /       \   /       \
+ATOM C3C  CPB     0.07 !      HB--CHB        FE         CHD--HD
+ATOM C4C  CPA     0.32 !            \       /   \       /
+ATOM C1D  CPA     0.32 !             C1B   /     \   C4C        HAC
+ATOM C2D  CPB     0.07 !HMB1\       /   \ /       \ /   \       /
+ATOM C3D  CPB     0.07 !HMB2-CMB--C2B    NB       NC    C3C--CAC
+ATOM C4D  CPA     0.32 !HMB3/      |     |         |     |     \   /HBC1
+GROUP                  !           |     |         |     |      CBC-HBC2
+ATOM CHA  CPM    -0.31 !          C3B---C4B       C1C---C2C        \HBC3
+ATOM HA   HA      0.12 !           |       \_CHC_/       |
+GROUP                  !          CAB         |         CMC--HMC3
+ATOM CHB  CPM    -0.31 !         /   \        HC       /  | 
+ATOM HB   HA      0.12 !   HBB3-CBB  HAB           HMC1  HMC2
+GROUP                  !       /   \
+ATOM CHC  CPM    -0.31 !    HBB1  HBB2
+ATOM HC   HA      0.12 !
+GROUP   
+ATOM CHD  CPM    -0.31
+ATOM HD   HA      0.12
+GROUP   
+ATOM CMA  CT3    -0.37
+ATOM HMA1 HA      0.09
+ATOM HMA2 HA      0.09
+ATOM HMA3 HA      0.09
+GROUP   
+ATOM CAA  CT2    -0.30
+ATOM HAA1 HA      0.09
+ATOM HAA2 HA      0.09
+GROUP   
+ATOM CBA  CT2    -0.30
+ATOM HBA1 HA      0.09
+ATOM HBA2 HA      0.09
+ATOM CGA  CC      0.72
+ATOM O1A  OC     -0.74
+ATOM O2A  OC     -0.74
+GROUP   
+ATOM CMB  CT3    -0.37
+ATOM HMB1 HA      0.09
+ATOM HMB2 HA      0.09
+ATOM HMB3 HA      0.09
+GROUP   
+ATOM CAB  CT1    -0.32
+ATOM HAB  HA      0.16
+GROUP   
+ATOM CBB  CT3    -0.27
+ATOM HBB1 HA      0.09
+ATOM HBB2 HA      0.09
+ATOM HBB3 HA      0.09
+GROUP   
+ATOM CMC  CT3    -0.37
+ATOM HMC1 HA      0.09
+ATOM HMC2 HA      0.09
+ATOM HMC3 HA      0.09
+GROUP   
+ATOM CAC  CT1    -0.32
+ATOM HAC  HA      0.16
+GROUP   
+ATOM CBC  CT3    -0.27
+ATOM HBC1 HA      0.09
+ATOM HBC2 HA      0.09
+ATOM HBC3 HA      0.09
+GROUP   
+ATOM CMD  CT3    -0.37
+ATOM HMD1 HA      0.09
+ATOM HMD2 HA      0.09
+ATOM HMD3 HA      0.09
+GROUP   
+ATOM CAD  CT2    -0.30
+ATOM HAD1 HA      0.09
+ATOM HAD2 HA      0.09
+GROUP   
+ATOM CBD  CT2    -0.30
+ATOM HBD1 HA      0.09
+ATOM HBD2 HA      0.09
+ATOM CGD  CC      0.72
+ATOM O1D  OC     -0.74
+ATOM O2D  OC     -0.74
+BOND FE  NA    FE  NB    FE  NC    FE  ND    NA  C1A   
+BOND C1A C2A   C2A C3A   C3A C4A   NA  C4A   C2A CAA   
+BOND CAA CBA   CBA CGA   CGA O1A   CGA O2A   C3A CMA   
+BOND CHB C4A   CHB C1B   NB  C1B   C1B C2B   C2B C3B   
+BOND C3B C4B   NB  C4B   C2B CMB   C3B CAB   CAB CBB   
+BOND CHC C4B   CHC C1C   NC  C1C   C1C C2C   C2C C3C   
+BOND C3C C4C   NC  C4C   C2C CMC   C3C CAC   CAC CBC   
+BOND CHD C4C   CHD C1D   ND  C1D   C1D C2D   C2D C3D   
+BOND C3D C4D   ND  C4D   C2D CMD   C3D CAD   CAD CBD   
+BOND CBD CGD   CGD O1D   CGD O2D   CHA C4D   CHA C1A   
+BOND CHA HA    CHB HB    CHC HC    CHD HD   
+BOND CAA HAA1  CAA HAA2  CBA HBA1  CBA HBA2   
+BOND CMA HMA1  CMA HMA2  CMA HMA3   
+BOND CMB HMB1  CMB HMB2  CMB HMB3   
+BOND CAB HAB   CBB HBB1  CBB HBB2  CBB HBB3
+BOND CMC HMC1  CMC HMC2  CMC HMC3   
+BOND CAC HAC   CBC HBC1  CBC HBC2  CBC HBC3 
+BOND CMD HMD1  CMD HMD2  CMD HMD3   
+BOND CAD HAD1  CAD HAD2  CBD HBD1  CBD HBD2   
+IMPR C2A C1A C3A CAA  C3A C2A C4A CMA  C2B C1B C3B CMB   
+IMPR C3B C2B C4B CAB  C2C C1C C3C CMC  C3C C2C C4C CAC   
+IMPR C2D C1D C3D CMD  C3D C2D C4D CAD  
+IMPR CGA CBA O2A O1A  CGD CBD O2D O1D
+IMPR C4A NA C1A C2A  C1A NA C4A C3A   
+IMPR C4B NB C1B C2B  C1B NB C4B C3B   
+IMPR C4C NC C1C C2C  C1C NC C4C C3C   
+IMPR C4D ND C1D C2D  C1D ND C4D C3D   
+IMPR NA C1A C2A C3A  NA C4A C3A C2A   
+IMPR NB C1B C2B C3B  NB C4B C3B C2B   
+IMPR NC C1C C2C C3C  NC C4C C3C C2C   
+IMPR ND C1D C2D C3D  ND C4D C3D C2D   
+IMPR NA C1A CHA C4D  NA C4A CHB C1B   
+IMPR NB C1B CHB C4A  NB C4B CHC C1C   
+IMPR NC C1C CHC C4B  NC C4C CHD C1D   
+IMPR ND C1D CHD C4C  ND C4D CHA C1A   
+IMPR CHA C1A C4D HA   
+IMPR CHB C1B C4A HB   
+IMPR CHC C1C C4B HC   
+IMPR CHD C1D C4C HD   
+IMPR C1A C2A CHA NA  C4A C3A CHB NA   
+IMPR C1B C2B CHB NB  C4B C3B CHC NB   
+IMPR C1C C2C CHC NC  C4C C3C CHD NC   
+IMPR C1D C2D CHD ND  C4D C3D CHA ND   
+IMPR NA C1A C4A FE   
+IMPR NB C1B C4B FE   
+IMPR NC C1C C4C FE   
+IMPR ND C1D C4D FE   
+!IMPR CAB CBB C3B HAB  HAB CAB CBB HBB2  CAB CBB HBB2 HBB1   
+!IMPR CAC CBC C3C HAC  HAC CAC CBC HBC2  CAC CBC HBC2 HBC1   
+ACCEPTOR NA   
+ACCEPTOR O1A    ! CGA
+ACCEPTOR O2A    ! CGA
+ACCEPTOR NB   
+ACCEPTOR NC   
+ACCEPTOR ND   
+ACCEPTOR O1D    ! CGD
+ACCEPTOR O2D    ! CGD
+IC FE   NA   C4A  C3A   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C3A  C4A  NA   C1A   0.0000  0.0000    0.0000  0.0000  0.0000
+IC FE   NA   C1A  C2A   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C4A  NA   FE   NB    0.0000  0.0000    0.0000  0.0000  0.0000
+IC NA   FE   NB   C1B   0.0000  0.0000    0.0000  0.0000  0.0000
+IC FE   NB   C1B  C2B   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C2B  C1B  NB   C4B   0.0000  0.0000    0.0000  0.0000  0.0000
+IC FE   NB   C4B  C3B   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C4B  NB   FE   NC    0.0000  0.0000    0.0000  0.0000  0.0000
+IC NB   FE   NC   C1C   0.0000  0.0000    0.0000  0.0000  0.0000
+IC FE   NC   C1C  C2C   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C2C  C1C  NC   C4C   0.0000  0.0000    0.0000  0.0000  0.0000
+IC FE   NC   C4C  C3C   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C4C  NC   FE   ND    0.0000  0.0000    0.0000  0.0000  0.0000
+IC NC   FE   ND   C1D   0.0000  0.0000    0.0000  0.0000  0.0000
+IC FE   ND   C1D  C2D   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C2D  C1D  ND   C4D   0.0000  0.0000    0.0000  0.0000  0.0000
+IC FE   ND   C4D  C3D   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C4A  NA   FE   CHB   0.0000  0.0000    0.0000  0.0000  0.0000
+IC NA   FE   CHB  HB    0.0000  0.0000    0.0000  0.0000  0.0000
+IC C4B  NB   FE   CHC   0.0000  0.0000    0.0000  0.0000  0.0000
+IC NB   FE   CHC  HC    0.0000  0.0000    0.0000  0.0000  0.0000
+IC C4C  NC   FE   CHD   0.0000  0.0000    0.0000  0.0000  0.0000
+IC NC   FE   CHD  HD    0.0000  0.0000    0.0000  0.0000  0.0000
+IC C4D  ND   FE   CHA   0.0000  0.0000    0.0000  0.0000  0.0000
+IC ND   FE   CHA  HA    0.0000  0.0000    0.0000  0.0000  0.0000
+IC C3B  C1B  *C2B CMB   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C4B  C2B  *C3B CAB   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C2B  C3B  CAB  CBB   0.0000  0.0000  -45.0000  0.0000  0.0000 ! PREVENTS VINYL COLLISION
+IC CHC  C1C  C2C  CMC   0.0000  0.0000    0.0000  0.0000  0.0000
+IC C4C  C2C  *C3C CAC   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C2C  C3C  CAC  CBC   0.0000  0.0000  -45.0000  0.0000  0.0000 ! PREVENTS VINYL COLLISION
+IC C4D  C2D  *C3D CAD   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C3D  C1D  *C2D CMD   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C2D  C3D  CAD  CBD   0.0000  0.0000 -120.0000  0.0000  0.0000
+IC C3D  CAD  CBD  CGD   0.0000  0.0000  180.0000  0.0000  0.0000
+IC CAD  CBD  CGD  O1D   0.0000  0.0000    0.0000  0.0000  0.0000
+IC CAD  CBD  CGD  O2D   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C4A  C2A  *C3A CMA   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C3A  C1A  *C2A CAA   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C1A  C2A  CAA  CBA   0.0000  0.0000  120.0000  0.0000  0.0000
+IC C2A  CAA  CBA  CGA   0.0000  0.0000  180.0000  0.0000  0.0000
+IC CAA  CBA  CGA  O1A   0.0000  0.0000    0.0000  0.0000  0.0000
+IC CAA  CBA  CGA  O2A   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C3C  C1C  *C2C CMC   0.0000  0.0000  180.0000  0.0000  0.0000
+IC CBA  O1A  *CGA O2A   0.0000  0.0000  180.0000  0.0000  0.0000
+IC CBD  O1D  *CGD O2D   0.0000  0.0000  180.0000  0.0000  0.0000
+IC HMA1 CMA  C2A  C1A   1.1000  109.5	  0.0     124.64  1.58 
+IC HMA2 CMA  C2A  C1A   1.1000  109.5	120.0     124.64  1.58 
+IC HMA3 CMA  C2A  C1A   1.1000  109.5	240.0     124.64  1.58 
+IC HMB1 CMB  C2B  C1B   1.1000  109.5	  0.0     124.64  1.58 
+IC HMB2 CMB  C2B  C1B   1.1000  109.5	120.0     124.64  1.58 
+IC HMB3 CMB  C2B  C1B   1.1000  109.5	240.0     124.64  1.58 
+IC HMC1 CMC  C2C  C1C   1.1000  109.5	  0.0     124.64  1.58 
+IC HMC2 CMC  C2C  C1C   1.1000  109.5	120.0     124.64  1.58 
+IC HMC3 CMC  C2C  C1C   1.1000  109.5	240.0     124.64  1.58 
+IC HMD1 CMD  C2D  C1D   1.1000  109.5	  0.0     124.64  1.58 
+IC HMD2 CMD  C2D  C1D   1.1000  109.5	120.0     124.64  1.58 
+IC HMD3 CMD  C2D  C1D   1.1000  109.5	240.0     124.64  1.58 
+IC HAA1 CAA  C2A  C3A   1.1000  109.5     0.0     127.34  1.58 
+IC HAA2 CAA  C2A  C3A   1.1000  109.5   180.0     127.34  1.58 	
+IC HBA1 CBA  CAA  C2A   1.1000  109.5     0.0     116.64  1.58 	
+IC HBA2 CBA  CAA  C2A   1.1000  109.5   180.0     116.64  1.58 
+IC HAD1 CAD  C2D  C3D   1.1000  109.5     0.0     127.34  1.58 
+IC HAD2 CAD  C2D  C3D   1.1000  109.5   180.0     127.34  1.58 	
+IC HBD1 CBD  CAD  C2D   1.1000  109.5     0.0     116.64  1.58 	
+IC HBD2 CBD  CAD  C2D   1.1000  109.5   180.0     116.64  1.58 
+IC HAC  CAC  C3C  C4C   1.1000  109.5     0.0     122.90  1.58 
+IC HBC1 CBC  CAC  C3C   1.1000  109.5     0.0     125.00  1.58 
+IC HBC2 CBC  CAC  C3C   1.1000  109.5   120.0     125.00  1.58 
+IC HBC3 CBC  CAC  C3C   1.1000  109.5   240.0     125.00  1.58
+IC CBC  HBC2 *CBC HBC1  1.1000  109.5     0.0     125.00  1.58 
+IC HAB  CAB  C3B  C4B   1.1000  109.5     0.0     122.90  1.58 
+IC HBB1 CBB  CAB  C3B   1.1100  109.5     0.0     118.00  1.58 
+IC HBB2 CBB  CAB  C3B   1.1100  109.5   120.0     118.00  1.58 
+IC HBB3 CBB  CAB  C3B   1.1100  109.5   240.0     118.00  1.58 
+IC CAB  HBB2 *CBB  HBB1  1.1000  109.5   180.0    120.00  1.58
+
+RESI HEMO        -1.44 ! 6-liganded planar heme in oxidized state.
+GROUP   
+ATOM FE   FE      1.34 !       O2A   O1A             O2D  O1D
+ATOM NA   NPH    -0.76 !         \\ //                 \\ //
+ATOM NB   NPH    -0.76 !          CGA                   CGD
+ATOM NC   NPH    -0.76 !           |                     |
+ATOM ND   NPH    -0.76 !    HBA1--CBA--HBA2  HA   HBD1--CBD--HBD2
+ATOM C1A  CPA     0.32 !           |          |          |
+ATOM C2A  CPB     0.07 !    HAA1--CAA-HAA2  _CHA_ HAD1--CAD--HAD2
+ATOM C3A  CPB     0.07 !           |       /     \       |
+ATOM C4A  CPA     0.32 !          C2A---C1A       C4D---C3D
+ATOM C1B  CPA     0.32 !           |     |         |     |
+ATOM C2B  CPB     0.07 !HMA1\      |     |         |     |      /HMD1
+ATOM C3B  CPB     0.07 !HMA2-CMA--C3A    NA       ND    C2D--CMD-HMD2
+ATOM C4B  CPA     0.32 !HMA3/       \   / \       / \   /       \HMD3
+ATOM C1C  CPA     0.32 !             C4A   \     /   C1D
+ATOM C2C  CPB     0.07 !            /       \   /       \
+ATOM C3C  CPB     0.07 !      HB--CHB        FE         CHD--HD
+ATOM C4C  CPA     0.32 !            \       /   \       /
+ATOM C1D  CPA     0.32 !             C1B   /     \   C4C        HAC
+ATOM C2D  CPB     0.07 !HMB1\       /   \ /       \ /   \       /
+ATOM C3D  CPB     0.07 !HMB2-CMB--C2B    NB       NC    C3C--CAC
+ATOM C4D  CPA     0.32 !HMB3/      |     |         |     |     \   /HBC1
+GROUP                  !           |     |         |     |      CBC-HBC2
+ATOM CHA  CPM    -0.29 !          C3B---C4B       C1C---C2C        \HBC3
+ATOM HA   HA      0.13 !           |       \_CHC_/       |
+GROUP                  !          CAB         |         CMC--HMC3
+ATOM CHB  CPM    -0.29 !         /   \        HC       /  | 
+ATOM HB   HA      0.13 !   HBB3-CBB  HAB           HMC1  HMC2
+GROUP                  !       /   \
+ATOM CHC  CPM    -0.29 !    HBB1  HBB2
+ATOM HC   HA      0.13 !
+GROUP   
+ATOM CHD  CPM    -0.29
+ATOM HD   HA      0.13
+GROUP   
+ATOM CMA  CT3    -0.34
+ATOM HMA1 HA      0.09
+ATOM HMA2 HA      0.09
+ATOM HMA3 HA      0.09
+GROUP   
+ATOM CAA  CT2    -0.27
+ATOM HAA1 HA      0.09
+ATOM HAA2 HA      0.09
+GROUP   
+ATOM CBA  CT2    -0.25
+ATOM HBA1 HA      0.09
+ATOM HBA2 HA      0.09
+ATOM CGA  CC      0.63
+ATOM O1A  OC     -0.64
+ATOM O2A  OC     -0.64
+GROUP   
+ATOM CMB  CT3    -0.34
+ATOM HMB1 HA      0.09
+ATOM HMB2 HA      0.09
+ATOM HMB3 HA      0.09
+GROUP   
+ATOM CAB  CT1    -0.34
+ATOM HAB  HA      0.16
+GROUP   
+ATOM CBB  CT3    -0.25
+ATOM HBB1 HA      0.09
+ATOM HBB2 HA      0.09
+ATOM HBB3 HA      0.09
+GROUP   
+ATOM CMC  CT3    -0.34
+ATOM HMC1 HA      0.09
+ATOM HMC2 HA      0.09
+ATOM HMC3 HA      0.09
+GROUP   
+ATOM CAC  CT1    -0.34
+ATOM HAC  HA      0.16
+GROUP   
+ATOM CBC  CT3    -0.25
+ATOM HBC1 HA      0.09
+ATOM HBC2 HA      0.09
+ATOM HBC3 HA      0.09
+GROUP   
+ATOM CMD  CT3    -0.34
+ATOM HMD1 HA      0.09
+ATOM HMD2 HA      0.09
+ATOM HMD3 HA      0.09
+GROUP   
+ATOM CAD  CT2    -0.27
+ATOM HAD1 HA      0.09
+ATOM HAD2 HA      0.09
+GROUP   
+ATOM CBD  CT2    -0.25
+ATOM HBD1 HA      0.09
+ATOM HBD2 HA      0.09
+ATOM CGD  CC      0.63
+ATOM O1D  OC     -0.64
+ATOM O2D  OC     -0.64
+BOND FE  NA    FE  NB    FE  NC    FE  ND    NA  C1A   
+BOND C1A C2A   C2A C3A   C3A C4A   NA  C4A   C2A CAA   
+BOND CAA CBA   CBA CGA   CGA O1A   CGA O2A   C3A CMA   
+BOND CHB C4A   CHB C1B   NB  C1B   C1B C2B   C2B C3B   
+BOND C3B C4B   NB  C4B   C2B CMB   C3B CAB   CAB CBB   
+BOND CHC C4B   CHC C1C   NC  C1C   C1C C2C   C2C C3C   
+BOND C3C C4C   NC  C4C   C2C CMC   C3C CAC   CAC CBC   
+BOND CHD C4C   CHD C1D   ND  C1D   C1D C2D   C2D C3D   
+BOND C3D C4D   ND  C4D   C2D CMD   C3D CAD   CAD CBD   
+BOND CBD CGD   CGD O1D   CGD O2D   CHA C4D   CHA C1A   
+BOND CHA HA    CHB HB    CHC HC    CHD HD   
+BOND CAA HAA1  CAA HAA2  CBA HBA1  CBA HBA2   
+BOND CMA HMA1  CMA HMA2  CMA HMA3   
+BOND CMB HMB1  CMB HMB2  CMB HMB3   
+BOND CAB HAB   CBB HBB1  CBB HBB2  CBB HBB3
+BOND CMC HMC1  CMC HMC2  CMC HMC3   
+BOND CAC HAC   CBC HBC1  CBC HBC2  CBC HBC3 
+BOND CMD HMD1  CMD HMD2  CMD HMD3   
+BOND CAD HAD1  CAD HAD2  CBD HBD1  CBD HBD2   
+IMPR C2A C1A C3A CAA  C3A C2A C4A CMA  C2B C1B C3B CMB   
+IMPR C3B C2B C4B CAB  C2C C1C C3C CMC  C3C C2C C4C CAC   
+IMPR C2D C1D C3D CMD  C3D C2D C4D CAD  
+IMPR CGA CBA O2A O1A  CGD CBD O2D O1D
+IMPR C4A NA C1A C2A  C1A NA C4A C3A   
+IMPR C4B NB C1B C2B  C1B NB C4B C3B   
+IMPR C4C NC C1C C2C  C1C NC C4C C3C   
+IMPR C4D ND C1D C2D  C1D ND C4D C3D   
+IMPR NA C1A C2A C3A  NA C4A C3A C2A   
+IMPR NB C1B C2B C3B  NB C4B C3B C2B   
+IMPR NC C1C C2C C3C  NC C4C C3C C2C   
+IMPR ND C1D C2D C3D  ND C4D C3D C2D   
+IMPR NA C1A CHA C4D  NA C4A CHB C1B   
+IMPR NB C1B CHB C4A  NB C4B CHC C1C   
+IMPR NC C1C CHC C4B  NC C4C CHD C1D   
+IMPR ND C1D CHD C4C  ND C4D CHA C1A   
+IMPR CHA C1A C4D HA   
+IMPR CHB C1B C4A HB   
+IMPR CHC C1C C4B HC   
+IMPR CHD C1D C4C HD   
+IMPR C1A C2A CHA NA  C4A C3A CHB NA   
+IMPR C1B C2B CHB NB  C4B C3B CHC NB   
+IMPR C1C C2C CHC NC  C4C C3C CHD NC   
+IMPR C1D C2D CHD ND  C4D C3D CHA ND   
+IMPR NA C1A C4A FE   
+IMPR NB C1B C4B FE   
+IMPR NC C1C C4C FE   
+IMPR ND C1D C4D FE   
+!IMPR CAB CBB C3B HAB  HAB CAB CBB HBB2  CAB CBB HBB2 HBB1   
+!IMPR CAC CBC C3C HAC  HAC CAC CBC HBC2  CAC CBC HBC2 HBC1   
+ACCEPTOR NA   
+ACCEPTOR O1A    ! CGA
+ACCEPTOR O2A    ! CGA
+ACCEPTOR NB   
+ACCEPTOR NC   
+ACCEPTOR ND   
+ACCEPTOR O1D    ! CGD
+ACCEPTOR O2D    ! CGD
+IC FE   NA   C4A  C3A   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C3A  C4A  NA   C1A   0.0000  0.0000    0.0000  0.0000  0.0000
+IC FE   NA   C1A  C2A   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C4A  NA   FE   NB    0.0000  0.0000    0.0000  0.0000  0.0000
+IC NA   FE   NB   C1B   0.0000  0.0000    0.0000  0.0000  0.0000
+IC FE   NB   C1B  C2B   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C2B  C1B  NB   C4B   0.0000  0.0000    0.0000  0.0000  0.0000
+IC FE   NB   C4B  C3B   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C4B  NB   FE   NC    0.0000  0.0000    0.0000  0.0000  0.0000
+IC NB   FE   NC   C1C   0.0000  0.0000    0.0000  0.0000  0.0000
+IC FE   NC   C1C  C2C   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C2C  C1C  NC   C4C   0.0000  0.0000    0.0000  0.0000  0.0000
+IC FE   NC   C4C  C3C   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C4C  NC   FE   ND    0.0000  0.0000    0.0000  0.0000  0.0000
+IC NC   FE   ND   C1D   0.0000  0.0000    0.0000  0.0000  0.0000
+IC FE   ND   C1D  C2D   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C2D  C1D  ND   C4D   0.0000  0.0000    0.0000  0.0000  0.0000
+IC FE   ND   C4D  C3D   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C4A  NA   FE   CHB   0.0000  0.0000    0.0000  0.0000  0.0000
+IC NA   FE   CHB  HB    0.0000  0.0000    0.0000  0.0000  0.0000
+IC C4B  NB   FE   CHC   0.0000  0.0000    0.0000  0.0000  0.0000
+IC NB   FE   CHC  HC    0.0000  0.0000    0.0000  0.0000  0.0000
+IC C4C  NC   FE   CHD   0.0000  0.0000    0.0000  0.0000  0.0000
+IC NC   FE   CHD  HD    0.0000  0.0000    0.0000  0.0000  0.0000
+IC C4D  ND   FE   CHA   0.0000  0.0000    0.0000  0.0000  0.0000
+IC ND   FE   CHA  HA    0.0000  0.0000    0.0000  0.0000  0.0000
+IC C3B  C1B  *C2B CMB   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C4B  C2B  *C3B CAB   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C2B  C3B  CAB  CBB   0.0000  0.0000  -45.0000  0.0000  0.0000 ! PREVENTS VINYL COLLISION
+IC CHC  C1C  C2C  CMC   0.0000  0.0000    0.0000  0.0000  0.0000
+IC C4C  C2C  *C3C CAC   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C2C  C3C  CAC  CBC   0.0000  0.0000  -45.0000  0.0000  0.0000 ! PREVENTS VINYL COLLISION
+IC C4D  C2D  *C3D CAD   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C3D  C1D  *C2D CMD   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C2D  C3D  CAD  CBD   0.0000  0.0000 -120.0000  0.0000  0.0000
+IC C3D  CAD  CBD  CGD   0.0000  0.0000  180.0000  0.0000  0.0000
+IC CAD  CBD  CGD  O1D   0.0000  0.0000    0.0000  0.0000  0.0000
+IC CAD  CBD  CGD  O2D   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C4A  C2A  *C3A CMA   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C3A  C1A  *C2A CAA   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C1A  C2A  CAA  CBA   0.0000  0.0000  120.0000  0.0000  0.0000
+IC C2A  CAA  CBA  CGA   0.0000  0.0000  180.0000  0.0000  0.0000
+IC CAA  CBA  CGA  O1A   0.0000  0.0000    0.0000  0.0000  0.0000
+IC CAA  CBA  CGA  O2A   0.0000  0.0000  180.0000  0.0000  0.0000
+IC C3C  C1C  *C2C CMC   0.0000  0.0000  180.0000  0.0000  0.0000
+IC CBA  O1A  *CGA O2A   0.0000  0.0000  180.0000  0.0000  0.0000
+IC CBD  O1D  *CGD O2D   0.0000  0.0000  180.0000  0.0000  0.0000
+IC HMA1 CMA  C2A  C1A   1.1000  109.5	  0.0     124.64  1.58 
+IC HMA2 CMA  C2A  C1A   1.1000  109.5	120.0     124.64  1.58 
+IC HMA3 CMA  C2A  C1A   1.1000  109.5	240.0     124.64  1.58 
+IC HMB1 CMB  C2B  C1B   1.1000  109.5	  0.0     124.64  1.58 
+IC HMB2 CMB  C2B  C1B   1.1000  109.5	120.0     124.64  1.58 
+IC HMB3 CMB  C2B  C1B   1.1000  109.5	240.0     124.64  1.58 
+IC HMC1 CMC  C2C  C1C   1.1000  109.5	  0.0     124.64  1.58 
+IC HMC2 CMC  C2C  C1C   1.1000  109.5	120.0     124.64  1.58 
+IC HMC3 CMC  C2C  C1C   1.1000  109.5	240.0     124.64  1.58 
+IC HMD1 CMD  C2D  C1D   1.1000  109.5	  0.0     124.64  1.58 
+IC HMD2 CMD  C2D  C1D   1.1000  109.5	120.0     124.64  1.58 
+IC HMD3 CMD  C2D  C1D   1.1000  109.5	240.0     124.64  1.58 
+IC HAA1 CAA  C2A  C3A   1.1000  109.5     0.0     127.34  1.58 
+IC HAA2 CAA  C2A  C3A   1.1000  109.5   180.0     127.34  1.58 	
+IC HBA1 CBA  CAA  C2A   1.1000  109.5     0.0     116.64  1.58 	
+IC HBA2 CBA  CAA  C2A   1.1000  109.5   180.0     116.64  1.58 
+IC HAD1 CAD  C2D  C3D   1.1000  109.5     0.0     127.34  1.58 
+IC HAD2 CAD  C2D  C3D   1.1000  109.5   180.0     127.34  1.58 	
+IC HBD1 CBD  CAD  C2D   1.1000  109.5     0.0     116.64  1.58 	
+IC HBD2 CBD  CAD  C2D   1.1000  109.5   180.0     116.64  1.58 
+IC HAC  CAC  C3C  C4C   1.1000  109.5     0.0     122.90  1.58 
+IC HBC1 CBC  CAC  C3C   1.1000  109.5     0.0     125.00  1.58 
+IC HBC2 CBC  CAC  C3C   1.1000  109.5   120.0     125.00  1.58 
+IC HBC3 CBC  CAC  C3C   1.1000  109.5   240.0     125.00  1.58
+IC CBC  HBC2 *CBC HBC1  1.1000  109.5     0.0     125.00  1.58 
+IC HAB  CAB  C3B  C4B   1.1000  109.5     0.0     122.90  1.58 
+IC HBB1 CBB  CAB  C3B   1.1100  109.5     0.0     118.00  1.58 
+IC HBB2 CBB  CAB  C3B   1.1100  109.5   120.0     118.00  1.58 
+IC HBB3 CBB  CAB  C3B   1.1100  109.5   240.0     118.00  1.58 
+IC CAB  HBB2 *CBB  HBB1  1.1000  109.5   180.0    120.00  1.58
+
+
+PRES HRCY        -0.97 ! Patch for REDUCED HEME to Cytochrome c links.
+                       ! Patch residues must be 1:CYS (N-terminal), 2:CYS (C-terminal), 3:HSD, 4:MET
+                       ! and 5:HEMR.
+                       ! Modified by Elijah Roberts 12/9/2005 to include charge redistribution and
+                       ! to be a single patch.
+                       !
+                       ! First (N-terminal) Heme to Cysteine (Thioether bond) portion of patch
+GROUP                  !          
+ATOM 1CB  CT2     0.07 ! -1CB--1SG--5CAB-
+ATOM 1SG  S      -0.27 !
+DELETE ATOM 1HG1
+BOND 1SG 5CAB
+ANGLE 1CB 1SG  5CAB   
+ANGLE 1SG 5CAB 5C3B
+ANGLE 1SG 5CAB 5CBB
+ANGLE 1SG 5CAB 5HAB
+DIHEDRAL 1CB 1SG 5CAB 5C3B     
+DIHEDRAL 1CB 1SG 5CAB 5CBB
+DIHEDRAL 1CB 1SG 5CAB 5HAB
+DIHEDRAL 1CA 1CB 1SG  5CAB
+DIHEDRAL 1HB1 1CB 1SG  5CAB
+DIHEDRAL 1HB2 1CB 1SG  5CAB
+                       !
+                       ! Second (C-terminal) Heme to Cysteine (Thioether bond) portion of patch
+GROUP                  !          
+ATOM 2CB  CT2     0.07 ! -2CB--2SG--5CAC-
+ATOM 2SG  S      -0.27 !
+DELETE ATOM 2HG1
+BOND 2SG 5CAC
+ANGLE 2CB 2SG  5CAC   
+ANGLE 2SG 5CAC 5C3C   
+ANGLE 2SG 5CAC 5CBC
+ANGLE 2SG 5CAC 5HAC
+DIHEDRAL 2CB 2SG 5CAC 5C3C
+DIHEDRAL 2CB 2SG 5CAC 5CBC 
+DIHEDRAL 2CB 2SG 5CAC 5HAC
+DIHEDRAL 2CA 2CB 2SG  5CAC
+DIHEDRAL 2HB1 2CB 2SG  5CAC
+DIHEDRAL 2HB2 2CB 2SG  5CAC
+                       !
+                       ! Heme to Histidine portion of patch
+GROUP                  !
+ATOM 3CB  CT2    -0.25 !          3HD1    3HE1
+ATOM 3ND1 NR1    -0.62 !            |      /
+ATOM 3HD1 H       0.42 !  3HB1    3ND1--3CE1
+ATOM 3CG  CPH1    0.32 !  |      /        ||
+GROUP                  ! -3CB--3CG        ||
+ATOM 3CE1 CPH2    0.23 !  |      \\       ||
+ATOM 3HE1 HR1     0.26 !  3HB2    3CD2--3NE2
+ATOM 3NE2 NR2    -0.49 !            |      \
+ATOM 3CD2 CPH1   -0.05 !          3HD2      5FE-
+ATOM 3HD2 HR3     0.15 !
+DELETE ANGLE 5NA 5FE 5NC  5NB 5FE 5ND 
+BOND 3NE2 5FE   
+ANGLE 3CD2 3NE2 5FE  3CE1 3NE2 5FE  3NE2 5FE 5NA  3NE2 5FE 5NB   
+ANGLE 3NE2 5FE  5NC  3NE2 5FE  5ND   
+IMPR 3NE2 3CD2 3CE1 5FE !add impr for heme/his planarity and heme/met planarity
+IC 3CD2 3NE2 5FE  5NA   0.0000  0.0000    0.0000  0.0000  0.0000
+IC 3CD2 3NE2 5FE  5NB   0.0000  0.0000    0.0000  0.0000  0.0000
+IC 3CD2 3NE2 5FE  5NB   0.0000  0.0000    0.0000  0.0000  0.0000
+IC 3CD2 3NE2 5FE  5NB   0.0000  0.0000    0.0000  0.0000  0.0000
+IC 3CE1 3NE2 5FE  5NA   0.0000  0.0000    0.0000  0.0000  0.0000
+                       !
+                       ! Heme to Methionine (Iron-sulfur bond) portion of patch
+GROUP                  !          
+ATOM 4CB  CT2    -0.18 ! -4CB--4CG--4SD--4CE
+ATOM 4CG  CT2    -0.23 !            |
+ATOM 4SD  S       0.22 !            5FE-
+ATOM 4CE  CT3    -0.35 !
+DELE ANGLE 5NA 5FE 5NC  5NB 5FE 5ND
+BOND 4SD 5FE       
+ANGLE 4CE 4SD 5FE   4CG 4SD 5FE   4SD 5FE 5NA
+ANGLE 4SD 5FE 5NB   4SD 5FE 5NC   4SD 5FE 5ND
+IC 4CE 4SD 5FE  5NA   0.0000  0.0000    0.0000  0.0000  0.0000
+IC 4CE 4SD 5FE  5NB   0.0000  0.0000    0.0000  0.0000  0.0000
+IC 4CE 4SD 5FE  5NB   0.0000  0.0000    0.0000  0.0000  0.0000
+IC 4CE 4SD 5FE  5NB   0.0000  0.0000    0.0000  0.0000  0.0000
+IC 4CG 4SD 5FE  5NA   0.0000  0.0000    0.0000  0.0000  0.0000
+
+
+
+PRES HOCY        -0.73 ! Patch for OXIDIZED HEME to Cytochrome c links.
+                       ! Patch residues must be 1:CYS (N-terminal), 2:CYS (C-terminal), 3:HSD, 4:MET
+                       ! and 5:HEMO.
+                       ! Modified by Elijah Roberts 12/9/2005 to include charge redistribution and
+                       ! to be a single patch.
+                       !
+                       ! First (N-terminal) Heme to Cysteine (Thioether bond) portion of patch
+GROUP                  !          
+ATOM 1CB  CT2     0.07 ! -1CB--1SG--5CAB-
+ATOM 1SG  S      -0.23 !
+DELETE ATOM 1HG1
+BOND 1SG 5CAB
+ANGLE 1CB 1SG  5CAB   
+ANGLE 1SG 5CAB 5C3B
+ANGLE 1SG 5CAB 5CBB
+ANGLE 1SG 5CAB 5HAB
+DIHEDRAL 1CB 1SG 5CAB 5C3B     
+DIHEDRAL 1CB 1SG 5CAB 5CBB
+DIHEDRAL 1CB 1SG 5CAB 5HAB
+DIHEDRAL 1CA 1CB 1SG  5CAB
+DIHEDRAL 1HB1 1CB 1SG  5CAB
+DIHEDRAL 1HB2 1CB 1SG  5CAB
+                       !
+                       ! Second (C-terminal) Heme to Cysteine (Thioether bond) portion of patch
+GROUP                  !          
+ATOM 2CB  CT2     0.07 ! -2CB--2SG--5CAC-
+ATOM 2SG  S      -0.23 !
+DELETE ATOM 2HG1
+BOND 2SG 5CAC
+ANGLE 2CB 2SG  5CAC   
+ANGLE 2SG 5CAC 5C3C   
+ANGLE 2SG 5CAC 5CBC
+ANGLE 2SG 5CAC 5HAC
+DIHEDRAL 2CB 2SG 5CAC 5C3C
+DIHEDRAL 2CB 2SG 5CAC 5CBC 
+DIHEDRAL 2CB 2SG 5CAC 5HAC
+DIHEDRAL 2CA 2CB 2SG  5CAC
+DIHEDRAL 2HB1 2CB 2SG  5CAC
+DIHEDRAL 2HB2 2CB 2SG  5CAC
+                       !
+                       ! Heme to Histidine portion of patch
+GROUP                  !
+ATOM 3CB  CT2    -0.22 !          3HD1    3HE1
+ATOM 3ND1 NR1    -0.61 !            |      /
+ATOM 3HD1 H       0.45 !  3HB1    3ND1--3CE1
+ATOM 3CG  CPH1    0.32 !  |      /        ||
+GROUP                  ! -3CB--3CG        ||
+ATOM 3CE1 CPH2    0.24 !  |      \\       ||
+ATOM 3HE1 HR1     0.27 !  3HB2    3CD2--3NE2
+ATOM 3NE2 NR2    -0.51 !            |      \
+ATOM 3CD2 CPH1   -0.04 !          3HD2      5FE-
+ATOM 3HD2 HR3     0.16 !
+DELETE ANGLE 5NA 5FE 5NC  5NB 5FE 5ND 
+BOND 3NE2 5FE   
+ANGLE 3CD2 3NE2 5FE  3CE1 3NE2 5FE  3NE2 5FE 5NA  3NE2 5FE 5NB   
+ANGLE 3NE2 5FE  5NC  3NE2 5FE  5ND   
+IMPR 3NE2 3CD2 3CE1 5FE !add impr for heme/his planarity and heme/met planarity
+IC 3CD2 3NE2 5FE  5NA   0.0000  0.0000    0.0000  0.0000  0.0000
+IC 3CD2 3NE2 5FE  5NB   0.0000  0.0000    0.0000  0.0000  0.0000
+IC 3CD2 3NE2 5FE  5NB   0.0000  0.0000    0.0000  0.0000  0.0000
+IC 3CD2 3NE2 5FE  5NB   0.0000  0.0000    0.0000  0.0000  0.0000
+IC 3CE1 3NE2 5FE  5NA   0.0000  0.0000    0.0000  0.0000  0.0000
+                       !
+                       ! Heme to Methionine (Iron-sulfur bond) portion of patch
+GROUP                  !          
+ATOM 4CB  CT2    -0.14 ! -4CB--4CG--4SD--4CE
+ATOM 4CG  CT2    -0.25 !            |
+ATOM 4SD  S       0.23 !            5FE-
+ATOM 4CE  CT3    -0.31 !
+DELE ANGLE 5NA 5FE 5NC  5NB 5FE 5ND
+BOND 4SD 5FE       
+ANGLE 4CE 4SD 5FE   4CG 4SD 5FE   4SD 5FE 5NA
+ANGLE 4SD 5FE 5NB   4SD 5FE 5NC   4SD 5FE 5ND
+IC 4CE 4SD 5FE  5NA   0.0000  0.0000    0.0000  0.0000  0.0000
+IC 4CE 4SD 5FE  5NB   0.0000  0.0000    0.0000  0.0000  0.0000
+IC 4CE 4SD 5FE  5NB   0.0000  0.0000    0.0000  0.0000  0.0000
+IC 4CE 4SD 5FE  5NB   0.0000  0.0000    0.0000  0.0000  0.0000
+IC 4CG 4SD 5FE  5NA   0.0000  0.0000    0.0000  0.0000  0.0000
+
+
+END
+

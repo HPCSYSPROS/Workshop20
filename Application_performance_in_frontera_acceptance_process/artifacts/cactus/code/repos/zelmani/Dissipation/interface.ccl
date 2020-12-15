@@ -1,0 +1,29 @@
+# Interface definition for thorn Dissipation
+# $Header$
+
+IMPLEMENTS: Dissipation
+
+INHERITS: grid SphericalSurface SpaceMask
+
+CCTK_INT FUNCTION MoLQueryEvolvedRHS (CCTK_INT IN EvolvedIndex)
+REQUIRES FUNCTION MoLQueryEvolvedRHS
+
+CCTK_INT FUNCTION \
+    SymmetryTableHandleForGrid (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION SymmetryTableHandleForGrid
+
+CCTK_INT FUNCTION HorizonRadiusInDirection                              \
+   (CCTK_INT IN horizon_number,                                         \
+    CCTK_INT IN N_points,                                               \
+    CCTK_REAL IN ARRAY x, CCTK_REAL IN ARRAY y, CCTK_REAL IN ARRAY z,   \
+    CCTK_REAL OUT ARRAY radius)
+USES FUNCTION HorizonRadiusInDirection
+
+
+
+PRIVATE:
+
+REAL epsdisA_group TYPE=gf TAGS='Checkpoint="no" Prolongation="none"'
+{
+  epsdisA, epsdisB
+} "dissipation array for spatially different dissipation"

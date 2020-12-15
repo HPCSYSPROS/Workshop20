@@ -1,0 +1,67 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+module Node {
+  // Node is on each Pe - 
+
+  #ifdef OPENATOM_VERSION
+    extern module oaSetup
+  #endif
+
+  message GroupInitMsg;
+  message ScriptParamMsg;  
+  message CheckpointMsg {
+    char key[];
+  };
+
+  group Node
+  {
+    entry Node(GroupInitMsg *);
+    entry void startUp(CkQdMsg *);
+    entry void startup(void);
+
+    entry void mallocTest(int);
+    entry void mallocTestQd(CkQdMsg *);
+
+    // after startup barriers - run simulation
+    entry void run(void);
+
+    // used to change parameters in mid-run
+    entry void scriptBarrier(CkQdMsg *);
+    entry void scriptParam(ScriptParamMsg *);
+
+    // used to change Molecule fields in mid-run
+    entry void reloadCharges(float charge[n], int n);
+
+    entry void reloadGridforceGrid(int gridnum);
+    entry void updateGridScale(int gridnum, float sx, float sy, float sz);
+
+    entry void resendMolecule();
+    entry void resendMolecule2();
+
+    // used for asynchronous checkpoint on remote replica
+    entry void recvCheckpointReq(CheckpointMsg*);
+    entry void recvCheckpointAck(CheckpointMsg*);
+
+    // exit scheduler to return to front end
+    entry void recvEnableExitScheduler(CkQdMsg *);
+    entry void exitScheduler(CkQdMsg *);
+
+    // clean early exit after quiescence
+    entry void recvEnableEarlyExit(CkQdMsg *);
+    entry void earlyExit(CkQdMsg *);
+
+    entry void startHPM();
+    entry void stopHPM();
+	
+	entry void traceBarrier(int, int);
+	entry void resumeAfterTraceBarrier(CkReductionMsg *);
+
+	entry void papiMeasureBarrier(int, int);
+	entry void resumeAfterPapiMeasureBarrier(CkReductionMsg *);
+	};
+}
+

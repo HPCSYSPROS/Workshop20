@@ -1,0 +1,4 @@
+implements: Constants
+
+INCLUDE HEADER: constants.h in constants.h
+

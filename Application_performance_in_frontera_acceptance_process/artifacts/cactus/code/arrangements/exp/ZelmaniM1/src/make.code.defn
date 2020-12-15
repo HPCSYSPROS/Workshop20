@@ -1,0 +1,12 @@
+# Main make.code.defn file for thorn ZelmaniM1
+
+# Source files in this directory
+SRCS = linterp_many.cc ZelmaniM1_Metric.cc ZelmaniM1_readtable.cc ZelmaniM1_getopacs.cc \
+	ZelmaniM1_helpers.cc ZelmaniM1_reconstruct.cc ZelmaniM1_RiemannHLLE.cc\
+ 	ZelmaniM1_CalcUpdate.cc ZelmaniM1_tests.cc ZelmaniM1_Closure.cc ZelmaniM1_ClosureSrcFlx.cc\
+	ZelmaniM1_UpdateHydroState.F90 ZelmaniM1_Luminosity.cc ZelmaniM1_RedShift.cc ZelmaniM1_SphericalAverage.cc
+
+
+
+# Subdirectories containing source files
+SUBDIRS = 

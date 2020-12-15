@@ -1,0 +1,63 @@
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+\title{\tt ExternalLibraries/HDF5}
+\author{Yaakoub Y El-Khamra, Thomas Radke}
+\date{$ $Date: 2007/11/12 16:24:16 $ $}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+\ifx\ThisThorn\undefined
+\newcommand{\ThisThorn}{{\it HDF5}}
+\else
+\renewcommand{\ThisThorn}{{\it HDF5}}
+\fi
+
+\begin{abstract}
+Thorn \ThisThorn\ provides the following utility programs:
+%
+\begin{itemize}
+  \item {\tt hdf5\_double\_to\_single}\\
+    Copies the entire contents of an input HDF5 file to an output HDF5 file,
+    converting all double precision datasets to single precision.
+  \item {\tt hdf5\_merge}\\
+    Merges a list of HDF5 input files into a single HDF5 output file.
+    This can be used to concatenate HDF5 output data created as one file per
+    timestep.
+  \item {\tt hdf5\_extract}\\
+    Extracts a given list of named objects (groups or datasets) from an HDF5
+    input file and writes them into a new HDF5 output file.
+    This is the reverse operation to what {\tt hdf5\_merge.c} does. Useful eg.
+    for extracting individual timesteps from a time series HDF5 datafile.
+\end{itemize}
+%
+All utility programs are located in the {\tt src/util/} subdirectory of thorn
+\ThisThorn. To build the utilities just do a
+
+\begin{verbatim}
+  make <configuration>-utils
+\end{verbatim}
+
+in the Cactus toplevel directory. The executables will then be placed in the
+{\tt exe/<configuration>/} subdirectory.
+
+All utility programs are self-explaining -- just call them without arguments
+to get a short usage info.
+If any of these utility programs is called without arguments it will print
+a usage message.
+\end{abstract}
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

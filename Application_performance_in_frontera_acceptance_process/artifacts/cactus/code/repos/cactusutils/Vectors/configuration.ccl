@@ -1,0 +1,16 @@
+# Configuration definitions for thorn Vectors
+
+PROVIDES Vectors
+{
+  SCRIPT configure.sh
+  LANG bash
+  OPTIONS                                \
+    VECTORISE                            \
+    VECTORISE_ALIGNED_ARRAYS             \
+    VECTORISE_ALWAYS_USE_UNALIGNED_LOADS \
+    VECTORISE_ALWAYS_USE_ALIGNED_LOADS   \
+    VECTORISE_INLINE                     \
+    VECTORISE_STREAMING_STORES
+}
+
+REQUIRES Vectors

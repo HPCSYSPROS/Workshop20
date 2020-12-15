@@ -1,0 +1,11 @@
+# Configuration definitions for thorn GSL
+
+PROVIDES GSL
+{
+  SCRIPT src/detect.sh
+  LANG bash
+  OPTIONS GSL_DIR GSL_INSTALL_DIR GSL_LIBS
+}
+
+# Pass configuration options to build script
+REQUIRES GSL

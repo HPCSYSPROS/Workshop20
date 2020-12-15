@@ -1,0 +1,43 @@
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+\title{Constants}
+\author{Frank L\"offler (knarf@cct.lsu.edu)}
+\date{$ $Date$ $}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+\begin{abstract}
+Thorn to provide macros for commonly used constants like the speed of light,
+the gravitational constant or the solar mass.
+\end{abstract}
+
+\section{Comments}
+ Because the number of defines could grow, I define some naming conventions:
+ \begin{itemize}
+  \item Names have to start with \textbf{CONSTANT\_}.
+  \item Afterwards a typical name is following.
+  \item A \_ is coming next.
+  \item Either SI, cgi or C (for Cactus) is the last part. This specifies the
+        system of units used here (SI, cgi or Cactus units).
+ \end{itemize}
+\section{Provided Constants}
+ \begin{itemize}
+  \item $c$ : the speed of light
+  \item $G$ : the gravitational constant
+  \item $M_{\odot}$ : the solar mass
+ \end{itemize}
+ 
+% Do not delete next line
+% END CACTUS THORNGUIDE
+\end{document}

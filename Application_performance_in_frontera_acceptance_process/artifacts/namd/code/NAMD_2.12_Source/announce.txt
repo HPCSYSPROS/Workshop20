@@ -1,0 +1,77 @@
++--------------------------------------------------------------------+
+|                                                                    |
+|                   NAMD 2.12 Release Announcement                   |
+|                                                                    |
++--------------------------------------------------------------------+
+
+                                                     December 22, 2016
+
+The Theoretical and Computational Biophysics Group at the University of
+Illinois is proud to announce the public release of a new version of
+NAMD, a parallel, object-oriented molecular dynamics code designed for
+high-performance simulation of large biomolecular systems.  NAMD is
+distributed free of charge and includes source code.  NAMD development
+is supported by the NIH National Institute of General Medical Sciences.
+
+NAMD 2.12 has many advantages over NAMD 2.11, among these are:
+
+- GPU-accelerated simulations up to three times as fast as NAMD 2.11
+
+- Improved vectorization and new kernels for Xeon Phi Knight's Landing
+
+- Improved scaling for large implicit solvent simulations
+
+- Improved scaling for multi-threaded "smp" builds
+
+- Communication thread sleeps in single-process-per-replica smp runs
+
+- Divide GPUs among replicas on host with "+devicesperreplica n"
+
+- Shared-memory parallel calculation of collective variables
+
+- Tcl scripting of collective variables thermodynamic integration
+
+- Constraints on probability distributions of collective variables
+
+- Collective variables module improvements including to histogram bias
+
+- Extended adaptive biasing force on-the-fly free energy estimator
+
+- Dynamic lambda scaling for alchemical work calculations
+
+- Scaling of bonded terms in alchemical free energy calculations
+
+- Properly scaled alchemical Lennard-Jones long-range corrections
+
+- Multigrator pressure and temperature control method
+
+- Retry after spurious EXDEV (Invalid cross-device link) output errors
+
+- Ability to modify grid force scaling without restarting
+
+- Ability to reload molecular structure without restarting
+
+- Optional Python scripting interface
+
+- QM/MM simulation via interfaces to ORCA and MOPAC
+
+- Update to Charm++ 6.7.1
+
+
+Details at http://www.ks.uiuc.edu/Research/namd/2.12/features.html
+
+NAMD is available from http://www.ks.uiuc.edu/Research/namd/
+
+For your convenience, NAMD has been ported to and will be installed
+on the machines at the NSF-sponsored national supercomputing centers.
+If you are planning substantial simulation work of an academic nature
+you should apply for these resources.  Benchmarks for your proposal
+are available at http://www.ks.uiuc.edu/Research/namd/performance.html
+
+The Theoretical and Computational Biophysics Group encourages NAMD users
+to be closely involved in the development process through reporting
+bugs, contributing fixes, periodical surveys and via other means.
+Questions or comments may be directed to namd@ks.uiuc.edu.
+
+We are eager to hear from you, and thank you for using our software!
+

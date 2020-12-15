@@ -1,0 +1,14 @@
+# Interface definition for thorn Timers
+
+IMPLEMENTS: Timers
+
+INCLUDE HEADER: CactusTimer.hh IN CactusTimer.hh
+INCLUDE HEADER: CactusTimerSet.hh IN CactusTimerSet.hh
+INCLUDE HEADER: Timer.hh IN Timer.hh
+INCLUDE HEADER: TimerTree.hh IN TimerTree.hh
+
+
+
+# Check whether existing output files should be truncated or not
+CCTK_INT FUNCTION IO_TruncateOutputFiles(CCTK_POINTER_TO_CONST IN cctkGH)
+REQUIRES FUNCTION IO_TruncateOutputFiles

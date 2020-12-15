@@ -1,0 +1,9 @@
+# Main make.code.defn file for thorn CarpetIOHDF5
+
+# Source files in this directory
+SRCS = CarpetIOHDF5.cc Input.cc Output.cc OutputSlice.cc GetAllActive.cc
+
+# Extend CXXFLAGS if HDF5 library was built with LFS support
+ifneq ($(strip $(HDF5_LFS_FLAGS)),)
+  CXXFLAGS += $(HDF5_LFS_FLAGS)
+endif

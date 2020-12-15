@@ -1,0 +1,4 @@
+module unload PrgEnv-pgi
+module load PrgEnv-cray
+module list
+make -f makefile.kraken.cray

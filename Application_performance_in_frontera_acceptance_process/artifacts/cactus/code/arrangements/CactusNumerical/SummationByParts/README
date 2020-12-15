@@ -1,0 +1,11 @@
+Cactus Code Thorn SummationByParts
+Author(s)     : Peter Diener <diener@cct.lsu.edu>
+Maintainer(s) : Peter Diener <diener@cct.lsu.edu>
+License       : LGPLv2.1 or later
+--------------------------------------------------------------------------
+
+Purpose of the thorn:
+
+Calculate derivates of grid functions using finite difference stencils
+that satisfy summation by parts.
+

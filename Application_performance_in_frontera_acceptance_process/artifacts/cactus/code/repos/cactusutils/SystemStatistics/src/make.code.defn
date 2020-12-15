@@ -1,0 +1,6 @@
+
+# Source files in this directory
+SRCS = systemstatistics.cc
+
+# Subdirectories containing source files
+SUBDIRS = 

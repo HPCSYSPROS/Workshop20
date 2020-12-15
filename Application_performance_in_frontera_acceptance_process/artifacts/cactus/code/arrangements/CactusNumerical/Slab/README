@@ -1,0 +1,12 @@
+Cactus Code Thorn Slab
+Thorn Author(s)     : Erik Schnetter <schnetter@cct.lsu.edu>
+Thorn Maintainer(s) : Erik Schnetter <schnetter@cct.lsu.edu>
+--------------------------------------------------------------------------
+
+Purpose of the thorn:
+
+This thorn provides routines that use MPI to transfer slabs of arrays
+between processors.
+
+There is a thorn TAT/SlabTest that contains additional routines for
+testing this thorn.

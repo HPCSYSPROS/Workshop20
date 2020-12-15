@@ -1,0 +1,99 @@
+# Parameter definitions for thorn DriftCorrect4
+# $Header: /numrelcvs/AEIDevelopment/DriftCorrect4/param.ccl,v 1.8 2006/04/11 10:11:54 knarf Exp $
+
+CCTK_INT verbose_level "Produce log output while running" STEERABLE=always
+{
+ 0:* :: "0: not saying anything, larger values mean greater verbosity"
+} 0
+
+
+
+SHARES: ADMBase
+
+USES KEYWORD initial_shift
+USES KEYWORD shift_evolution_method
+
+
+
+
+
+PRIVATE:
+
+boolean first_activation_on_recovery "are we only just now starting drift correction?" STEERABLE=always
+{
+} no
+
+REAL position_x "Desired black hole x position" STEERABLE=always
+{
+  *:* :: ""
+} 0.0
+
+REAL position_y "Desired black hole y position" STEERABLE=always
+{
+  *:* :: ""
+} 0.0
+
+REAL position_z "Desired black hole z position" STEERABLE=always
+{
+  *:* :: ""
+} 0.0
+
+REAL min_dx "Minimum position difference before we start correcting in x direction" STEERABLE=always
+{
+  *:* :: ""
+} 0.0
+
+REAL min_dy "Minimum position difference before we start correcting in y direction" STEERABLE=always
+{
+  *:* :: ""
+} 0.0
+
+REAL min_dz "Minimum position difference before we start correcting in z direction" STEERABLE=always
+{
+  *:* :: ""
+} 0.0
+
+
+
+BOOLEAN bitant "Assume bitant symmetry; leave z direction alone"
+{
+} "no"
+
+REAL first_driftcorrect_time "First time at which the drift correction is applied" STEERABLE=always
+{
+  0:* :: ""
+} 0
+
+BOOLEAN do_position_correction "Apply position correction?" STEERABLE=always
+{
+} "yes"
+
+REAL position_timescale "Time scale for position correction" STEERABLE=always
+{
+  (0:* :: ""
+} 1.0
+
+REAL position_damping_factor "Damping factor for position correction" STEERABLE=always
+{
+  (0:* :: ""
+} 1.0
+
+REAL position_correction_falloff "Fallloff factor for position correction" STEERABLE=always
+{
+  0:* :: "0.0 disables this falloff, parameter is factor in gauss function"
+} 0.0
+
+REAL attenuation_s "Bruegmann-style attenuation exponent s" STEERABLE=always
+{
+  * :: ""
+} 2.0
+
+REAL attenuation_c "Bruegmann-style attenuation coefficient c" STEERABLE=always
+{
+  (0:* :: ""
+} 1.0
+
+REAL attenuation_n "Exponent on detg factor in front of attenuation" STEERABLE=always
+{
+  * :: ""
+} 0.0

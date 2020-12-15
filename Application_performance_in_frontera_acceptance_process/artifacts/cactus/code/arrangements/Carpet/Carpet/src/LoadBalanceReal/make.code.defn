@@ -1,0 +1,4 @@
+# Main make.code.defn file for thorn Carpet   -*-Makefile-*-
+
+# Source files in this directory
+SRCS = carpet_boxtypes.F90 carpet_region.F90 splitregions_recursively.F90 splitregions_recursively.cc

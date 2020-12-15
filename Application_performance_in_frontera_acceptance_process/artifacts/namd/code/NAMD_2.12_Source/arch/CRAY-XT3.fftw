@@ -1,0 +1,6 @@
+
+FFTDIR=/usr/local/packages/fftw/gcc
+FFTINCL=-I$(FFTDIR)/include
+FFTLIB=-L$(FFTDIR)/lib -lsrfftw -lsfftw
+FFTFLAGS=-DNAMD_FFTW
+FFT=$(FFTINCL) $(FFTFLAGS)

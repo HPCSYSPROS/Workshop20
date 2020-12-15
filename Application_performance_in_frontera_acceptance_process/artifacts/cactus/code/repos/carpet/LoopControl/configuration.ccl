@@ -1,0 +1,9 @@
+# Configuration definition for thorn LoopControl
+
+OPTIONAL CycleClock hwloc Vectors
+{
+}
+
+PROVIDES LoopControl
+{
+}

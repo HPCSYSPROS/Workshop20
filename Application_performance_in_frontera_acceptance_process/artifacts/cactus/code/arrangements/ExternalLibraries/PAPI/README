@@ -1,0 +1,24 @@
+Cactus Code Thorn PAPI
+Author(s)    : Erik Schnetter
+Maintainer(s): Cactus team
+Licence      : BSD
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Distribute the Performance Application Programming Interface; see
+<http://icl.cs.utk.edu/papi/index.html>.
+
+
+
+From the web site:
+
+PAPI provides the tool designer and application engineer with a
+consistent interface and methodology for use of the performance
+counter hardware found in most major microprocessors. PAPI enables
+software engineers to see, in near real time, the relation between
+software performance and processor events.
+
+In addition Component PAPI provides access to a collection of
+components that expose performance measurement opportunites across the
+hardware and software stack.

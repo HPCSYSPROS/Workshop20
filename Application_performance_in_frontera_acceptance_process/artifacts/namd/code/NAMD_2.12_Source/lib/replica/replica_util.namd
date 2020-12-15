@@ -1,0 +1,82 @@
+
+# functions for reduction, broadcast, and timing across replicas
+
+# reductions can use binary operators below, standard Tcl like concat,
+# VMD/NAMD extensions like vecadd, or user-defined binary operators
+
+proc add { a b } {
+  return [expr $a + $b]
+}
+
+proc and { a b } {
+  return [expr $a && $b]
+}
+
+proc or { a b } {
+  return [expr $a || $b]
+}
+
+proc min { a b } {
+  if { $a < $b } { return $a } else { return $b }
+}
+
+proc max { a b } {
+  if { $a > $b } { return $a } else { return $b }
+}
+
+proc replicaTime { script } {
+  set t [lindex [time {uplevel $script}] 0]
+  set min [replicaAllReduce min $t]
+  set max [replicaAllReduce max $t]
+  set sum [replicaAllReduce add $t]
+  set avg [expr $sum / [numReplicas]]
+  set loss [expr (100. * ($max - $avg)) / $avg]
+  set loss [format "%.2f" $loss]
+  print "REPLICA [myReplica] TIMING $t MIN $min MAX $max AVG $avg LOSS $loss% FOR $script"
+}
+
+proc replicaReduce { operator contrib } {
+  set rank [myReplica]
+  set size [numReplicas]
+  for { set i 1 } { $i < $size } { set i [expr 2 * $i] } {
+    if { $rank & $i } {
+      set dst [expr $rank - $i]
+      # print "rank $rank send to $dst"
+      replicaSend $contrib $dst
+    } else {
+      set src [expr $rank + $i]
+      if { $src < $size } {
+        # print "rank $rank recv from $src"
+        set contrib [$operator $contrib [replicaRecv $src]]
+      }
+    }
+    if { $rank & (2 * $i - 1) } { break }
+  }
+  if { ! $rank } { return $contrib }
+}
+
+proc replicaAllReduce { operator contrib } {
+  return [replicaBroadcast [replicaReduce $operator $contrib]]
+}
+
+proc replicaBroadcast { msg } {
+  set rank [myReplica]
+  set size [numReplicas]
+  for { set i 1 } { $i < $size } { set i [expr 2 * $i] } { }
+  for { set i [expr $i /2] } { $i > 0 } { set i [expr $i / 2] } {
+    if { $rank & ($i - 1) } { continue}
+    if { $rank & $i } {
+      set src [expr $rank - $i]
+      # print "rank $rank recv from $src"
+      set msg [replicaRecv $src]
+    } else {
+      set dst [expr $rank + $i]
+      if { $dst < $size } {
+        # print "rank $rank send to $dst"
+        replicaSend $msg $dst
+      }
+    }
+  }
+  return $msg
+}
+

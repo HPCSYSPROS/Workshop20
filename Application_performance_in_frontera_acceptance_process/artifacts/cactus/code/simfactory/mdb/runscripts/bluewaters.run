@@ -1,0 +1,58 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+echo "Checking:"
+pwd
+hostname
+date
+cat ${PBS_NODEFILE} > SIMFACTORY/NODES
+
+#echo "PAPI:"
+#set +x
+#set +e
+## Define module command
+#source /etc/profile
+#set -x
+#module unload perftools
+#module load papi/5.0.1
+#echo papi_avail
+#aprun -n 1 papi_avail
+#echo papi_native_avail
+#aprun -n 1 papi_native_avail
+#module unload papi
+#module load perftools/6.0.1
+#set +x
+#if [ ! -e @EXECUTABLE@+pat ]; then
+#    pushd $(dirname @EXECUTABLE@)
+#    pat_build $(basename @EXECUTABLE@)
+#    popd
+#fi
+# See "man hwpc", and the file
+# "/opt/cray/perftools/6.0.1/share/CounterGroups.amd_fam15h"
+#export PAT_RT_HWPC=sampling,PAPI_TOT_INS,PAPI_FP_OPS,PAPI_L1_DCA,PAPI_L1_DCM
+#export PAT_RT_HWPC=sampling,PAPI_L1_DCA,PAPI_L1_DCM,DATA_CACHE_REFILLS_FROM_L2_OR_NORTHBRIDGE:ALL,DATA_CACHE_REFILLS_FROM_NORTHBRIDGE
+#export PAT_RT_HWPC=sampling,PAPI_L1_ICA,INSTRUCTION_CACHE_REFILLS_FROM_SYSTEM,INSTRUCTION_CACHE_REFILLS_FROM_L2
+
+echo "Environment:"
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export GMON_OUT_PREFIX=gmon.out
+export OMP_NUM_THREADS=@NUM_THREADS@
+export ATP_ENABLED=1
+env | sort > SIMFACTORY/ENVIRONMENT
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+aprun -cc numa_node -n @NUM_PROCS@ -N @(min(@NODE_PROCS@, @NUM_PROCS@))@ -d @NUM_THREADS@ @EXECUTABLE@ -L 3 @PARFILE@
+echo "Stopping:"
+date
+
+#echo "Performance report:"
+#pat_report cactus_sim+*.xf
+
+echo "Done."

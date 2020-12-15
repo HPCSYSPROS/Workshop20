@@ -1,0 +1,951 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                          %
+%              (C) Copyright 1995 The Board of Trustees of the             %
+%                          University of Illinois                          %
+%                           All Rights Reserved                            %
+%								  	   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% RCS INFORMATION:
+%
+%       $RCSfile: ug.bib,v $
+%       $Author: jim $        $Locker:  $                $State: Exp $
+%       $Revision: 1.25 $      $Date: 2016/09/19 22:51:20 $
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DESCRIPTION:
+%	Local bibliography entries for the NAMD User's Guide
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% REVISION HISTORY:
+%
+% $Log: ug.bib,v $
+% Revision 1.25  2016/09/19 22:51:20  jim
+% Fix error.
+%
+% Revision 1.24  2015/03/03 18:37:36  dhardy
+% Added recommendations and reference for MSM
+%
+% Revision 1.23  2014/05/21 00:35:48  jlai7
+% Updated structure based sections and added references to SMOG code
+%
+% Revision 1.22  2013/06/11 20:22:52  jim
+% From JÈrÙme HÈnin, add back ref Shirts2007 that got deleted.
+%
+% Revision 1.21  2013/06/10 16:03:08  jim
+% Move colvars references to separate .bib file.
+%
+% Revision 1.20  2012/04/18 22:20:47  jim
+% Updated colvars references from Giacomo Fiorin.
+%
+% Revision 1.19  2012/02/23 19:26:01  dtanner
+% adding documentation for LCPO
+%
+% Revision 1.18  2011/09/28 22:17:37  dhardy
+% added Drude model to user guide, with references in bib file
+%
+% Revision 1.17  2011/05/12 19:49:04  jim
+% Add missing journal names.
+%
+% Revision 1.16  2011/03/15 07:53:00  yiwang
+% added aMD related references - yi
+%
+% Revision 1.15  2011/03/08 17:51:58  jim
+% Add MARTINI forcefield references.
+%
+% Revision 1.14  2011/02/03 16:41:27  dtanner
+% adding users guide chapter for implicit solvent as well as shortening superfluous gbis communication by sending messages of size zero instead of messages of size nAtoms
+%
+% Revision 1.13  2010/09/12 21:49:32  jim
+% update from Jerome Henin
+%
+% Revision 1.12  2010/02/25 18:11:21  dbwells2
+% *** empty log message ***
+%
+% Revision 1.11  2009/10/27 22:56:45  dhardy
+% fixed the documentation for longSplitting and the new 'c2' option
+%
+% Revision 1.10  2009/06/14 01:28:16  petefred
+% Add documentation for LJ tail corrections
+%
+% Revision 1.9  2009/03/23 21:06:57  char
+% updated refs for alchemical section
+%
+% Revision 1.8  2008/11/14 01:29:19  char
+% *** empty log message ***
+%
+% Revision 1.6  2006/09/17 21:33:00  jim
+% update chipot ref
+%
+% Revision 1.5  2005/07/21 16:23:32  jim
+% Add adaptive biasing force method from Chipot.
+%
+% Revision 1.4  2003/09/18 22:35:08  jim
+% Patches from Chris Chipot and Jerome Henin.
+%
+% Revision 1.3  2002/03/08 23:07:45  jim
+% Added refs from proposal to LES docs.
+%
+% Revision 1.2  2002/02/20 22:26:03  jim
+% Added alchemical free energy docs "as is", fixed only to build.
+%
+% Revision 1.1  1998/01/05 21:12:29  dhardy
+% user guide, first draft
+%
+% Revision 1.3  1997/08/07 16:09:43  dhardy
+% changed CHARMm to CHARMM
+%
+% Revision 1.2  1996/05/20 16:39:37  brunner
+% Now includes bib entries and abbreviations for all references
+% in ug.tex
+%
+% Revision 1.1  1995/06/19 16:12:36  nelson
+% Initial revision
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% NOTES:	1) see top of group.bib for journal abbreviations.
+%		2) article keyword should be of the form AAAANN, where
+%		   AAAA = first four characters of first author, in all-caps
+%		   NN = last two digits of year published, i.e. 94
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% New note: I am moving all bib entries here, so we don't need to read
+% other bibs.  This reduces duplicate definitions.  But we then need
+% to put all abbreviations here as well.
+% RKB 5-20-96
+%
+
+@string{JMB = "J.\ Mol.\ Biol."}
+@string{JCC = "J.\ Comp.\ Chem."}
+@string{JCP = "J.\ Chem.\ Phys."}
+@string{JACS = "J.\ Am. Chem.\ Soc."}
+@string{ANM = "Ann.\ Numer.\ Math."}
+@string{JPC = "J.~Phys.\ Chem."}
+@string{TCA = "Theor\ Chem\ Acc"}
+@string{PRO = "Proteins:\ Struct.,\ Func.,\ Gen."}
+@string{JPCA = "J.~Phys.\ Chem.~A"}
+@string{JPCB = "J.~Phys.\ Chem.~B"}
+@string{JPCL = "J.~Phys.\ Chem.\ Lett."}
+@string{JCTC = "J.~Chem.\ Theor.\ Comp."}
+@string{CPL = "Chem.\ Phys.\ Lett."}
+@string{CP = "Chem.\ Phys."}
+
+@inproceedings{CRUZ93,
+  author={Carolina Cruz-Neira and Dan J. Sandin and Thomas A. DeFanti},
+  title={Unknown},
+  year=1993,
+  pages={135},
+  booktitle={Proceedings of SIGGRAPH '93},
+  address={Anaheim, CA},
+  publisher={Association for Computing Machinery}
+}
+
+
+@inproceedings{lin:atm,
+  author={Mengjou Lin and Jenwei Hsieh and David H. C. Du and Joseph P. Thomas and James A. MacDonald},
+  title={Distributed Network Computing Over Local {ATM} Networks},
+  year=1994,
+  pages={154-163},
+  booktitle={Proceedings of Supercomputing '94},
+  address={Washington, DC},
+  publisher={IEEE Computer Society Press}
+}
+
+@manual{sun:xdr,
+  organization={Sun Microsystems},
+  title={X{D}{R}: External Data Representation Standard. {RFC}-1014},
+  year=1987
+}
+
+@techreport{duke:fma,
+  author={J. Board and Z. Hakura and W. Elliot and W. Rankin},
+  title={Scalable Variants of Multipole-Accelerated Algorithms for Molecular Dynamics Applications}, 
+  institution={Duke University, Dept. of Elec. Engr.},
+  type={Technical Report},
+  number={TR94-006},
+  year={1994}
+}
+
+@article{ZhSc93,
+  Author="G. Zhang and T. Schlick",
+  Title="{LIN}: A New Algorithm to Simulate the Dynamics of Biomolecules by Combining Implicit-Integration and Normal Mode Techniques",
+  Journal=JCC,
+  volume=14,
+  pages={1212--1233},
+  year=1993
+}
+
+@techreport{ornl:pvm,
+  author={A. Geist and A. Beguelin and J. Dongarra and W. Jiang and R. Manchek and V. Sunderam},
+  title={{PVM}~3 Users Guide and Reference Manual},
+  institution={Oak Ridge National Laboratory},
+  type={Technical Manual},
+  number={ORNL/TM-12187},
+  month={May},
+  year={1994}
+}
+
+@article{penn:npt,
+  Author={G. Martyna and D. Tobias and M. Klein},
+  Title={Constant pressure molecular dynamics algorithms},
+  Journal=JCP,
+  volume=101,
+  pages={4177--4189},
+  year=1994
+}
+
+@article{BERN77,
+  author={F. C. Bernstein and T. F. Koetzle and G. J. B. Williams and E. F. Meyer, Jr. and M. D. Brice and J. R. Rodgers and O. Kennard and T. Shimanouchi and M. Tasumi},
+  title={The Protein Data Bank: A Computer-Based Archival File For Macromolecular Structures},
+  journal=JMB,
+  volume=112,
+  pages={535--542},
+  year=1977
+}
+
+@manual{XMOL93,
+  key={MSCI},
+  title={XMol, Version 1.3.1},
+  organization={Minnesota Supercomputer Center, Inc.},
+  address={Minneapolis, MN},
+  year=1993
+}
+
+@article{CARS91,
+  author={M. Carson},
+  title={{RIBBONS} 2.0},
+  journal=JAC,
+  volume=24,
+  pages={958--961},
+  year=1991
+}
+
+@article{WEIN81,
+  author={P. K. Weiner and P. A. Kollman},
+  title={{AMBER}: Assisted Model Building With Energy Refinement.  A General Program for Modeling Molecules and Their Interactions},
+  journal=JCC,
+  volume=2,
+  pages=287,
+  year=1981
+}
+
+@incollection{CARS85,
+  author={M. Carson and J. Hermans},
+  title={The Molecular Dynamics Workshop Laboratory},
+  booktitle={Molecular Dynamics and Protein Structure},
+  editor={J. Hermans},
+  publisher={University of North Carolina},
+  address={Chapel Hill},
+  pages={165--166},
+  year=1985
+}
+
+@inproceedings{crpc:space,
+  Author={T. Clark and R. Hanxleden and J. McCammon and L. Scott},
+  Title={Parallelizing Molecular Dynamics using Spatial Decomposition},
+  month=May,
+  year=1994,
+  booktitle={Proceedings of the Scalable High Performance Computing Conference},
+  address={Knoxville, TN},
+}
+
+@techreport{sandia:decomp,
+  author={S. Plimpton and B. Hendrickson},
+  title={A New Parallel Method for Molecular Dynamics Simulation of Macromolecular Systems},
+  institution={Sandia National Laboratories},
+  type={Technical Report},
+  number={SAND94-1862},
+  month={August},
+  year={1994}
+}
+
+@article{bb:decomp,
+  author={B. R. Brooks and M. Hodoscek},
+  title={Parallelization of CHARMM for MIMD Machines},
+  journal={Chemical Design Automation News},
+  volume=7,
+  number=12,
+  pages={16--22},
+  year=1992
+}
+
+@inproceedings{kale:mdl,
+  author={L. V. Kale and A. Gursoy},
+  title={Modularity, Reuse and Efficiency with Message-Driven Libraries},
+  booktitle={Proceedings of the $7^{th}$ SIAM Parallel Processing Conference}, 
+  month =Feb,
+  year  =1995,
+  address={San Fransisco, CA}
+}
+
+@inproceedings{kale:charm,
+  author={L. V. Kale and S. Krishnan},
+  title={CHARM++ :  A Portable Concurrent Object Oriented System Based on {C++}},
+  booktitle={Proceedings of OOPSLA-93},
+  month =Sep,
+  year  =1993,
+  address={Washington, DC}
+}
+
+@article{HANE94,
+  author={S. W. Haney},
+  title={Is {C++} Fast Enough For Scientific Computing?},
+  journal=CIP,
+  volume=8,
+  number=6,
+  pages={690--694},
+  year=1994
+}
+
+@article{BERG87,
+  author={M. J. Berger and S. H. Bokhari},
+  title={A Partitioning Strategy for Nonuniform Problems on Multiprocessors},
+  journal={IEEE Transactions on Computers},
+  volume={C-36},
+  number=5,
+  pages={570--580},
+  month=May,
+  year=1987
+}
+
+@incollection{WIND95,
+  author={A. Windemut},
+  title={Advanced Algorithms for Molecular Dynamics Simulation: The Program PMD},
+  booktitle={Parallel Computing in Computational Chemistry},
+  editor={T. Mattson},
+  publisher={ACS Books},
+  year={1995 - In Press}
+}
+
+@inproceedings{EICK92,
+  author={T. von Eicken and D. E. Culler and S. C. Goldstein and K. E. Schauser},
+  title={Active messages: a mechanism for integrated communication and computation},
+  year=1992,
+  booktitle={Proceedings of the International Symposium on Computer Architecture}
+}
+
+@techreport{HUMP94,
+  author={William Humphrey and Andrew Dalke},
+  title={{VMD} User Guide ({Version} 0.94)},
+  institution={University of Illinois},
+  type={Beckman Institute Technical Report},
+  number={TB-94-07},
+  tbreference={0},
+  tbtechrep={TB-94-07},
+  year=1994
+}
+
+@book{ALLE87,
+  author={M. P. Allen and D. J. Tildesley},
+  title={Computer Simulation of Liquids},
+  publisher={Oxford University Press},
+  address={New York},
+  year=1987
+}
+
+@book{MCCA87,
+   author={J. A. McCammon and S. C. Harvey},
+   title={Dynamics of Proteins and Nucleic Acids},
+   publisher={Cambridge University Press},
+   address={Cambridge},
+   year=1987
+}
+
+@manual{BRUN92b,
+  author={Axel T. Br\"unger},
+  title={X-PLOR, Version~3.1, A System for {X}-ray Crystallography and {NMR}},
+  organization={The Howard Hughes Medical Institute and Department of Molecular Biophysics and Biochemistry, Yale University},
+  year={1992}
+}
+@article{BROO83,
+  author={Bernard R. Brooks and Robert E. Bruccoleri and Barry D. Olafson and David J. States and S. Swaminathan and Martin Karplus},
+  title={{CHARMM:} A Program for  Macromolecular Energy, Minimization, and Dynamics Calculations},
+  journal=JCC,
+  year={1983},
+  volume={4},
+  number={2},
+  pages={187--217}
+}
+ 
+@article{Shirts2007,
+  author = {Shirts, Michael R. and Mobley, David L. and Chodera, John D. and Pande, Vijay S.},
+  title = {Accurate and Efficient Corrections for Missing Dispersion Interactions in Molecular Simulations},
+  journal = JPCB,
+  volume = {111},
+  number = {45},
+  pages = {13052-13063},
+  year = {2007},
+  doi = {10.1021/jp0735987},
+  URL = {http://pubs.acs.org/doi/abs/10.1021/jp0735987},
+  eprint = {http://pubs.acs.org/doi/pdf/10.1021/jp0735987}
+}
+
+% begin FEP entries from sdixit and chipot and harrison
+
+@ARTICLE{Axelsen1998,
+  author = {Axelsen, P. H. and
+	 Li, D.},
+  title = {Improved convergence in dual--topology free energy
+	 calculations through use of harmonic restraints},
+  journal = {J. Comput. Chem. },
+  year = {1998},
+  volume = {19},
+  pages = {1278-1283}
+}
+
+@ARTICLE{Beveridge1989,
+  author = {Beveridge, D. L. and DiCapua, F. M. },
+  title = {Free energy via molecular simulation:
+	 Applications to chemical and biomolecular systems},
+  journal = {Annu. Rev. Biophys. Biophys. },
+  year = {1989},
+  volume = {18},
+  pages = {431-492}
+}
+
+@ARTICLE{Boresch1999,
+  author = {Boresch, S. and Karplus, M. },
+  title = {The role of bonded terms in free energy simulations:
+	 I. Theoretical analysis},
+  journal = {J. Phys. Chem. A},
+  year = {1999},
+  volume = {103},
+  pages = {103-118}
+}
+
+@ARTICLE{Chipot2002g,
+  author = {Chipot, C. and Pearlman, D. A.},
+  title = {Free energy calculations. The long and winding gilded road},
+  journal = {Mol. Sim.},
+  year = {2002},
+  volume = {28},
+  pages = {1-12}
+}
+
+@ARTICLE{Gao1989,
+  author = {Gao, J. and Kuczera, K. and Tidor, B. and Karplus, M. },
+  title = {Hidden thermodynamics of mutant proteins: A molecular
+	 dynamics analysis},
+  journal = {Science},
+  year = {1989},
+  volume = {244},
+  pages = {1069-1072}
+}
+
+@ARTICLE{Gilson1997,
+  author = {Gilson, M. K. and
+	 Given, J. A. and
+	 Bush, B. L. and
+	 McCammon, J. A.},
+  title = {The statistical--thermodynamic basis for computation of binding
+	 affinities: A critical review},
+  journal = {Biophys. J.},
+  year = {1997},
+  volume = {72},
+  pages = {1047-1069}
+}
+
+@INCOLLECTION{VanGunsteren1989,
+  author = {van Gunsteren, W. F.},
+  title = {Methods for calculation of free energies and
+	 binding constants: Successes and problems},
+  booktitle = {Computer simulation of biomolecular systems:
+	 Theoretical and experimental applications},
+  publisher = {Escom},
+  year = {1989},
+  editor = {Van Gunsteren, W. F. and Weiner, P. K. },
+  pages = {27-59},
+  address = {The Netherlands}
+}
+
+@INCOLLECTION{King1993,
+  author = {King, P. M.},
+  title = {Free energy via molecular simulation: A primer},
+  booktitle = {Computer simulation of biomolecular systems:
+	 Theoretical and experimental applications},
+  publisher = {ESCOM},
+  year = {1993},
+  editor = {Van Gunsteren, W. F. and Weiner, P. K. and Wilkinson, A. J.},
+  volume = {2},
+  pages = {267-314},
+  address = {Leiden}
+}
+
+@ARTICLE{Kirkwood1935,
+  author = {Kirkwood, J. G. },
+  title = {Statistical mechanics of fluid mixtures},
+  journal = {J. Chem. Phys. },
+  year = {1935},
+  volume = {3},
+  pages = {300-313}
+}
+
+@ARTICLE{Kollman1993,
+  author = {Kollman, P. A.},
+  title = {Free energy calculations: Applications to chemical and biochemical
+	phenomena},
+  journal = {Chem. Rev. },
+  year = {1993},
+  volume = {93},
+  pages = {2395-2417},
+}
+
+@ARTICLE{Lu2004,
+  author = {Lu, N. and Kofke, D. A. and Woolf, T. B.},
+  title = {Improving the efficiency and reliability of free energy
+	 perturbation calculations using overlap sampling methods},
+  journal = {J. Comput. Chem.},
+  year = {2004},
+  volume = {25},
+  pages = {28-39}
+}
+
+@INCOLLECTION{Mark1998,
+  author = {Mark, A. E.},
+  title = {Free Energy Perturbation Calculations},
+  booktitle = {Encyclopedia of computational chemistry},
+  publisher = {Wiley and Sons},
+  year = {1998},
+  editor = {Schleyer, P. v. R. and Allinger, N. L. and Clark, T. and Gasteiger,
+	J. and Kollman, P. A. and Schaefer III, H. F. and Schreiner, P.
+	R.},
+  volume = {2},
+  pages = {1070-1083},
+  address = {Chichester}
+}
+
+@ARTICLE{Pearlman1994a,
+  author = {Pearlman, D. A.},
+  title = {A comparison of alternative approaches to free energy calculations},
+  journal = {J. Phys. Chem.},
+  year = {1994},
+  volume = {98},
+  pages = {1487-1493},
+}
+
+@ARTICLE{Straatsma1992,
+  author = {Straatsma, T. P. and McCammon, J. A. },
+  title = {Computational alchemy},
+  journal = {Annu. Rev. Phys. Chem.},
+  year = {1992},
+  volume = {43},
+  pages = {407-435}
+}
+
+@ARTICLE{Straatsma1991,
+  author={Straatsma, T. P. and McCammon, J. A. },
+  title={Multiconfiguration thermodynamic integration},
+  journal={J. Chem. Phys.},
+  year={1991},
+  volume={95},
+  pages={1175-1118}
+}
+
+@ARTICLE{Zwanzig1954,
+  author = {Zwanzig, R. W. },
+  title = {High--temperature equation of state by a perturbation method. I.
+	Nonpolar gases},
+  journal = {J. Chem. Phys.},
+  year = {1954},
+  volume = {22},
+  pages = {1420-1426}
+}
+
+@BOOK{Chipot2007,
+  title = {Free energy calculations.
+	 Theory and applications in chemistry and biology},
+  publisher = {Springer Verlag},
+  year = {2007},
+  editor = {C. Chipot and A. Pohorille},
+}
+
+@INBOOK{Kirkwood1968,
+  title={Theory of liquids},
+  publisher={Gordon and Breach},
+  year={1968},
+  editor={Alder, B. J. },
+  author={Kirkwood, J. G. },
+  address={New York},
+  booktitle={Theory of liquids}
+}
+
+@ARTICLE{Beutler1994,
+  author = {Beutler, T. C. and Mark, A. E. and van Schaik, R. C. and Gerber, P. R. and van Gunsteren, W. F. },
+  title = {Avoiding singularities and numerical instabilities in free energy calculations based on molecular simulations},
+  journal = {Chem. Phys. Lett.},
+  year = {1994},
+  volume = {222},
+  pages = {529--539}
+}
+
+@ARTICLE{Bennett1976,
+  author = {Bennett, C. H.},
+  title = {Efficient estimation of free energy differences with monte carlo data},
+  journal = {J. Comp. Phys.},
+  year = {1976},
+  volume = {22},
+  pages = {245--268}
+}
+
+@ARTICLE{Zacharias1994,
+  author = {Zacharias M. and Straatsma, T. P. and McCammon J. A.},
+  title = {Separation-shifted scaling, a new scaling method for {L}ennard-{J}ones interactions in thermodynamic integration},
+  journal = {J. Chem. Phys.},
+  year = {1994},
+  volume = {100},
+  pages = {9025--9031}
+}
+
+@BOOK{Frenkel2002,
+    author={Daan Frenkel and Berend Smit},
+    title={Understanding Molecular Simulation From Algorithms to Applications},
+    publisher={Academic Press},
+    year=2002,
+    address={California}
+}
+
+  
+
+
+% end FEP entries from sdixit and chipot and harrison
+
+
+@Article{ROIT91,
+  author =       "A. Roitberg and R. Elber",
+  title =        "Modeling side chains in peptides and proteins: Application of the locally enhanced sampling technique and the simulated annealing methods to find minimum energy conformations",
+  journal =      JCP,
+  year =         1991,
+  volume =       95,
+  pages =        {9277--9287}
+}
+
+@article{SIMM98,
+  author={C. Simmerling and T. Fox and P. A. Kollman},
+  title={Use of locally enhanced sampling in free energy calculations: {T}esting and application to the $\alpha\rightarrow\beta$ anomerization of glucose},
+  journal=JACS,
+  volume=120,
+  number=23,
+ year=1998,
+ pages={5771-5782}
+}
+
+@article{SIMM00,
+author={C. Simmerling and M. R. Lee and A. R. Ortiz and A. Kolinski and J. Skolnick and P. A. Kollman},
+title={Combining {MONSSTER} and {LES/PME} to predict protein structure from amino acid sequence: {A}pplication to the small protein {CMTI-1}},
+journal=JACS,
+volume=122,
+number=35,
+ year=2000,
+ pages={8392-8402}
+}
+
+%% introduces artificial splittings for MTS
+@article{SKEE94,
+  author = {R. D. Skeel and J. J. Biesiadecki},
+  title = "Symplectic integration with variable stepsize",
+  journal = ANM,
+  volume=1,
+  pages="191-198",
+  year = "1994",
+}
+
+@article{KOOP2006,
+  title={Advantages of a {Lowe-Andersen} thermostat in molecular dynamics simulations},
+  author={E. A. Koopman and C. P. Lowe},
+  journal=JCP,
+  volume={124},
+  pages={204103},
+  year={2006}
+}
+
+@ARTICLE{Deng2009,
+  author = {Deng, Yuqing and Roux, Beno\^it},
+  title = {Computations of Standard Binding Free Energies with Molecular Dynamics
+   Simulations},
+  journal = {J. Phys. Chem. B},
+  year = {2009},
+  volume = {113},
+  pages = {2234--2246},
+  number = {8}
+}
+
+@ARTICLE{Henin2010,
+    author = {H\'enin, J. and Fiorin, G. and Chipot, C. and Klein, M. L.},
+    title = {Exploring Multidimensional Free Energy Landscapes Using Time-Dependent
+     Biases on Collective Variables},
+    journal = {J. Chem. Theory Comput.},
+    year = {2010},
+    volume = {6},
+    pages = {35-47},
+    number = {1}
+}
+
+#SMOG references from JLai
+@article{Whitford2009aaa,
+author = {Whitford, Paul C. and Noel, Jeffrey K. and Gosavi, Shachi and Schug, Alexander and Sanbonmatsu, Kevin Y. and Onuchic, JosÈ N.},
+title = {An all-atom structure-based potential for proteins: Bridging minimal models with all-atom empirical forcefields},
+journal = {Proteins},
+volume = {75},
+number = {2},
+pages = {430--441},
+year = {2009},
+}
+
+@article{Noel2010ssd,
+author = {Noel, Jeffrey K and Whitford, Paul C and Sanbonmatsu, Karissa Y and Onuchic, Jos\'{e} N},
+issn = {1362-4962},
+journal = {Nucleic Acids Research},
+pages = {W657--61},
+pmid = {20525782},
+title = {{SMOG@ctbp: simplified deployment of structure-based models in GROMACS.}},
+volume = {38},
+year = {2010}
+}
+@article{Whitford2009nhf,
+title = "Nonlocal Helix Formation Is Key to Understanding S-Adenosylmethionine-1 Riboswitch Function ",
+journal = {Biophysical Journal},
+volume = "96",
+number = "2",
+pages = "L7 - L9",
+year = "2009",
+issn = "0006-3495",
+author = "Paul C. Whitford and Alexander Schug and John Saunders and Scott P. Hennelly and JosÈ N. Onuchic and Kevin Y. Sanbonmatsu"
+}
+#end SMOG references from JLai
+
+#GBIS references from dtanner
+@article{BOND64,
+  author = {A. Bondi},
+  title ={van der {Waals} volumes and radii },
+  journal=JPC,
+  volume={68},
+  pages={441--451},
+  year={1964}
+}
+@Article{ONUF04,
+ author = {Alexey Onufriev and Donald Bashford and David A. Case},
+ title = {Exploring Protein Native States and Large-Scale Conformational Changes With a Modified Generalized Born Model},
+ journal = PRO,
+ year = 2004,
+ volume = 55,
+ pages = {383-394},
+}
+@Article{ONUF00,
+ author = {Alexey Onufriev and Doland Bashford and David A. Case},
+ title = {Modification of the Generalised Born Model Suitable for Macromolecules},
+ journal = JPC,
+ year = 2000,
+ volume = 104,
+ pages = {3712-3720},
+}
+@Article{HAWK96,
+ author = {Gregory D. Hawkins and Christopher J. Cramer and Donald G. Truhlar},
+ title = {Parametrized Models of Aqueous Free Energies of Solvation Based on Pairwise Descreening of Solute Atomic Charges from a Dielectric Medium},
+ journal = JPC,
+ year = 1996,
+ volume = 100,
+ pages = {19824-19839},
+}
+@Article{SCHA90,
+ author = {Michael Schaefer and Cornelius Froemmel},
+ title = {A Precise Analytical Method for Calculating the Electrostatic Energy of Macromolecules in Aqueous Solution},
+ journal = JMB,
+ year = 1990,
+ volume = 216,
+ pages = {1045-1066},
+}
+@Article{SRIN99,
+ author = {Jayashree Srinivasan and Megan W. Trevathan and Paul Beroza and David A. Case},
+ title = {Application of a pairwise generalized Born model to proteins and nucleic acids: inclusion of salt effÙè∞üects},
+ journal = TCA,
+ year = 1999,
+ volume = 101,
+ pages = {426-434},
+}
+@Article{STIL90,
+ author = {W. Clark Still and Anna Tempczyk and Ronald C. Hawley and Thomas Hendrickson},
+ title = {Semianalytical Treatment of Solvation for Molecular Mechanics and Dynamics},
+ journal = JACS,
+ year = 1990,
+ volume = 112,
+ pages = {6127-6129},
+}
+@Article{WEIS99,
+ author = {Weiser, Jorg and Senkin, Peter and Still, W. Clark},
+ title = {Approximate atomic surfaces from linear combinations of pairwise overlaps ({LCPO})},
+ journal = JCC,
+ year = 1999,
+ volume = 20,
+ pages = {217--230},
+}
+
+#end GBIS references from dtanner
+
+#begin MARTINI forcefield
+
+@article{MARR2004,
+        author={Siewert J. Marrink and Alex H. de Vries and Alan E. Mark},
+        title={Coarse Grained Model for Semiquantitative Lipid Simulations},
+        journal=JPCB,
+        volume=108,
+        pages={750--760},
+        year=2004
+}
+
+@article{MARR2007,
+  author={S. J. Marrink and H. J. Risselada and S. Yefimov and D. P. Tieleman and A. H. de Vries},
+  title={The MARTINI forcefield: coarse grained model for biomolecular simulations},
+  journal=JPCB,
+  year=2007,
+  volume=111,
+  pages={7812--7824},
+  owner={char}
+}
+
+@article{MONT2008,
+   author = {L. Monticelli and S.K. Kandasamy and X. Periole and R.G. Larson D.P. Tieleman S.J. Marrink},
+   title = {The MARTINI coarse grained forcefield: extension to proteins},
+   journal = JCTC,
+   volume = {4},
+   pages = {819-834},
+   year = {2008}
+}
+
+#end MARTINI forcefield
+
+#begin aMD references
+@article{HAME2004mc,
+author = {D. Hamelberg and J. Mongan and J.A. McCammon},
+title = {Accelerated molecular dynamics: a promising and efficient simulation method for biomolecules},
+journal = JCP,
+volume = {120},
+number = {24},
+pages = {11919-11929},
+year = {2004},
+}
+
+@article{HAME2007mc,
+author = {D. Hamelberg and C.A. de Oliveira and J.A. McCammon},
+title = {Sampling of slow diffusive conformational transitions with accelerated molecular dynamics},
+journal = JCP,
+volume = {127},
+pages = {155102},
+year = {2007},
+}
+
+@article{WANG2011mc,
+author = {Y. Wang and C. Harrison and K. Schulten and J.A. McCammon},
+title = {Implementation of Accelerated Molecular Dynamics in {NAMD}},
+journal = {"Comp.\ Sci.\ Discov."},
+volume = {4},
+pages = {015002},
+year = {2011},
+}
+#end of aMD references
+
+
+#begin Drude polarizable force field references
+
+@article{Thole81,
+	Author = {B. T. Thole},
+	Folder = {Polarisabilites distribuees},
+	Journal = CP,
+	Pages = {341--350},
+	Title = {Molecular polarizabilities calculated with a modified dipole interaction},
+	Volume = 59,
+	Year = 1981
+}
+
+@article{van1998molecular,
+	Author = {Van Duijnen, P.T. and Swart, M.},
+	Date-Added = {2010-08-16 12:14:32 -0500},
+	Date-Modified = {2010-08-16 12:14:32 -0500},
+	Journal = JPCA,
+	Number = {14},
+	Pages = {2399--2407},
+	Publisher = {ACS Publications},
+	Title = {Molecular and atomic polarizabilities: Thole's model revisited},
+	Volume = {102},
+	Year = {1998}
+}
+
+@article{Lamoureux-2003a,
+	Author = {Lamoureux, G. and Roux, B.},
+	Di = {10.1063/1.1589749},
+	Journal = JCP,
+	Number = {6},
+	Owner = {roux},
+	Pages = {3025--3039},
+	Sn = {0021-9606},
+	Tc = {50},
+	Timestamp = {2008.09.03},
+	Title = {Modeling induced polarization with classical {D}rude oscillators: {T}heory and molecular dynamics simulation algorithm},
+	Ut = {WOS:000184350300010},
+	Volume = {119},
+	Year = {2003}
+}
+
+@article{Harder2006,
+	Author = {Harder, E. and Anisimov, V. M. and Vorobyov, I. V. and Lopes, P. E. M. and Noskov, S. Y. and MacKerell, A. D. and Roux, B.},
+	Di = {10.1021/ct600180x},
+	Journal = JCTC,
+	Number = {6},
+	Owner = {roux},
+	Pages = {1587--1597},
+	Sn = {1549-9618},
+	Tc = {9},
+	Timestamp = {2008.09.03},
+	Title = {Atomic level anisotropy in the electrostatic modeling of lone pairs for a polarizable force field based on the classical Drude oscillator},
+	Ut = {WOS:000241992200013},
+	Volume = {2},
+	Year = {2006}
+}
+
+@article{Lamoureux-2006a,
+	Author = {Lamoureux, G. and Harder, E. and Vorobyov, I. V. and Roux, B. and MacKerell, A. D.},
+	Di = {10.1016/j.cplett.2005.10.135},
+	Journal = CPL,
+	Number = {1-3},
+	Owner = {roux},
+	Pages = {245--249},
+	Sn = {0009-2614},
+	Tc = {19},
+	Timestamp = {2008.09.03},
+	Title = {A polarizable model of water for molecular dynamics simulations of biomolecules},
+	Ut = {WOS:000234849500047},
+	Volume = {418},
+	Year = {2006}
+}
+
+@article{JIAN2011,
+  author={Wei Jiang and David Hardy and James Phillips and Alex MacKerell and Klaus Schulten and Benoit Roux},
+  title={High-performance scalable molecular dynamics simulations of a polarizable force field based on classical {Drude} oscillators in {NAMD}},
+  journal=JPCL,
+  volume={2},
+  pages={87-92},
+  year={2011},
+  tbreference={547},
+  tbstatus={Published.},
+  annote={}
+}
+
+#end Drude polarizable force field references
+
+% MSM reference
+
+@article{HARD2015,
+author={David J. Hardy and Zhe Wu and James C. Phillips and John E. Stone and Robert D. Skeel and Klaus Schulten},
+title={Multilevel Summation Method for Electrostatic Force Evaluation},
+journal=JCTC,
+volume={11},
+pages={766-779},
+year={2015},
+note={},
+tbreference={652},
+tbstatus={Published.},
+annote={}
+}
+

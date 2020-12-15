@@ -1,0 +1,19 @@
+This directory contains the interpolation functions registered for
+   CCTK_InterpLocal()
+under the names
+   "first-order uniform cartesian"
+   "second-order uniform cartesian"
+   "third-order uniform cartesian"
+and for
+   CCTK_InterpLocalUniform()
+under the name
+   "uniform cartesian"
+
+
+Implementation Notes
+====================
+The interpolation operators registered for different orders are mapped
+via wrappers (in "Startup.c") onto a single routine (in "Operator.c"),
+just passing the order as an additional argument.
+
+The actual core interpolation routine is located in "Interpolate.cc".

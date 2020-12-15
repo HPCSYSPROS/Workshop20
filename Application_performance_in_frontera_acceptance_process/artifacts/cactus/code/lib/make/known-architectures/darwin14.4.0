@@ -1,0 +1,12 @@
+#! /bin/sh
+# /*@@
+#   @file    darwin14.4.0
+#   @date    2015-07-10
+#   @author  Barry Wardell
+#   @desc
+#            Known architecture stuff for OS X (Darwin) release 14.4.0
+#   @enddesc
+#   @version $Header$
+# @@*/
+
+. $srcdir/known-architectures/darwin

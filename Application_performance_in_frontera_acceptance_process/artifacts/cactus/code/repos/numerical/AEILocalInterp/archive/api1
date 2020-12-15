@@ -1,0 +1,323 @@
+As I've explained in a recent message to the cactususers mailing list,
+I'm working on a new "generalized interpolator" for Cactus, which will
+be able to interpolate derivatives of grid functions as well as the
+grid functions themselves.  Corresponding to this, I (in consultation
+with Thomas Radke and Tom Goodale) have also come up with a new design
+for the Cactus interpolation API.
+
+The purpose of this message is to solicit comments and/or suggestions
+about the new API.
+
+
+Problems with the Current Interpolator API
+==========================================
+
+I see two major problems with the current interpolator API
+(CCTK_InterpGV() and CCTK_InterpLocal()):
+
+The current API uses variable argument lists to allow interpolating
+many arrays in a single call.  This has turned out to be somewhat
+error-prone.  (There is *no* compiler checking of variable argument lists!)
+To allow better compiler error checking, we propose replacing all the
+variable argument lists with explicit arrays of pointers.
+
+The current interpolator interface encodes all parameters for the
+interpolator (eg things like the order) into the character-string
+interpolator name.  This is a bit awkward, but managable if there are
+only a few parameters, all integers.  But it's completely unworkable for
+a generalized interpolator, which needs a whole bunch of extra parameters
+to tell it what derivatives to take.  Instead, we propose that a
+generalized interpolator get a handle to one of the new key-value
+tables, and that any extra parameters (such as "which derivatives to
+take" info) be passed in the table.  This makes it easy to add new
+interpolation operators which take additional parameters (eg a rational
+interpolator might have two order parameters, one for numerator and
+one for denominator), without having to change the API.
+
+
+The Generalized Interpolator API (version 1)
+============================================
+
+In more detail, here is my proposal for the new API:
+(don't be scared by the length, it's not that complicated!)
+(there are some examples below)
+
+  int status = CCTK_GInterpGV(arguments described below)
+  int status = CCTK_GInterpLocal(arguments described below)
+
+arguments (both CCTK_GInterpGV() and CCTK_GInterpLocal())
+  const cGH *GH;
+  int N_dims;
+  int operator_handle, int coord_system_handle;
+  int param_table_handle;	/* handle to key-value table, see below */
+
+  int N_interp_points;
+  /* array of CCTK_VARIABLE_* codes giving data types */
+  /* of arrays pointed to by  interp_coords[]  arrays */
+  const int interp_coord_types[N_dims];
+  /* array of pointers to arrays giving x,y,... coordinates of interp points */
+  const void *const interp_coords[N_dims];
+
+  int N_input_arrays, N_output_arrays;
+
+for CCTK_GInterpGV():
+  /* array of CCTK variable indices of input arrays */
+  const int input_array_indices[N_input_arrays];
+
+for CCTK_GInterpLocal():
+  /* array of CCTK_VARIABLE_* codes giving data types of input arrays */
+  const int input_array_types[N_input_arrays];
+  /* array of input array dimensions (common to all input arrays) */
+  const int input_array_dims[N_dims];
+  /* array of pointers to input arrays */
+  const void *const input_arrays[N_input_arrays];
+
+for both functions again:
+  /* array of CCTK_VARIABLE_* codes giving data types of output arrays */
+  const int output_array_types[N_output_arrays];
+  /* array of pointers to output arrays */
+  void *const output_arrays[N_output_arrays];
+
+The information passed in the table would depend on the interpolation
+operator.  For what I am currently implementing, I will register only
+a single operator, "generalized polynomial interpolation", and take the
+following parameters in the table:
+
+  int order;			/* mandatory */
+
+Thus the simplest call can just use Util_TableCreateFromString("order=3")
+for a 3rd-order interpolation, for example.
+
+All the remaining parameters in the table are optional; if they're
+omitted defaults will be supplied:
+
+  const char *molecule_type;	/* this selects one of a family of related */
+				/* operators; the default (and the only one */
+				/* I'm implementing right now) is to use the */
+				/* usual hypercube-shaped molecules */
+
+  int smoothing;		/* the way I'm implementing the interpolation */
+				/* it's easy to also do Savitzky-Golay type */
+				/* smoothing; this parameter gives how much */
+				/* to enlarge the interpolation molecule for */
+				/* this; the default is 0 (no smoothing) */
+
+Optionally, the caller can specify a mask gridfn
+for CCTK_GInterpGV():
+  int mask_gridfn_index;
+for CCTK_GInterpLocal();
+  int mask_type;		/* one of the CCTK_VARIABLE_* codes */
+  const void *const mask_array;
+and the range of values for the mask which correspond to valid points:
+  CCTK_REAL mask_min, mask_max;	/* valid <--> closed interval [min,max] */
+
+And last but not least, optionally, the caller can specify taking
+derivatives as part of the interpolation:
+  const int operand_indices[N_output_arrays];
+  const int opcodes[N_output_arrays];
+The semantics here are that
+   output array[i] = op(input array[ operand_indices[i] ])
+where  op  is specified as an integer operation code
+(we'll put #defines for these in one of the cctk header files).
+Note that the array operand_indices[] doesn't directly name the inputs,
+but rather gives the indices in the list of inputs.  This allows for a
+more efficient implementation in the case where some of the input arrays
+have many different operations applied to them.
+
+
+
+Pointers in Fortran
+===================
+
+One possible problem area with this API is that it requires creating
+arrays of pointers pointing to other arrays.  In C this is no problem,
+but in Fortran 77 this is difficult.  So, I propose adding a new Cactus
+function  pointer_to()  to make this easier for Fortran users:
+
+   CCTK_POINTER pointer_to(any array in your code)
+
+This would be #defined to %loc on those compilers which have that
+extension to standard Fortran, or would be a Cactus-provided utility
+routine for other cases.  It's trivial to write the latter case in C
+so long as the Fortran compiler actually uses call by reference, as
+almost all Fortran compilers do anyway for arrays.
+
+
+
+A Simple Example
+================
+
+Here's a simple example, written in Fortran 77, interpolating a real
+and a complex grid function in 3D:
+
+c
+c input grid functions:
+c    real_gridfn     (CCTK_REAL)
+c    complex_gridfn  (CCTK_COMPLEX)
+c
+c interpolation coordinates
+c    xcoord, ycoord, zcoord   (CCTK_REAL arrays of size N)
+c
+c output arrays:
+c    real_at_xyz     (CCTK_REAL array of size N)
+c    complex_at_xyz  (CCTK_COMPLEX array of size N)
+c
+	integer status
+	CCTK_POINTER input_gridfn_indices(2)
+	integer interp_coord_types(3)
+	CCTK_POINTER interp_coords(3)
+	integer output_array_types(2)
+	CCTK_POINTER output_arrays(2)
+
+	call CCTK_VarIndex(input_gridfn_indices(1), "mythorn::real_gridfn")
+	call CCTK_VarIndex(input_gridfn_indices(2), "mythorn::complex_gridfn")
+
+c could also initialize this with a DATA statement
+	interp_coord_types(1) = CCTK_VARIABLE_REAL
+	interp_coord_types(2) = CCTK_VARIABLE_REAL
+	interp_coord_types(3) = CCTK_VARIABLE_REAL
+	interp_coords(1) = pointer_to(xcoord)
+	interp_coords(2) = pointer_to(ycoord)
+	interp_coords(3) = pointer_to(zcoord)
+c could also initialize this with a DATA statement
+	output_array_types(1) = CCTK_VARIABLE_REAL
+	output_array_types(2) = CCTK_VARIABLE_COMPLEX
+	output_arrays(1) = pointer_to(real_at_xyz)
+	output_arrays(2) = pointer_to(complex_at_xyz)
+	call CCTK_InterpGV(status,
+			   cctk_GH,
+			   3,			# number of dimensions
+			   operator_handle, coord_system_handle,
+			   Util_TableCreateFromString("order=3"),
+			   N, interp_coord_types, interp_coords,
+			   2, 2,		# number of input/output arrays
+			   input_gridfn_indices,
+			   output_array_types, output_arrays);
+	if (status .lt. 0) then
+c		help, an error occured!
+	end if
+
+
+
+A More Complicated Example
+==========================
+
+Here's a more complicated example, written in C++.  (I'm really only using
+C++ to get cleaner initialization of the various arrays, this is still
+"almost C".)  This example is a simplified form of what I will be doing
+in my new apparent horizon finder:
+
+//
+// input grid functions (12 of them, all 3D CCTK_REAL):
+//	gxx, gxy, gxz, gyy, gyz, gzz,
+//	Kxx, Kxy, Kxz, Kyy, Kyz, Kzz
+//
+// interpolation coordinates:
+//	xcoord, ycoord, zcoord   (CCTK_REAL arrays of size N)
+//
+// output arrays (30 of them, all 3D CCTK_REAL)
+// (interpolate the gij and Kij, also interpolate all first derivs of the gij)
+//	I_gxx, dx_gxx, dy_gxx, dz_gxx,
+//	I_gxy, dx_gxy, dy_gxy, dz_gxy,
+//	I_gxz, dx_gxz, dy_gxz, dz_gxz,
+//	I_gyy, dx_gyy, dy_gyy, dz_gyy,
+//	I_gyz, dx_gyz, dy_gyz, dz_gyz,
+//	I_gzz, dx_gzz, dy_gzz, dz_gzz,
+//	I_Kxx, I_Kxy, I_Kxz, I_Kyy, I_Kyz, I_Kzz,
+//
+
+const int gxx_index = CCTK_VarIndex("somethorn::gxx");
+const int gxy_index = CCTK_VarIndex("somethorn::gxy");
+const int gxz_index = CCTK_VarIndex("somethorn::gxz");
+const int gyy_index = CCTK_VarIndex("somethorn::gyy");
+const int gyz_index = CCTK_VarIndex("somethorn::gyz");
+const int gzz_index = CCTK_VarIndex("somethorn::gzz");
+const int Kxx_index = CCTK_VarIndex("somethorn::Kxx");
+const int Kxy_index = CCTK_VarIndex("somethorn::Kxy");
+const int Kxz_index = CCTK_VarIndex("somethorn::Kxz");
+const int Kyy_index = CCTK_VarIndex("somethorn::Kyy");
+const int Kyz_index = CCTK_VarIndex("somethorn::Kyz");
+const int Kzz_index = CCTK_VarIndex("somethorn::Kzz");
+
+const int N_dims = 3;
+int interp_coord_types[N_dims]
+	= { CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL };
+const void *const interp_coords[N_dims]
+	= { (const void *) &xcoord,
+	    (const void *) &ycoord,
+	    (const void *) &zcoord };
+
+const int N_input_arrays = 12;
+int input_array_types[N_input_arrays]
+	= { CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL,
+	    CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL,
+	    CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL,
+	    CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL };
+
+const int N_output_arrays = 30;
+int output_array_types[N_output_arrays];
+	for (int oi = 0 ; oi < N_output_arrays ; ++oi)
+	{
+	output_array_types[oi] = CCTK_VARIABLE_REAL;
+	}
+
+#define VP(x) static_cast<void *>(x)
+void *const output_arrays[N_output_arrays]
+	= {
+	  VP(I_gxx), VP(dx_gxx), VP(dy_gxx), VP(dz_gxx),
+	  VP(I_gxy), VP(dx_gxy), VP(dy_gxy), VP(dz_gxy),
+	  VP(I_gxz), VP(dx_gxz), VP(dy_gxz), VP(dz_gxz),
+	  VP(I_gyy), VP(dx_gyy), VP(dy_gyy), VP(dz_gyy),
+	  VP(I_gyz), VP(dx_gyz), VP(dy_gyz), VP(dz_gyz),
+	  VP(I_gzz), VP(dx_gzz), VP(dy_gzz), VP(dz_gzz),
+	  VP(I_Kxx), VP(I_Kxy), VP(I_Kxz), VP(I_Kyy), VP(I_Kyz), VP(I_Kzz),
+	  };
+
+int operand_indices[N_output_arrays];
+	= {
+	  gxx_index, gxx_index, gxx_index, gxx_index,
+	  gxy_index, gxy_index, gxy_index, gxy_index,
+	  gxz_index, gxz_index, gxz_index, gxz_index,
+	  gyy_index, gyy_index, gyy_index, gyy_index,
+	  gyz_index, gyz_index, gyz_index, gyz_index,
+	  gzz_index, gzz_index, gzz_index, gzz_index,
+	  Kxx_index, Kxy_index, Kxz_index, Kyy_index, Kyz_index, Kzz_index,
+	  };
+
+const int op_I  = CCTK_INTERP_OPCODE_I;
+const int op_dx = CCTK_INTERP_OPCODE_DX;
+const int op_dy = CCTK_INTERP_OPCODE_DY;
+const int op_dz = CCTK_INTERP_OPCODE_DZ;
+int opcodes[N_output_arrays]
+	= {
+	  op_I, op_dx, op_dy, op_dz,
+	  op_I, op_dx, op_dy, op_dz,
+	  op_I, op_dx, op_dy, op_dz,
+	  op_I, op_dx, op_dy, op_dz,
+	  op_I, op_dx, op_dy, op_dz,
+	  op_I, op_dx, op_dy, op_dz,
+	  op_I, op_I, op_I, op_I, op_I, op_I,
+	  };
+
+int param_table_handle = Util_TableCreate(UTIL_TABLE_DEFAULT);
+Util_TableSet1Int(param_table_handle,
+		  3, "order");
+Util_TableSetInt(param_table_handle,
+		 N_output_arrays, operand_indices, "operand_indices");
+Util_TableSetInt(param_table_handle,
+		 N_output_arrays, opcodes, "opcodes");
+
+int status = CCTK_GInterpGV(GH,
+			    N_dims,
+			    operator_handle, coord_system_handle,
+			    param_table_handle,
+			    N_interp_points, interp_coord_types, interp_coords,
+			    N_input_arrays, N_output_arrays,
+			    input_array_indices,
+			    output_array_types, output_arrays);
+if (status < 0)
+	{ /* something bad happened */ }
+Util_TableDestroy(param_table_handle);
+
+
+

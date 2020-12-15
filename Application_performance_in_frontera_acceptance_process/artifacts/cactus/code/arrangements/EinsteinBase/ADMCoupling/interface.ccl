@@ -1,0 +1,4 @@
+# Interface definition for thorn ADMCoupling
+# $Header$
+
+implements: ADMCoupling

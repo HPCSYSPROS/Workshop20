@@ -1,0 +1,9 @@
+Cactus Code Thorn TensorTypes
+Thorn Author(s)     : Erik Schnetter <schnetter@aei.mpg.de>
+Thorn Maintainer(s) : Erik Schnetter <schnetter@aei.mpg.de>
+License             : LGPLv2.1 or later
+--------------------------------------------------------------------------
+
+Purpose of the thorn:
+
+Provide information about various types of tensors.

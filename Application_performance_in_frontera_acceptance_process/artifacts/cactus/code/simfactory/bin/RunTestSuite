@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Run the test suite.  This script is called from SimRestart.run()
+# with the run script as the only argument.
+
+command="$1"
+
+# This is a hack because the run scripts assume they are in the
+# restart directory, but tests are run from individual directories
+# under TEST
+export CCTK_TESTSUITE_RUN_COMMAND="rm -f output-0000-active && ln -s . output-0000-active && mkdir -p SIMFACTORY && TESTSUITE_PARFILE=\$parfile $command"
+
+# This is the number of MPI processes to run on
+export CCTK_TESTSUITE_RUN_PROCESSORS=@NUM_PROCS@
+
+# Do not produce core files
+ulimit -c 0
+
+MAKE=$(@SOURCEDIR@/simfactory/bin/sim print-mdb-entry @MACHINE@ | grep '^make' | sed -e 's/^make *= *//;s/ *#.*$//')
+
+${MAKE} @CONFIGURATION@-testsuite PROMPT=no

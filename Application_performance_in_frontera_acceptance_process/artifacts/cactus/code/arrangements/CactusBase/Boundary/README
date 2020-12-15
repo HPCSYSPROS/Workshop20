@@ -1,0 +1,46 @@
+Cactus Code Thorn Boundary
+Author(s)    : Gabrielle Allen
+               Gerd Lanfermann
+               Miguel Alcubierre
+               David Rideout
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+This thorn defines a generic interface for boundary conditions, which
+allows, among other things, symmetry boundary conditions associated
+with the grid to be applied without other thorns having knowledge of
+them.
+
+This thorn also provides some standard outer boundary conditions.
+
+Currently:
+
+  - scalar boundary conditions
+
+  - flat boundary conditions (a copy of the point just inside the
+    boundary)
+ 
+  - radiation boundary conditions
+
+  - copy boundary conditions 
+
+  - Robin boundary conditions
+
+  - static boundary conditions
+
+
+2. Additional information
+
+Each of the boundary conditions mentioned above work only on grid
+variables with less than four dimensions.
+
+All the boundary conditions work with an arbitrarily size stencil
+width, except for the Robin boundary condition which currently only
+works with a stencil width of one.
+
+The Robin boundary condition is only implemented for 3D grid functions
+at the moment.
+

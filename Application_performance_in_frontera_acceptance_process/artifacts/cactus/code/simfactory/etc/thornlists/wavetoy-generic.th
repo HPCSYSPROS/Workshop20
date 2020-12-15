@@ -1,0 +1,28 @@
+!DESC "Basic WaveToy thorns"
+
+!REPOSITORY_TYPE pserver
+!REPOSITORY_LOCATION cvs.cactuscode.org
+!REPOSITORY_NAME /cactusdevcvs
+
+CactusBase/Boundary
+CactusBase/CartGrid3D
+CactusBase/CoordBase
+CactusBase/IOASCII
+CactusBase/IOBasic
+CactusBase/IOUtil
+CactusBase/LocalInterp
+CactusBase/LocalReduce
+CactusBase/MoL
+CactusBase/SymBase
+CactusBase/Time
+
+CactusPUGH/PUGH
+CactusPUGH/PUGHInterp
+CactusPUGH/PUGHReduce
+CactusPUGH/PUGHSlab
+
+CactusUtils/NaNChecker
+CactusUtils/TimerReport
+
+CactusWave/IDScalarWaveC
+CactusWave/WaveToyC

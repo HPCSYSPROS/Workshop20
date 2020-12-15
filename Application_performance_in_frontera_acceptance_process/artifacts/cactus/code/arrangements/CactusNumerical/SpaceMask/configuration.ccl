@@ -1,0 +1,10 @@
+# Configuration definition for thorn SpaceMask
+# $Header$
+
+PROVIDES SpaceMask
+{
+  SCRIPT
+  LANG
+}
+
+REQUIRES CartGrid3D

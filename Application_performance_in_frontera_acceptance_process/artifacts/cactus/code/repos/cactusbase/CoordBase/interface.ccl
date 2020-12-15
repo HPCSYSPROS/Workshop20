@@ -1,0 +1,181 @@
+# Interface definition for thorn CoordBase
+# $Header$
+
+implements: CoordBase
+
+# Old header file - should use aliased functions
+
+include header: CoordBase.h in CoordBase.h
+
+
+
+# Exported functions
+
+CCTK_INT FUNCTION Coord_SystemRegister  \
+  (CCTK_POINTER_TO_CONST IN GH,         \
+   CCTK_INT IN dim,                     \
+   CCTK_STRING IN systemname)
+PROVIDES FUNCTION Coord_SystemRegister  \
+  WITH CoordBase_SystemRegister         \
+  LANGUAGE C
+
+CCTK_INT FUNCTION Coord_SystemHandle  \
+  (CCTK_POINTER_TO_CONST IN GH,       \
+   CCTK_STRING IN systemname)
+PROVIDES FUNCTION Coord_SystemHandle  \
+  WITH CoordBase_SystemHandle         \
+  LANGUAGE C
+
+CCTK_INT FUNCTION Coord_CoordRegister  \
+  (CCTK_POINTER_TO_CONST IN GH,        \
+   CCTK_INT IN systemhandle,           \
+   CCTK_INT IN direction,              \
+   CCTK_STRING IN coordname)
+PROVIDES FUNCTION Coord_CoordRegister  \
+  WITH CoordBase_CoordRegister         \
+  LANGUAGE C
+
+CCTK_INT FUNCTION Coord_CoordHandle    \
+  (CCTK_POINTER_TO_CONST IN GH,        \
+   CCTK_STRING IN coordname,           \
+   CCTK_STRING IN systemname)
+PROVIDES FUNCTION Coord_CoordHandle    \
+  WITH CoordBase_CoordHandle           \
+  LANGUAGE C
+
+CCTK_INT FUNCTION Coord_GroupSystem    \
+  (CCTK_POINTER_TO_CONST IN GH,        \
+   CCTK_STRING IN groupname)
+PROVIDES FUNCTION Coord_GroupSystem    \
+  WITH CoordBase_GroupSystem           \
+  LANGUAGE C
+
+CCTK_INT FUNCTION Coord_SetDefaultSystem   \
+  (CCTK_POINTER_TO_CONST IN GH,            \
+   CCTK_STRING IN systemname)
+PROVIDES FUNCTION Coord_SetDefaultSystem   \
+  WITH CoordBase_SetDefaultSystem          \
+  LANGUAGE C
+
+CCTK_INT FUNCTION Coord_GetDefaultSystem   \
+  (CCTK_POINTER_TO_CONST IN GH,            \
+   CCTK_INT IN systemdim)
+PROVIDES FUNCTION Coord_GetDefaultSystem   \
+  WITH CoordBase_GetDefaultSystem          \
+  LANGUAGE C
+
+
+
+# The location of the boundary points
+
+CCTK_INT FUNCTION GetBoundarySpecification \
+  (CCTK_INT IN size, \
+   CCTK_INT OUT ARRAY nboundaryzones, \
+   CCTK_INT OUT ARRAY is_internal, \
+   CCTK_INT OUT ARRAY is_staggered, \
+   CCTK_INT OUT ARRAY shiftout)
+PROVIDES FUNCTION GetBoundarySpecification \
+   WITH CoordBase_GetBoundarySpecification \
+   LANGUAGE C
+
+
+
+# The overall extent of the domain
+
+CCTK_INT FUNCTION GetDomainSpecification \
+  (CCTK_INT IN size, \
+   CCTK_REAL OUT ARRAY physical_min, \
+   CCTK_REAL OUT ARRAY physical_max, \
+   CCTK_REAL OUT ARRAY interior_min, \
+   CCTK_REAL OUT ARRAY interior_max, \
+   CCTK_REAL OUT ARRAY exterior_min, \
+   CCTK_REAL OUT ARRAY exterior_max, \
+   CCTK_REAL OUT ARRAY spacing)
+PROVIDES FUNCTION GetDomainSpecification \
+   WITH CoordBase_GetDomainSpecification \
+   LANGUAGE C
+
+
+
+# Convert between boundaries types
+
+CCTK_INT FUNCTION ConvertFromPhysicalBoundary \
+  (CCTK_INT IN size, \
+   CCTK_REAL IN  ARRAY physical_min, \
+   CCTK_REAL IN  ARRAY physical_max, \
+   CCTK_REAL OUT ARRAY interior_min, \
+   CCTK_REAL OUT ARRAY interior_max, \
+   CCTK_REAL OUT ARRAY exterior_min, \
+   CCTK_REAL OUT ARRAY exterior_max, \
+   CCTK_REAL IN  ARRAY spacing)
+PROVIDES FUNCTION ConvertFromPhysicalBoundary \
+   WITH CoordBase_ConvertFromPhysicalBoundary \
+   LANGUAGE C
+
+CCTK_INT FUNCTION ConvertFromInteriorBoundary \
+  (CCTK_INT IN size, \
+   CCTK_REAL OUT ARRAY physical_min, \
+   CCTK_REAL OUT ARRAY physical_max, \
+   CCTK_REAL IN  ARRAY interior_min, \
+   CCTK_REAL IN  ARRAY interior_max, \
+   CCTK_REAL OUT ARRAY exterior_min, \
+   CCTK_REAL OUT ARRAY exterior_max, \
+   CCTK_REAL IN  ARRAY spacing)
+PROVIDES FUNCTION ConvertFromInteriorBoundary \
+   WITH CoordBase_ConvertFromInteriorBoundary \
+   LANGUAGE C
+
+CCTK_INT FUNCTION ConvertFromExteriorBoundary \
+  (CCTK_INT IN size, \
+   CCTK_REAL OUT ARRAY physical_min, \
+   CCTK_REAL OUT ARRAY physical_max, \
+   CCTK_REAL OUT ARRAY interior_min, \
+   CCTK_REAL OUT ARRAY interior_max, \
+   CCTK_REAL IN  ARRAY exterior_min, \
+   CCTK_REAL IN  ARRAY exterior_max, \
+   CCTK_REAL IN  ARRAY spacing)
+PROVIDES FUNCTION ConvertFromExteriorBoundary \
+   WITH CoordBase_ConvertFromExteriorBoundary \
+   LANGUAGE C
+
+
+
+# Convenient way to determine boundary sizes
+CCTK_INT FUNCTION GetBoundarySizesAndTypes \
+  (CCTK_POINTER_TO_CONST IN cctkGH, \
+   CCTK_INT IN size, \
+   CCTK_INT OUT ARRAY bndsize, \
+   CCTK_INT OUT ARRAY is_ghostbnd, \
+   CCTK_INT OUT ARRAY is_symbnd, \
+   CCTK_INT OUT ARRAY is_physbnd)
+PROVIDES FUNCTION GetBoundarySizesAndTypes \
+   WITH CoordBase_GetBoundarySizesAndTypes \
+   LANGUAGE C
+
+
+
+CCTK_INT FUNCTION SymmetryTableHandleForGrid \
+  (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION SymmetryTableHandleForGrid
+
+# Current map
+CCTK_INT FUNCTION MultiPatch_GetMap \
+  (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION MultiPatch_GetMap
+
+# Multi-patch bbox, specifying outer boundaries
+CCTK_INT FUNCTION MultiPatch_GetBbox \
+  (CCTK_POINTER_TO_CONST IN cctkGH, \
+   CCTK_INT IN size, \
+   CCTK_INT OUT ARRAY bbox)
+USES FUNCTION MultiPatch_GetBbox
+
+# The location of the boundary points
+CCTK_INT FUNCTION MultiPatch_GetBoundarySpecification \
+  (CCTK_INT IN map, \
+   CCTK_INT IN size, \
+   CCTK_INT OUT ARRAY nboundaryzones, \
+   CCTK_INT OUT ARRAY is_internal, \
+   CCTK_INT OUT ARRAY is_staggered, \
+   CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION MultiPatch_GetBoundarySpecification

@@ -1,0 +1,11 @@
+CVS info   : $Header: /home/cvs/cccc/EUHydro/ZelmaniQuadWaveExtract/README,v 1.1 2004/06/27 23:58:19 cott Exp $
+
+Cactus Code Thorn ZelmaniQuadWaveExtract
+Thorn Author(s)     : Christian D. Ott <cott@aei.mpg.de>
+Thorn Maintainer(s) : Christian D. Ott <cott@aei.mpg.de>
+--------------------------------------------------------------------------
+
+Purpose of the thorn:
+
+Implements quadrupole formula wave extraction for Zelmani
+

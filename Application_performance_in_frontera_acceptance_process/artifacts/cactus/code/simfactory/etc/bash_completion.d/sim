@@ -1,0 +1,180 @@
+# Begin simfactory2 section
+have sim &&
+_sim () { local cur prev words cword cmds opts remote='' command=''
+    COMPREPLY=()
+    _get_comp_words_by_ref cur prev words cword
+    cmds="print-mdb sync remove-submitscript submit archive\
+          list-configurations print-mdb-entry create create-run cleanup\
+          create-submit build list-archived-simulations checkout\
+          list-simulations run stop execute setup-silent show-output\
+          list-machines setup run-debug purge get-archived-simulation\
+          get-output-dir login whoami interactive"
+    opts="-h --help --define --mdbkey --substitute --replace --append\
+          --hostname --force --noverbose --verbose --cdb --mdb --argument\
+          --remotecactuspath --runscript --remotemachine --noconsole --console\
+          --basedir --machine --scratchdir --submitscript --ppn-used\
+          --sourcebasedir --ppn --allocation --procs --walltime --remote\
+          --queue --localdir --num-threads --num-smt"
+    build_opts="--noprofile --profile --nooptimise --optimise --no-submitscript\
+          --nounsafe --unsafe --virtual --noreconfig --reconfig\
+          --virtual-executable --noclean --clean --nodebug --debug\
+          --thornlist --optionlist"
+    sim_opts="--from-restart-id --notestsuite --testsuite --norecover --recover\
+          --nohide --hide --debugger --nohide-dangerous --hide-dangerous\
+          --job-id --select-tests --nohide-boring --hide-boring --parfile\
+          --follow --configuration --config --restart-id"
+    sync_opts="-p --sync-path --sync-parfiles --sync-sourcetree"
+    util_opts="--setup-email --setup-user --setup-sourcebasedir --simulation"
+    info_opts="--long --name-only"
+
+    # So we can easily handle an option of the form --option=value
+    _split_longopt
+
+    # Check if we should complete for a remote machine
+    if [ "$prev" != "--remote" ]; then
+        local using_remote=0
+        for (( i=0; i<$cword; i++ )); do
+            if [ ${using_remote} == 1 ]; then
+                remote="--remote ${words[i]}";
+                break;
+            fi
+            if [ ${words[i]} == "--remote" ]; then
+                using_remote=1;
+            fi
+        done
+    fi
+
+    # Options which take a value
+    case "$prev" in
+    --define|--mdbkey|--substitute|--replace|--append|--argument|--allocation|\
+    --queue|--setup-user|--setup-email)
+        # Things we don't have a good suggestion for
+        return 0
+        ;;
+    --hostname)
+        # known_hosts
+        _known_hosts
+        return 0
+        ;;
+    --cdb|--mdb|--runscript|--basedir|--scratchdir|--submitscript|\
+    --sourcebasedir|--localdir|--virtual-executable|--thornlist|--optionlist|\
+    --parfile|-p|--sync-path|--setup-sourcebasedir)
+        # Local paths
+        _filedir
+        return 0
+        ;;
+    --remotecactuspath)
+        # Remote paths (FIXME: this should be remote)
+        _filedir
+        return 0
+        ;;
+    --remote|--remotemachine|--machine)
+        # Things which expect a machine name
+        local machines=$(sim list-machines --no-verbose --name-only 2> /dev/null )
+        COMPREPLY=( $(compgen -W "${machines}" -- ${cur}) )
+        return 0
+        ;;
+    --ppn-used|--ppn|--procs|--num-threads|--num-smt|--from-restart-id|\
+    --job-id|--restart-id|--walltime)
+        # Numeric values
+        COMPREPLY=()
+        return 0
+        ;;
+    --debugger)
+        COMPREPLY=( $(compgen -W "totalview ddt" -- ${cur}) )
+        return 0
+        ;;
+    --select-tests)
+        COMPREPLY=( $(compgen -W "all `ls arrangements/` `for i in arrangements/*/; do ls $i; done`" -- ${cur}) )
+        return 0
+        ;;
+    --configuration|--config)
+        # Things which expect a configuration name
+        # list-configurations is too slow - just use ls if we can
+        if [ "$remote" == "" ]; then
+            configs=$(ls configs/ 2> /dev/null)
+        else
+            configs=$(sim ${remote} list-configurations --no-verbose --name-only 2> /dev/null )
+        fi
+        COMPREPLY=( $(compgen -W "${configs}" -- ${cur}) )
+        return 0
+        ;;
+    --simulation)
+        local sims=$(sim ${remote} list-simulations --no-verbose --name-only 2> /dev/null )
+        COMPREPLY=( $(compgen -W "${sims}" -- ${cur}) )
+    	return 0
+	    ;;
+    esac
+
+    # Which subcommand have we already specified
+    for (( i=0; i<$cword; i++ )); do
+        if [[ "${cmds}" != "${cmds/ ${words[i]} /}" ]]; then
+            command="${words[i]}";
+        fi
+    done
+
+    case "$command" in
+    remove-submitscript)
+        # list-configurations is too slow - just use ls if we can
+        if [ "$remote" == "" ]; then
+            configs=$(ls configs/ 2> /dev/null)
+        else
+            configs=$(sim ${remote} list-configurations --no-verbose --name-only 2> /dev/null )
+        fi
+        COMPREPLY=( $(compgen -W "${configs}" -- ${cur}) )
+    	return 0
+	    ;;
+	build)
+        # list-configurations is too slow - just use ls if we can
+        if [ "$remote" == "" ]; then
+            configs=$(ls configs/ 2> /dev/null)
+        else
+            configs=$(sim ${remote} list-configurations --no-verbose --name-only 2> /dev/null )
+        fi
+        COMPREPLY=( $(compgen -W "${configs} ${build_opts} ${opts}" -- ${cur}) )
+    	return 0
+	    ;;
+    submit|archive|cleanup|run|stop|execute|show-output|run-debug|purge|get-output-dir|interactive)
+        local sims=$(sim ${remote} list-simulations --no-verbose --name-only 2> /dev/null )
+        COMPREPLY=( $(compgen -W "${sims} ${sim_opts} ${opts}" -- ${cur}) )
+    	return 0
+	    ;;
+    login)
+        local machines=$(sim list-machines --no-verbose --name-only 2> /dev/null )
+        COMPREPLY=( $(compgen -W "${machines} ${opts}" -- ${cur}) )
+    	return 0
+	    ;;
+    sync)
+        local machines=$(sim list-machines --no-verbose --name-only 2> /dev/null )
+        COMPREPLY=( $(compgen -W "${machines} ${sync_opts} ${opts}" -- ${cur}) )
+    	return 0
+	    ;;
+	create-run|create-submit|create)
+	    COMPREPLY=( $(compgen -W "${sim_opts} ${opts}" -- ${cur}) )
+	    return 0
+	    ;;
+	get-archived-simulation)
+        local sims=$(sim ${remote} list-archived-simulations --no-verbose --name-only 2> /dev/null )
+        COMPREPLY=( $(compgen -W "${sims}" -- ${cur}) )
+    	return 0
+	    ;;
+	setup)
+	    COMPREPLY=( $(compgen -W "${util_opts}" -- ${cur}) )
+	    return 0
+	    ;;
+	list-configurations|list-archived-simulations|list-simulations|list-machines)
+	    COMPREPLY=( $(compgen -W "${info_opts}" -- ${cur}) )
+	    return 0
+	    ;;
+	print-mdb|print-mdb-entry|checkout|setup-silent|whoami)
+	    return 0
+	    ;;
+	*)
+	    COMPREPLY=( $(compgen -W "${cmds} ${opts}" -- ${cur}) )
+	    return 0
+	    ;;
+    esac
+}
+
+complete -F _sim -o filenames sim
+# End simfactory2 section

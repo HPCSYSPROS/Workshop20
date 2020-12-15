@@ -1,0 +1,20 @@
+REMARK original generated coordinate pdb file
+ATOM      1  C1  CYH     0      -0.044  -1.457  -0.226  1.00  0.00      CH   C
+ATOM      2  C2  CYH     0       1.240  -0.766   0.226  1.00  0.00      CH   C
+ATOM      3  C3  CYH     0      -1.284  -0.691   0.226  1.00  0.00      CH   C
+ATOM      4  C4  CYH     0       1.284   0.691  -0.226  1.00  0.00      CH   C
+ATOM      5  C5  CYH     0      -1.240   0.766  -0.226  1.00  0.00      CH   C
+ATOM      6  C6  CYH     0       0.044   1.457   0.226  1.00  0.00      CH   C
+ATOM      7  H1  CYH     0      -0.046  -1.543  -1.319  1.00  0.00      CH   H
+ATOM      8  H2  CYH     0      -0.074  -2.477   0.174  1.00  0.00      CH   H
+ATOM      9  H3  CYH     0       1.313  -0.811   1.319  1.00  0.00      CH   H
+ATOM     10  H4  CYH     0       2.108  -1.303  -0.174  1.00  0.00      CH   H
+ATOM     11  H5  CYH     0      -2.182  -1.175  -0.174  1.00  0.00      CH   H
+ATOM     12  H6  CYH     0      -1.359  -0.731   1.319  1.00  0.00      CH   H
+ATOM     13  H7  CYH     0       2.182   1.175   0.174  1.00  0.00      CH   H
+ATOM     14  H8  CYH     0       1.359   0.732  -1.319  1.00  0.00      CH   H
+ATOM     15  H9  CYH     0      -1.313   0.811  -1.319  1.00  0.00      CH   H
+ATOM     16  H10 CYH     0      -2.108   1.303   0.174  1.00  0.00      CH   H
+ATOM     17  H11 CYH     0       0.046   1.543   1.319  1.00  0.00      CH   H
+ATOM     18  H12 CYH     0       0.074   2.477  -0.174  1.00  0.00      CH   H
+END

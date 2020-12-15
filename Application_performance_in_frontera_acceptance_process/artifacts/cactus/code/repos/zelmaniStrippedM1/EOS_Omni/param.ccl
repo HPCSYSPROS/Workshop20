@@ -1,0 +1,180 @@
+# Parameter definitions for thorn EOS_Omni
+
+
+restricted:
+
+# poly EOS
+REAL poly_gamma "Adiabatic Index for poly EOS" STEERABLE=RECOVER
+{
+ : :: ""
+} 2.0
+
+REAL poly_gamma_initial "Initial Adiabatic Index for poly EOS" STEERABLE=RECOVER
+{
+ -1   :: "use poly_gamma, ie no change in gamma during ID"
+ (0:* :: "assume that ID used this adiabiatic index"
+} -1
+
+REAL poly_k "Polytropic constant in c=G=Msun=1"  STEERABLE=RECOVER
+{
+ : :: ""
+} 100.0
+
+# gamma-law EOS
+REAL gl_gamma "Adiabatic Index for gamma-law EOS" STEERABLE=RECOVER
+{
+ : :: ""
+} 2.0
+
+REAL gl_k "Polytropic constant in c=G=Msun=1 for gamma-law EOS" STEERABLE=RECOVER 
+{
+ : :: ""
+} 100.0
+
+# hybrid EOS
+REAL hybrid_gamma1 "subnuclear adiabatic Index for hybrid EOS" STEERABLE=RECOVER
+{
+ : :: ""
+} 1.325
+
+REAL hybrid_gamma2 "subnuclear adiabatic Index for hybrid EOS" STEERABLE=RECOVER
+{
+ : :: ""
+} 2.5
+
+REAL hybrid_gamma_th "Thermal gamma for hybrid EOS" STEERABLE=RECOVER
+{
+ : :: ""
+} 1.5
+
+REAL hybrid_k1 "Polytropic constant in c=G=Msun=1 for hybrid EOS" STEERABLE=RECOVER 
+{
+ : :: ""
+} 0.4640517
+
+REAL hybrid_rho_nuc "Density at which to switch between gammas; c=G=Msun=1" STEERABLE=RECOVER 
+{
+ : :: ""
+} 3.238607e-4
+
+
+# piecewise polytrope hybrid EOS
+REAL pwp_gamma1 "first adiabatic Index for piecewise polytropic EOS" STEERABLE=RECOVER
+{
+ : :: ""
+} 1.325
+
+REAL pwp_gamma2 "second adiabatic Index for piecewise polytropic EOS" STEERABLE=RECOVER
+{
+ : :: ""
+} 2.5
+
+REAL pwp_gamma3 "third adiabatic Index for piecewise polytropic EOS" STEERABLE=RECOVER
+{
+ : :: ""
+} 3.5
+
+REAL pwp_gamma4 "fourth adiabatic Index for piecewise polytropic EOS" STEERABLE=RECOVER
+{
+ : :: ""
+} 3.5
+
+
+REAL pwp_k1 "Polytropic constant in c=G=Msun=1 for piecewise polytropic EOS" STEERABLE=RECOVER 
+{
+ : :: ""
+} 0.4640517
+
+REAL pwp_rho_1 "Density at which to switch between gammas; c=G=Msun=1" STEERABLE=RECOVER 
+{
+ : :: ""
+} 3.238607e-4
+
+REAL pwp_rho_2 "Density at which to switch between gammas; c=G=Msun=1" STEERABLE=RECOVER 
+{
+ : :: ""
+} 3.238607e-4
+
+REAL pwp_rho_3 "Density at which to switch between gammas; c=G=Msun=1" STEERABLE=RECOVER 
+{
+ : :: ""
+} 3.238607e-4
+
+
+REAL pwp_gamma_th "Thermal adiabatic Index for piecewise polytropic EOS" STEERABLE=RECOVER
+{
+ : :: ""
+} 3.5
+
+
+################ cold tabulated EOS + gamma-Law
+
+STRING coldeos_table_name "table name for cold EOS (ASCII)" 
+{
+ .* :: "Can be anything"
+} "blah.asc"
+
+BOOLEAN coldeos_read_table "Read in cold EOS table?" 
+{
+} "No"
+
+BOOLEAN coldeos_use_thermal_gamma_law "use an additional thermal gamma?"
+{
+} "Yes"
+
+################ barotropic tabulated EOS + gamma-Law
+
+STRING barotropiceos_table_name "table name for barotropic EOS (ASCII)" 
+{
+ .* :: "Can be anything"
+} "blah.asc"
+
+BOOLEAN barotropiceos_read_table "Read in barotropic EOS table?" 
+{
+} "No"
+
+BOOLEAN barotropiceos_use_thermal_gamma_law "use an additional thermal gamma?"
+{
+} "Yes"
+
+REAL barotropiceos_gammath "thermal gamma for barotropic EOS"
+{
+ 1.0:* :: "something"
+} 2.0
+
+################ Finite-Temperature Nuclear EOS
+
+BOOLEAN nuceos_read_table "Read in EOS table?" STEERABLE=RECOVER
+{
+} "No"
+
+BOOLEAN do_energy_shift "shift energies around?" STEERABLE=ALWAYS
+{
+} "yes"
+
+BOOLEAN dump_nuceos_table "Dump table in ASCII at beginning" STEERABLE=RECOVER
+{
+} "No"
+
+STRING dump_nuceos_table_name "nuceos dump table name (ASCII)" STEERABLE=RECOVER
+{
+ .* :: "Can be anything"
+} "blah.asc"
+
+STRING nuceos_table_name "nuceos table name (hdf5)" STEERABLE=RECOVER
+{
+ .* :: "Can be anything"
+} "blah.h5"
+
+BOOLEAN read_table_on_single_process "read table on one process only and bcast data" STEERABLE=ALWAYS
+{
+} "no"
+
+INT reader_process "read table on this process and bcast data" STEERABLE=ALWAYS
+{
+  0:* :: "read on process N"
+} 0
+
+shares: IO
+
+USES STRING out_dir

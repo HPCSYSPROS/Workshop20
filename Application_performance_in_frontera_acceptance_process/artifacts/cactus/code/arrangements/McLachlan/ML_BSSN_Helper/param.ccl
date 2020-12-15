@@ -1,0 +1,61 @@
+# ML_BSSN_Helper
+
+SHARES: Boundary
+
+USES CCTK_INT radpower
+
+SHARES: MethodofLines
+
+USES CCTK_INT MoL_Num_Constrained_Vars
+
+SHARES: ADMBase
+
+USES KEYWORD evolution_method
+
+SHARES: GenericFD
+
+USES CCTK_INT boundary_width
+
+SHARES: ML_BSSN
+
+# For backward compatibility
+USES KEYWORD my_initial_data
+EXTENDS KEYWORD my_initial_boundary_condition
+{
+  "extrapolate-gammas" :: "extrapolate-gammas"
+}
+EXTENDS KEYWORD my_rhs_boundary_condition
+{
+  "NewRad" :: "NewRad"
+}
+USES KEYWORD my_boundary_condition
+USES KEYWORD apply_dissipation
+USES CCTK_REAL shiftGammaCoeff
+USES CCTK_REAL LapseACoeff
+USES CCTK_REAL ShiftBCoeff
+USES CCTK_REAL LapseAdvectionCoeff
+USES CCTK_REAL ShiftAdvectionCoeff
+USES CCTK_INT evolveB
+
+USES CCTK_INT timelevels
+USES CCTK_INT rhs_timelevels
+USES CCTK_INT other_timelevels
+
+USES CCTK_REAL harmonicF
+USES CCTK_REAL conformalMethod
+
+EXTENDS KEYWORD initial_boundary_condition
+{
+  "extrapolate-gammas" :: "extrapolate-gammas"
+}
+EXTENDS KEYWORD rhs_boundary_condition
+{
+  "NewRad" :: "NewRad"
+}
+
+PRIVATE:
+
+CCTK_INT ML_BSSN_MaxNumConstrainedVars "Number of constrained variables used by this thorn" ACCUMULATOR-BASE=MethodofLines::MoL_Num_Constrained_Vars
+{
+  20:20 :: "Number of constrained variables used by this thorn"
+} 20

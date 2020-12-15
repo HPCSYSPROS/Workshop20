@@ -1,0 +1,44 @@
+# Schedule definitions for thorn CartesianCoordinates
+
+STORAGE: general_coordinates
+STORAGE: jacobian_state
+STORAGE: jacobian_derivative_state
+STORAGE: inverse_jacobian_state
+STORAGE: volume_form_state
+
+if (store_jacobian)
+{
+  STORAGE: jacobian
+}
+
+if (store_jacobian_derivative)
+{
+  STORAGE: jacobian2
+}
+
+if (store_inverse_jacobian)
+{
+  STORAGE: inverse_jacobian
+}
+
+if (store_volume_form)
+{
+   STORAGE: volume_form
+}
+
+SCHEDULE GROUP Coordinates_SetGlobalCoords_Group AT BASEGRID
+{
+} "Determine the global coordinates at each grid point."
+
+schedule group Coordinates_SetGlobalCoords_Group at CCTK_POSTREGRIDINITIAL
+{
+} "Determine the global coordinates of each gridpoint."
+
+schedule group Coordinates_SetGlobalCoords_Group at CCTK_POSTREGRID
+{
+} "Determine the global coordinates of each gridpoint."
+
+SCHEDULE CartesianCoordinates_Init in Coordinates_SetGlobalCoords_Group
+{
+  LANG: C
+} "Make clear that we have a trivial coordinate system"

@@ -1,0 +1,4 @@
+# Interface definition for thorn CCCCGlobalModes
+# $Header:$
+
+REQUIRES CarpetLib

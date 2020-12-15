@@ -1,0 +1,22 @@
+# Parameter definitions for thorn AEILocalInterp
+# $Header$
+
+# all parameters are private to this thorn
+private:
+
+#
+# If this logging is done, each processor writes its log data to a file
+# named via
+#	snprintf(buffer, length,
+#		 "AEILocalInterp.proc%d.log"
+#		 CCTK_MyProc())
+# Note that these log files are typically quite large, and writing them
+# may significantly slow the simulation -- you should probably only use
+# this option for debugging purposes.
+#
+Boolean log_interp_coords						\
+  "should we log the grid min(delta)max and the interpolation		\
+   coordinates for each call on the interpolator?"			\
+	STEERABLE=ALWAYS
+{
+} false

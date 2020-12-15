@@ -1,0 +1,78 @@
+#! /bin/sh
+#  /*@@
+#    @file      uxpv4.1_ES
+#    @date      Thu 06 Sep 2001
+#    @author    Thomas Radke
+#    @desc
+#               Known-architectures file for Fujitsu vector machines
+#    @enddesc
+#    @version   $Header$
+#  @@*/
+
+# check the machine hardware type
+# the VPP5000 series has 64bit, all others are assumed 32bit
+uname=`uname -m`
+
+if test "$uname" = '5000'; then
+  FUJITSU_LIBDIR='lib64'
+  FUJITSU_LIBS='fj95fv fj95f fj95 fj95f'
+else
+  FUJITSU_LIBDIR='lib'
+  FUJITSU_LIBS='fj90fv fj90f fj90 fj90f'
+fi
+
+if test "$CCTK_CONFIG_STAGE" = "preferred-compilers"; then
+  : ${F90=frt}
+else
+  # no way to generate dependencies on this machine
+  : ${C_DEPEND='echo'}
+  : ${CXX_DEPEND='echo'}
+  : ${F_DEPEND='echo'}
+  : ${F77_DEPEND='echo'}
+  : ${C_DEPEND_OUT='> /dev/null; : > $@'}
+  : ${CXX_DEPEND_OUT='> /dev/null; : > $@'}
+  : ${F_DEPEND_OUT='> /dev/null; : > $@'}
+  : ${F77_DEPEND_OUT='> /dev/null; : > $@'}
+
+  # '-Am' is needed to compile with modules
+  # '-X9' is needed to compile *.F files as fortran 90 code
+  : ${F77FLAGS='-Am'}
+  : ${F90FLAGS='-Am -X9'}
+
+  # some optimization flags
+  : ${C_OPTIMISE_FLAGS='-O -K4'}
+  : ${CXX_OPTIMISE_FLAGS='-O -K4 -Klib'}
+  : ${F77_OPTIMISE_FLAGS='-Kfast -Of'}
+  : ${F90_OPTIMISE_FLAGS='-Kfast -Of'}
+
+  case "$LD" in
+    vcc | CC)
+      # native linker only takes static libs by default
+      # but we also want socket lib
+      : ${LIBS="${FUJITSU_LIBS}"}
+      : ${LDFLAGS="-Wl,-J,-P,-dy /usr/${FUJITSU_LIBDIR}/libsocket.so /usr/${FUJITSU_LIBDIR}/libvfl.so"}
+      ;;
+    cc)
+      : ${LIBS="${FUJITSU_LIBS} socket vfl elf m gen fjsamp px"}
+      : ${LDFLAGS="-Wl,-J,-P,-L/usr/lang/${FUJITSU_LIBDIR}"}
+      ;;
+    *)
+      echo "Unknown linker $LD, don\'t know what libs to link with."
+      exit 2
+      ;;
+  esac
+
+# MPI stuff
+  if test -n "$MPI"; then
+    if test "$uname" = '5000'; then
+      NATIVE_MPI_INC_DIRS='/usr/lang/mpi2/include64'
+      NATIVE_MPI_LIB_DIRS='/usr/lang/mpi2/lib64'
+      NATIVE_MPI_LIBS='mpi++ mpi mp'
+    else
+      NATIVE_MPI_INC_DIRS='/usr/lang/mpi2/include'
+      NATIVE_MPI_LIB_DIRS='/usr/lang/mpi2/lib'
+      NATIVE_MPI_LIBS='mpi mp'
+    fi
+  fi
+
+fi

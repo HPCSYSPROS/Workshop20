@@ -1,0 +1,6 @@
+# Configuration definition for thorn SummationByParts
+# $Header$
+
+PROVIDES SummationByParts
+{
+}

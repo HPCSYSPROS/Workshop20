@@ -1,0 +1,11 @@
+# Parameter definitions for thorn InitBase
+
+RESTRICTED:
+
+KEYWORD initial_data_setup_method "Procedure for setting up initial data"
+{
+  "init_some_levels"  :: "Set up at least one time level; other time levels are scratch space"
+  "init_single_level" :: "Set up exactly one time level; other time levels are not accessed"
+  "init_two_levels"   :: "Set up exactly two time levels; other time levels are not accessed"
+  "init_all_levels"   :: "Set up all active time levels"
+} "init_some_levels"

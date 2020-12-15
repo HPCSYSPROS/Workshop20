@@ -1,0 +1,15 @@
+NAMD_ARCH = BlueGeneQ
+CHARMARCH = pamilrts-bluegeneq-async-smp-xlc
+
+CXX = bgxlC_r -qlanglvl=extended0x -qstaticinline -qsuppress=1540-0448:1500-036 -DNO_SOCKET  -DDUMMY_VMDSOCK -DNOHOSTNAME -DNO_CHDIR -DNO_STRSTREAM_H -DNO_GETPWUID -DARCH_POWERPC -DPOWERPC_TANINT
+
+CXXMEMUSAGE = $(CHARMC)
+
+CXXOPTS = -O3 -Q -qhot
+CXXNOALIASOPTS = -O3 -Q -qalias=noallptrs:notypeptr -qdebug=plst3:cycles -qdebug=QPLAT:QPLAT27 -DA2_QPX
+# NOTE: -qdebug=QPLAT:QPLAT27 is a NAMD-specific optimization for A2_QPX code
+
+CXXTHREADOPTS = -O3 -Q
+
+CC = bgxlc_r 
+COPTS = -O3 -qhot

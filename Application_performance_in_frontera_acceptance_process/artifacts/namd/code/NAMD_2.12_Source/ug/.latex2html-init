@@ -1,0 +1,25 @@
+
+$BODYTEXT = 'BGCOLOR="WHITE"';
+$WHITE_BACKGROUND = 1;
+$LATEX_COLOR = "\\pagecolor{white}";
+
+sub pre_pre_process {
+    s/\\begin\s*{cvnamd}\s*\n?//gom;
+    s/\\end\s*{cvnamd}\s*\n?//gom;
+    s/\n[^%\n]*\\end\s*{cvlammps}\s*\n?/\001/gom;
+    s/((^|\n)[^%\n]*)\\begin\s*{cvlammps}([^\001]*)\001/$1/gom;
+    s/\n[^%\n]*\\end\s*{cvrefman}\s*\n?/\001/gom;
+    s/((^|\n)[^%\n]*)\\begin\s*{cvrefman}([^\001]*)\001/$1/gom;
+}
+
+sub custom_TITLE_hook {
+    local($title, $toc_sec_title) = @_;
+    if ( $DOCUMENT_TITLE ) {
+      return($title." (".$DOCUMENT_TITLE.")");
+    } else {
+      $DOCUMENT_TITLE = $title unless ($title eq "Footnotes");
+      return($title);
+    }
+}
+
+1;  # this must be the last line

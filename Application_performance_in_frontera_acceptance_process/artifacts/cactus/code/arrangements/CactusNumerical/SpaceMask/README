@@ -1,0 +1,10 @@
+Cactus Code Thorn SpaceMask
+Author(s)    : Denis Pollney
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Provides utilities for assigning states to individual grid points
+using a mask grid function.

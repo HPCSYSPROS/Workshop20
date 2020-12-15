@@ -1,0 +1,15 @@
+#! /bin/bash
+#$ -r n
+#$ -l h_rt=@WALLTIME@
+#$ -q @QUEUE@
+#$ -pe daturamon @PROCS_REQUESTED@
+#$ @('@CHAINED_JOB_ID@' != '' ? '-hold_jid @CHAINED_JOB_ID@' : '')@
+#$ -N @SHORT_SIMULATION_NAME@
+#$ -M @EMAIL@
+#$ -m abe
+#$ -o @RUNDIR@/@SIMULATION_NAME@.out
+#$ -e @RUNDIR@/@SIMULATION_NAME@.err
+#$ -cwd
+#$ -R y
+cd @SOURCEDIR@
+@SIMFACTORY@ run @SIMULATION_NAME@ --machine=datura --restart-id=@RESTART_ID@ @FROM_RESTART_COMMAND@

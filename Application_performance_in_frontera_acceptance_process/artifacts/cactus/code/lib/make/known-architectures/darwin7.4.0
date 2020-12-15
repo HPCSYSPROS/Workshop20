@@ -1,0 +1,13 @@
+#! /bin/sh
+# /*@@
+#   @file    darwin7.4.0
+#   @date    Tuesday June 1 2004 
+#   @author  Gabrielle Allen
+#   @desc
+#            Known architecture stuff for MacOS X (Darwin) release 7.4.0
+#   @enddesc
+#   @version $Header$
+# @@*/
+
+. $srcdir/known-architectures/darwin
+

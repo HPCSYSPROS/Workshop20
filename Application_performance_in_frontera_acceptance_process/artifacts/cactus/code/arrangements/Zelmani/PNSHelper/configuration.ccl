@@ -1,0 +1,3 @@
+# Configuration definitions for thorn PNSHelper
+
+REQUIRES Carpet GSL LAPACK MPI

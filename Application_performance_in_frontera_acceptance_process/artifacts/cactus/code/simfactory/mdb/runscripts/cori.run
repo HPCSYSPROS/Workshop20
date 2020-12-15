@@ -1,0 +1,31 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+module list
+
+echo "Checking:"
+pwd
+hostname
+date
+# TODO: This does not work
+cat ${PBS_NODES} > SIMFACTORY/NODES
+
+echo "Environment:"
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export GMON_OUT_PREFIX=gmon.out
+export OMP_NUM_THREADS=@NUM_THREADS@
+env | sort > SIMFACTORY/ENVIRONMENT
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+srun -n @NUM_PROCS@ -c @(@PPN@ / @NODE_PROCS@)@ @EXECUTABLE@ -L 3 @PARFILE@
+echo "Stopping:"
+date
+
+echo "Done."

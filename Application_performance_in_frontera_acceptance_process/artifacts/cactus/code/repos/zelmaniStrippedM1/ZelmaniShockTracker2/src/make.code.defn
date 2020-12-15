@@ -1,0 +1,7 @@
+# Main make.code.defn file for thorn ZelmaniShockFinder
+
+# Source files in this directory
+SRCS = CheckStatus.c Track.cc Print.cc helpers.cc zst_find.cc
+
+# Subdirectories containing source files
+SUBDIRS = 

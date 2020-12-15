@@ -1,0 +1,683 @@
+% /*@@
+%   @file      Infrastructure.tex
+%   @date      27 Jan 1999
+%   @author    Tom Goodale, Gabrielle Allen, Gerd Lanferman, Thomas Radke
+%   @desc
+%              Infrastructure thorn writer's guide for the Cactus User's Guide
+%   @enddesc
+%   @version   $Header$
+% @@*/
+
+\renewcommand{\thepage}{\Alph{part}\arabic{page}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Infrastructure Thorns}
+\label{chap:infrastructure}
+
+\begin{itemize}
+ \item{} Concepts and terminology (Overloading and registration of functions)
+ \item{} The cGH structure --- what it is and how to use it
+ \item{} Extending the cGH structure
+ \item{} Querying group and variable information
+ \item{} Providing an I/O layer
+ \item{} Providing a communication layer
+ \item{} Providing a reduction operator
+ \item{} Providing an interpolation operator
+ \item{} Overloadable functions
+\end{itemize}
+
+\section{Concepts and Terminology}
+\label{chap:cote}
+
+\subsection{Overloading and Registration}
+
+The flesh defines a core API which guarantees the presence of a set of
+functions.  Although the flesh guarantees the presence of these functions,
+they can be provided by thorns.  Thorns do this by either the \textit{overloading}
+or the \textit{registration} of functions.
+
+\subsubsection{Overloading}
+
+Some functions can only be provided by one thorn.  The first thorn to
+\textit{overload} this function succeeds, and any later attempt to overload
+the function fails.  For each overloadable function, there is a function
+with a name something like {\tt CCTK\_Overload...} which is passed the
+function pointer.
+
+\subsubsection{Registration}
+
+Some functions may be provided by several thorns.  The thorns \textit{register}
+their function with the flesh, and when the flesh-provided function is called,
+the flesh calls all the registered functions.
+
+\subsection{GH Extensions}
+
+A GH extension is a way to associate data with each cGH.  This data should be data
+that is required to be associated with a particular GH by a thorn.
+
+Each GH extension is given a unique handle.
+
+\subsection{I/O Methods}
+
+An I/O method is a distinct way to output data.  Each I/O method has a unique name,
+and the flesh-provided I/O functions operate on all registered I/O methods.
+
+\section{GH Extensions}
+
+A GH extension is created by calling {\tt CCTK\_RegisterGHExtension}, with the
+name of the extension.  This returns a unique handle that identifies the extension.
+(This handle can be retrieved at any time by a call to {\tt CCTK\_GHExtensionHandle}.)
+
+Associated with a GH extension are three functions
+
+\begin{Lentry}
+\item[{\tt SetupGH}]
+this is used to actually create the data structure holding the extension.  It
+is called when a new cGH is created.
+\item[{\tt InitGH}]
+this is used to initialise the extension.  It is called after the scheduler has
+been initialised on the cGH.
+\item[{\tt ScheduleTraverseGH}]
+this is called whenever the schedule tree is due to be traversed on the GH.  It
+should initialise the data on the cGH and the call {\tt CCTK\_ScheduleTraverse} to traverse
+the schedule tree.
+\end{Lentry}
+
+\section{Overloadable and Registerable Functions in Main}
+
+ \begin{tabular}{|l|l|}
+   \hline  {\bf Function} & {\bf Default} \\
+   \hline {\t CCTK\_Initialise}           &\\
+   \hline {\t CCTK\_Evolve}               &\\
+   \hline {\t CCTK\_Shutdown}             &\\
+   \hline
+ \end{tabular}
+
+\section{Overloadable and Registerable Functions in Comm}
+
+  \begin{tabular}{|l|l|}
+   \hline {\bf Function} & {\bf Default}  \\
+   \hline {\t CCTK\_SyncGroup}           &\\
+   \hline {\t CCTK\_SyncGroupsByDirI}    &\\
+   \hline {\t CCTK\_EnableGroupStorage}  &\\
+   \hline {\t CCTK\_DisableGroupStorage} &\\
+   \hline {\t CCTK\_QueryMaxTimeLevels}  &\\
+   \hline {\t CCTK\_EnableGroupComm}     &\\
+   \hline {\t CCTK\_DisableGroupComm}    &\\
+   \hline {\t CCTK\_Barrier}             &\\
+   \hline {\t CCTK\_Reduce}              &\\
+   \hline {\t CCTK\_Interp}              &\\
+   \hline {\t CCTK\_ParallelInit}        &\\
+   \hline
+  \end{tabular}
+
+\section{Overloadable and Registerable Functions in I/O}
+
+ \begin{tabular}{|l|l|}
+   \hline {\bf Function} & {\bf Default}   \\
+   \hline {\t CCTK\_OutputGH}            & \\
+   \hline {\t CCTK\_OutputVarAsByMethod} & \\
+   \hline
+ \end{tabular}
+
+\section{Drivers}
+
+The flesh does not know about memory allocation for grid variables, about how
+to communicate data when synchronisation is called for, or about
+multiple patches or adaptive mesh refinement.  All this is the job of a driver.
+
+This chapter describes how to add a driver to your code.
+
+\subsection{Anatomy}
+
+A driver consists of a Startup routine which creates a GH extension, 
+registers its associated functions, and overloads the communication functions.
+It may optionally register interpolation, reduction, and I/O methods.
+
+A driver may also overload the default Initialisation and Evolution routines,
+although a simple unigrid evolver is supplied in the flesh.
+
+\subsection{Startup}
+
+A driver consists of a GH extension, and the following overloaded
+functions.
+
+\begin{enumerate}
+\item{} {\tt CCTK\_EnableGroupStorage}
+\item{} {\tt CCTK\_DisableGroupStorage}
+\item{} {\tt CCTK\_QueryMaxTimeLevels}
+\item{} {\tt CCTK\_ArrayGroupSizeB}
+\item{} {\tt CCTK\_QueryGroupStorageB}
+\item{} {\tt CCTK\_SyncGroup}
+\item{} {\tt CCTK\_SyncGroupsByDirI}
+\item{} {\tt CCTK\_EnableGroupComm}
+\item{} {\tt CCTK\_DisableGroupComm}
+\item{} {\tt CCTK\_Barrier}
+\item{} {\tt CCTK\_OverloadParallelInit}
+\item{} {\tt CCTK\_OverloadExit}
+\item{} {\tt CCTK\_OverloadAbort}
+\item{} {\tt CCTK\_OverloadMyProc}
+\item{} {\tt CCTK\_OverloadnProcs}
+\end{enumerate}
+
+The overloadable function {\tt CCTK\_SyncGroup} is deprecated, a driver should
+instead provide a routine to overload the more general function
+{\tt CCTK\_SyncGroupsByDirI}.
+
+\subsection{The GH Extension}
+
+The GH extension is where the driver stores all its grid-dependent information.
+This is stuff like any data associated with a grid variable (e.g.\ storage and
+communication state), how many grids if it is AMR, ...  It is very difficult to
+describe in general, but one simple example might be
+
+\begin{verbatim}
+
+struct SimpleExtension
+{
+  /* The data associated with each variable */
+  /* data[var][timelevel][ijk]                */
+  void ***data
+} ;
+
+\end{verbatim}
+
+with a {\tt SetupGH} routine like
+
+\begin{verbatim}
+
+struct SimpleExtension *SimpleSetupGH(tFleshConfig *config, int conv_level, cGH *GH)
+{
+   struct SimpleExtension *extension;
+
+   extension = NULL;
+
+   if(conv_level < max_conv_level)
+   {
+      /* Create the extension */
+      extension = malloc(sizeof(struct SimpleExtension));
+
+      /* Allocate data for all the variables */
+      extension->data = malloc(num_vars*sizeof(void**));
+
+      for(var = 0 ; var < num_vars; var++)
+      {
+        /* Allocate the memory for the time levels */
+        extension->data[var] = malloc(num_var_time_levels*sizeof(void *));
+
+        for(time_level = 0; time_level < num_var_time_level; time_level++)
+        {
+          /* Initialise the data to NULL */
+          extension->data[var][time_level] = NULL;
+        }
+      }
+    }
+
+   return extension;
+}
+
+\end{verbatim}
+
+Basically, what this example is doing is preparing a data array for use.  The
+function can query the flesh for information on every variable.  Note that
+scalars should always have memory actually assigned to them.
+
+An {\tt InitGH} function isn't strictly necessary, and in this case, it could
+just be a dummy function.
+
+The {\tt ScheduleTraverseGH} function needs to fill out the cGH data, and
+then call {\tt CCTK\_ScheduleTraverse} to have the functions scheduled at
+that point executed on the grid
+
+\begin{verbatim}
+
+int SimpleScheduleTraverseGH(cGH *GH, const char *where)
+{
+  int retcode;
+  int  var;
+  int  gtype;
+  int  ntimelevels;
+  int  level;
+  int  idir;
+
+  extension = (struct SimpleExtension *)GH->extensions[SimpleExtension];
+
+  for (idir=0;idir<GH->cctk_dim;idir++)
+  {
+    GH->cctk_levfac[idir] = 1;
+    GH->cctk_nghostzones[idir] = extension->nghostzones[idir];
+    GH->cctk_lsh[idir]         = extension->lnsize[idir];
+    GH->cctk_gsh[idir]         = extension->nsize[idir];
+    GH->cctk_bbox[2*idir]      = extension->lb[extension->myproc][idir] == 0;
+    GH->cctk_bbox[2*idir+1]    = extension->ub[extension->myproc][idir]
+                              == extension->nsize[idir]-1;
+    GH->cctk_lbnd[idir]        = extension->lb[extension->myproc][idir];
+    GH->cctk_ubnd[idir]        = extension->ub[extension->myproc][idir];
+
+  }
+
+  for(var = 0; var < extension->nvariables; var++)
+  {
+    gtype = CCTK_GroupTypeFromVarI(var);
+    ntimelevels = CCTK_MaxTimeLevelsVI(var);
+
+    for(level = 0; level < ntimelevels; level++)
+    {
+      switch(gtype)
+      {
+        case CCTK_SCALAR :
+          GH->data[var][level] = extension->variables[var][level];
+          break;
+        case CCTK_GF     :
+          GH->data[var][level] =
+            ((pGF ***)(extension->variables))[var][level]->data;
+          break;
+        case CCTK_ARRAY :
+          GH->data[var][level] =
+            ((pGA ***)(extension->variables))[var][level]->data;
+          break;
+        default:
+          CCTK_WARN(CCTK_WARN_ALERT,"Unknown group type in SimpleScheduleTraverse");
+      }
+    }
+  }
+
+  retcode = CCTK_ScheduleTraverse(where, GH, NULL);
+
+  return retcode;
+
+}
+
+\end{verbatim}
+
+The third argument to {\tt CCTK\_ScheduleTraverse} is actually a function
+which will be called by the scheduler when it wants to call a function
+scheduled by a thorn.  This function is given some information about
+the function to call, and is an alternative place where the cGH can be setup.
+
+This function is optional, but a simple implementation might be
+
+\begin{verbatim}
+
+int SimpleCallFunction(void *function,
+                       cFunctionData *fdata,
+                       void *data)
+{
+  void (*standardfunc)(void *);
+
+  int (*noargsfunc)(void);
+
+  switch(fdata->type)
+  {
+    case FunctionNoArgs:
+      noargsfunc = (int (*)(void))function;
+      noargsfunc();
+      break;
+    case FunctionStandard:
+      switch(fdata->language)
+      {
+        case LangC:
+          standardfunc = (void (*)(void *))function;
+          standardfunc(data);
+          break;
+        case LangFortran:
+          fdata->FortranCaller(data, function);
+          break;
+        default :
+          CCTK_WARN(CCTK_WARN_ALERT, "Unknown language.");
+      }
+      break;
+    default :
+      CCTK_WARN(CCTK_WARN_ALERT, "Unknown function type.");
+  }
+
+  /* Return 0, meaning didn't synchronise */
+  return 0;
+}
+
+\end{verbatim}
+
+The return code of the function signifies whether or not the function
+synchronised the groups in this functions synchronisation list of not.
+
+The flesh will synchronise them if the function returns false.
+
+Providing this function is probably the easiest way to do multi-patch or
+AMR drivers.
+
+\subsection{Memory Functions}
+
+These consist of
+\begin{enumerate}
+\item{} {\tt CCTK\_EnableGroupStorage}
+\item{} {\tt CCTK\_DisableGroupStorage}
+\item{} {\tt CCTK\_QueryMaxTimeLevels}
+\item{} {\tt CCTK\_QueryGroupStorageB}
+\item{} {\tt CCTK\_ArrayGroupSizeB}
+\end{enumerate}
+
+\subsubsection{En/Disable Group Storage}
+
+These are responsible for switching the memory for all variables
+in a group on or off.  They should return the former state, e.g.\
+if the group already has storage assigned, they should return 1.
+
+In our simple example above, the enabling routine would look
+something like
+
+\begin{verbatim}
+
+int SimpleEnableGroupStorage(cGH *GH, const char *groupname)
+{
+
+  extension = (struct SimpleExtension *)GH->extensions[SimpleExtension];
+
+  if(extension->data[first][0][0] == NULL)
+  {
+    for(var = first; var <= last; var++)
+    {
+      allocate memory for all time levels;
+    }
+    retcode = 0;
+  }
+  else
+  {
+    retcode = 1;
+  }
+
+  return retcode;
+}
+
+\end{verbatim}
+
+The disable function is basically the reverse of the enable one.
+
+The {\tt CCTK\_QueryMaxTimeLevels} function returns the maximum number of
+timelevels ever activated for a given group ie. the size of the {\tt data}
+member of {\tt cGH}.
+
+The {\tt QueryGroupStorage} function basically returns true or false if
+there is storage for the group, and the {\tt ArrayGroupSize} returns the
+size of the grid function or array group in a particular direction.
+
+\subsubsection{En/Disable Group Comm}
+
+These are the communication analogues to the storage functions.  Basically,
+they flag that communication is to be done on that group or not, and may
+initialise data structures for the communication.
+
+
+\section{I/O Methods}
+\label{chap:io_methods}
+%
+The flesh by itself does not provide output for grid variables or other data.
+Instead, it provides a mechanism for thorns to register their own
+routines as I/O methods, and to invoke these I/O methods by either the
+flesh scheduler or by other thorn routines.
+
+This chapter explains how to implement your own I/O methods and register
+them with the flesh.
+%
+\subsection{I/O Method Registration}
+%
+All I/O methods have to be registered with the flesh before they can be used.
+
+The flesh I/O registration API provides a routine {\t CCTK\_RegisterIOMethod()}
+to create a handle for a new I/O method which is identified by its name
+(this name must be unique for all I/O methods).
+With such a handle, a thorn can then register a set of functions (using the
+{\t CCTK\_RegisterIOMethod*()} routines from the flesh) for doing
+periodic, triggered, and/or unconditional output.
+
+The following example shows how a thorn would register an I/O method,
+{\tt SimpleIO}, with routines to provide all these different types of output.
+%
+\begin{verbatim}
+  void SimpleIO_Startup (void)
+  {
+    int handle = CCTK_RegisterIOMethod ("SimpleIO");
+    if (handle >= 0)
+    {
+      CCTK_RegisterIOMethodOutputGH (handle, SimpleIO_OutputGH);
+
+      CCTK_RegisterIOMethodTimeToOutput (handle, SimpleIO_TimeToOutput);
+      CCTK_RegisterIOMethodTriggerOutput (handle, SimpleIO_TriggerOutput);
+
+      CCTK_RegisterIOMethodOutputVarAs (handle, SimpleIO_OutputVarAs);
+    }
+  }
+\end{verbatim}
+%
+%
+\subsection{Periodic Output of Grid Variables}
+%
+The flesh scheduler will automatically call {\t CCTK\_OutputGH()} at every
+iteration after the {\tt CCTK\_ANALYSIS} time bin. This function loops over all
+I/O methods and calls their routines registered as {\t OutputGH()} (see also Section
+\ref{subsec:schedule_ccl}).
+%
+\begin{alltt}
+  int SimpleIO_OutputGH (const cGH *\var{GH});
+\end{alltt}
+%
+The {\t OutputGH()} routine itself should loop over all variables living on the
+\texttt{GH} grid hierarchy, and do all necessary output if requested
+(this is usually determined by I/O parameter settings).
+
+As its return code, it should pass back the number of variables which were output
+at the current iteration, or zero if no output was done by this I/O method.
+%
+%
+\subsection{Triggered Output of Grid Variables}
+%
+Besides the periodic output at every so many iterations using {\t OutputGH()},
+analysis and output of grid variables can also be done via triggers. For this,
+a {\t TimeToOutput()} routine is registered with an I/O method.
+This routine will be called by the flesh scheduler at every iteration before
+{\tt CCTK\_ANALYSIS} with the triggering variable(s) as defined in the schedule
+block for all {\tt CCTK\_ANALYSIS} routines (see Section \ref{scheduling:schedule_block}).
+
+If the {\t TimeToOutput()} routine decides that it is now time to do output, the
+flesh scheduler will invoke the corresponding analysis routine and also request
+output of the triggering variable(s) using {\t TriggerOutput()}.
+%
+\begin{alltt}
+  int SimpleIO_TimeToOutput (const cGH *\var{GH}, int \var{varindex});
+  int SimpleIO_TriggerOutput (const cGH *\var{GH}, int \var{varindex});
+\end{alltt}
+%
+Both routines get passed the index of a possible triggering grid variable.
+
+{\t TimeToOutput()} should return a non-zero value if analysis and output
+for \texttt{\var{varindex}} should take place at the current iteration, and zero
+otherwise.
+
+{\t TriggerOutput()} should return zero for successful output of variable
+\texttt{\var{varindex}}, and a negative value in case of an error.
+%
+%
+\subsection{Unconditional Output of Grid Variables}
+
+An I/O method's {\t OutputVarAs()} routine is supposed to do output for a
+specific grid variable if ever possible. It will be invoked by the flesh I/O API
+routines {\t CCTK\_OutputVar*()} for unconditional, non-triggered output of
+grid variables (see also Section \ref{sec:io}).
+
+A function registered as an \texttt{OutputVarAs()} routine has the following
+prototype:
+%
+\begin{alltt}
+  int SimpleIO_OutputVarAs (const cGH *\var{GH}, const char *\var{varname}, const char *\var{alias});
+\end{alltt}
+%
+The variable to output, \texttt{\var{varname}}, is given by its full name.
+The full name may have appended an optional I/O options string enclosed in
+curly braces (with no space between the full name and the opening curly brace).
+In addition to that, an \texttt{\var{alias}} string can be passed which then
+serves the purpose of constructing a unique name for the output file.
+
+The {\t OutputVarAs()} routine should return zero if output for
+\texttt{\var{varname}}
+was done successfully, or a negative error code otherwise.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Checkpointing/Recovery Methods}
+\label{chap:cp_recovery_methods}
+
+Like for I/O methods, checkpointing/recovery functionality must be implemented
+by thorns. The flesh only provides specific time bins at which the scheduler
+will call thorns' routines, in order to perform checkpointing and/or recovery.
+
+This chapter explains how to implement checkpointing and recovery methods
+in your thorn.  For further information, see the documentation for thorn
+\texttt{CactusBase/IOUtil}.
+
+\subsection{Checkpointing Invocation}
+
+Thorns register their checkpointing routines at {\t CCTK\_CPINITIAL} and/or
+{\t CCTK\_CHECKPOINT} and/or {\t CCTK\_TERMINATE}. These time bins are
+scheduled right after all initial data has been set up, after every
+evolution timestep, and after the last time step of a simulation,
+respectively. (See Section \ref{subsec:schedule_ccl} for a description of all timebins).
+Depending on
+parameter settings, the checkpoint routines decide whether to write an initial
+data checkpoint, and when to write an evolution checkpoint.
+
+Each checkpoint routine should save all information to persistent storage, which
+is necessary to restart the simulation at a later time from exactly the same
+state. Such information would include
+%
+\begin{itemize}
+  \item the current settings of all parameters
+  \item the contents of all grid variables which have global storage assigned
+    and are not tagged with {\tt checkpoint="no"} (see also Section \ref{subsec:Appendix.interface-variables} on page \pageref{subsec:Appendix.interface-variables} for a list of possible tags)\\
+    Note that grid variables should be synced before writing them to disk.
+  \item other relevant information such as the current iteration number and
+    physical time, the number of processors, etc.
+\end{itemize}
+
+
+\subsection{Recovery Invocation}
+
+Recovering from a checkpoint is a two-phase operation for which the flesh
+provides distinct timebins for recovery routines to be scheduled at:
+%
+\begin{Lentry}
+  \item[{\t CCTK\_RECOVER\_PARAMETERS}] This time bin is executed before
+    {\t CCTK\_STARTUP}, in which the parameter file is parsed. From these parameter
+    settings, the recovery routines should decide whether recovery was
+    requested, and if so, restore all parameters from the checkpoint file and
+    overwrite those which aren't steerable.\\
+    The flesh loops over all registered recovery routines to find out
+    whether recovery was requested. Each recovery routine should, therefore,
+    return a positive integer value for successful parameter recovery (causing
+    a shortcut of the loop over all registered recovery routines),
+    zero for no recovery, or a negative value to flag an error.\\
+    If recovery was requested, but no routine could successfully recover
+    parameters, the flesh will abort the run with an error message.
+    If no routine recovered any parameters, i.e. if all parameter
+    recovery routines returned zero, then this indicates that this run
+    is not a recovery run.\\
+    If parameter recovery was performed successfully, the scheduler will set the
+    {\tt recovered} flag which---in combination with the setting of the {\tt
+    Cactus::recovery\_mode} parameter---decides whether any thorn routine
+    scheduled for {\t CCTK\_INITIAL} and {\t CCTK\_POSTINITIAL} will be called.
+    The default is to not execute these initial time bins during recovery, 
+    because the initial data will be set up from the checkpoint file during the
+    following {\t CCTK\_RECOVER\_VARIABLES} time bin.
+  \item[{\t CCTK\_RECOVER\_VARIABLES}]
+    Recovery routines scheduled for this time bin are responsible for restoring
+    the contents of all grid variables with storage assigned from the
+    checkpoint.\\
+    Depending on the setting of {\tt Cactus::recovery\_mode}, they should also
+    decide how to treat errors in recovering individual grid variables. Strict
+    recovery (which is the default) requires all variables to be restored
+    successfully (and will stop the code if not), whereas a relaxed mode
+    could, e.g. allow for grid variables, which are not found in the checkpoint
+    file, to be gracefully ignored during recovery.
+\end{Lentry}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Clocks for Timing}
+\label{chap:clocks}
+
+To add a Cactus clock, you need to write several functions to provide the
+timer functionality (see Section \ref{sec:timers}), and then register these
+functions with the flesh as a named clock.
+
+The function pointers are placed in function pointer fields of a 
+\texttt{cClockFuncs} structure.  The fields of this structure are are:
+
+\begin{Lentry}
+
+\item[{\t create}] {\t void *(*create)(int)}
+\item[{\t destroy}] {\t void (*destroy)(int, void *)}
+\item[{\t start}] {\t void (*start)(int, void *)}
+\item[{\t stop}] {\t void (*stop)(int, void *)}
+\item[{\t reset}] {\t void (*reset)(int, void *)}
+\item[{\t get}] {\t void (*get)(int, void *, cTimerVal *)}
+\item[{\t set}] {\t void (*set)(int, void *, cTimerVal *)}
+\item[{\t n\_vals}] {\t int}
+
+\end{Lentry}
+
+The first \texttt{int} argument of the functions may be used in any way
+you see fit.
+
+The \texttt{n\_vals} field holds the number of elements in the 
+\texttt{vals} array field of the \texttt{cTimerVal} structure 
+used by your timer (usually 1).
+
+The return value of the \texttt{create} function will be a pointer to
+a new structure representing your clock.
+
+The second \texttt{void*} argument of all the other functions will be the
+pointer returned from the \texttt{create} function.
+
+The \texttt{get} and \texttt{set} functions should write to and read from
+(respectively) a structure pointed to by the \texttt{cTimerVal*} argument:
+
+\begin{verbatim}
+typedef enum {val_none, val_int, val_long, val_double} cTimerValType;
+
+typedef struct
+{
+  cTimerValType type;
+  const char *heading;
+  const char *units;
+  union
+ {
+    int        i;
+    long int   l;
+    double     d;
+  } val;
+  double seconds;
+  double resolution;
+} cTimerVal;
+\end{verbatim}
+
+The \texttt{heading} field is the name of the clock, the \texttt{units} 
+field  holds a string describing the type held in the \texttt{val} field,
+and the \texttt{seconds} field is the time elapsed in seconds.  The 
+\texttt{resolution} field is the smallest non-zero difference in values 
+of two calls to the timer, in seconds.  For example, it could reflect
+that the clock saves the time value internally as an integer value 
+representing milliseconds.
+
+To name and register the clock with the flesh, call the function
+\begin{alltt}
+	CCTK_ClockRegister( "\var{my_clock_name}", &\var{clock_func} ).
+\end{alltt}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{cactuspart}

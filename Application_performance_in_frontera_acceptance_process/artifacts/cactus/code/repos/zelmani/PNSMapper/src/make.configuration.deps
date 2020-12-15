@@ -1,0 +1,2 @@
+$(CCTK_LIBDIR)$(DIRSEP)libthorn_PNSMapper.a : $(CCTK_LIBDIR)$(DIRSEP)libthorn_EOS_Omni.a
+

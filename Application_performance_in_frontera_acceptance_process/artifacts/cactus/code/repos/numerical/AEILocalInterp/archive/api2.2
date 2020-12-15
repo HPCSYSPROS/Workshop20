@@ -1,0 +1,496 @@
+Author: Jonathan Thornburg <jthorn@aei.mpg.de>
+Date: 30 December 2001
+
+This is version 2.2 of my proposal for the new interpolator API.  The
+main changes since version 1 are
+* function names have changed (longer, more descriptive)
+* output arrays may now be N-dimensional (before they were only 1-D)
+* a bunch more optional stuff in the table to specify array strides,
+  time levels, etc
+* no #defines in the header file for derivative operation codes
+* int arrays changed to CCTK_INT
+
+Don't be scared by the length, for most uses it's not that complicated!
+There are some examples below...
+
+
+
+Synopsis
+========
+
+  int status = CCTK_InterpLocalArrays(arguments described below)
+  int status = CCTK_InterpGridArrays(arguments described below)
+
+return is 0 for ok, various -ve values for error codes
+
+(N.b. the flesh APIs to register interpolation operators will also need
+their C function prototypes changed to match the changes here.)
+
+
+
+Function Arguments
+==================
+
+  /***** misc arguments *****/
+for CCTK_InterpGridArrays() only:
+  const cGH *GH;
+for both CCTK_InterpLocalArrays() and CCTK_InterpGridArrays():
+  /* note N_dims is the number of dimensions in the *interpolation*; */
+  /* this may be smaller than the number of dimensions of the input arrays */
+  /* if the storage indexing is set up appropriately (eg to interpolate */
+  /* in 1-D lines or 2-D planes of 3-D grid arrays) */
+  int N_dims;
+  int operator_handle;
+  int param_table_handle;       /* handle to "parameter table", a key-value */
+                                /* table, see below for table entries */
+
+  /***** arguments specifying the coordinate system *****/
+for CCTK_InterpLocalArrays():
+  /* the local coordinate system is specified as a generic linear mapping */
+  /* from (integer) local input array subscripts --> (global) coordinates: */
+  /*   coordinate = coord_system_origin[axis] + subscript*grid_spacing[axis] */
+  const CCTK_REAL coord_system_origin[N_dims];	/* coords of subscript 0 */
+  const CCTK_REAL grid_spacing[N_dims];
+for CCTK_InterpGridArrays():
+  int coord_system_handle;	/* handle to Cactus coordinate system */
+				/* specifying mapping of */
+				/* (integer) input array subscripts */
+				/* <--> (floating point) coordinates */
+
+  /***** arguments specifying the interpolation points *****/
+  int N_interp_points;
+  /* (pointer to) array of CCTK_VARIABLE_* codes giving the */
+  /* data types of the arrays pointed to by  interp_coords[] */
+  const CCTK_INT interp_coord_type_codes[N_dims];
+  /* (pointer to) array[N_dims] of pointers to arrays[N_interp_points] */
+  /* giving x,y,z,... coordinates of interpolation points */
+  const void *const interp_coords[N_dims];
+
+  /***** arguments specifying the inputs (the data to be interpolated) *****/
+  int N_input_arrays;
+for CCTK_InterpLocalArrays():
+  /* array of input array dimensions (common to all input arrays) */
+  const CCTK_INT input_array_dims[N_dims];
+  /* array of CCTK_VARIABLE_* codes giving data types of input arrays */
+  const CCTK_INT input_array_type_codes[N_input_arrays];
+  /* array of pointers to input arrays */
+  const void *const input_arrays[N_input_arrays];
+for CCTK_InterpGridArrays():
+  /* array of CCTK variable indices of input arrays */
+  const CCTK_INT input_array_variable_indices[N_input_arrays];
+
+for both CCTK_InterpLocalArrays() and CCTK_InterpGridArrays() again:
+  /***** arguments specifying the outputs (the interpolation results) *****/
+  int N_output_arrays;
+  /* array of CCTK_VARIABLE_* codes giving data types of output arrays */
+  const CCTK_INT output_array_type_codes[N_output_arrays];
+  /* array[N_output_arrays] of pointers to output arrays[N_interp_points] */
+  void *const output_arrays[N_output_arrays];
+
+
+
+Information Passed in the Parameter Table
+=========================================
+
+The "parameter table" may be used to specify non-default storage indexing
+for input or output arrays, and/or various options for the interpolation
+itself.  Some interpolators may not implement all of these options.
+
+
+Array Addressing/Subscripting Options
+-------------------------------------
+
+Sometimes one of the "arrays" used by the interpolator isn't contiguous
+in memory.  For example, we might want to do 2-D interpolation within a
+plane of a 3-D grid array, and/or the grid array might be a member of a
+compact group.  To support this, we use several optional table entries
+(these should be supported by all interpolation operators):
+
+For the input arrays, we use
+
+  const CCTK_INT input_array_offsets[N_input_arrays];
+  /* next 3 table entries are shared by all input arrays */
+  const CCTK_INT input_array_strides       [N_dims];
+  const CCTK_INT input_array_min_subscripts[N_dims];
+  const CCTK_INT input_array_max_subscripts[N_dims];
+
+Then for input array number a, the generic subscripting expression for
+the 3-D case is
+  data_pointer[offset + i*istride + j*jstride + k*kstride]
+where
+  data_pointer = input_arrays[a]
+  offset = input_array_offsets[a]
+  (istride,jstride,kstride) = input_array_stride[]
+and where (i,j,k) run from input_array_min_subscripts[] to
+input_array_max_subscripts[] inclusive.
+
+The defaults are offset=0, stride=determined from input_array_dims[]
+in the usual Fortran manner, input_array_min_subscripts[] = 0,
+input_array_max_subscripts[] = input_array_dims[]-1.  If the stride
+and max subscript are both specified explicitly, then the
+input_array_dims[] function argument is ignored.
+
+For CCTK_InterpGridArrays() operating on a member of a compact group
+the offset and strides are interpreted in units of _grid_points_.  This
+has the advantage that interpolator calls need not be changed if a grid
+array is changed from being simple to/from compact.  In terms of actual
+memory addressing, then, the internal subscripting expression for this
+case would be
+  group_data_pointer[offset + member_number + i*istride*N_members
+                                            + j*jstride*N_members
+                                            + k*kstride*N_members]
+
+For CCTK_InterpGridArrays(), by default the input (grid) arrays are at
+the "current" Cactus time level (level 0).  This may be changed with the
+table entry
+  const CCTK_INT input_array_time_levels[N_input_arrays];
+
+By default the interpolation-point coordinates and the output arrays
+are all contiguous 1-D arrays.  This may be changed with the table
+entries
+
+  const CCTK_INT interp_coords_offsets[N_dims];
+  const CCTK_INT output_array_offsets[N_output_arrays];
+  /* next 4 table entries are shared by all interp coords and output arrays */
+  const CCTK_INT interp_point_N_dims;
+  const CCTK_INT interp_point_strides       [interp_point_N_dims];
+  const CCTK_INT interp_point_min_subscripts[interp_point_N_dims];
+  const CCTK_INT interp_point_max_subscripts[interp_point_N_dims];
+
+For example, if we wanted to do 3-D interpolation, interpolating a value
+at each non-ghost-zone point of a 2-D grid of points, with the grid point
+coordinates stored as 2-D arrays, we would use
+  N_dims = 3
+  interp_point_N_dims = 2
+  interp_point_strides[] = set up from the full size of the 2-D grid
+  interp_point_{min,max}_subscripts[] = specify the non-ghost-zone points
+                                        of the 2-D grid
+
+Excision Options
+----------------
+
+Some interpolators may specifically support excision, where a mask array
+(same dimensionality and indexing as the input arrays) is used to mark
+some grid points as valid (ok to use data there) and other grid points
+as invalid (the interpolator isn't allowed to use data there).
+
+If an interpolator supports this, it should use the following optional
+parameters:
+
+for CCTK_InterpLocalArrays();
+  const CCTK_INT mask_type_code;  /* one of the CCTK_VARIABLE_* codes */
+  const void *const mask_array;   /* same dimensions/indexing as input arrays */
+for CCTK_InterpGridArrays():
+  const CCTK_INT mask_variable_index;
+
+for both CCTK_InterpLocalArrays() and CCTK_InterpGridArrays():
+  /* we consider a grid point to be valid if and only if the mask */
+  /* has a value in the closed interval [mask_valid_min,mask_valid_max] */
+  /* n.b. the caller should beware of possible rounding problems here; */
+  /*      it may be appropriate to widen the valid interval slightly */
+  /*      if the endpoints aren't exactly-representable floating-point */
+  /*      values */
+  const mask_type mask_valid_min, mask_valid_max;
+
+The same type of storage options supported for the input and/or output
+arrays, are also supported for the mask; the mask may have its own offset
+and/or time level, but shares any input-array stride and/or min/max
+subscript specification:
+
+  const CCTK_INT mask_offset;
+  const CCTK_INT mask_time_level;
+
+
+The remaining parameter-table options are specific to the new interpolator
+I'm currently implementing for PUGHInterp.  This registers (only) a single
+operator, "generalized polynomial interpolation".
+
+
+Interpolation Order and Molecule Family
+---------------------------------------
+
+The mandatory parameter
+
+  const CCTK_INT order;
+
+sets the order of the interpolating polynomial (1=linear, 2=quadratic,
+3=cubic, etc).  Thus the simplest call can just use (eg)
+  Util_TableCreateFromString("order=3")
+for cubic interpolation.
+
+All the remaining parameters in the table are optional; if they're
+omitted defaults will be supplied.
+
+  /* this selects one of a family of related operators */
+  /* the default (and the only one I'm implementing right now) */
+  /* is "cube" to use the usual hypercube-shaped molecules */
+  const char *const molecule_family;
+
+Smoothing
+---------
+
+The way I'm implementing the interpolation it's easy to also do
+Savitzky-Golay type smoothing (= moving least-square fitting, cf
+Numerical Recipes 2nd edition section 14.8).  This is controlled by
+the parameter
+
+  const CCTK_INT smoothing;
+
+which says how much (how many points) to enlarge the interpolation
+molecule for this.  The default is 0 (no smoothing).  1 would mean to
+enlarge the molecule by 1 point, e.g. to use a 5-point molecule instead
+of the usual 4-point one for cubic interpolation.  2 would mean to
+enlarge by 2 points, e.g. to use a 6-point molecule for cubic
+interpolation.  Etc etc.
+
+This type of smoothing is basically free apart from the increase in
+the molecule size, e.g. a smoothing=2 cubic interpolation has exactly
+the same cost as any other 6-point-molecule interpolation.
+
+Derivatives
+-----------
+
+This interpolator can optionally (and again at no extra cost) take
+partial derivatives as part of the interpolation:
+  const CCTK_INT operand_indices[N_output_arrays];
+  const CCTK_INT opcodes        [N_output_arrays];
+The semantics here are that
+   output array[i] = op(input array[ operand_indices[i] ])
+where  op  is specified as an integer operation code as described below.
+
+Note that the array operand_indices[] doesn't directly name the inputs,
+but rather gives the indices (0-origin) in the list of inputs.  This
+allows for a more efficient implementation in the case where some of
+the input arrays have many different operations applied to them.
+
+The operations are coded based on the decimal digits of the integer:
+each decimal digit means to take the derivative in that direction;
+the order of the digits in a number is ignored.  For example:
+  0 = no derivative, "just" interpolate
+  1 = interpolate d/dx1 (derivative along x1 coordinate)
+  2 = interpolate d/dx2 (derivative along x2 coordinate)
+  11 = interpolate d^2/dx1^2 (2nd derivative along x1 coordinate)
+  22 = interpolate d^2/dx2^2 (2nd derivative along x2 coordinate)
+  12 = 21 = interpolate d^2/dx1 dx2 (mixed 2nd partial derivative in x1 and x2)
+  122 = 212 = 221 = interpolate d^3/dx1 dx2^2 (mixed 3rd partial derivative)
+  222 = interpolate d^3/dx2^3 (3rd derivative along x2 coordinate)
+  123 = 132 = 213 = 231 = 312 = 321
+      = interpolate d^3/dx1 dx2 dx3 (mixed 3rd partial derivative)
+
+After discussion with Tom Goodale, we have decided *not* to put #defines
+for the operation codes in any of the interpolator header files -- the
+operation codes are specific to this particular interpolation operator,
+not common to all operators, so they don't belong in the overall
+common-to-all header files.
+
+
+
+Pointers in Fortran
+===================
+
+One possible problem area with this API is that it requires creating
+arrays of pointers pointing to other arrays.  In C this is no problem,
+but in Fortran 77 this is difficult.  So, I propose adding two new Cactus
+functions to make this easier for Fortran users:
+
+   CCTK_POINTER Util_PointerTo(any Fortran variable or array)
+   CCTK_POINTER Util_NullPointer()
+
+Util_PointerTo would be #defined to %loc on those compilers which have
+that extension to standard Fortran, or would be a Cactus-provided utility
+routine for other cases.  It's trivial to write the latter case in C so
+long as the Fortran compiler actually uses call by reference; I've never
+heard of a Fortran compiler doing otherwise for arrays.  (And even for
+Fortran scalar variables it would be very hard for a compiler to do otherwise
+in light of separate compilation and 1-element arrays being allowed to be
+passed to/from scalar variables.)
+
+
+
+A Simple Example
+================
+
+Here's a simple example, written in Fortran 77, to do quadratic interpolation
+of a real and a complex local array in 3-D:
+
+c input arrays:
+        integer ni, nj, nk
+        parameter (ni=..., nj=..., nk=...)
+        CCTK_REAL    real_gridfn   (ni,nj,nk)
+        CCTK_COMPLEX complex_gridfn(ni,nj,nk)
+
+c interpolation coordinates
+        integer N_interp
+        parameter (N_interp = ...)
+        CCTK_REAL xcoord(N_interp), y_coord(N_interp), z_coord(N_interp)
+
+c output arrays:
+        CCTK_REAL    real_at_xyz   (N_interp)
+        CCTK_COMPLEX complex_at_xyz(N_interp)
+
+        integer status, dummy
+        CCTK_INT input_array_type_codes(2)
+        data input_array_type_codes /CCTK_VARIABLE_REAL,
+     $                               CCTK_VARIABLE_COMPLEX/
+        CCTK_INT input_array_dims(3)
+        CCTK_POINTER input_arrays(2)
+        CCTK_INT interp_coord_type_codes(3)
+        data interp_coord_type_codes /CCTK_VARIABLE_REAL,
+     $                                CCTK_VARIABLE_REAL,
+     $                                CCTK_VARIABLE_REAL/
+        CCTK_POINTER interp_coords(3)
+        CCTK_INT output_array_type_codes(2)
+        data output_array_type_codes /CCTK_VARIABLE_REAL,
+     $                                CCTK_VARIABLE_COMPLEX/
+        CCTK_POINTER output_arrays(2)
+
+        input_array_dims(1) = ni
+        input_array_dims(2) = nj
+        input_array_dims(3) = nk
+        interp_coords(1) = Util_PointerTo(xcoord)
+        interp_coords(2) = Util_PointerTo(ycoord)
+        interp_coords(3) = Util_PointerTo(zcoord)
+        output_arrays(1) = Util_PointerTo(real_at_xyz)
+        output_arrays(2) = Util_PointerTo(complex_at_xyz)
+
+        call CCTK_InterpLocalArrays
+     $          (status,                ! return code
+                 3,                     ! number of dimensions
+                 operator_handle, coord_system_handle,
+                 Util_TableCreateFromString("order=2"),
+                 N_interp,
+                 interp_coord_type_codes, interp_coords,
+                 2,                     ! number of input arrays
+                 input_array_type_codes, input_array_dims, input_arrays,
+                 2,                     ! number of output arrays
+                 output_array_type_codes, output_arrays)
+
+        if (status .lt. 0) then
+                call CCTK_WARN(status, "Error return from interpolator!")
+                call CCTK_Exit(dummy, Util_NullPointer(), status)
+        end if
+
+
+
+A More Complicated Example
+==========================
+
+Here's a more complicated example, written in C++.  (I'm really only using
+C++ to get cleaner initialization of the various arrays, this is still
+"almost C".)  This example is a simplified form of what I will be doing
+in my new apparent horizon finder:
+
+//
+// input grid functions (12 of them, all 3-D CCTK_REAL):
+//      gxx, gxy, gxz, gyy, gyz, gzz,
+//      Kxx, Kxy, Kxz, Kyy, Kyz, Kzz
+//
+// interpolation coordinates:
+//      xcoord, ycoord, zcoord   (all CCTK_REAL[N_interp_points])
+//
+// we want to interpolate the gij and Kij, and also interpolate all the
+// first derivatives of the gij, so the output arrays are
+// (30 of them, all CCTK_REAL[N_interp_points])
+//      I_gxx, dx_gxx, dy_gxx, dz_gxx,
+//      I_gxy, dx_gxy, dy_gxy, dz_gxy,
+//      I_gxz, dx_gxz, dy_gxz, dz_gxz,
+//      I_gyy, dx_gyy, dy_gyy, dz_gyy,
+//      I_gyz, dx_gyz, dy_gyz, dz_gyz,
+//      I_gzz, dx_gzz, dy_gzz, dz_gzz,
+//      I_Kxx, I_Kxy, I_Kxz, I_Kyy, I_Kyz, I_Kzz
+//
+
+#define VP(x) static_cast<void *>(x)
+
+const int N_dims = 3;
+const CCTK_INT interp_coord_type_codes[N_dims]
+        = { CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL };
+const void *const interp_coords[N_dims]
+        = { VP(xcoord), VP(ycoord), VP(zcoord) };
+
+const int N_input_arrays = 12;
+const CCTK_INT input_array_types[N_input_arrays]
+        = { CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL,
+            CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL,
+            CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL,
+            CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL };
+
+const CCTK_INT input_array_variable_indices[N_input_arrays]
+        = { CCTK_VarIndex("somethorn::gxx"),
+            CCTK_VarIndex("somethorn::gxy"),
+            CCTK_VarIndex("somethorn::gxz"),
+            CCTK_VarIndex("somethorn::gyy"),
+            CCTK_VarIndex("somethorn::gyz"),
+            CCTK_VarIndex("somethorn::gzz"),
+            CCTK_VarIndex("somethorn::Kxx"),
+            CCTK_VarIndex("somethorn::Kxy"),
+            CCTK_VarIndex("somethorn::Kxz"),
+            CCTK_VarIndex("somethorn::Kyy"),
+            CCTK_VarIndex("somethorn::Kyz"),
+            CCTK_VarIndex("somethorn::Kzz") };
+
+const int N_output_arrays = 30;
+CCTK_INT output_array_type_codes[N_output_arrays];
+        for (int oi = 0 ; oi < N_output_arrays ; ++oi)
+        {
+        output_array_type_codes[oi] = CCTK_VARIABLE_REAL;
+        }
+
+void *const output_arrays[N_output_arrays]
+        = {
+          VP(I_gxx), VP(dx_gxx), VP(dy_gxx), VP(dz_gxx),
+          VP(I_gxy), VP(dx_gxy), VP(dy_gxy), VP(dz_gxy),
+          VP(I_gxz), VP(dx_gxz), VP(dy_gxz), VP(dz_gxz),
+          VP(I_gyy), VP(dx_gyy), VP(dy_gyy), VP(dz_gyy),
+          VP(I_gyz), VP(dx_gyz), VP(dy_gyz), VP(dz_gyz),
+          VP(I_gzz), VP(dx_gzz), VP(dy_gzz), VP(dz_gzz),
+          VP(I_Kxx), VP(I_Kxy), VP(I_Kxz), VP(I_Kyy), VP(I_Kyz), VP(I_Kzz)
+          };
+
+const CCTK_INT operand_indices[N_output_arrays];
+        = {
+          0, 0, 0, 0,           // gxx
+          1, 1, 1, 1,           // gxy
+          2, 2, 2, 2,           // gxz
+          3, 3, 3, 3,           // gyy
+          4, 4, 4, 4,           // gyz
+          5, 5, 5, 5,           // gzz
+          6, 7, 8, 9, 10, 11    // Kxx-Kzz
+          };
+
+const CCTK_INT opcodes[N_output_arrays]
+        = {
+          0, 1, 2, 3,           // I, dx, dy, dz
+          0, 1, 2, 3,           // I, dx, dy, dz
+          0, 1, 2, 3,           // I, dx, dy, dz
+          0, 1, 2, 3,           // I, dx, dy, dz
+          0, 1, 2, 3,           // I, dx, dy, dz
+          0, 1, 2, 3,           // I, dx, dy, dz
+          0, 0, 0, 0, 0, 0      // all I
+          };
+
+int param_table_handle = Util_TableCreate(UTIL_TABLE_DEFAULT);
+Util_TableSetInt(param_table_handle, 3, "order");
+Util_TableSetIntArray(param_table_handle,
+		      N_output_arrays, operand_indices,
+		      "operand_indices");
+Util_TableSetIntArray(param_table_handle,
+		      N_output_arrays, opcodes,
+		      "opcodes");
+
+int status = CCTK_InterpGridArrays(GH,
+                                   N_dims,
+                                   operator_handle, coord_system_handle,
+                                   param_table_handle,
+                                   N_interp_points,
+                                   interp_coord_type_codes, interp_coords,
+                                   N_input_arrays,
+                                   input_array_variable_indices,
+                                   N_output_arrays,
+                                   output_array_type_codes, output_arrays);
+if (status < 0)
+        {
+        CCTK_WARN(status, "error return from CCTK_InterpGridArrays()!");
+        CCTK_Exit(GH, status);                                  /*NOTREACHED*/
+        }
+Util_TableDestroy(param_table_handle);

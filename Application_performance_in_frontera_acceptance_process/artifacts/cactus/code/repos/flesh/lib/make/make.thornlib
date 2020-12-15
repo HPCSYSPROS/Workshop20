@@ -1,0 +1,164 @@
+# /*@@
+#   @file      make.thornlib
+#   @date      Sun Jan 17 22:20:45 1999
+#   @author    Tom Goodale
+#   @desc 
+#   Creates the library for a particular thorn
+#   @enddesc 
+#   @version $Id$
+# @@*/
+
+# Dividers to make the screen output slightly nicer
+DIVEL   =  __________________
+DIVIDER =  $(DIVEL)$(DIVEL)$(DIVEL)$(DIVEL)
+ifeq ($(shell echo $(VERBOSE) | tr '[:upper:]' '[:lower:]'),yes)
+define NOTIFY_DIVIDER
+	echo $(DIVIDER)
+endef
+else
+define NOTIFY_DIVIDER
+endef
+endif
+
+# Include the main make definitions for this configuration
+include $(CONFIG)/make.config.defn
+
+BINDINGS_DIR=$(TOP)/bindings
+
+# Include the configuration make.THORN_NAME.defn for the thorn
+# if it is not CactusBindings
+INC_DIRS = 
+ifneq ($(THORN), CactusBindings)
+-include $(BINDINGS_DIR)/Configuration/Thorns/make.$(THORN).defn
+endif
+
+# Add appropriate include lines
+INC_DIRS += $(SYS_INC_DIRS) $(SRCDIR) $(wildcard $(SRCDIR)/include) $(CONFIG) $(BINDINGS_DIR)/include $(CCTK_HOME)/src/include $(CCTK_HOME)/arrangements $(BINDINGS_DIR)/Configuration/Thorns $(BINDINGS_DIR)/include/$(THORN)
+
+INC_DIRS_F = $(INC_DIRS)
+
+# Allow subdirectories to inherit these include directories
+export INC_DIRS
+export INC_DIRS_F
+
+# Define some make variables
+PRE_WRAPPER = make.pre
+POST_WRAPPER = make.post
+
+CCTK_SRCS :=
+
+# Include the thorn's local include data
+include $(SRCDIR)/make.code.defn
+
+# Some extra stuff to allow make to recurse into subdirectories
+# Protect the value of SRCS and SUBDIRS of this directory
+
+LOCAL_SUBDIRS := . $(SUBDIRS)
+
+# Include all the make.code.defn files for the subdirectories
+# These have to be wrapped to allow us to concatenate all the
+# SRCS definitions, complete with subdirectory names.
+# Using -include to prevent warnings the first time the make.identity files 
+# need to be made.
+ifneq ($(strip $(LOCAL_SUBDIRS)),)
+-include $(foreach DIR,$(LOCAL_SUBDIRS), $(DIR)/make.identity $(MAKE_DIR)/$(PRE_WRAPPER) $(SRCDIR)/$(DIR)/make.code.defn $(MAKE_DIR)/$(POST_WRAPPER))
+endif
+
+# The CactusBindings pseudo-thorn doesn't need to define its own bindings 8-)
+
+ifneq ($(THORN), CactusBindings)
+THORNBINDINGS=cctk_Bindings
+-include cctk_Bindings/make.identity $(MAKE_DIR)/$(PRE_WRAPPER) $(BINDINGS_DIR)/build/$(THORN)/make.code.defn $(MAKE_DIR)/$(POST_WRAPPER)
+endif
+
+# Restore the value of SRCS and SUBDIRS of this directory
+SRCS = $(CCTK_SRCS)
+
+SUBDIRS = $(LOCAL_SUBDIRS)
+
+# Turn source file names into object file names
+OBJS = $(SRCS:%=%.o)
+
+$(NAME): $(addsuffix /make.checked, $(SUBDIRS) $(THORNBINDINGS))
+	if [ -r $(NAME) ] ; then echo Updating $(NAME) ; else echo Creating $(NAME) ; fi
+	rm -f $@
+###	create an archive of the object files
+#	
+##	This naive method will fail on some machines (eg. IBM SP5)
+##	when there are too many object files to be passed on the command line.
+#	$(AR) $(ARFLAGS) $@ $(OBJS)
+#
+##	This creates a list of all object files and incrementally archives them
+##	in batches not larger than $(OBJS-words-max) files at a time.
+	$(MAKE) -f $(MAKE_DIR)/make.thornlib $(NAME).objectlist
+	xargs -n $(OBJS-words-max) $(AR) $(ARFLAGS) $@ < $(NAME).objectlist
+##	Alternatively, we could create a single object file from the object
+##	files and put it into an archive.
+#	ld -r -o $@.o $(OBJS)
+#	$(AR) $(ARFLAGS) $@ $@.o
+	if test "x$(USE_RANLIB)" = "xyes" ; then $(RANLIB) $(RANLIBFLAGS) $@ ; fi
+##	Or we could create a dynamic library the object files.
+##	to do: use a two-level namespace
+##		(this requires knowing the dependencies of each thorn library)
+#	libtool -dynamic -arch_only ppc -o $@ $(OBJS) -flat_namespace -undefined suppress -single_module
+	$(NOTIFY_DIVIDER)
+
+# Extra stuff for allowing make to recurse into directories
+
+# This one makes the object files in the subdirectory
+.PHONY: FORCE
+
+$(addsuffix /make.checked, $(SUBDIRS)) : FORCE
+	if [ ! -d $(dir $@) ] ; then $(MKDIR) $(MKDIRFLAGS) $(dir $@) ; fi
+	cd $(dir $@) ; $(MAKE) CCTK_TARGET=make.checked TOP=$(TOP) CONFIG=$(CONFIG) SRCDIR=$(subst /*,,$(dir $(SRCDIR)/$@)*) THORN=$(THORN) USESTHORNS="$(USESTHORNS)" -f $(MAKE_DIR)/make.subdir
+
+cctk_Bindings/make.checked: FORCE
+	cd cctk_Bindings; $(MAKE) CCTK_TARGET=make.checked TOP=$(TOP) CONFIG=$(CONFIG) SRCDIR=$(BINDINGS_DIR)/build/$(THORN) THORN=$(THORN) USESTHORNS="$(USESTHORNS)" -f $(MAKE_DIR)/make.subdir
+
+# This one puts a file containing identity info into the build subdirectory
+$(addsuffix /make.identity, $(SUBDIRS) $(THORNBINDINGS)):
+	if [ ! -d $(dir $@) ] ; then $(MKDIR) $(MKDIRFLAGS) $(dir $@) ; fi
+	echo CCTK_THIS_SUBDIR := $(dir $@) > $@
+
+
+
+# Create a file containing the names of all object files.
+
+# Since the list may be too long to be passed to a shell, it is split
+# into a set of rules which add lines to a file.  This file can later
+# be used via xargs.
+
+OBJS-words = $(words $(OBJS))
+
+ifeq ($(shell uname),AIX)
+# Be conservative about the maximum number of objects that can be
+# handled at once.  AIX has a command line length limit of about
+# 32000.  Each object's path name may be about 100 characters long.
+OBJS-words-max = 200
+else ifneq ($(findstring CYGWIN_NT,$(shell uname)),)
+# Ditto
+OBJS-words-max = 200
+else
+# Assume that the system has no limit to speak of
+OBJS-words-max = 10000
+endif
+
+ifeq ($(shell test $(OBJS-words) -le $(OBJS-words-max) && echo 1), 1)
+
+# The list is short.  Create the file directly, which is faster.
+
+.PHONY: $(NAME).objectlist
+$(NAME).objectlist:
+	echo $(OBJS) > $@
+
+else
+
+# The list is long.  Create it one object file a time.
+
+.PHONY: $(NAME).objectlist
+$(NAME).objectlist:
+	$(shell : > $@.tmp)
+	$(foreach obj, $(OBJS), $(shell echo $(obj) >> $@.tmp))
+	mv $@.tmp $@
+
+endif

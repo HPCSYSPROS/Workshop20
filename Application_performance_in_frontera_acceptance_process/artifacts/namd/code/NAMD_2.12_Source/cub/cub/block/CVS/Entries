@@ -1,0 +1,13 @@
+/block_discontinuity.cuh/1.1/Thu Sep  8 21:02:02 2016//THEAD
+/block_exchange.cuh/1.1/Thu Sep  8 21:02:02 2016//THEAD
+/block_histogram.cuh/1.1/Thu Sep  8 21:02:02 2016//THEAD
+/block_load.cuh/1.1/Thu Sep  8 21:02:02 2016//THEAD
+/block_radix_rank.cuh/1.1/Thu Sep  8 21:02:02 2016//THEAD
+/block_radix_sort.cuh/1.1/Thu Sep  8 21:02:02 2016//THEAD
+/block_raking_layout.cuh/1.1/Thu Sep  8 21:02:02 2016//THEAD
+/block_reduce.cuh/1.1/Thu Sep  8 21:02:02 2016//THEAD
+/block_reduce_by_key.cuh/1.1/Thu Sep  8 21:02:02 2016//THEAD
+/block_scan.cuh/1.1/Thu Sep  8 21:02:02 2016//THEAD
+/block_shuffle.cuh/1.1/Thu Sep  8 21:02:02 2016//THEAD
+/block_store.cuh/1.1/Thu Sep  8 21:02:02 2016//THEAD
+D/specializations////

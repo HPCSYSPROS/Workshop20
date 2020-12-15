@@ -1,0 +1,7 @@
+# Schedule definitions for thorn CoordBase
+# $Header$
+
+schedule CoordBase_Startup at CCTK_STARTUP
+{
+  LANG: C
+} "Register a GH extension to store the coordinate system handles"

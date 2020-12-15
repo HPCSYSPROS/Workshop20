@@ -1,0 +1,69 @@
+# Schedule definitions for thorn CarpetIOHDF5
+
+storage: next_output_iteration next_output_time this_iteration
+storage: last_output_iteration_slice last_output_time_slice this_iteration_slice
+
+schedule CarpetIOHDF5_Startup at STARTUP after IOUtil_Startup
+{
+  LANG: C
+} "Startup routine"
+
+schedule CarpetIOHDF5_Init at INITIAL
+{
+  LANG: C
+  OPTIONS: global
+} "Initialisation routine"
+
+schedule CarpetIOHDF5_InitCheckpointingIntervals at POST_RECOVER_VARIABLES
+{
+  LANG: C
+  OPTIONS: global
+} "Initialisation of checkpointing intervals after recovery"
+
+schedule CarpetIOHDF5_InitialDataCheckpoint at CPINITIAL
+{
+  LANG: C
+  OPTIONS: meta
+} "Initial data checkpoint routine"
+
+schedule CarpetIOHDF5_EvolutionCheckpoint at CHECKPOINT
+{
+  LANG: C
+  OPTIONS: meta
+} "Evolution checkpoint routine"
+
+schedule CarpetIOHDF5_TerminationCheckpoint at TERMINATE
+{
+  LANG: C
+  OPTIONS: meta
+} "Termination checkpoint routine"
+
+schedule CarpetIOHDF5_CloseFiles at POSTINITIAL
+{
+  LANG: C
+  OPTIONS: global
+} "Close all filereader input files"
+
+if (! CCTK_Equals (recover, "no") && *recover_file)
+{
+  schedule CarpetIOHDF5_RecoverParameters at RECOVER_PARAMETERS
+  {
+    LANG:C
+    OPTIONS: meta
+  } "Parameter recovery routine"
+
+  if (use_reflevels_from_checkpoint)
+  {
+    schedule CarpetIOHDF5_SetNumRefinementLevels at STARTUP before CarpetIOHDF5_Startup
+    {
+      LANG:C
+      OPTIONS: meta
+    } "Overwrite 'CarpetRegrid::refinement_levels' with the number of levels found in the checkpoint file"
+  }
+
+  schedule CarpetIOHDF5_CloseFiles at POST_RECOVER_VARIABLES
+  {
+    LANG: C
+    OPTIONS: meta
+  } "Close all initial data checkpoint files after recovery"
+}

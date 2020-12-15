@@ -1,0 +1,8 @@
+
+foreach f { job0.conf job1.conf } {
+  source $f
+  source ../show_replicas.vmd
+}
+
+source ../clone_reps.vmd
+

@@ -1,0 +1,61 @@
+% $Header$
+
+% This file contains documentation for features which aren't implemented
+% yet, and which are far enough in the future that I (Jonathan) decided
+% to remove them from documentation.tex for the time being.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Caching}
+\label{sect-generic-options/caching}
+
+Some interpolators may support special ``caching'' optimizations to
+speed repeated interpolations where some or all of the interpolator
+arguments and/or parameters are the same.  For example, when interpolating
+a tabulated equation of state the number of dimensions, the coordinate
+origin and grid spacing, and the input arrays (the tabulated equation
+of state data), will probably all be the same from one interpolator
+call to another.
+
+If an interpolator supports caching, the following parameters should
+be used to control this:
+
+\begin{verbatim}
+const char cache_type[];        /* set with Util_TableSetString() */
+const char cache_control[];     /* set with Util_TableSetString() */
+CCTK_INT cache_handle;
+\end{verbatim}
+
+There are three basic operations supported:
+\begin{description}
+\item[Create a Cache]
+	To set up caching, call the interpolator with \verb|cache_type|
+	set to describe what arguments and/or parameters will remain
+	the same in future interpolator calls, \verb|cache_control|
+	set to the string \verb|"create"|, and \verb|cache_handle|
+	{\em not\/} in the parameter table.  The interpolator will
+	then do extra (possibly quite time-consuming) work to set
+	up cached information.  The interpolator will delete the
+	key \verb|cache_control|, and return a handle to the cached
+	information in \verb|cache_handle|; this allows multiple caches
+	to be active concurrently.
+\item[Use a Cache]
+	To use a cache (\ie{} to make an interpolation with the
+	hoped-for speedup), just call the interpolator with
+	\verb|cache_handle| set to the value returned when the cache
+	was created.  Note that you still have to provide all the
+	``will be the same'' interpolator arguments and/or parameters;
+	providing a cache handle is essentially just a promise that
+	these will be the same as in the cache-create interpolator
+	call.  The details of what information is cached, and if/how
+	the ``will be the same'' arguments are still used, are up to
+	the interpolator.
+\item[Destroy a Cache]
+	To destroy a cache (\ie{} free any memory allocated when
+	the cache was created), call the interpolator with
+	\verb|cache_handle| set to the value returned when the cache
+	was created, and  \verb|cache_control| set to the string
+	\verb|"destroy"|.  The interpolator will delete the keys
+	\verb|cache_handle| and \verb|cache_control|, and destroy
+	the cache.
+\end{description}

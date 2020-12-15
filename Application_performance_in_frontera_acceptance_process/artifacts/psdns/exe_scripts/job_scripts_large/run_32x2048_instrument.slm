@@ -1,0 +1,98 @@
+#!/usr/bin/bash
+#SBATCH -J psdns_core_inst_1640nodes_32x2048_1t       # Job Name
+#SBATCH -o psdns_core_inst_1640nodes_32x2048_1t.o%j   # Name of the output
+#SBATCH -N 1640         # Total number of Nodes
+#SBATCH -n 65536           # Total number of mpi tasks requested
+#SBATCH -p test2
+#SBATCH -t 00:30:00     # Run time (hh:mm:ss) - 2.5 hours
+#SBATCH -A A-ccsc
+
+# for echoing commands
+#set -x
+
+#cd /scratch/00901/lars/spp/psdns/dir_runs1/
+#echo Present directory = `pwd`
+
+### cd $PBS_O_WORKDIR
+
+
+###  #module unload altd
+###  #module unload CrayPat
+###  module load fftw
+###  module load cray-hdf5-parallel
+###  module load craype-hugepages2M
+
+module load impi
+module load fftw3
+module load phdf5
+#module load remora
+module list
+
+# for perftools
+#module unload darshan
+#module unload xalt
+#module load perftools-base
+#module load perftools-lite
+
+###  export XT_SYMMETRIC_HEAP_SIZE=200M
+###  export APRUN_BALANCED_INJECTION=64
+###  export ATP_ENABLED=1
+
+#export MV2_SHOW_CPU_BINDING=1
+#ulimit -s unlimited
+export OMP_STACKSIZE=200M
+export OMP_NUM_THREADS=1
+export OMP_PLACES=cores
+export OMP_PROC_BIND=spread
+
+# Special path to ibrun and tacc_affinity
+#export PATH=/home1/00422/cazes/test_ibrun/1.5:$PATH
+source ./setup_frontier_run.sh
+export ANTIAFFINITY=0
+echo -----------------------------
+echo This will be used:
+type ibrun
+type tacc_affinity
+echo ANTIAFFINITY = $ANTIAFFINITY
+echo -----------------------------
+
+
+rm -rf iostep_timings
+mkdir iostep_timings
+rm -rf outpen
+#csh prep_dirs 4
+#csh prep_dirs 32
+#csh prep_dirs 64
+csh prep_dirs 256
+
+date
+
+
+# Execution block.
+
+executable="DNS2d_p8.avx2.x"
+frequency=performance
+output_dir="output_${SLURM_JOB_NAME}_${SLURM_JOBID}"
+
+instrument_dir="${executable}_${frequency}_${SLURM_JOBID}"
+if [ "$ANTIAFFINITY" -eq "1" ]; then
+  instrument_dir="anti_${executable}_${frequency}_${SLURM_JOBID}"
+fi
+
+mkdir $output_dir
+#Instrumented run
+ibrun tacc_affinity /scratch/projects/tacc/spp/cazes/bin/instrumented_run.sh ./${executable}
+
+echo "run finished"
+cd $instrument_dir
+/scratch/hpc_tools/average_freq.py; /scratch/hpc_tools/average_imc.py
+cd ../
+mv $instrument_dir $output_dir
+./mv_out.sh $output_dir
+
+#Flop count run
+#ibrun tacc_affinity ./flop_count.sh ./${executable}
+# /scratch/hpc_tools/aggregate_flop_count_new.py ${executable} ${SLURM_JOBID}
+# ./mv_out.sh $output_dir
+
+echo "Finished running $executable"

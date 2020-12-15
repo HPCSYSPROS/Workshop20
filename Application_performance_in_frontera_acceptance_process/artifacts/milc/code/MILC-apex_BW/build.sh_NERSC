@@ -1,0 +1,7 @@
+#!/bin/sh
+
+cd ks_imp_rhmc/
+make clean
+rm ../libraries/*.[ao]
+make su3_rhmd_hisq
+

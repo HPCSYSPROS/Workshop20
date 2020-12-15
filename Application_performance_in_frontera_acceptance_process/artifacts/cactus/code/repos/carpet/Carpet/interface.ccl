@@ -1,0 +1,474 @@
+# Interface definition for thorn Carpet
+
+IMPLEMENTS: Driver
+
+include header: carpet_public.hh in carpet.hh
+include header: carpet_public.h in carpet.h
+
+uses include header: Requirements.hh
+
+uses include header: nompi.h
+
+uses include header: loopcontrol.h
+
+uses include header: CactusTimerSet.hh
+uses include header: Timer.hh
+uses include header: TimerTree.hh
+
+uses include header: mpi_string.hh
+
+uses include header: cacheinfo.hh
+uses include header: defs.hh
+uses include header: dist.hh
+uses include header: typecase.hh
+uses include header: typeprops.hh
+
+uses include header: balance.hh
+uses include header: bbox.hh
+uses include header: bboxset.hh
+uses include header: fulltree.hh
+uses include header: region.hh
+uses include header: vect.hh
+
+uses include header: data.hh
+uses include header: gdata.hh
+
+uses include header: dh.hh
+uses include header: gf.hh
+uses include header: ggf.hh
+uses include header: gh.hh
+uses include header: th.hh
+
+uses include header: operators.hh
+
+
+
+# Get access to communicators
+CCTK_POINTER_TO_CONST \
+FUNCTION GetMPICommUniverse (CCTK_POINTER_TO_CONST IN cctkGH)
+PROVIDES FUNCTION GetMPICommUniverse WITH Carpet_GetMPICommUniverse LANGUAGE C
+
+CCTK_POINTER_TO_CONST \
+FUNCTION GetMPICommWorld (CCTK_POINTER_TO_CONST IN cctkGH)
+PROVIDES FUNCTION GetMPICommWorld WITH Carpet_GetMPICommWorld LANGUAGE C
+
+
+
+# Get access to process->host mapping
+CCTK_INT FUNCTION CCTK_MyHost(CCTK_POINTER_TO_CONST IN cctkGH)
+CCTK_INT FUNCTION CCTK_nHosts(CCTK_POINTER_TO_CONST IN cctkGH)
+CCTK_INT FUNCTION CCTK_nProcsOnHost(CCTK_POINTER_TO_CONST IN cctkGH, CCTK_INT IN host)
+CCTK_INT FUNCTION CCTK_ProcsOnHost(CCTK_POINTER_TO_CONST IN cctkGH, CCTK_INT IN host, CCTK_INT ARRAY OUT procs, CCTK_INT IN nprocs)
+PROVIDES FUNCTION CCTK_MyHost       WITH Carpet_MyHost       LANGUAGE C
+PROVIDES FUNCTION CCTK_nHosts       WITH Carpet_nHosts       LANGUAGE C
+PROVIDES FUNCTION CCTK_nProcsOnHost WITH Carpet_nProcsOnHost LANGUAGE C
+PROVIDES FUNCTION CCTK_ProcsOnHost  WITH Carpet_ProcsOnHost  LANGUAGE C
+
+
+
+# Register and unregister routines which are called before and after
+# every scheduled routine
+CCTK_INT \
+FUNCTION RegisterScheduleWrapper \
+  (CCTK_INT IN CCTK_FPOINTER func_before (CCTK_POINTER_TO_CONST IN cctkGH,    \
+                                          CCTK_POINTER          IN function,  \
+                                          CCTK_POINTER          IN attribute, \
+                                          CCTK_POINTER          IN data),     \
+   CCTK_INT IN CCTK_FPOINTER func_after  (CCTK_POINTER_TO_CONST IN cctkGH,    \
+                                          CCTK_POINTER          IN function,  \
+                                          CCTK_POINTER          IN attribute, \
+                                          CCTK_POINTER          IN data))
+CCTK_INT \
+FUNCTION UnRegisterScheduleWrapper \
+  (CCTK_INT IN CCTK_FPOINTER func_before (CCTK_POINTER_TO_CONST IN cctkGH,    \
+                                          CCTK_POINTER          IN function,  \
+                                          CCTK_POINTER          IN attribute, \
+                                          CCTK_POINTER          IN data),     \
+   CCTK_INT IN CCTK_FPOINTER func_after  (CCTK_POINTER_TO_CONST IN cctkGH,    \
+                                          CCTK_POINTER          IN function,  \
+                                          CCTK_POINTER          IN attribute, \
+                                          CCTK_POINTER          IN data))
+PROVIDES FUNCTION RegisterScheduleWrapper \
+  WITH Carpet_RegisterScheduleWrapper \
+  LANGUAGE C
+PROVIDES FUNCTION UnRegisterScheduleWrapper \
+  WITH Carpet_UnRegisterScheduleWrapper \
+  LANGUAGE C
+
+
+
+# Provide the function to en-/disable prolongation
+CCTK_INT FUNCTION EnableProlongating(CCTK_INT IN flag)
+PROVIDES FUNCTION EnableProlongating WITH CarpetEnableProlongating LANGUAGE C
+
+CCTK_INT FUNCTION QueryProlongating()
+PROVIDES FUNCTION QueryProlongating WITH CarpetQueryProlongating LANGUAGE C
+
+
+
+# The number of time integrator substeps
+CCTK_INT FUNCTION MoLNumIntegratorSubsteps ()
+USES FUNCTION MoLNumIntegratorSubsteps
+
+
+
+
+# The symmetry boundaries
+CCTK_INT FUNCTION GetSymmetryBoundaries \
+  (CCTK_POINTER_TO_CONST IN cctkGH, \
+   CCTK_INT IN size, \
+   CCTK_INT OUT ARRAY symbnd)
+USES FUNCTION GetSymmetryBoundaries
+
+
+
+# The location of the boundary points
+CCTK_INT FUNCTION GetBoundarySpecification \
+  (CCTK_INT IN size, \
+   CCTK_INT OUT ARRAY nboundaryzones, \
+   CCTK_INT OUT ARRAY is_internal, \
+   CCTK_INT OUT ARRAY is_staggered, \
+   CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION GetBoundarySpecification
+
+# The overall size of the domain
+CCTK_INT FUNCTION GetDomainSpecification \
+  (CCTK_INT IN size, \
+   CCTK_REAL OUT ARRAY physical_min, \
+   CCTK_REAL OUT ARRAY physical_max, \
+   CCTK_REAL OUT ARRAY interior_min, \
+   CCTK_REAL OUT ARRAY interior_max, \
+   CCTK_REAL OUT ARRAY exterior_min, \
+   CCTK_REAL OUT ARRAY exterior_max, \
+   CCTK_REAL OUT ARRAY spacing)
+USES FUNCTION GetDomainSpecification
+
+# Conversion between boundary types
+CCTK_INT FUNCTION ConvertFromPhysicalBoundary \
+  (CCTK_INT IN size, \
+   CCTK_REAL IN  ARRAY physical_min, \
+   CCTK_REAL IN  ARRAY physical_max, \
+   CCTK_REAL OUT ARRAY interior_min, \
+   CCTK_REAL OUT ARRAY interior_max, \
+   CCTK_REAL OUT ARRAY exterior_min, \
+   CCTK_REAL OUT ARRAY exterior_max, \
+   CCTK_REAL IN  ARRAY spacing)
+USES FUNCTION ConvertFromPhysicalBoundary
+
+CCTK_INT FUNCTION ConvertFromExteriorBoundary \
+  (CCTK_INT IN size, \
+   CCTK_REAL OUT ARRAY physical_min, \
+   CCTK_REAL OUT ARRAY physical_max, \
+   CCTK_REAL OUT ARRAY interior_min, \
+   CCTK_REAL OUT ARRAY interior_max, \
+   CCTK_REAL IN  ARRAY exterior_min, \
+   CCTK_REAL IN  ARRAY exterior_max, \
+   CCTK_REAL IN  ARRAY spacing)
+USES FUNCTION ConvertFromExteriorBoundary
+
+
+
+# The setup of the system
+CCTK_INT FUNCTION MultiPatch_GetSystemSpecification \
+  (CCTK_INT OUT maps)
+USES FUNCTION MultiPatch_GetSystemSpecification
+
+# The location of the boundary points
+CCTK_INT FUNCTION MultiPatch_GetBoundarySpecification \
+  (CCTK_INT IN map, \
+   CCTK_INT IN size, \
+   CCTK_INT OUT ARRAY nboundaryzones, \
+   CCTK_INT OUT ARRAY is_internal, \
+   CCTK_INT OUT ARRAY is_staggered, \
+   CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION MultiPatch_GetBoundarySpecification
+
+# The overall size of the domain
+CCTK_INT FUNCTION MultiPatch_GetDomainSpecification \
+  (CCTK_INT IN map, \
+   CCTK_INT IN size, \
+   CCTK_REAL OUT ARRAY physical_min, \
+   CCTK_REAL OUT ARRAY physical_max, \
+   CCTK_REAL OUT ARRAY interior_min, \
+   CCTK_REAL OUT ARRAY interior_max, \
+   CCTK_REAL OUT ARRAY exterior_min, \
+   CCTK_REAL OUT ARRAY exterior_max, \
+   CCTK_REAL OUT ARRAY spacing)
+USES FUNCTION MultiPatch_GetDomainSpecification
+
+# Conversion between boundary types
+CCTK_INT FUNCTION MultiPatch_ConvertFromPhysicalBoundary \
+  (CCTK_INT IN map, \
+   CCTK_INT IN size, \
+   CCTK_REAL IN  ARRAY physical_min, \
+   CCTK_REAL IN  ARRAY physical_max, \
+   CCTK_REAL OUT ARRAY interior_min, \
+   CCTK_REAL OUT ARRAY interior_max, \
+   CCTK_REAL OUT ARRAY exterior_min, \
+   CCTK_REAL OUT ARRAY exterior_max, \
+   CCTK_REAL IN  ARRAY spacing)
+USES FUNCTION MultiPatch_ConvertFromPhysicalBoundary
+
+
+
+CCTK_INT FUNCTION Accelerator_Cycle             \
+  (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION Accelerator_Cycle
+
+CCTK_INT FUNCTION Accelerator_PreCallFunction   \
+  (CCTK_POINTER_TO_CONST IN cctkGH,             \
+   CCTK_POINTER_TO_CONST IN attribute)
+USES FUNCTION Accelerator_PreCallFunction
+
+CCTK_INT FUNCTION Accelerator_PostCallFunction  \
+  (CCTK_POINTER_TO_CONST IN cctkGH,             \
+   CCTK_POINTER_TO_CONST IN attribute)
+USES FUNCTION Accelerator_PostCallFunction
+
+CCTK_INT FUNCTION Accelerator_PreSync           \
+  (CCTK_POINTER_TO_CONST IN cctkGH,             \
+   CCTK_INT ARRAY        IN groups,             \
+   CCTK_INT              IN ngroups)
+USES FUNCTION Accelerator_PreSync
+
+CCTK_INT FUNCTION Accelerator_PostSync          \
+  (CCTK_POINTER_TO_CONST IN cctkGH,             \
+   CCTK_INT ARRAY        IN groups,             \
+   CCTK_INT              IN ngroups)
+USES FUNCTION Accelerator_PostSync
+
+CCTK_INT FUNCTION Accelerator_NotifyDataModified        \
+  (CCTK_POINTER_TO_CONST IN cctkGH,                     \
+   CCTK_INT ARRAY        IN variables,                  \
+   CCTK_INT ARRAY        IN rls,                        \
+   CCTK_INT ARRAY        IN tls,                        \
+   CCTK_INT              IN nvariables,                 \
+   CCTK_INT              IN on_device)
+USES FUNCTION Accelerator_NotifyDataModified
+
+CCTK_INT FUNCTION Accelerator_RequireValidData          \
+  (CCTK_POINTER_TO_CONST IN cctkGH,                     \
+   CCTK_INT ARRAY        IN variables,                  \
+   CCTK_INT ARRAY        IN rls,                        \
+   CCTK_INT ARRAY        IN tls,                        \
+   CCTK_INT              IN nvariables,                 \
+   CCTK_INT              IN on_device)
+USES FUNCTION Accelerator_RequireValidData
+
+
+
+# Access coordinate information (on the coarse level)
+CCTK_INT FUNCTION GetCoordRange        \
+    (CCTK_POINTER_TO_CONST IN  cctkGH, \
+     CCTK_INT              IN  m,      \
+     CCTK_INT              IN  ml,     \
+     CCTK_INT              IN  size,   \
+     CCTK_INT        ARRAY OUT gsh,    \
+     CCTK_REAL       ARRAY OUT lower,  \
+     CCTK_REAL       ARRAY OUT upper,  \
+     CCTK_REAL       ARRAY OUT delta)
+PROVIDES FUNCTION GetCoordRange WITH Carpet_GetCoordRange LANGUAGE C
+
+
+
+# Get current refinement level and number of refinement levels
+CCTK_INT FUNCTION                         \
+    GetRegriddingEpoch                    \
+        (CCTK_POINTER_TO_CONST IN cctkGH)
+PROVIDES FUNCTION GetRegriddingEpoch \
+    WITH Carpet_GetRegriddingEpoch   \
+    LANGUAGE C
+
+CCTK_INT FUNCTION                         \
+    GetRegriddingEpochs                   \
+        (CCTK_POINTER_TO_CONST IN cctkGH, \
+         CCTK_INT IN size,                \
+         CCTK_INT ARRAY OUT epochs)
+PROVIDES FUNCTION GetRegriddingEpochs \
+    WITH Carpet_GetRegriddingEpochs   \
+    LANGUAGE C
+
+CCTK_INT FUNCTION                         \
+    GetRefinementLevel                    \
+        (CCTK_POINTER_TO_CONST IN cctkGH)
+PROVIDES FUNCTION GetRefinementLevel \
+    WITH Carpet_GetRefinementLevel   \
+    LANGUAGE C
+
+CCTK_INT FUNCTION                         \
+    GetRefinementLevels                   \
+        (CCTK_POINTER_TO_CONST IN cctkGH)
+PROVIDES FUNCTION GetRefinementLevels \
+    WITH Carpet_GetRefinementLevels   \
+    LANGUAGE C
+
+CCTK_INT FUNCTION                         \
+    GetMaxRefinementLevels                \
+        (CCTK_POINTER_TO_CONST IN cctkGH)
+PROVIDES FUNCTION GetMaxRefinementLevels \
+    WITH Carpet_GetMaxRefinementLevels   \
+    LANGUAGE C
+
+CCTK_INT FUNCTION                         \
+    GetLocalComponent                     \
+        (CCTK_POINTER_TO_CONST IN cctkGH)
+PROVIDES FUNCTION GetLocalComponent \
+    WITH Carpet_GetLocalComponent   \
+    LANGUAGE C
+
+CCTK_INT FUNCTION                         \
+    GetLocalComponents                    \
+        (CCTK_POINTER_TO_CONST IN cctkGH)
+PROVIDES FUNCTION GetLocalComponents \
+    WITH Carpet_GetLocalComponents   \
+    LANGUAGE C
+
+CCTK_INT FUNCTION                         \
+    GetMap                                \
+        (CCTK_POINTER_TO_CONST IN cctkGH)
+PROVIDES FUNCTION GetMap \
+    WITH Carpet_GetMap   \
+    LANGUAGE C
+
+CCTK_INT FUNCTION                         \
+    GetMaps                               \
+        (CCTK_POINTER_TO_CONST IN cctkGH)
+PROVIDES FUNCTION GetMaps \
+    WITH Carpet_GetMaps   \
+    LANGUAGE C
+
+CCTK_INT FUNCTION                         \
+    GetTimeLevel                          \
+        (CCTK_POINTER_TO_CONST IN cctkGH)
+PROVIDES FUNCTION GetTimeLevel \
+    WITH Carpet_GetTimeLevel   \
+    LANGUAGE C
+
+CCTK_INT FUNCTION                         \
+    GetTimeLevelOffset                    \
+        (CCTK_POINTER_TO_CONST IN cctkGH)
+PROVIDES FUNCTION GetTimeLevelOffset \
+    WITH Carpet_GetTimeLevelOffset   \
+    LANGUAGE C
+
+
+
+# Get pointer to grid variable for a specific map and refinement level
+CCTK_POINTER FUNCTION                     \
+    VarDataPtrI                           \
+        (CCTK_POINTER_TO_CONST IN cctkGH, \
+         CCTK_INT IN map,                 \
+         CCTK_INT IN reflevel,            \
+         CCTK_INT IN component,           \
+         CCTK_INT IN timelevel,           \
+         CCTK_INT IN varindex)
+PROVIDES FUNCTION VarDataPtrI \
+    WITH Carpet_VarDataPtrI   \
+    LANGUAGE C
+
+
+
+# The true prototype of the routine below:
+#   int Carpet_Regrid (const cGH * cctkGH,
+#                      gh::rregs * superregss,
+#                      gh::mregs * regsss,
+#                      int         force);
+CCTK_INT FUNCTION Carpet_Regrid (CCTK_POINTER_TO_CONST IN cctkGH, \
+                                 CCTK_POINTER IN superregss,      \
+                                 CCTK_POINTER IN regsss,          \
+                                 CCTK_INT IN force)
+USES FUNCTION Carpet_Regrid
+
+# The true prototype of the routine below:
+#   int Carpet_Regrid (const cGH * cctkGH,
+#                      vector<gh::rregs> * superregsss,
+#                      vector<gh::mregs> * regssss,
+#                      int                  force);
+CCTK_INT FUNCTION Carpet_RegridMaps (CCTK_POINTER_TO_CONST IN cctkGH, \
+                                     CCTK_POINTER IN superregsss,     \
+                                     CCTK_POINTER IN regssss,         \
+                                     CCTK_INT IN force)
+USES FUNCTION Carpet_RegridMaps
+
+
+
+# function to check whether existing output files should be truncated or not
+CCTK_INT FUNCTION IO_TruncateOutputFiles \
+  (CCTK_POINTER_TO_CONST IN GH)
+
+REQUIRES FUNCTION IO_TruncateOutputFiles
+
+CCTK_INT FUNCTION Boundary_SelectedGVs(CCTK_POINTER_TO_CONST IN GH, \
+  CCTK_INT IN array_size, CCTK_INT ARRAY OUT var_indicies, \
+  CCTK_INT ARRAY OUT faces, CCTK_INT ARRAY OUT boundary_widths, \
+  CCTK_INT ARRAY OUT table_handles, CCTK_STRING IN bc_name)
+USES FUNCTION Boundary_SelectedGVs
+
+
+# TODO: make this somehow public, e.g. by moving it into its own thorn
+
+CCTK_INT point_classification TYPE=gf TAGS='checkpoint="no" prolongation="none"'
+{
+  point_class
+  # negative: needs to be set explicitly (e.g. boundary)
+  # zero:     unused (e.g. ghost)
+  # positive: needs to be evolved
+  # -1:      boundary point (needs to be set explicitly)
+  #  0:      unused (e.g. ghost point, or restriction target)
+  #  n=1..N: evolved, used for integrator substeps i<=n
+  #          (i=N..1, counting backwards; see MoL documentation) 
+  #          i.e.: n=1: used between time steps (i.e., should be visualised)
+  #                n>1: used only while time stepping (e.g. buffer zones)
+} "Grid point classification"
+
+CCTK_INT carpet_unusedpoints_mask TYPE=GF tags='Prolongation="none"' "mask which is set !=0 for points which do not influence future evolution, assuming appropriate regridding"
+
+
+
+CCTK_REAL timing TAGS='checkpoint="no"'
+{
+  physical_time_per_hour
+  current_physical_time_per_hour
+  
+  time_total time_evolution time_computing time_communicating time_io
+  
+  evolution_steps_count
+  
+  local_grid_points_per_second total_grid_points_per_second
+  local_grid_point_updates_count total_grid_point_updates_count
+  local_interior_points_per_second total_interior_points_per_second
+  local_interior_point_updates_count total_interior_point_updates_count
+  
+  io_per_second
+  io_bytes_per_second io_bytes_ascii_per_second io_bytes_binary_per_second
+  io_count
+  io_bytes_count io_bytes_ascii_count io_bytes_binary_count
+  
+  comm_per_second
+  comm_bytes_per_second
+  comm_count
+  comm_bytes_count
+  
+  time_levels
+} "Physical timing information"
+
+CCTK_REAL timing_procs TYPE=array DIM=1 SIZE=1 DISTRIB=constant TAGS='checkpoint="no"'
+{
+  grid_points_per_second
+  grid_point_updates_count
+  interior_points_per_second
+  interior_point_updates_count
+} "Per-processor timing information"
+
+CCTK_REAL timing_levels TYPE=array DIM=1 SIZE=max_refinement_levels DISTRIB=constant TAGS='checkpoint="no"'
+{
+  time_level time_level_count
+} "Per-level timing information"
+
+CCTK_REAL memory_procs TYPE=array DIM=1 SIZE=1 DISTRIB=CONSTANT TAGS='checkpoint="no"'
+{
+  metadata
+  grid_structure
+  grid_arrays
+  grid_functions
+} "Memory usage information"

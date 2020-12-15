@@ -1,0 +1,42 @@
+#
+# This function is a wrapper around  codegen[C]()  which returns the
+# genenerated code explictly as a Maple string.
+#
+# Arguments:
+# expr = (in) The expression for which code is to be generated.
+# ... = (in) Any further arguments are taken as options to be passed
+#	     to codegen[C]()
+#
+# Results:
+# The function returns a maple string of C code.
+#
+C_str :=
+proc(expr::algebraic)
+local tempname, str, temp;
+
+# name of temp file
+# FIXME: should use process number to ensure uniqueness
+tempname := "/tmp/C_str.tmp.c";
+
+# truncate temp file to zero length
+fopen(tempname, WRITE);
+fclose(tempname);
+
+# generate the code
+codegen[C](args, filename=tempname);
+
+# read the code back in
+str := "";
+	while true
+	do
+	temp := readline(tempname);
+	if (temp = 0)
+	   then break;
+	end if;
+	str := cat(str, temp);
+	end do;
+fclose(tempname);
+
+# strip off the leading "   t0 = "
+return op(2,sscanf(str, "%s = %[^;];"));
+end proc;

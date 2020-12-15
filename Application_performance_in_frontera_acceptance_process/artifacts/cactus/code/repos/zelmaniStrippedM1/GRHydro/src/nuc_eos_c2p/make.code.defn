@@ -1,0 +1,14 @@
+SRCS =  con2prim_MHD.c \
+	readtable.c \
+	prim2con_MHD.c \
+	NR.c \
+	findtemp.c \
+	linterp_for_temp.c \
+	linterp_some.c \
+	linterp_some2.c \
+	linterp_some3.c \
+	linterp_some4.c \
+	nuc_eos.c 
+
+SUBDIRS = 
+

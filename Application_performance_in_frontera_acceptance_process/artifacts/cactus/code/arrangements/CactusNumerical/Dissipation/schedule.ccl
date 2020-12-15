@@ -1,0 +1,37 @@
+# Schedule definitions for thorn Dissipation
+# $Header$
+
+STORAGE: epsdisA_group
+
+SCHEDULE dissipation_paramcheck AT paramcheck
+{
+  LANG: C
+} "Check dissipation parameters for consistency"
+
+SCHEDULE dissipation_basegrid AT basegrid
+{
+  LANG: C
+} "Ensure that there are enough ghost zones"
+
+SCHEDULE setup_epsdis AT cctk_poststep after SphericalSurface_HasBeenSet
+{
+  LANG: C
+  SYNC: epsdisA_group
+} "Setup spatially varying dissipation"
+
+SCHEDULE setup_epsdis AT cctk_postregridinitial
+{
+  LANG: C
+  SYNC: epsdisA_group
+} "Setup spatially varying dissipation"
+
+SCHEDULE setup_epsdis AT cctk_postregrid
+{
+  LANG: C
+  SYNC: epsdisA_group
+} "Setup spatially varying dissipation"
+
+SCHEDULE dissipation_add IN MoL_PostRHS
+{
+  LANG: C
+} "Add Kreiss-Oliger dissipation to the right hand sides"

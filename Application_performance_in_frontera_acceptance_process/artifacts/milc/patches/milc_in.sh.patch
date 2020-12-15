@@ -1,0 +1,21 @@
+--- MILC-apex_BW2017/benchmarks/large/milc_in.sh	2017-01-05 10:14:03.000000000 -0600
++++ MILC-apex_BW_SKL_CORE-AVX2_no-vec/benchmarks/large/milc_in.sh	2017-10-12 15:56:00.000000000 -0500
+@@ -9,15 +9,10 @@
+ # reload_cmd - set to "reload_parallel $checklat" or "continue"
+ #
+ # choose which command to execute by setting run_type before calling
++
++
+ function run_milc() {
+-    if [ "$run_type" == "srun" ]; then
+-      command="srun -n $N --ntasks-per-socket=$S ./su3_rhmd_hisq"
+-    elif [ "$run_type" == "aprun" ]; then
+-#      command="aprun -l node_list -n $N -d $threads_per_rank -cc depth -S $S ./su3_rhmd_hisq"
+-      command="aprun -n $N -d $threads_per_rank -cc depth -S $S ./su3_rhmd_hisq"
+-    else
+-      command="mpirun -n $N -env I_MPI_PIN_DOMAIN socket -env OMP_NUM_THREADS=$threads_per_rank ./su3_rhmd_hisq"
+-    fi
++    command="$S ./su3_rhmd_hisq.sh"
+     echo "$0: Running \"${command}\" "
+     if [ "$debug" == "true" ]; then
+       command="cat ";

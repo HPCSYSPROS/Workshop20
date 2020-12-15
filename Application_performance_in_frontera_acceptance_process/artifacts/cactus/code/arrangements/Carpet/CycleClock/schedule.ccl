@@ -1,0 +1,6 @@
+# Schedule definitions for thorn CycleClock
+
+SCHEDULE CycleClock_Setup AT startup BEFORE Driver_Startup
+{
+  LANG: C
+} "Set up CycleClock"

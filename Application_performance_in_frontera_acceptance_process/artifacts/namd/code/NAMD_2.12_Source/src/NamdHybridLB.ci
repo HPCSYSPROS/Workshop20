@@ -1,0 +1,31 @@
+module NamdHybridLB {
+
+extern module HybridBaseLB;
+extern module LBDatabase;
+extern module BaseLB;
+
+include "CentralLB.h";
+include "CentralLBMsg.h";
+include "HybridLBMsg.h";
+
+message LocalLBInfoMsg{
+	MigrateInfo moves[];
+	double cpuloads[];
+};
+
+message SplitComputesMsg {
+	int cid[];
+	float load[];
+};
+
+group [migratable] NamdHybridLB : HybridBaseLB {
+  entry void NamdHybridLB(void);
+  entry void UpdateLocalLBInfo(LocalLBInfoMsg*);
+//  entry void CollectInfo(Location loc[n], int n, int fromlevel);	
+  entry void splitComputes(SplitComputesMsg*);
+};
+
+};
+
+
+

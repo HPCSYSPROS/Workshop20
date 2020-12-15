@@ -1,0 +1,50 @@
+# Schedule definitions for thorn EOS_Omni
+
+
+schedule EOS_Omni_Startup AT WRAGH
+{
+ LANG: Fortran
+ OPTIONS: global
+} "Set up conversion factors and other fun stuff"
+
+if (nuceos_read_table)
+{
+  SCHEDULE nuc_eos_readtable_cactus_wrapper AT CCTK_BASEGRID
+  {
+    LANG: C
+    OPTIONS: global
+  } "Read EOS HDF5 table"
+
+  SCHEDULE EOS_OMNI_get_energy_shift AT CCTK_BASEGRID AFTER nuc_eos_readtable_cactus_wrapper
+  {
+    LANG: Fortran
+    OPTIONS: global
+  } "setup energy_shift in EOS_Omni_Module"
+
+  if (dump_nuceos_table)
+  {
+    SCHEDULE EOS_OMNI_dumptable after nuc_eos_readtable_cactus_wrapper AT CCTK_BASEGRID
+    {
+      LANG: C
+      OPTIONS: global
+    } "Dump EOS HDF5 table in ASCII"	
+  }
+}
+
+if (coldeos_read_table)
+{
+  SCHEDULE EOS_OMNI_ReadColdTable AT CCTK_BASEGRID
+  {
+    LANG: Fortran
+    OPTIONS: global
+  } "Read Cold EOS ASCII table"
+}
+
+if (barotropiceos_read_table)
+{
+  SCHEDULE EOS_OMNI_BarotropicReadTable AT CCTK_BASEGRID
+  {
+    LANG: Fortran
+    OPTIONS: global
+  } "Read barotropic EOS ASCII table"
+}

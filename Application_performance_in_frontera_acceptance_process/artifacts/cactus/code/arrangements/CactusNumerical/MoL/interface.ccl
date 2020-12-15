@@ -1,0 +1,191 @@
+# Interface definition for thorn MoL
+# $Header$
+
+implements: MethodOfLines
+
+##################################################
+### Functions from NaNChecker that may be used ###
+##################################################
+
+CCTK_INT FUNCTION CheckVarsForNaN              \
+    (CCTK_POINTER_TO_CONST IN cctkGH,          \
+     CCTK_INT              IN report_max,      \
+     CCTK_STRING           IN vars,            \
+     CCTK_STRING           IN check_for,       \
+     CCTK_STRING           IN action_if_found)
+USES FUNCTION CheckVarsForNaN
+
+##############################################
+### Functions from Carpet that may be used ###
+##############################################
+
+CCTK_INT FUNCTION EnableProlongating(CCTK_INT IN Status)
+USES FUNCTION EnableProlongating
+
+################################################################
+### Aliased registration and type changing functions for the ###
+### standard (i.e., real) GFs.                               ###
+################################################################
+
+CCTK_INT FUNCTION MoLRegisterEvolved(CCTK_INT IN EvolvedIndex, \
+                                     CCTK_INT IN RHSIndex)
+CCTK_INT FUNCTION MoLRegisterEvolvedSlow(CCTK_INT IN EvolvedIndex, \
+                                         CCTK_INT IN RHSIndexSlow)
+
+CCTK_INT FUNCTION MoLRegisterConstrained(CCTK_INT IN ConstrainedIndex)
+CCTK_INT FUNCTION MoLRegisterSaveAndRestore(CCTK_INT IN SandRIndex)
+CCTK_INT FUNCTION MoLRegisterEvolvedGroup(CCTK_INT IN EvolvedIndex, \
+                                          CCTK_INT IN RHSIndex)
+CCTK_INT FUNCTION MoLRegisterEvolvedGroupSlow(CCTK_INT IN EvolvedIndex, \
+                                              CCTK_INT IN RHSIndexSlow)
+CCTK_INT FUNCTION MoLRegisterConstrainedGroup(CCTK_INT IN ConstrainedIndex)
+CCTK_INT FUNCTION MoLRegisterSaveAndRestoreGroup(CCTK_INT IN SandRIndex)
+CCTK_INT FUNCTION MoLChangeToEvolved(CCTK_INT IN EvolvedIndex, \
+                                     CCTK_INT IN RHSIndex)
+CCTK_INT FUNCTION MoLChangeToEvolvedSlow(CCTK_INT IN EvolvedIndex, \
+                                         CCTK_INT IN RHSIndexSlow)
+CCTK_INT FUNCTION MoLChangeToConstrained(CCTK_INT IN ConstrainedIndex)
+CCTK_INT FUNCTION MoLChangeToSaveAndRestore(CCTK_INT IN SandRIndex)
+CCTK_INT FUNCTION MoLChangeToNone(CCTK_INT IN RemoveIndex)
+CCTK_INT FUNCTION MoLQueryEvolvedRHS(CCTK_INT IN EvolvedIndex)
+CCTK_INT FUNCTION MoLNumIntegratorSubsteps()
+
+PROVIDES FUNCTION MoLRegisterEvolved WITH MoL_RegisterEvolved LANGUAGE C
+PROVIDES FUNCTION MoLRegisterEvolvedSlow WITH MoL_RegisterEvolvedSlow LANGUAGE C
+PROVIDES FUNCTION MoLRegisterConstrained WITH MoL_RegisterConstrained \
+                  LANGUAGE C
+PROVIDES FUNCTION MoLRegisterSaveAndRestore WITH MoL_RegisterSaveAndRestore \
+                  LANGUAGE C
+PROVIDES FUNCTION MoLRegisterEvolvedGroup WITH MoL_RegisterEvolvedGroup \
+                  LANGUAGE C
+PROVIDES FUNCTION MoLRegisterEvolvedGroupSlow WITH MoL_RegisterEvolvedGroupSlow \
+                  LANGUAGE C
+PROVIDES FUNCTION MoLRegisterConstrainedGroup WITH \
+                  MoL_RegisterConstrainedGroup LANGUAGE C
+PROVIDES FUNCTION MoLRegisterSaveAndRestoreGroup WITH \
+                  MoL_RegisterSaveAndRestoreGroup LANGUAGE C
+PROVIDES FUNCTION MoLChangeToEvolved WITH MoL_ChangeToEvolved LANGUAGE C
+PROVIDES FUNCTION MoLChangeToEvolvedSlow WITH MoL_ChangeToEvolvedSlow LANGUAGE C
+PROVIDES FUNCTION MoLChangeToConstrained WITH MoL_ChangeToConstrained \
+                  LANGUAGE C
+PROVIDES FUNCTION MoLChangeToSaveAndRestore WITH MoL_ChangeToSaveAndRestore \
+                  LANGUAGE C
+PROVIDES FUNCTION MoLChangeToNone WITH MoL_ChangeToNone LANGUAGE C
+PROVIDES FUNCTION MoLQueryEvolvedRHS WITH MoL_QueryEvolvedRHS LANGUAGE C
+PROVIDES FUNCTION MoLNumIntegratorSubsteps WITH MoL_NumIntegratorSubsteps \
+                  LANGUAGE C
+
+##############################################################
+### Aliased functions that can be provided by other thorns ###
+### to override low-level grid variable operations.        ###
+##############################################################
+
+CCTK_INT FUNCTION GetRefinementLevel            \
+    (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION GetRefinementLevel
+
+CCTK_INT FUNCTION Device_GetDevice              \
+  (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION Device_GetDevice
+
+# Computes:
+#   var = scale * var + \sum_i^nsrcs facts[i] * scrcs[i][tls[i]]
+CCTK_INT FUNCTION LinearCombination             \
+    (CCTK_POINTER_TO_CONST IN cctkGH,           \
+     CCTK_INT              IN var,              \
+     CCTK_INT              IN rl ,              \
+     CCTK_INT              IN tl ,              \
+     CCTK_REAL             IN scale,            \
+     CCTK_INT  ARRAY       IN srcs,             \
+     CCTK_INT  ARRAY       IN tls,              \
+     CCTK_REAL ARRAY       IN facts,            \
+     CCTK_INT              IN nsrcs)
+USES FUNCTION LinearCombination
+
+CCTK_INT FUNCTION Accelerator_NotifyDataModified \
+  (CCTK_POINTER_TO_CONST IN cctkGH,              \
+   CCTK_INT ARRAY        IN variables,           \
+   CCTK_INT ARRAY        IN rls,                 \
+   CCTK_INT ARRAY        IN tls,                 \
+   CCTK_INT              IN nvariables,          \
+   CCTK_INT              IN on_device)
+USES FUNCTION Accelerator_NotifyDataModified
+
+private:
+
+CCTK_REAL RKAlphaCoefficients \
+            TYPE    = ARRAY \
+            DIM     = 2 \
+            SIZE    = MoL_Intermediate_Steps,MoL_Num_Scratch_Levels+1 \
+            DISTRIB = CONSTANT \
+            TAGS    = 'Checkpoint="no"'
+#{
+#} "The alpha coefficients used by the generic Runge-Kutta integrators"
+
+CCTK_REAL RKBetaCoefficients \
+            TYPE    = ARRAY \
+            DIM     = 1 \
+            SIZE    = MoL_Intermediate_Steps \
+            DISTRIB = CONSTANT \
+            TAGS    = 'Checkpoint="no"'
+#{
+#} "The beta coefficients used by the generic Runge-Kutta integrators"
+
+CCTK_INT MoL_Counters \
+            TYPE    = SCALAR \
+            TAGS    = 'Checkpoint="no"'
+{
+  MoL_Intermediate_Step
+  MoL_Stepsize_Bad
+  
+  # A flag indicating whether it is time for slow RHS evaluation. 
+  # Oustide the MoL loop, it is guaranteed to be 1.
+  # It is only zero for certain MoL substeps when multirate methods are used.
+  MoL_SlowStep
+  
+  # A flag indicating whether it is time for slow post step computations (e.g. applying BCs)
+  # Oustide the MoL loop, it is guaranteed to be 1.
+  # It is only zero for certain MoL substeps when multirate methods are used.
+  MoL_SlowPostStep
+  
+} "The counter for the time integration method"
+
+CCTK_REAL MoL_Original_Time \
+            TYPE    = SCALAR \
+            TAGS    = 'Checkpoint="no"'
+{
+  Original_Time
+  Original_Delta_Time
+} "The original time and delta time which are reset by MoL during evolution"
+
+# there is a hard-coded limit on the number of scratch levels of 99
+# changing it here will increase this limit
+CCTK_REAL ScratchSpaceSlow[MoL_Num_Scratch_Levels] \
+            TYPE       = GF \
+            Timelevels = 99 \
+            TAGS       = 'Prolongation="None" Checkpoint="no"'
+
+CCTK_REAL ScratchSpace[MoL_Num_Scratch_Levels] \
+            TYPE       = GF \
+            Timelevels = 99 \
+            TAGS       = 'Prolongation="None" Checkpoint="no"'
+
+CCTK_REAL SandRScratchSpace \
+            TYPE       = GF \
+            Timelevels = 99 \
+            TAGS       = 'Prolongation="None" Checkpoint="no"'
+
+# Error vector and scalars for RK45
+
+CCTK_REAL ErrorEstimate \
+            TYPE       = GF \
+            Timelevels = 99 \
+            TAGS       = 'Prolongation="None" Checkpoint="no"'
+
+CCTK_REAL ErrorScalars \
+            TYPE       = SCALAR
+{
+  Error
+  Count
+  EstimatedDt
+} "Global error estimate"

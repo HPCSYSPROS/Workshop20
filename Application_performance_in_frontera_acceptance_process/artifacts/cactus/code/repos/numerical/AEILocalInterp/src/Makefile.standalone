@@ -1,0 +1,15 @@
+# Makefile for standalone test programs in this directory
+# $Header$
+
+test_molecule_posn	: test_molecule_posn.c molecule_posn.c \
+                          InterpLocalUniform.h
+	gcc -g \
+            -Wall -W -Wno-unused -Wshadow -Winline -Wpointer-arith \
+            -Wbad-function-cast -Wcast-align -Wcast-qual \
+            -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations \
+            -DAEILOCALINTERP_STANDALONE_TEST -o test_molecule_posn \
+            test_molecule_posn.c molecule_posn.c -lm
+
+.PHONY	: clean
+clean	:
+	-rm test_molecule_posn

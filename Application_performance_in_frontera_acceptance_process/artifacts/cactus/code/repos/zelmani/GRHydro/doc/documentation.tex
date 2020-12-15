@@ -1,0 +1,2127 @@
+\documentclass{article}
+%\usepackage{../../../../doc/ThornGuide/cactus}
+\usepackage{../../../../doc/latex/cactus}
+\begin{document}
+
+% The title of the document (not necessarily the name of the Thorn)
+\title{The {\tt GRHydro} code: three-dimensional relativistic hydrodynamics}
+
+% The author of the documentation - on one line, otherwise it does not work
+\author{Original authors: Luca Baiotti, Ian Hawke, Pedro Montero \cr Contributors: 
+  Sebastiano Bernuzzi, Giovanni Corvino, Toni Font, Joachim Frieben, \cr Roberto De Pietri, Thorsten
+  Kellermann, Frank L\"offler, Christian D. Ott, \cr Luciano Rezzolla, Nikolaos Stergioulas, Aaryn
+  Tonita, \cr {\it and many others,} \cr {\it especially those who were in the European Network ``Sources of
+    Gravitational Waves'' } }
+
+% the date your document was last changed, if your document is in CVS, 
+% please use:
+\date{$ $Date: 2009-12-07 19:20:47 -0600 (Mon, 07 Dec 2009) $ $}
+\maketitle
+
+% *======================================================================*
+%  Cactus Thorn template for ThornGuide documentation
+%  Author: Ian Kelley
+%  Date: Sun Jun 02, 2002
+%  $Header$                                                             
+%
+%  Thorn documentation in the latex file doc/documentation.tex 
+%  will be included in ThornGuides built with the Cactus make system.
+%  The scripts employed by the make system automatically include 
+%  pages about variables, parameters and scheduling parsed from the 
+%  relevent thorn CCL files.
+%  
+%  This template contains guidelines which help to assure that your     
+%  documentation will be correctly added to ThornGuides. More 
+%  information is available in the Cactus UsersGuide.
+%                                                    
+%  Guidelines:
+%   - Do not change anything before the line
+%       % START CACTUS THORNGUIDE",
+%     except for filling in the title, author, date etc. fields.
+%        - Each of these fields should only be on ONE line.
+%        - Author names should be sparated with a \\ or a comma
+%   - You can define your own macros are OK, but they must appear after
+%     the START CACTUS THORNGUIDE line, and do not redefine standard 
+%     latex commands.
+%   - To avoid name clashes with other thorns, 'labels', 'citations', 
+%     'references', and 'image' names should conform to the following 
+%     convention:          
+%       ARRANGEMENT_THORN_LABEL
+%     For example, an image wave.eps in the arrangement CactusWave and 
+%     thorn WaveToyC should be renamed to CactusWave_WaveToyC_wave.eps
+%   - Graphics should only be included using the graphix package. 
+%     More specifically, with the "includegraphics" command. Do
+%     not specify any graphic file extensions in your .tex file. This 
+%     will allow us (later) to create a PDF version of the ThornGuide
+%     via pdflatex. |
+%   - References should be included with the latex "bibitem" command. 
+%   - use \begin{abstract}...\end{abstract} instead of \abstract{...}
+%   - For the benefit of our Perl scripts, and for future extensions, 
+%     please use simple latex.     
+%
+% *======================================================================* 
+% 
+% Example of including a graphic image:
+%    \begin{figure}[ht]
+%       \begin{center}
+%          \includegraphics[width=6cm]{MyArrangement_MyThorn_MyFigure}
+%       \end{center}
+%       \caption{Illustration of this and that}
+%       \label{MyArrangement_MyThorn_MyLabel}
+%    \end{figure}
+%
+% Example of using a label:
+%   \label{MyArrangement_MyThorn_MyLabel}
+%
+% Example of a citation:
+%    \cite{MyArrangement_MyThorn_Author99}
+%
+% Example of including a reference
+%   \bibitem{MyArrangement_MyThorn_Author99}
+%   {J. Author, {\em The Title of the Book, Journal, or periodical}, 1 (1999), 
+%   1--16. {\tt http://www.nowhere.com/}}
+%
+% *======================================================================* 
+
+% If you are using CVS use this line to give version information
+% $Header$
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+% Add all definitions used in this documentation here 
+%   \def\mydef etc
+
+%\newcommand{\eqref}[1]{(\ref{#1})}
+
+% Add an abstract for this thorn's documentation
+\begin{abstract}
+  {\tt GRHydro} is a fully general-relativistic three-dimensional hydrodynamics code. It evolves the
+  hydrodynamics using High Resolution Shock Capturing methods and can
+  work with realistic equations of state. The evolution of the
+  spacetime can be done by any other ``appropriate'' thorn, such as
+  the {\tt CCATIE} code, maintained and developed at the Albert-Einstein-Institut (Potsdam).
+\end{abstract}
+
+% The following sections are suggestive only.
+% Remove them or add your own.
+
+\section{Introduction}
+\label{sec:intro}
+
+The {\tt GRHydro}\footnote{GRHydro started as a branch of Whisky. 
+  The name Whisky is
+  due to Tom Goodale, who pointed out that the in the original Gaelic
+  {\it uisge beatha} (from which {\tt Whisky} is derived) meant {\it water of
+  life}. This name was chosen at a free and fair democratic ballot
+  at the EU Network meeting in Southampton that gave the right answer
+  thanks to a little bit of help from the authors of the code after
+  some slight irregularities on the part of certain specialists in
+  strange stars.} code is based upon the public version of the {\tt Whisky} code which
+  is a product of the EU Network on Sources of
+  Gravitational Radiation\footnote{http://www.eu-network.org},
+  and was initially written by Luca Baiotti, Ian Hawke
+  and Pedro Montero, based on the publicly available {\tt GR3D} code and
+  with many other important contributors.
+  With the help of large parts of the community, the {\tt GRHydro} code got
+  improved, extended and included into the Einstein Toolkit.
+
+\section{Using This Thorn}
+\label{sec:use}
+
+What follows is a brief introduction to using {\tt GRHydro}. It assumes that
+you know the required physics and numerical methods, and also the
+basics of Cactus\footnote{http://www.cactuscode.org}. If you don't, then skip this section and come back
+to it after reading the rest of this ThornGuide of Cactus. For more details such
+as thornlists and parameter files, take a look at the Einstein Toolkit web page
+which is currently stored at
+\begin{verbatim}
+http://www.einsteintoolkit.org
+\end{verbatim}
+
+{\tt GRHydro} uses the hydro variables defined in {\tt HydroBase}
+and provides own ``conserved'' hydro variables and methods to evolve them. It
+does not provide any information about initial data or equations of
+state. For these, other thorns are required. A minimal list of thorns
+for performing a shock-tube test is given in the shock-tube test
+parameter file, found at
+\begin{verbatim}
+GRHydro/test/GRHydro_test_shock.par
+\end{verbatim}
+and will include the essential thorns
+\begin{verbatim}
+GRHydro EOS_Omni ADMBase ADMCoupling MoL
+\end{verbatim}
+Initial data for shocks can be set using
+\begin{verbatim}
+GRHydro_Init_Data 
+\end{verbatim}
+Initial data for spherically symmetric static stars (with
+perturbations or multiple ``glued'' stars) can be set by
+\begin{verbatim}
+TOVSolver
+\end{verbatim}
+
+The actual evolution in time is controlled by the Method of Lines
+thorn MoL. For full details see the relevant ThornGuide. For the
+purposes of {\tt GRHydro} at least two parameters are relevant; {\tt
+  ode\_method} and {\tt mol\_timesteps}. If second-order accuracy is
+all that is required then {\tt ode\_method} can be set to either {\tt
+  "rk2"} (second-order TVD Runge-Kutta evolution) or {\tt "icn"}
+(Iterative Crank Nicholson, number of iterations controlled by {\tt
+  mol\_timesteps}, defaults to three), and {\tt mol\_timesteps} can be
+ignored. A more generic (and hence less efficient) method can be
+chosen by setting {\tt ode\_method} to {\tt "genrk"} which is a
+Shu-Osher type TVD Runge-Kutta evolution. Then the parameter {\tt
+  mol\_timesteps} controls the number of intermediate steps and hence
+the order of accuracy. First to seventh order are currently supported.
+
+{\tt GRHydro} currently uses a Reconstruction-Evolution type method. The type
+of reconstruction is controlled by the parameter {\tt recon\_method}.
+The currently supported values are {\tt "tvd"} for slope limited TVD
+reconstruction, {\tt "ppm"} for the Colella-Woodward PPM method, and
+{\tt "eno"} for the Essentially Non-Oscillatory method of Harten et
+al. Each of these has further controlling parameters. For example
+there are a number of slope limiters controlled by the keyword {\tt
+  tvd\_limiter}, the PPM method supports shock detection by the
+Boolean {\tt ppm\_detect}, and the ENO method can have various orders
+of accuracy controlled by {\tt eno\_order}. Note that the higher-order
+methods such as PPM and ENO require the stencil size to be increased
+using {\tt GRHydro\_stencil} {\bf and} {\tt driver::ghost\_size}.
+
+For the evolution various approximate Riemann solvers are available,
+controlled by {\tt riemann\_solver}. Currently implemented are {\tt
+  "HLLE"}, {\tt "Roe"} and {\tt "Marquina"}. For the Roe and Marquina
+methods there are added options to choose which method is used for
+calculating the left eigenvectors. This now defaults to the efficient
+methods of the Valencia group, but the explicit matrix inversion is
+still there for reference.
+
+For the equations of state, two ``types'' are recognized, controlled
+by the parameter {\tt GRHydro\_eos\_type}. These are {\tt "Polytype"}
+where the pressure is a function of the rest-mass density, $P=P(\rho)$, and the
+more generic {\tt "General"} type where the pressure is a function
+of the rest-mass density and the specific internal energy, $P=P(\rho, \epsilon)$. For the
+{\tt Polytype} equations of state one fewer equation is evolved and
+the specific internal energy is set directly from the rest-mass density. The
+actual equation of state used is controlled by the parameter {\tt
+  GRHydro\_eos\_table}. Polytype equations of state include {\tt
+  "2D\_Polytrope"} and general equations of state include {\tt
+  "Ideal\_Fluid"}. 
+
+\subsection{Obtaining This Thorn}
+
+The public version of GRHydro can be found on the
+website {\tt http://www.einsteintoolkit.org}. 
+
+\subsection{Basic Usage}
+
+The simplest way to start using {\tt GRHydro} would be to download some
+example parameter files from the web page to try it. There are a number
+of essential parameters which might reward some experimentation. These
+include:
+\begin{itemize}
+\item Reconstruction methods:
+  \begin{itemize}
+  \item {\tt recon\_method}: The type of reconstruction method to
+    use. {\tt tvd} is the standard. {\tt ppm} is more accurate but it requires 
+    more resources. {\tt eno} gives in theory
+    arbitrary order of accuracy but it is practically unworthy to go beyond fifth order.
+  \item {\tt tvd\_limiter}: When using {\tt tvd} reconstruction the
+    choice of limiter can have a large effect. {\tt vanleerMC2} is
+    probably the best to use, but the extremes of {\tt minmod} and {\tt
+      Superbee} are also interesting.
+  \item {\tt ppm\_detect}: When using {\tt ppm} reconstruction with
+    shocks, the shock detection algorithm can notably sharpen the
+    profile.
+  \end{itemize}
+\item Riemann solvers: {\tt Marquina} is the standard solver
+  used. {\tt HLLE} is significantly faster, but sometimes provides cruder approximation.
+\item Equations of state: These are controlled by the {\tt
+    GRHydro\_eos\_type} and {\tt GRHydro\_eos\_table} parameters. Changing
+  these parameters will depend on which equation of state thorns you
+  have compiled in.
+\item Initial data parameters: {\tt GRHydro\_rho\_central} is inherited by many
+  initial data thorns to set the central density of compact fluid
+  objects such as single stars. However, this parameter is depreciated.
+\item Atmosphere parameters: Many of these are listed in
+  section~\ref{sec:atmosphere}. 
+\end{itemize}
+
+\subsection{Special Behaviour}
+
+Although in theory {\tt GRHydro} can deal with conformal metrics as well as
+physical metrics, this part of the code is completely untested as we
+don't have conformal initial data (although this would not be hard -
+we just haven't had the incentive).
+
+\subsection{Interaction With Other Thorns}
+
+{\tt GRHydro} provides the appropriate contribution to the stress energy
+through the {\tt TmunuBase} interface. Those spacetime evolvers that
+use this interface can use {\tt GRHydro} without change. 
+%To pass the required variables across {\tt GRHydro} is a friend of {\tt ADMCoupling}.
+
+{\tt GRHydro} uses the {\tt MoL} thorn to perform the actual time
+evolution. This means that if all other evolution thorns are also
+using {\tt MoL} then the complete evolution will have the accuracy of
+the {\tt MoL} evolution method without change. This (currently) allows
+for up to fourth-order accuracy in time without any changes to {\tt GRHydro}.
+
+For the general equations of state {\tt GRHydro} uses the {\tt EOS\_Omni}
+interface. This returns the necessary hydrodynamical quantities, such
+as the pressure and derivatives with general function calls. The
+parameter {\tt GRHydro\_eos\_table} controls which equation of state is
+used during evolution.
+
+For the metric quantities {\tt GRHydro} uses the standard {\tt
+  CactusEinstein} arrangement, especially {\tt ADMBase}. This allows
+the standard thorns to be used for the calculation of constraint
+violations, emission of gravitational waves, location of the apparent
+horizon, and more.
+
+\subsection{Support and Feedback}
+
+{\tt GRHydro} is part of the Einstein Toolkit, with its web page located at
+\begin{verbatim}
+http://www.einsteintoolkit.org
+\end{verbatim}
+It contains information on obtaining the code, together with
+thornlists and sample parameter files. For questions, send an email
+to the Einstein Toolkit mailing list {\tt users@einsteintoolkit.org}.
+
+\section{Physical System}
+\label{sec:phys}
+
+The equations of general relativistic hydrodynamics can be written in
+the flux conservative form
+\begin{equation}
+  \label{eq:consform1}
+  \partial_t {\bf q} + \partial_{x^i} {\bf f}^{(i)} ({\bf q}) = {\bf
+    s} ({\bf q}),
+\end{equation}
+where ${\bf q}$ is a set of {\it conserved variables}, ${\bf f}^{(i)}
+({\bf q})$ the fluxes and ${\bf s} ({\bf q})$ the source
+terms.
+The five conserved variables are labeled $D$, $S_i$, and $\tau$, where
+$D$ is the generalized particle number density, $S_i$ are the generalized
+momenta in each direction, and $\tau$ is an internal energy term.
+These conserved variables are composed from a set of {\it primitive variables},
+which are $\rho$, the rest-mass density, $p$, the
+pressure, $v^i$, the fluid 3-velocities, $\epsilon$, the specific internal
+energy, and $W$, the Lorentz factor, via the following relations
+% from GRHydro/src/Prim2con.F90
+%  w = 1.d0 / sqrt(1.d0 - (gxx*dvelx*dvelx + gyy*dvely*dvely + gzz &
+%       &*dvelz*dvelz + 2*gxy*dvelx*dvely + 2*gxz*dvelx *dvelz + 2*gyz&
+%       &*dvely*dvelz))
+% 
+%  dpress = (GRHydro_eos_gamma - 1.d0) * drho * deps
+%
+%  ddens = sqrt(det) * drho * w
+%  dsx = sqrt(det) * (drho*(1+deps)+dpress)*w*w * (gxx*dvelx + gxy&
+%       &*dvely + gxz*dvelz)
+%  dsy = sqrt(det) * (drho*(1+deps)+dpress)*w*w * (gxy*dvelx + gyy&
+%       &*dvely + gyz*dvelz)
+%  dsz = sqrt(det) * (drho*(1+deps)+dpress)*w*w * (gxz*dvelx + gyz&
+%       &*dvely + gzz*dvelz)
+%  dtau = sqrt(det) * ((drho*(1+deps)+dpress)*w*w - dpress) - ddens
+\
+\begin{eqnarray}
+  \label{eq:prim2con}
+   D &=& \sqrt{\gamma}W\rho \nonumber \\
+   S_i &=& \sqrt{\gamma} \rho h W^2 v_i \nonumber \\
+   \tau &=& \sqrt{\gamma}\left( \rho h W^2 - p\right) - D, 
+\end{eqnarray}
+where $\gamma$ is the determinant of the spatial 3-metric $\gamma_{ij}$ and 
+$h \equiv 1 + \epsilon + p/\rho$.
+Only five of the primitive variables are
+independent. Usually the Lorentz factor is defined in terms of the
+velocities and the metric as $W = (1-\gamma_{ij}v^i v^j)^{-1/2}$.  
+Also one of the pressure, rest-mass density or specific internal energy terms is given in 
+terms of the other two by an {\it equation of state}.
+
+The fluxes are usually defined in terms of both the conserved
+variables and the primitive variables:
+%
+\begin{eqnarray}
+{\bf F}^i({\bf U}) &=& [D(\alpha v^i - \beta^i), S_j(\alpha v^i -
+  \beta^i) + p\delta^i_j, \tau(\alpha v^i - \beta^i) + p
+  v^i]^T\ .
+\end{eqnarray}
+%
+The source terms are
+%
+\begin{eqnarray} \label{source_terms}
+{\bf s}({\bf U}) = \Big [0, T^{\mu\nu}\big (\partial_\mu g_{\nu j} +
+  \Gamma^\delta_{\mu\nu} g_{\delta j}\big ), \alpha \big (T^{\mu
+    0}\partial_\mu \ln \alpha - T^{\mu\nu}\Gamma^0_{\nu\mu} \big) \Big ]\ .
+\end{eqnarray}
+%
+Note that the source terms do not contain differential operators
+acting on the stress-energy tensor and that this is important for the
+numerical preservation of the hyperbolicity character of the system.
+Also note that in a curved spacetime the equations are not in a
+strictly-homogeneous conservative form, which is recovered only in flat
+spacetime. This conservative form of the relativistic Euler equations
+was first derived by the group at the Universidad de Valencia
+\cite{Banyuls97} and therefore was named the {\it Valencia
+formulation}. 
+
+
+%Describe possible equations of state.
+
+%Any other physics points (there'll be lots).
+
+For more detail see the review of Font~\cite{livrevgrrfd}. 
+
+\section{Numerical Implementation}
+
+\section{High Resolution Shock Capturing methods}
+\label{sec:hrsc}
+
+The numerical evolution of a hydrodynamical problem is complicated by
+the occurrence of {\it shocks}, {\it i.e.} genuine nonlinear discontinuities that
+will generically form. It is also complicated by the conservation
+constraint. In a High Resolution Shock Capturing (HRSC) method the
+requirement of conservation is used to ensure the correct evolution of
+a shock. A HRSC method also avoids spurious oscillations at shocks
+which are known as Gibbs' phenomena, while retaining a high order of
+accuracy over the majority of the domain.
+
+For a full introduction to HRSC methods see~\cite{laney}, \cite{toro},
+\cite{leveque}, \cite{livrevsrrfd} and \cite{livrevgrrfd}.
+
+In the {\tt GRHydro} code it was decided to use the {\it method of lines} as a
+base for the HRSC scheme. The method of lines is a way of turning a
+partial differential equation such as~(\ref{eq:consform1}) into an
+ordinary differential equation. For the {\tt GRHydro} code the following steps
+are required.
+\begin{itemize}
+\item Partition the domain of interest into {\it cells}. For
+  simplicity we shall assume a regular Cartesian partitioning. This is
+  not necessary for the method of lines, but it is for {\tt GRHydro}.
+\item Over a given cell with Cartesian coordinates $(x^1_i, x^2_j, x^3_k)$,
+  integrate equation~(\ref{eq:consform1}) in space to find the
+  ordinary differential equation
+  \begin{eqnarray}
+    \label{eq:molform1} \nonumber
+    \frac{{\rm d} \,}{{\rm d} t} {\bf q} & = & \int \!\!\!\! \int \!\!\!\!
+      \int {\bf s} \,{\rm d}^3 x + \int_{x^2_{j-1/2}}^{x^2_{j+1/2}}
+    \int_{x^3_{k-1/2}}^{x^3_{k+1/2}} {\bf f}^{(1)} ({\bf q}
+    (x^1_{i-1/2}, y, z)) {\rm d} y \, {\rm d} z - \\
+    &&    \int_{x^2_{j-1/2}}^{x^2_{j+1/2}} 
+    \int_{x^3_{k-1/2}}^{x^3_{k+1/2}} {\bf f}^{(1)} ({\bf q}
+    (x^1_{i+1/2}, y, z))
+    {\rm d} y \, {\rm d} z + \cdots
+  \end{eqnarray}
+  where the boundaries of the Cartesian cells are given by $x^1_{i \pm
+  1/2}$ and so on.
+\item If we define $\bar{\bf q}$ as the integral average of
+  ${\bf q}$ over the cell, after dividing (\ref{eq:molform1}) by the volume of the cell, we get an ordinary
+  differential equation for $\bar{\bf q}$, in terms of the flux functions and the
+  source terms as functions of the spatial differential of $\bar{{\bf
+  q}}$. We note that, unlike the spatial differential of ${\bf q}$,
+  the spatial differential of $\bar{{\bf q}}$ is well defined in a
+  cell containing a discontinuity. 
+\end{itemize}
+
+This ordinary differential equation can be solved by the Cactus thorn
+MoL. All that {\tt GRHydro} has to do is to return the values of the discrete
+spatial differential operator
+\begin{eqnarray}
+  \label{eq:molrhs1} \nonumber
+  {\bf L}({\bf q}) & = & \int \!\!\!\! \int \!\!\!\!
+      \int {\bf s} \,{\rm d}^3 x + \int_{x^2_{j-1/2}}^{x^2_{j+1/2}}
+    \int_{x^3_{k-1/2}}^{x^3_{k+1/2}} {\bf f}^{(1)} ({\bf q}
+    (x^1_{i-1/2}, y, z)) {\rm d} y \, {\rm d} z - \\
+    &&    \int_{x^2_{j-1/2}}^{x^2_{j+1/2}} 
+    \int_{x^3_{k-1/2}}^{x^3_{k+1/2}} {\bf f}^{(1)} ({\bf q}
+    (x^1_{i+1/2}, y, z)) {\rm d} y \, {\rm d} z + \cdots
+\end{eqnarray}
+given the data ${\bf q}$, and to supply the boundary conditions that will
+be required to calculate this right hand side at the next time level.
+We note that in the current implementation of MoL the solution to the
+ordinary differential equation~(\ref{eq:molform1}) will be $N^{\rm
+  th}$-order accurate provided that the time integrator used by MoL is $N^{\rm
+  th}$-order accurate in time, and that the discrete operator ${\bf L}$ is
+$N^{\rm th}$-order accurate in space and {\it first}-order (or better)
+accurate in time.  For more details on the method of lines, and the
+options given with the time integration for MoL, see the relevant
+chapter in the ThornGuide.
+
+In this implementation of {\tt GRHydro} the right hand side operator ${\bf L}$
+will be simplified considerably by approximating the integrals by the
+midpoint rule to get
+\begin{equation}
+  \label{eq:molrhs2}
+  {\bf L}({\bf q}) = {\bf s}_{i,j,k} + {\bf f}^{(1)}_{i-1/2,j,k} -
+    {\bf f}^{(1)}_{i+1/2,j,k} + \cdots
+\end{equation}
+where the dependence of the flux on ${\bf q}$ and spatial position is
+implicit in the notation. Given this simplification, the calculation
+of the right hand side operator splits simply into the following two parts:
+\begin{enumerate}
+\item Calculate the source terms ${\bf s}({\bf q}(x^1_i, x^2_j,
+  x^3_k))$:
+
+  Given that $\bar{{\bf q}}$ is a second-order accurate approximation
+  to ${\bf q}$ at the midpoint of the cell, which is precisely $(x^1_i, x^2_j,
+  x^3_k)$, for second-order accuracy it is sufficient to use ${\bf
+  s}(\bar{{\bf q}}_{i,j,k})$.
+\item In each coordinate direction $x^a$, calculate the {\it intercell
+    flux} ${\bf f}^{(a)}({\bf q}_{i+1/2,j,k})$:
+  
+  From the initial data $\bar{{\bf q}}$ given at time $t^n$ we can
+  reconstruct the data at the cell boundary, $({\bf q}_{i+1/2,j,k})$
+  to any required accuracy in space (except in the vicinity of a
+  shock, where only first-order accuracy is guaranteed).
+% - FIXME: check,
+%  Ian thinks the ENO theorems say that for linear problems get high order
+%  even with discty). 
+  However this will only be zeroth-order accurate
+  in time. To ensure first-order accuracy in time, we have to find
+  $({\bf q}_{i+1/2,j,k})(t)$ while retaining the high spatial order
+  of accuracy. This requires two steps:
+  \begin{enumerate}
+  \item {\it Reconstruct} the data ${\bf q}$ over the cells adjacent
+    to the required cell boundary. This reconstruction should use the
+    high spatial order of accuracy. This gives two values of
+    $({\bf q}_{i+1/2,j,k})$, which we call ${\bf q}_L$ and ${\bf q}_R$,
+    where ${\bf q}_L$ is obtained from cell $i$ (left cell) and ${\bf q}_R$
+    from cell $i+1$ (right cell).
+  \item The values ${\bf q}_{L,R}$ are used as initial data for the
+    {\it Riemann problem}. This is the initial value problem given by
+    the partial differential equation~(\ref{eq:consform1}) with
+    semi-infinite piecewise constant initial data ${\bf q}_{L,R}$. As
+    the true function ${\bf q}$ is probably not piecewise constant we
+    will not get the exact solution of the general problem even if we
+    solve the local Riemann problem exactly. However, it will be first-order 
+    accurate in time and retain the high order of accuracy in
+    space which, as explained in the documentation to the MoL thorn,
+    is sufficient to ensure that the method as a whole has a high
+    order of accuracy. 
+  \end{enumerate}
+\end{enumerate}
+
+So, the difficult part of {\tt GRHydro} is expressed in two routines. One that
+reconstructs the function ${\bf q}$ at the boundaries of a
+computational cell given the cell average data $\bar{{\bf q}}$, and
+another that calculates the intercell flux ${\bf f}$ at this cell
+boundary. 
+
+\section{Reconstruction}
+\label{sec:recon}
+
+In the reduction of all of {\tt GRHydro} to two routines in the last section
+one point was glossed over. That is, in order for the numerical method
+to be consistent and convergent it must retain conservation and not
+introduce spurious oscillations. Up to this point all the steps have
+either been exact or have neither changed the conservation properties
+or the profile of the function. Also, the calculation of the intercell
+flux from the Riemann problem can be made to be ``exactly correct''.
+That is, even though as explained above it may not be the true flux
+for the real function ${\bf q}$, it will be the exact physical
+solution for the values ${\bf q}_{L,R}$ given by the reconstruction
+routine, so the intercell flux cannot violate conservation or
+introduce oscillations.  Unphysical effects such as these can only be
+introduced by an incorrect reconstruction.
+
+For a full explanation of reconstruction methods see
+Laney~\cite{laney}, Toro~\cite{toro}, Leveque~\cite{leveque}. For the
+moment we will concentrate on the simplest methods that are better
+than first-order accurate in space, the TVD slope-limited methods.
+More complex methods such as ENO will be introduced later.
+
+In the late 1950's Godunov proved a theorem that, in this context,
+says
+\begin{quote}
+Any {\bf linear} reconstruction method of higher-than-first-order
+accuracy may introduce spurious oscillations.
+\end{quote}
+For this theorem {\it linear} meant that the reconstruction method was
+independent of the data it was reconstructing. Simple centred
+differencing is a linear second-order method and is oscillatory near a
+shock. Instead we must find a reconstruction method that depends on
+the data ${\bf q}$ being reconstructed.
+
+Switching our attention to conservation, we note that there is
+precisely one conservative first-order reconstruction method,
+\begin{equation}
+  \label{eq:reconfirst}
+  {\bf q}^{{\rm First}}(x) = \bar{{\bf q}}_i, \qquad x \in [
+  x_{i-1/2}, x_{i+1/2} ], 
+\end{equation}
+and that any second-order conservative method can be written in terms
+of a {\it slope} or rather \emph{difference} $\Delta_i$ as
+\begin{equation}
+  \label{eq:reconsecond}
+  {\bf q}^{{\rm Second}}(x) = \bar{{\bf q}}_i + \frac{x -
+  x_i}{x_{i+1/2} - x_{i-1/2}} \Delta_i, \qquad x \in [ x_{i-1/2}, x_{i+1/2} ].
+\end{equation}
+
+\subsection{TVD Reconstruction}
+\label{sec:tvd}
+
+As we want a method that is accurate ({\it i.e.}, at least to second order)
+while being stable ({\it i.e.}, only first order or nonlinear at shocks)
+then the obvious thing to do is to use some second-order method in the
+form of equation~(\ref{eq:reconsecond}) in smooth regions but which
+changes to the form of equation~(\ref{eq:reconfirst}) smoothly near
+shocks. 
+
+In the articles describing the {\tt GRAstro\_Hydro}
+code\footnote{http://wugrav.wustl.edu/ASC/internal/asccodes.html},
+this was described as an average of the two reconstructions, 
+\begin{equation}
+  {\bf q}^{{\rm TVD}}(x) = \phi({\bf q}) {\bf q}^{{\rm Second}} + (1 -
+  \phi({\bf q})) {\bf q}^{{\rm First}},
+  \label{First_qTVD}
+\end{equation}
+where $\phi \in [0,1]$ varies smoothly in some sense, and is zero near
+a shock and 1 in smooth regions. In Toro's notation~\cite{toro} (which we usually adopt here) 
+the slope limiter function $\phi$ (having the same attributes as above)
+directly multiplies the slope, giving
+\begin{equation}
+  {\bf q}^{{\rm TVD}}(x) = \bar{{\bf q}}_i + \frac{x -
+  x_i}{x_{i+1/2} - x_{i-1/2}} \phi({\bf q}) \Delta_i, \qquad x \in [
+  x_{i-1/2}, x_{i+1/2} ]. 
+  \label{Toro_qTVD}
+\end{equation}
+Equations (\ref{First_qTVD}) and (\ref{Toro_qTVD}) are equivalent.
+
+For details on how to construct a limiter, on their stability regions and on 
+the explicit expressions for the limiters used here,
+see~\cite{toro}. The {\tt GRHydro} code implements the {\tt minmod} limiter
+(the most diffusive and the default), the Van Leer Monotonized Centred
+(MC) ({\tt VanLeerMC}) limiter in a number of forms (which should give equivalent results), 
+and the {\tt Superbee} limiter. The limiter specified by the parameter value {\tt VanLeerMC2} 
+is the recommended one.
+
+As an example, we show how TVD with the minmod limiter is implemented
+in the code. First, we define the minmod function:
+\begin{equation}
+  \label{eq:tvdminmod}
+  \mathrm{\mathbf{minmod}}(a,b) = \left\{ \begin{array}{c l} 
+      \textrm{min}(|a|,|b|) & \textrm{if } (a b > 0)\\
+      0 & \textrm{otherwise}. \end{array}\right.
+\end{equation}
+For reconstructing $\mathbf{q}$ %at the cell interfaces $i+\frac{1}{2}$ and $i-\frac{1}{2}$, 
+we choose two differences
+\begin{equation}
+  \begin{array}{lcl}
+    \Delta_{\mathrm{upw}} & = & \mathbf{q}_i - \mathbf{q}_{i-1}\\
+    \Delta_{\mathrm{loc}} & = & \mathbf{q}_{i+1} - \mathbf{q}_{i}\,,\\
+  \end{array}
+\end{equation}
+and write
+\begin{equation}
+  {\bf q}^{{\rm TVD,minmod}}(x) = \bar{{\bf q}}_i + \frac{x -
+  x_i}{x_{i+1/2} - x_{i-1/2}} \mathbf{minmod}(\Delta_{\mathrm{upw}},\Delta_{\mathrm{loc}}), 
+    \qquad x \in [
+  x_{i-1/2}, x_{i+1/2} ]. 
+\end{equation}
+\subsection{PPM reconstruction}
+\label{sec:ppm}
+
+The piecewise parabolic method (PPM) of Colella and
+Woodward~\cite{ppm} is a rather more complex method that requires a
+number of steps. The implementation in the {\tt GRHydro} code is specialized
+to use evenly spaced grids. Also, some of the more complex features are not
+implemented; in particular, the dissipation algorithm is only the
+simplest given in the original article. Here we just give the implementation
+details. For more details on the method we refer to the original
+article.
+
+Again we assume we are reconstructing a scalar function $q$ as a
+function of $x$ in one dimension on an evenly spaced grid, with spacing $\Delta
+x$. The first step is to interpolate a quadratic polynomial to the cell
+boundary, 
+\begin{equation}
+  \label{eq:ppm1}
+  q_{i+1/2} = \frac{1}{2} \left( q_{i+1} + q_i \right) + \frac{1}{6}
+  \left( \delta_m q_i - \delta_m q_{i+1} \right), 
+\end{equation}
+where
+\begin{equation}
+  \label{eq:ppmdm1}
+  \delta_m q_i = \left\{ \begin{array}{c l} \textrm{min}(|\delta q_i|,
+      2|q_{i+1} - q_i|, 2|q_i - q_{i-1}|) \textrm{ sign}(\delta q_i) &
+      \textrm{if } (q_{i+1} - q_i)(q_i - q_{i-1}) > 0, \\
+      0 & \textrm{otherwise}. \end{array} \right.,
+\end{equation}
+and
+\begin{equation}
+  \label{eq:ppmd1}
+  \delta q_i = \frac{1}{2}(q_{i+1} - q_{i-1}).
+\end{equation}
+At this point we set both left and right states at the interface to be
+equal to this,
+\begin{equation}
+  \label{eq:ppmset1}
+  q_i^R = q_{i+1}^L = q_{1+1/2}.
+\end{equation}
+
+This reconstruction will be oscillatory near shocks. To preserve
+monotonicity, the following replacements are made:
+\begin{eqnarray}
+  \label{eq:ppmmonot}
+  q_i^L = q_i^R = q_i & \textrm{if} & (q_i^R - q_i)(q_i - q_i^L) \leq
+  0 \\
+  q_i^L = 3 q_i - 2q_i^R & \textrm{if} & (q_i^R - q_i^L)\left( q_i -
+  \frac{1}{2} (q_i^L + q_i^R) \right) > \frac{1}{6}(q_i^R - q_i^L)^2
+  \\ 
+  q_i^R = 3 q_i - 2q_i^L & \textrm{if} & (q_i^R - q_i^L)\left( q_i -
+  \frac{1}{2} (q_i^L + q_i^R) \right) < -\frac{1}{6}(q_i^R -
+  q_i^L)^2. 
+\end{eqnarray}
+
+However, before applying the monotonicity preservation two other steps
+may be applied. Firstly we may steepen discontinuities. This is to
+ensure sharp profiles and is only applied to contact
+discontinuities. This may be switched on or off using the parameter
+{\tt ppm\_detect}. This part of the method replaces the cell boundary
+reconstructions of the density with
+\begin{eqnarray}
+  \label{eq:ppmdetect}
+  \rho_i^L & = & \rho_i^L (1-\eta) + \left(\rho_{i-1} + \frac{1}{2}
+    \delta_m \rho_{i-1} \right) \eta \\
+  \rho_i^R & = & \rho_i^R (1-\eta) + \left(\rho_{i+1} - \frac{1}{2}
+    \delta_m \rho_{i+1} \right) \eta
+\end{eqnarray}
+where $\eta$ is only applied if the discontinuity is mostly a contact
+(see~\cite{ppm} for the details) and is defined as
+\begin{equation}
+  \label{eq:ppmeta}
+  \eta = \textrm{max}(0, \textrm{min}(1, \eta_1 (\tilde{\eta} - \eta_2))),
+\end{equation}
+where $\eta_1,\eta_2$ are positive constants and
+\begin{equation}
+  \label{eq:ppmetatilde}
+  \tilde{\eta} = \left\{ \begin{array}{c l} 
+  \frac{\rho_{i-2} - \rho_{i+2} + 4 \delta\rho_i}{12\delta\rho_i} &
+  \textrm{ if } \left\{
+\begin{array}{l}
+  \delta^2\rho_{i+1}\delta^2\rho_{i-1} < 0\\
+  (\rho_{i+1} - \rho_{i-1}) - \epsilon \textrm{min}(|\rho_{i+1}|,|\rho_{i-1}|) >
+  0\nonumber
+\end{array} \right. \\
+  0 & \textrm{otherwise} \end{array} \right.,
+\end{equation}
+with $\epsilon$ another positive constant and
+\begin{equation}
+  \label{eq:ppmd2rho}
+  \delta^2\rho_i = \frac{\rho_{i+1} - 2\rho_i + \rho_{i-1}}{6\Delta
+    x^2}.  
+\end{equation}
+
+Another step that is performed before monotonicity enforcement is to
+flatten the zone structure near shocks. This adds simple dissipation
+and is always in the code. In short, the reconstructions are again
+altered to
+\begin{equation}
+  \label{eq:ppmflatten}
+  q_i^{L,R} = \nu_i q_i^{L,R} + (1 - \nu_i) q_i,
+\end{equation}
+where
+\begin{equation}
+  \label{eq:ppmflatten2}
+  \nu_i = \left\{ \begin{array}{c l} {\rm max}(0, 1 - \textrm{max}(0, \omega_2
+      (\frac{p_{i+1} - p_{i-1}}{p_{i+2} - p_{i-2}} - \omega_1))) & \textrm{
+        if } \omega_0 \textrm{min}(p_{i-1}, p_{i+1}) < |p_{i+1} - p_{i - 1}| 
+      \textrm{ and } v^x_{i-1} - v^x_{i+1} > 0 \\
+      1 & \textrm{otherwise} \end{array} \right.
+\end{equation}
+and $\omega_0, \omega_1,\omega_2$ are constants.
+
+The above flattening procedure is not the one in the original article of Colella and Woodward, but
+it has been adapted from it in order to have a stencil of three points.  The original flattening
+procedure is also implemented in {\tt GRHydro}. Instead of \ref{eq:ppmflatten}, it consists in the formula
+\begin{equation}
+  \label{eq:ppmflatten-stencil4}
+  q_i^{L,R} = \tilde \nu_i q_i^{L,R} + (1 - \tilde \nu_i) q_i,
+\end{equation}
+where
+\begin{eqnarray}
+\tilde \nu_i &=& {\rm max}\Big(\nu_i,\nu_{i+{\rm sign}(p_{i-1}-p_{i+1})}\Big)
+\end{eqnarray}
+and $\nu_i$ is given by \ref{eq:ppmflatten2}. This can be activated by setting the parameter {\tt
+ppm\_flatten} to {\tt stencil\_4}. Formula \ref{eq:ppmflatten-stencil4}, despite requiring
+more computational resources (especially when mesh refinement is used), usually gives very similar
+results to \ref{eq:ppmflatten}, so we routinely use \ref{eq:ppmflatten}.
+
+
+\subsection{ENO Reconstruction}
+\label{sec:eno}
+
+An alternative way of getting higher-than-second-order accuracy is the implementation of the
+Essentially Non-Oscillatory methods of Harten et.al~\cite{eno}. The
+essential idea is to alter the stencil to use those points giving the
+smoothest reconstruction. The only restriction is that the stencil
+must include the cell to be reconstructed (for stability). Here we
+describe the simplest ENO type reconstruction: piecewise polynomial
+reconstruction using the (un)divided differences to measure the
+smoothness. 
+
+Let $k$ be the order of the reconstruction. Suppose we are
+reconstructing the scalar function $q$ in cell $i$. We start with the
+cell $I_i$. We then add to the stencil cell $I_j$, where $j = i \pm
+1$, where we choose $j$ to minimize the Newton divided differences
+\begin{eqnarray}
+  \label{enodd}
+  q \left[ x_{i-1}, x_i \right] & = & \frac{q_i - q_{i-1}}{x_{i+1/2}
+    - x_{i-3/2}} \\
+  q \left[ x_i, x_{i+1} \right] & = & \frac{q_{i+1} - q_i}{x_{i+3/2}
+    - x_{i-1/2}}.
+\end{eqnarray}
+\noindent We then recursively add more cells, minimizing the higher-order 
+Newton divided differences $q \left[ x_{i-k}, \dots, x_{i+j} \right]$
+defined by 
+\begin{equation}
+  \label{enodd2}
+  q \left[ x_{i-k}, \dots, x_{i+j} \right] = \frac{ q \left[ x_{i-k+1},
+  \dots, x_{i+j} \right] - q \left[ x_{i-k}, \dots, x_{i+j-1} \right]
+  }{x_{i+j} - x_{i-k}}.
+\end{equation}
+\noindent The reconstruction at the cell boundary is given by a
+standard $k^{\textrm{th}}$-order polynomial interpolation on the chosen
+stencil. 
+
+\cite{shueno} has outlined an elegant way of calculating the cell
+boundary values solely in terms of the stencil and the known data. If
+the stencil is given by
+\begin{equation}
+  \label{enostencil1}
+  S(i) = \left\{ I_{i-r}, \dots, I_{i+k-r-1} \right\},
+\end{equation}
+\noindent for some integer $r$, then there exist constants $c_{rj}$
+depending only on the grid $x_i$ such that the boundary
+values for cell $I_i$ are given by
+\begin{equation}
+  \label{enoc1}
+  q_{i+1/2} = \sum_{j=0}^{k-1} c_{rj} q_{i-r+j}, \qquad q_{i-1/2} =
+  \sum_{j=0}^{k-1} c_{r-1,j} q_{i-r+j}. 
+\end{equation}
+\noindent The constants $c_{rj}$ are given by the rather complicated
+formula 
+\begin{equation}
+  \label{enoc2}
+  c_{rj} = \left\{ \sum_{m=j+1}^k \frac{ \sum_{l=0, l \neq m}^k
+  \prod_{q=0, q \neq m, l}^k \left(  x_{i+1/2} - x_{i-r+q-1/2} \right)
+  }{ \prod_{l=0, l \neq m}^k \left(  x_{i-r+m-1/2} - x_{i-r+L-1/2}
+  \right) }  \right\} \Delta x_{i-r+j}. 
+\end{equation}
+\noindent This simplifies considerably if the grid is even. The
+coefficients for an even grid are given (up to seventh order)
+by~\cite{shueno}.
+
+\section{Riemann Problems}
+\label{sec:riemann}
+
+Given the reconstructed data, we then solve a local Riemann problem in
+order to get the intercell flux. The Riemann problem is specified by
+an equation in flux conservative homogeneous form,
+\begin{equation}
+  \label{eq:homconsform1}
+  \partial_t {\bf q} + \partial_{x^i} {\bf f}^{(i)} ({\bf q}) = 0
+\end{equation}
+with piecewise constant initial data ${\bf q}_{_{L,R}}$ separated by a
+discontinuity at $x^{(1)}=0$. Flux terms for the other directions are
+given similarly.  There is no intrinsic scale to this problem and so
+the solution must be a self similar solution with similarity variable
+$\xi = x^{(1)}/t$. The solution is given in terms of {\it waves} which
+separate different {\it states}, with each state being constant. The
+waves are either {\it shocks}, across which all hydrodynamical
+variables change discontinuously, {\it rarefactions}, across which all
+the variables change continuously (the wave is not a single value of
+$\xi$ for a rarefaction, but spreads across a finite range), or {\it
+contact or tangential} discontinuities, across which some but not all
+of the hydrodynamical variables change discontinuously and the rest
+are constant. The characteristics of the matter evolution converge and
+break at a shock, diverge at a rarefaction and are parallel at the
+other linear discontinuities.
+
+The best references for solving the Riemann problem either exactly or
+approximately are~\cite{leveque}, \cite{toro}, \cite{laney}. Here, we start by 
+giving a simple outline. We
+start by considering the $N$ dimensional linear problem in one
+dimension given by
+\begin{equation}
+%  \label{eq:linsys1}
+  \label{lsrp}
+  \partial_t {\bf q} + A \partial_{x} {\bf q} = 0  \ ,
+\end{equation}
+where $A$ is a $N\times N$ matrix with constant coefficients. We
+define the eigenvalues $\lambda^j$ with associated right and left
+eigenvectors ${\bf r}^j,{\bf l}_j$, where the eigenvectors are
+normalized to each other ({\it i.e.}, their dot product is
+$\delta^i_j$). 
+%%%%This was sort of written twice
+%Defining the characteristic variables ${\bf w}_i$ as
+%\begin{equation}
+%  \label{eq:charvar1}
+%  {\bf w}_i = {\bf l}^j_i \cdot {\bf q}_j \ ,
+%\end{equation}
+%then equation (\ref{eq:linsys1}) transforms to a set of uncoupled
+%linear equations
+%\begin{equation}
+%  \label{eq:linsys2}
+%  \partial_t {\bf w}_i + \Lambda \partial_{x} {\bf w}_i = 0   \ ,
+%\end{equation}
+%where the matrix $\Lambda$ contains the eigenvalues on the diagonals
+%and is zero elsewhere. By convention the eigenvalues are ordered
+%$\lambda_1 < \dots < \lambda_N$.
+%
+%The solution to one of the uncoupled equations along the cell boundary
+%is simply that the characteristic variable is given by
+%\begin{equation}
+%  \label{eq:linflux}
+%  {\bf w}_i = \left\{ \begin{array}[c]{r c l} ({\bf w}_i)_L & {\rm if}
+%      & \lambda_i > 0 \\ 
+%      ({\bf w}_i)_R & {\rm if} & \lambda_i < 0. \end{array}\right\},
+%\end{equation}
+%where, as before, subscripts $L$ and $R$ are used to denote quantities
+%obtained from cells on the left and right, respectively, of the intercell 
+%interface.
+%To get the intercell flux we transform the solution back to the
+%conserved variables by taking the dot product with the right
+%eigenvectors and then multiplying by the matrix $A$. This can be written
+%in a number of ways; the form we use is
+%\begin{equation}
+%  \label{eq:linsysflux}
+%  {\bf f}_{i+1/2} = \frac{1}{2} \left[ A({\bf q}_{_L}) + A({\bf q}_{_R})
+%  - \Sigma_{j=1}^N |\lambda_j| \Delta {\bf w}_j {\bf r} \right], 
+%\end{equation}
+%where $\Delta {\bf w}^j$ is the jump in the appropriate characteristic
+%variable across the $j^{{\rm th}}$ wave. We note that the
+%characteristic jumps are easily calculated from
+%\begin{equation}
+%  \label{eq:charjump}
+%  \Delta {\bf w}_i = {\bf l}_i^j \left[ ({\bf q}_R)_j - ({\bf q}_L)_j
+%  \right]. 
+%\end{equation}
+%
+%The Roe flux is simply given by locally assuming that the conserved
+%variables are constant. Thus the matrix $A$ is simply given by
+%evaluating the Jacobian matrix $\partial {\bf f}({\bf q}) / \partial
+%{\bf q}$ at some average state. Equation~(\ref{eq:linsysflux}) is then
+%used to evaluate the intercell flux. The only questions are
+%\begin{itemize}
+%\item What is an appropriate intermediate state?
+%\item When is this approximate (in)valid?
+%\end{itemize}
+%
+%\subsection{Linear system}
+%%
+%Let ${\bf l}_i$, ${\bf r}^i$ be the left and right eigenvectors,
+%respectively, of the matrix $A$ with eigenvalues $\lambda_i$,
+%normalized such that ${\bf l}_i \cdot {\bf r}^j = \delta_i^j$. 
+%
+\label{sec:linsys}
+We shall assume that the eigenvectors span the space. The characteristic
+variables ${\bf w}_i$ are defined by
+\begin{equation}
+  \label{charvar}
+  {\bf w}_i = {\bf l}_i \cdot {\bf q}.
+\end{equation}
+\noindent Then equation (\ref{lsrp}) when written in terms of the
+characteristic variables becomes
+\begin{equation}
+  \label{charvarrp}
+  \partial_t {\bf w} + \Lambda \partial_x {\bf w} = 0,
+\end{equation}
+\noindent where $\Lambda$ is the matrix containing the eigenvalues
+$\lambda_i$ on the diagonals and zeros elsewhere. Hence each
+characteristic variable ${\bf w}^i$ obeys the linear advection
+equation with velocity $a = \lambda_i$. This solves the Riemann
+problem in terms of characteristic variables.
+
+In order to write the solution in terms of the original variables
+${\bf q}$ we order the variables in such a way  that $\lambda_1 \leq \dots \leq
+\lambda_N$. We also define the differences in the characteristic
+variables $\Delta {\bf w}_i = ({\bf w}_i)_L - ({\bf w}_i)_R$ across
+the $i^{{\rm th}}$ characteristic wave. These differences are single
+numbers (`scalars'). We note that these differences can easily be
+found from the initial data using
+\begin{equation}
+  \label{dw}
+  \Delta {\bf w}_i = {\bf l}_i \cdot \left( {\bf q}_L - {\bf q}_R
+  \right). 
+\end{equation}
+\noindent As the change in the solution across each wave is precisely
+the difference in the associated characteristic variable, the solution
+of the Riemann problem in terms of characteristic variables can be
+written as either
+\begin{equation}
+  \label{lsrpsol1}
+  {\bf w}_i = ({\bf w}_i)_L + \sum_{j=1}^M \Delta {\bf w}_j {\bf e}^j \quad
+  {\rm if}\ \lambda_M < \xi < \lambda_{M+1},
+\end{equation}
+\noindent or 
+\begin{equation}
+  \label{lsrpsol2}
+  {\bf w} = ({\bf w}_i)_R - \sum_{j=M+1}^N \Delta {\bf w}_j {\bf e}^j
+  \quad {\rm if}\ \lambda_M < \xi < \lambda_{M+1},
+\end{equation}
+\noindent or as the average
+\begin{equation}
+  \label{lsrpsol3}
+  {\bf w}_i = \frac{1}{2} \left( ({\bf w}_i)_L + ({\bf w}_i)_R +
+  \sum_{j=1}^M \Delta 
+  {\bf w}_j {\bf e}^j - \sum_{j=M+1}^N \Delta {\bf w}_j {\bf e}^j 
+  \right) \quad {\rm if}\ \lambda_M < \xi < \lambda_{M+1},
+\end{equation}
+\noindent where ${\bf e}^i$ is the column vector $({\bf e}^i)_j =
+\delta^i_j$. 
+
+Converting back to the original variables ${\bf q}$ we have the
+solution
+\begin{equation}
+  \label{lsrpsol4}
+  {\bf q} = \frac{1}{2} \left( {\bf q}_L + {\bf q}_R + \sum_{i=1}^M \Delta
+  {\bf w}_i {\bf r}^i - \sum_{i=M+1}^N \Delta {\bf w}_i {\bf r}^i
+  \right) \quad {\rm if}\ \lambda_M < \xi < \lambda_{M+1}.
+\end{equation} 
+\noindent In the case where we are only interested in the flux
+along the characteristic $\xi = 0$ we can write the solution in the
+simple form
+\begin{equation}
+  \label{lsrpsol6}
+  {\bf f}({\bf q}) = \frac{1}{2} \left( {\bf f}({\bf q}_L) + {\bf f}({\bf
+  q}_R) - \sum_{i=1}^N | \lambda_i | \Delta {\bf w}_i {\bf r}^i \right).
+\end{equation} 
+
+All exact Riemann solvers have to solve at least an implicit
+equation and so are computationally very expensive. As the 
+solution of Riemann problems takes a large portion of
+the time to run in a HRSC code, approximations that speed the
+calculation of the intercell flux are often essential. This is
+especially true in higher dimensions (>1), where the solution of the
+ordinary differential equation to give the relation across a
+rarefaction wave makes the use of an exact Riemann solver impractical.
+
+Approximate Riemann solvers can have problems, as shown in depth by
+Quirk~\cite{Quirk}. Hence it is best to compare the
+results of as many different solvers as possible. Here we shall describe
+the three approximate solvers used in this code, starting with the
+simplest.
+
+\subsection{HLLE solver}
+\label{sec:hlle}
+
+The Harten-Lax-van Leer-Einfeldt (HLLE) solver of Einfeldt~\cite{Einfeldt88} is a
+simple two-wave approximation. We assume that the maximum and minimum wave speeds
+$\xi_{\pm}$ are known. The solution of the Riemann problem is then
+given by requiring conservation to hold across the waves. The solution
+takes the form
+\begin{equation}
+  \label{hlle1}
+  {\bf q} = \left\{ \begin{array}[c]{r c l} {\bf q}_L & {\rm if} & \xi
+        < \xi_- \\  {\bf  q}_* & {\rm if} & \xi_- < \xi < \xi_+ \\
+        {\bf q}_R & {\rm if} & \xi   > \xi_+, \end{array}\right. 
+\end{equation}
+\noindent and the intermediate state ${\bf q}_*$ is given by
+\begin{equation}
+  \label{hlle2}
+  {\bf q}_* = \frac{\xi_+ {\bf q}_R - \xi_- {\bf q}_L - {\bf f}({\bf
+  q}_R) + {\bf f}({\bf q}_L)}{\xi_+ - \xi_-}.
+\end{equation}
+\noindent If we just want the numerical flux along the boundary then
+this takes the form
+\begin{equation}
+  \label{hlleflux}
+  {\bf f}({\bf q}) = \frac{\widehat{\xi}_+{\bf f}({\bf q}_L) -
+  \widehat{\xi}_-{\bf f}({\bf q}_R) + \widehat{\xi}_+ \widehat{\xi}_-
+  ({\bf q}_R - {\bf q}_L)}{\widehat{\xi}_+ - \widehat{\xi}_-},
+\end{equation}
+\noindent where
+\begin{equation}
+  \label{hlle3}
+  \widehat{\xi}_- = {\rm min}(0, \xi_-), \quad \widehat{\xi}_+ =
+  {\rm max}(0, \xi_+). 
+\end{equation}
+
+Knowledge of the precise minimum and maximum characteristic velocities
+$\xi_{\pm}$ requires knowing the solution of the Riemann problem.
+Instead, the characteristic velocities are usually found from the
+eigenvalues of the Jacobian matrix $\partial {\bf f} / \partial {\bf
+  q}$ evaluated at some intermediate state. To ensure that the maximum
+and minimum eigenvalues over the entire range between the left and
+right states are found, we evaluate the Jacobian in both the left and
+right states and take the maximum and minimum over all eigenvalues.
+This ensures, for the systems of equations considered here, that the
+real maximum and minimum characteristic velocities are contained
+within $[\xi_-, \xi_+]$.
+
+If we set $\alpha = {\rm max}(|\xi_-|, |\xi_+|)$ and replace the
+characteristic velocities $\xi_{\pm}$ with $\pm \alpha$, we find the
+Lax--Friedrichs flux ({\it cf.} also Tadmor's semi-discrete scheme~\cite{Tadmor00})
+\begin{equation}
+  \label{lfflux}
+  {\bf f}({\bf q}) = \frac{1}{2} \left[ {\bf f}({\bf q}_L) + {\bf f}({\bf
+  q}_R) + \alpha ({\bf q}_L -{\bf q}_R) \right].
+\end{equation}
+\noindent This is very diffusive, but also very stable.
+
+
+\subsection{Roe solver}
+\label{sec:roe}
+
+The linearized solver of Roe~\cite{Roe81} is probably the most popular
+approximate Riemann solver. The simplest interpretation is that the
+Jacobian $\partial {\bf f} / \partial {\bf q}$ is linearized about
+some intermediate state. Then the conservation form reduces to the
+linear equation
+\begin{equation}
+  \label{roe1}
+  \partial_t {\bf q} + A \partial_x {\bf q} = 0,
+\end{equation}
+\noindent where $A$ is a constant coefficient matrix. This is
+identical to equation (\ref{lsrp}) and so all the results of
+section~\ref{sec:linsys} on linear systems hold. We reiterate that the
+standard form for the flux along the characteristic ray $\xi=0$ is
+\begin{equation}
+  \label{roe2}
+  {\bf f}({\bf q}) = \frac{1}{2} \left( {\bf f}({\bf q}_L) + {\bf f}({\bf
+  q}_R) - \sum_{i=1}^N | \lambda_i | \Delta {\bf w}_i {\bf r}^i \right).
+\end{equation} 
+
+There is a choice of which intermediate state the Jacobian should be
+evaluated at. Roe gives three criteria that ensure the consistency and
+stability of the numerical flux:
+\begin{enumerate}
+\item $A({\bf q}_{{\rm Roe}}) \left( {\bf q}_R - {\bf q}_L \right) =
+  {\bf f}({\bf q}_R) - {\bf f}({\bf q}_L)$,
+\item $A({\bf q}_{{\rm Roe}})$ is diagonalizable with real
+  eigenvalues, 
+\item $A({\bf q}_{{\rm Roe}}) \rightarrow \partial {\bf f} / \partial
+  {\bf q}$ smoothly as ${\bf q}_{{\rm Roe}} \rightarrow {\bf q}$.
+\end{enumerate}
+\noindent A true Roe average for relativistic hydrodynamics, {\it i.e.}, an
+intermediate state that satisfies all these conditions, has been
+constructed by Eulderink~\cite{Eulderink94}. However, frequently it is sufficient
+to use
+\begin{equation}
+  \label{roe3}
+  {\bf q}_{{\rm Roe}} = \frac{1}{2} \left( {\bf q}_R + {\bf q}_L \right),
+\end{equation}
+\noindent which satisfies only the last two conditions. For simplicity
+we have implemented this arithmetic average.
+
+
+\subsection{Marquina solver}
+\label{sec:marq}
+
+Unlike all the other Riemann solvers introduced so far, the Marquina
+solver as outlined in \cite{Marquina1} does not solve the Riemann
+problem completely. Instead, only the flux along the characteristic
+ray $\xi=0$ is given. It can be seen as a generalized Roe solver, as
+the results are the same except at sonic points. These points are
+where the fluid velocity is equal to the speed of sound of the fluid.
+In the context of Riemann problems, sonic points are found when the
+ray $\xi=0$ is within a rarefaction wave.
+
+Firstly define the left ${\bf l}({\bf q}_{L,R})$ and right ${\bf
+  r}({\bf q}_{L,R})$ eigenvectors and the eigenvalues $\lambda({\bf
+  q}_{L,R})$ of the Jacobian matrix $\partial {\bf f} / \partial {\bf
+  q}$ evaluated at the left and right states. Next define left and
+right characteristic variables ${\bf w}_{L,R}$ and fluxes
+${\bf \phi}_{L,R}$ by
+\begin{equation}
+  \label{marq1}
+  ({\bf w}_i)_{L,R} = {\bf l}_i({\bf q}_{L,R}) \cdot {\bf q}_{L,R}, \quad
+  ({\bf \phi}_i)_{L,R} = {\bf l}_i({\bf q}_{L,R}) \cdot {\bf f}({\bf
+  q}_{L,R}). 
+\end{equation}
+
+Then the algorithm chooses the correct-sided characteristic flux if
+the eigenvalues $\lambda_i({\bf q}_L)$, $\lambda_i({\bf q}_R)$ have
+the same sign, and uses a Lax--Friedrichs type flux if they change
+sign. In full, the algorithm is given in figure~\ref{fig:marqcode}.
+\begin{figure}[htbp]
+  \begin{center}
+    \leavevmode
+\begin{equation}
+  \label{marqalg}
+  \begin{array}[l]{l}
+    {\bf For}\ \, i = 1, \dots, N\ {\bf do} \\
+    \qquad \begin{array}[c]{l}
+      {\bf If}\ \, \lambda_i({\bf q}_L) \lambda_i({\bf q}_R) > 0
+        \ \, {\bf then} \\
+      \qquad \qquad \begin{array}[c]{l}
+        {\bf If}\ \,  \lambda_i({\bf q}_L) > 0 \ \, {\bf then} \\
+        \qquad \qquad \qquad \begin{array}[c]{r c l}
+          {\bf \phi}^i_+ & = & {\bf \phi}^i_L \\
+          {\bf \phi}^i_- & = & 0
+        \end{array} \\
+        {\bf else}  \\
+        \qquad \qquad \qquad \begin{array}[c]{r c l}
+          {\rm \phi}^i_+ & = & 0 \\
+          {\rm \phi}^i_- & = & {\bf \phi}^i_R
+        \end{array} \\
+        {\bf end if}
+      \end{array} \\
+      {\bf else} \\
+      \qquad \qquad \begin{array}[c]{r c l}
+        \alpha^i & = & {\rm max}(|\lambda_i({\bf q}_L), \lambda_i({\bf
+          q}_R)|) \\
+        {\bf \phi}^i_+ & = & \frac{1}{2} \left( {\bf \phi}^i_L +
+          \alpha^i {\bf w}^i_L \right) \\
+        {\bf \phi}^i_- & = & \frac{1}{2} \left( {\bf \phi}^i_R -
+          \alpha^i {\bf w}^i_R \right)
+      \end{array} \\
+      {\bf end if} \\
+    \end{array} \\
+    {\bf end do}
+  \end{array}
+\end{equation}
+    \caption[The algorithm to calculate the Marquina flux]{The
+      algorithm to calculate the Marquina flux.}
+    \label{fig:marqcode}
+  \end{center}
+\end{figure}
+
+Then the numerical flux is given by
+\begin{equation}
+  \label{marqflux}
+  {\bf f}({\bf q}) = \sum_{i=1}^N \left[ {\bf \phi}^i_+ 
+  {\bf r}^i ({\bf q}_L) + {\bf \phi}^i_- {\bf r}^i ({\bf q}_R)
+  \right].
+\end{equation}
+
+The above implementation is based on \cite{Aloy99b}.
+
+
+\section{Other points in {\tt GRHydro}}
+\label{sec:misc}
+
+There are a number of other things done by {\tt GRHydro} which, whilst not as
+important as reconstruction and evolution, are still essential.
+
+
+\subsection{Source terms}
+\label{sec:sources}
+
+In a curved spacetime the equations are not in homogeneous conservation-law 
+form but also contain source terms. These are actually calculated
+first, before the flux terms (it simplifies the loop very slightly).
+There are a few points to note about the calculation of the sources.
+\begin{itemize}
+\item The calculation used here, taken from the {\tt GR3D} code, requires both the
+  metric and the extrinsic curvature.
+\item In order to calculate the Christoffel symbols the gauge and
+  metric variables must be differenced. Currently centred differencing
+  of second or fourth (we are safe to use this, as {\tt GRHydro} requires 
+  always at least 2 ghost zones) order is hardwired in. The two differencings can be selected via
+  the parameter {\tt ADMMacros/spatial\_order}.
+\item For numerical reasons, namely in order to avoid the presence of time derivatives
+  in the source-term computation, the implemented form of the source terms is not
+  \eqref{source_terms} directly, but it has been modified as shown in
+  the following paragraphs (following a clever idea by Mark Miller (see the {\tt GR3D} code) 
+\end{itemize}
+
+%The actual derivation of the source terms is somewhat complex and not
+%at all obvious. If anybody comes up with a better way of doing things
+%than the below, please alter the documentation. 
+In what follows Greek letters range from $0$ to $3$ and roman letters from $1$ to $3$.
+
+For the following computations, we need the expression of some of the 4-Christoffel symbols
+$\ {}^{(4)}\Gamma^\rho_{\mu\nu}$ applied to the 3+1 decomposed
+variables. In order to remove time derivatives we will frequently make
+use of the ADM evolution equation for the 3-metric in the form
+%
+\begin{equation}
+  \label{eq:SourceADMg}
+  \partial_t \gamma_{ij} = 2\left(- \alpha K_{ij} + \partial_{(i}
+  \beta_{j)} - {}^{(3)}\Gamma^k_{ij} \beta_k \right)\ .
+\end{equation}
+%
+As it is used in what follows, we also recall that $\nabla$ is the
+covariant derivative associated with the spatial 3-surface and we note that it is
+compatible with the 3-metric:
+%
+\begin{eqnarray}
+\label{compatible_derivative}
+\nabla_i\gamma^{jk}=\partial_i\gamma^{jk} + 2{}^{(3)}\Gamma^j_{il}\gamma^{lk} = 0 \ .
+\end{eqnarray}
+%
+We start from the ${}^{(4)}\Gamma^0_{00}$ symbol:
+%
+\begin{eqnarray}
+\label{eq:Gamma000}
+{}^{(4)}\Gamma^0_{00} = \frac{1}{2\alpha^2}\Big[
+-\partial_t\big(\beta_k\beta^k\big)+2\alpha\partial_t\alpha
++ 2\beta^i\partial_t\beta_i - \beta^i\partial_i\big(\beta_k\beta^k\big) + 2\alpha\beta^i\partial_i\alpha\Big]
+\end{eqnarray}
+%
+and we expand the derivatives as
+%
+\begin{eqnarray} \label{de_t_beta2}
+\partial_t\big(\beta_k\beta^k\big) &=&
+\partial_t\big(\gamma_{jk}\beta^j\beta^k\big) = 2\gamma_{jk}\beta^j\partial_t\beta^k +
+\beta^j\beta^k\partial_t\gamma_{jk} = \nonumber \\
+ &=& 2\beta_k\partial_t\beta^k -2\alpha K_{jk}
+\beta^j\beta^k + 2\beta^j\beta^k\partial_j\beta_k - 2{}^{(3)}\Gamma^i_{kj} \beta_i\beta^j\beta^k
+\end{eqnarray}
+%
+and
+%
+\begin{eqnarray}  \label{de_i_beta2}
+\partial_i\big(\beta_k\beta^k\big) =
+\partial_i\big(\gamma^{jk}\beta_j\beta_k\big) =
+2\gamma^{jk}\beta_j\partial_i\beta_k + \beta_j\beta_k\partial_i\gamma^{jk} =
+2\beta_k\partial_i\beta_k -2{}^{(3)}\Gamma^j_{ik}\beta_j\beta^k \ ,
+\end{eqnarray}
+%
+where we have used \eqref{eq:SourceADMg} and
+\eqref{compatible_derivative}, respectively.
+Inserting \eqref{de_t_beta2} and \eqref{de_i_beta2}, equation
+\eqref{eq:Gamma000} becomes
+%
+\begin{eqnarray}
+  \label{eq:Gamma000_final}
+{}^{(4)}\Gamma^0_{00} = \frac{1}{\alpha}\Big(\partial_t\alpha +
+\beta^i\partial_i\alpha + K_{jk}\beta^j\beta^k \Big)\ .
+\end{eqnarray}
+%
+With the same strategy we then compute
+%
+\begin{eqnarray}
+  \label{eq:SourceChr1a}
+  {}^{(4)}\Gamma^0_{i0} & = & - \frac{1}{2\alpha^2} \Big[
+      \partial_i (\beta^k \beta_k - \alpha^2) - \beta^j (\partial_i
+      \beta_j - \partial_j \beta_i + \partial_t \gamma_{ij}) \Big] = - \frac{1}{\alpha} \Big(\partial_i\alpha - \beta^j K_{ij}\Big)
+\end{eqnarray}
+%
+and
+%
+\begin{eqnarray}
+\label{eq:SourceChr0ij}
+  {}^{(4)}\Gamma^0_{ij} & = & - \frac{1}{2\alpha^2} \Big[
+      \partial_i\beta_j + \partial_j\beta_i - \partial_t\gamma_{ij} - \beta^k
+  (\partial_i\gamma_{kj} + \partial_j\gamma_{ki} - \partial_k\gamma_{ij})\Big] = -
+  \frac{1}{\alpha} K_{ij}\ .
+\end{eqnarray}
+%
+Other more straightforward calculations give
+%
+\begin{alignat}{3}
+  \label{eq:SourceS3a}
+  {}^{(4)}\Gamma_{00j} &=& {}^{(4)}\Gamma^\nu_{0j}g_{\nu 0} & =  \frac{1}{2} \partial_j \left( \beta_k
+    \beta^k - \alpha^2 \right), \\
+\nonumber\\
+  \label{eq:SourceS3b}
+  {}^{(4)}\Gamma_{l0j} &=& {}^{(4)}\Gamma^\nu_{lj}g_{\nu 0} & =  \alpha K_{lj} + \partial_l\beta_j + \partial_j\beta_l - \beta_k{}^{(3)}\Gamma^k_{lj}\ , \\
+\nonumber\\
+  \label{eq:SourceS3c}
+  {}^{(4)}\Gamma_{0lj} &=& {}^{(4)}\Gamma^\nu_{0j}g_{\nu l} & =  -\alpha K_{jl} + \partial_l\beta_j - \beta_k {}^{(3)}\Gamma^k_{lj}\ , \\
+\nonumber\\
+  \label{eq:SourceS3d}
+  {}^{(4)}\Gamma_{lmj} &=& {}^{(4)}\Gamma^\nu_{lj}g_{\nu m} & =  {}^{(3)}\Gamma_{lmj}\ ,
+\end{alignat}
+%
+where~\eqref{eq:SourceADMg} was used to derive \eqref{eq:SourceS3b}
+and~\eqref{eq:SourceS3c}.
+\subsubsection{Source term for $S_k$}
+Now we have all the expressions for calculating the source terms. The
+ones for the variables $S_{\,k}$ are
+%
+\begin{equation}
+  \label{eq:SourceS1}
+  \big({\mathcal S}_{S_k}\big)_j = T^\mu_\nu \Gamma^\nu_{\mu j} = T^{\mu\nu} \Gamma_{\mu\nu j}\ .
+\end{equation}
+%
+After expanding the derivative in
+\eqref{eq:SourceS3a}, the coefficient of the $T^{\ 00}$ term in
+\eqref{eq:SourceS1} becomes
+%
+\begin{eqnarray}
+  \label{eq:SourceS4a}
+  {}^{(4)}\Gamma_{00j} & = & \frac{1}{2} \beta^l \beta^m \partial_j
+  \gamma_{lm} - \alpha \partial_j \alpha + \beta_m \partial_j \beta^m.
+\end{eqnarray}
+%
+The coefficient of the $T^{\,0i}$ term 
+% (or the $T^{i0}$ term, as the stress-energy tensor is symmetric) 
+is
+%
+\begin{eqnarray}
+  \label{eq:SourceS5a}
+  {}^{(4)}\Gamma_{0ij} + {}^{(4)}\Gamma_{i0j} = \partial_j\beta_i = \beta^l \partial_i
+  \gamma_{jl} + \gamma_{il} \partial_j \beta^l.
+\end{eqnarray}
+%
+The coefficient of the $T^{\,lm}$ term is simply
+%
+\begin{eqnarray}
+  \label{eq:SourceS6a} 
+{}^{(3)}\Gamma_{lmj} =
+  \frac{1}{2} \Big (\partial_j\gamma_{ml} + \partial_m\gamma_{jl} - \partial_l\gamma_{mj} \Big).
+\end{eqnarray}
+%
+Finally, summing \eqref{eq:SourceS4a}--\eqref{eq:SourceS6a} we
+find
+%
+\begin{eqnarray}
+  \label{eq:SourceS2a} 
+\big({\mathcal S}_{S_k}\big)_j & = &
+  T^{00}\left( \frac{1}{2} \beta^l \beta^m \partial_j \gamma_{lm} -
+  \alpha \partial_j \alpha \right) + T^{0i} \beta^l \partial_j
+  \gamma_{il} + T^0_i\partial_j \beta^i + \frac{1}{2} T^{lm}
+  \partial_j \gamma_{lm} \ ,
+\end{eqnarray}
+%
+which is the expression implemented in the code. 
+%This also has the advantage that all partial derivatives of the shift are collected in
+%one term.
+% ACTUALLY, NO PARTICULAR EFFORT WAS MADE TO COLLECT THE SHIFT DERIVATIVES...
+
+\subsubsection{Source term for $\tau$}
+
+The source term for $\tau$ is [{\it cf.} \eqref{source_terms}]
+%
+\begin{equation}
+  \label{eq:SourceT1}
+  {\mathcal S}_{\tau} = \alpha \left( T^{\mu 0} \partial_{\mu}
+  \alpha - \alpha T^{\mu\nu} {}^{(4)}\Gamma^0_{\mu\nu}\right).
+\end{equation}
+%
+For clarity, again we consider separately the terms containing as a
+factor the different components of $T^{\mu\nu}$. From
+\eqref{eq:Gamma000_final} we find the coefficient of $T^{\,00}$ to be
+%
+\begin{eqnarray}
+  \label{eq:SourceT3a}
+\alpha\big(\partial_t \alpha -\alpha {}^{(4)}\Gamma^0_{00}\big) =
+-\alpha\big( \beta^i \partial_i \alpha + \beta^k \beta^l K_{kl}\big)\ .
+\end{eqnarray}
+%
+The coefficient of the term $T^{\,0i}$ is given by
+% Here we note that we it is T^{0i} + T^{i0}
+%
+\begin{eqnarray}
+  \label{eq:SourceT4a}
+  \alpha\big(\partial_i \alpha - 2 \alpha {}^{(4)}\Gamma^0_{i0}\big) =
+  2 \alpha\beta^j K_{ij} - \alpha\partial_i \alpha
+\end{eqnarray}
+%
+and, finally, the coefficient for $T^{\,ij}$ is
+%
+\begin{eqnarray}
+  \label{eq:SourceT5a}
+  -\alpha^2 {}^{(4)}\Gamma^0_{ij} = \alpha K_{ij}\ .
+\end{eqnarray}
+The final expression implemented in the code is thus
+%
+\begin{eqnarray}
+  \label{eq:SourceT2a}
+  {\mathcal S}_{\tau}  = \alpha\big[ T^{00}\left( \beta^i\beta^j K_{ij} - \beta^i
+  \partial_i \alpha \right) +  T^{0i} \left( -\partial_i \alpha + 2
+  \beta^j K_{ij} \right) 
++ T^{ij} K_{ij}\big]\ .
+\end{eqnarray}
+
+%% original version by Ian. It contains typos, Luca believes
+%\subsubsection{Source term for S}
+%
+%The source terms for $S_j$ are 
+%\begin{equation}
+%  \label{eq:SourceS1}
+%  {\cal S}_{S_j} = \alpha \sqrt{\gamma} T^{\mu\nu}
+%  {}^{(4)}\Gamma_{\nu\mu j}.
+%\end{equation}
+%Ignoring the factor of $\alpha \sqrt{\gamma}$, these source terms are
+%coded as
+%\begin{eqnarray}
+%  \label{eq:SourceS2a}
+%  {\cal S}_{S_j} & = & T^{00}\left( \frac{1}{2} \beta^l \beta^m
+%    \partial_j \gamma_{lm} - \alpha \partial_j \alpha \right) + \\
+%  \label{eq:SourceS2b}
+%  &  & T^{0i} \left(  \beta^l \partial_j \gamma_{il} \right) + \\
+%  \label{eq:SourceS2c}
+%  &  & \frac{1}{2} T^{lm} \partial_j \gamma_{lm} + \\
+%  \label{eq:SourceS2d}
+%  &  & \frac{\rho h W^2 v_l}{\alpha}\partial_j \beta^l . 
+%\end{eqnarray}
+%
+%In order to get from the first expression to the expression in the
+%code we need to calculate the 4-Christoffel symbols ${}^{(4)}\Gamma$
+%applied to the 3+1 decomposed variables. In order to remove time
+%derivatives we will frequently make use of the ADM evolution equation
+%for the 3-metric in the form
+%\begin{equation}
+%  \label{eq:SourceADMg}
+%  \partial_0 \gamma_{ij} = - 2 \left( \alpha K_{ij} + \partial_{(i}
+%  \beta_{j)} - {}^{(3)}\Gamma^k_{ij} \beta_k \right),
+%\end{equation}
+%or equivalent forms.
+%
+%So, the heart of the calculation is to show that
+%\begin{eqnarray}
+%  \label{eq:SourceS3a}
+%  {}^{(4)}\Gamma_{00j} & = & \frac{1}{2} \partial_j \left( \beta_k
+%    \beta^k - \alpha^2 \right), \\
+%  \label{eq:SourceS3b}
+%  {}^{(4)}\Gamma_{l0j} & = & -\alpha K_{jl} - \beta_{j,l} - \beta_k
+%  {}^{(3)}\Gamma^k_{lj}, \\
+%  \label{eq:SourceS3c}
+%  {}^{(4)}\Gamma_{0mj} & = & \alpha K_{mj} + {}^{(3)}\Gamma^k_{mj}
+%  \beta_k, \\
+%  \label{eq:SourceS3d}
+%  {}^{(4)}\Gamma_{lmj} & = & {}^{(3)}\Gamma_{lmj}.
+%\end{eqnarray}
+%These are tedious but straightforward, where~(\ref{eq:SourceADMg}) was
+%used in equations~(\ref{eq:SourceS3b}) and~(\ref{eq:SourceS3c}).
+%
+%Substituting these expressions into the original form of
+%equation~(\ref{eq:SourceS1}) we find the coefficient of the $T^{00}$
+%term to be
+%\begin{eqnarray}
+%  \label{eq:SourceS4a}
+%  {}^{(4)}\Gamma_{00j} & = & \frac{1}{2} \beta^l \beta^m \partial_j
+%  \gamma_{lm} - \alpha \partial_j \alpha \\
+%  \label{eq:SourceS4b}
+%  && + \beta_m \partial_j \beta^m.
+%\end{eqnarray}
+%Line~(\ref{eq:SourceS4a}) is equivalent to the
+%line~(\ref{eq:SourceS2a}) in the code. 
+%
+%The coefficient of the $T^{0i}+T^{i0}$ term (as the stress-energy
+%tensor is symmetric here) is
+%\begin{eqnarray}
+%  \label{eq:SourceS5a}
+%  {}^{(4)}\Gamma_{0ij} + {}^{(4)}\Gamma_{i0j} & = & \beta^l \partial
+%  \gamma_{jl} \\
+%  \label{eq:SourceS5b}
+%  && + \gamma_{il} \partial_j \beta^l.
+%\end{eqnarray}
+%Similarly to above, line~(\ref{eq:SourceS5a}) is equivalent to the
+%line~(\ref{eq:SourceS2b}) in the code. 
+%
+%The coefficient of the $T^{lm}$ term is given by
+%\begin{eqnarray}
+%  \label{eq:SourceS6a}
+%  {}^{(4)}\Gamma_{lmj} & = & {}^{(3)}\Gamma_{lmj} \\
+%  \label{eq:SourceS6b}
+%  & = & \frac{1}{2} \gamma_{ml,j} \\ 
+%  \label{eq:SourceS6c}
+%  && + \frac{1}{2} \left( \gamma_{jl,m} - \gamma_{mj,l} \right).
+%\end{eqnarray}
+%Again, line~(\ref{eq:SourceS6b}) is equivalent to the
+%line~(\ref{eq:SourceS2b}) in the code. 
+%
+%In each of these sets of coefficients there is an extra line. In the
+%case of the coefficient of $T^{lm}$ line~(\ref{eq:SourceS6c}) vanishes
+%when contracted with $T^{lm}$ due to the symmetry of the stress-energy
+%tensor and the anti-symmetry of line~(\ref{eq:SourceS6c}) with respect
+%to $l,m$. However, lines~(\ref{eq:SourceS5b}) and (\ref{eq:SourceS4b})
+%do not vanish. Instead, after contraction with the appropriate
+%components of the stress-energy tensor, they simplify to form
+%line~(\ref{eq:SourceS2d}) in the code. This gathers all partial
+%derivatives of the shift in one place.
+%
+%\subsubsection{Source term for $\tau$}
+%
+%The derivation of the source term for $\tau$ is a bit more involved.
+%
+%The source term for $\tau$ is
+%\begin{equation}
+%  \label{eq:SourceT1}
+%  {\cal S}_{\tau} = \alpha \sqrt{\gamma} \left( T^{\mu 0} \partial_{\mu}
+%  \alpha - \alpha T^{\mu\nu} {}^{(4)}\Gamma^0_{\mu\nu}\right).
+%\end{equation}
+%Ignoring the factor of $\alpha \sqrt{\gamma}$, these source terms are
+%coded as
+%\begin{eqnarray}
+%  \label{eq:SourceT2a}
+%  {\cal S}_{\tau} & = & T^{00}\left( \beta^i\beta^j K_{ij} - \beta^i
+%    \partial_i \alpha \right) + \\
+%  \label{eq:SourceT2b}
+%  &  & T^{0i} \left( -\partial_i \alpha + 2 \beta^j K_{ij} \right) + \\
+%  \label{eq:SourceT2c}
+%  &  &  T^{lm} K_{lm}.
+%\end{eqnarray}
+%
+%We consider the coefficient of $T^{00}$ first. In what follows $D$ is
+%the covariant derivative associated with the 3-surface. We note that
+%it is compatible with the 3-metric, $D_i\gamma_{jk}=0$. Expanding the
+%coefficient directly we get
+%\begin{eqnarray}
+%  \label{eq:SourceT3a}
+%  \partial_0 \alpha - \alpha {}^{(4)}\Gamma^0_{00} & = & - \beta^i
+%  \partial_i \alpha + \frac{1}{\alpha} \left( \beta^i \partial_0
+%    \beta_i - \frac{1}{2} \partial_0 (\beta^k \beta_k) - \frac{1}{2}
+%    \beta^i \partial_i (\beta^k \beta_k) \right) \\
+%  \label{eq:SourceT3b}
+%  & = & -\beta^i \partial_i \alpha + \frac{1}{2\alpha} \left( 2 \beta^i
+%    \partial_0 \beta_i - \beta^k \partial_0 \beta_k - \beta_k \partial_0
+%    \beta^k - \beta^i D_i (\beta^k \beta_k) \right) \\
+%  \label{eq:SourceT3c}
+%  & = & -\beta^i \partial_i \alpha + \frac{1}{2\alpha} \left(
+%    \gamma_{kl} \beta^l \partial_0 \beta^k - \beta^k \partial_0
+%    (\gamma_{kl} \beta^l) - \beta^i \left( \beta_k D_i \beta^k +
+%      \beta^k D_i \beta_k \right) \right) \\
+%  \label{eq:SourceT3d}
+%  & = & -\beta^i \partial_i \alpha + \frac{1}{2\alpha} \left(
+%    -\beta^k \beta^l \partial_0 \gamma_{kl} - \beta^i \left( \beta^l
+%      D_i \beta_l + \beta^k D_i \beta_k + \beta_k \beta_l D_i
+%      \gamma^{kl} \right) \right) \\
+%  \label{eq:SourceT3e}
+%  & = & -\beta^i \partial_i \alpha + \frac{1}{2\alpha} \left(
+%    2 \alpha \beta^k \beta^l K_{kl} - \beta^k \beta^l (D_k \beta_l +
+%    D_l \beta_k) + 2 \beta^i \beta^k D_i \beta_k \right) \\
+%  \label{eq:SourceT3f}
+%  & = & -\beta^i \partial_i \alpha + \beta^k \beta^l K_{kl}.
+%\end{eqnarray}
+%Again to go from line~(\ref{eq:SourceT3d}) to (\ref{eq:SourceT3e}) we
+%used the evolution equation~(\ref{eq:SourceADMg}), expressed in terms
+%of the covariant derivative $D$.
+%
+%To simplify the calculation of the other coefficients we first
+%calculate the 4-Christoffel symbol ${}^{(4)}\Gamma^0_{i\nu}$. This is
+%given by
+%\begin{eqnarray}
+%  \label{eq:SourceChr1a}
+%  {}^{(4)}\Gamma^0_{i\nu} & = & - \frac{1}{2\alpha^2} \left\{ \left(
+%      \partial_i (\beta^k \beta_k - \alpha^2) - \beta^j (\partial_i
+%      \beta_j - \partial_j \beta_i + \partial_0 \gamma_{ij}) \right)
+%    \delta^0_{\nu} + \right. \\
+%    && \left. \left( (\partial_l \beta_i + \partial_i \beta_l -
+%      \partial_0 \gamma_{il}) - 2 \beta^j {}^{(3)}\Gamma_{jil} \right)
+%    \delta^l_{\nu} \right\} \\
+%  \label{eq:SourceChr1b}
+%  & = & - \frac{1}{2\alpha^2} \left\{ \left(
+%      \partial_i (\beta^k \beta_k - \alpha^2) - \beta^j ( 2 \partial_i
+%      \beta_j - 2 \alpha K_{ij} - 2 \beta_k {}^{(3)}\Gamma^k_{ij})
+%      \right) \delta^0_{\nu} + \right. \\
+%    && \left. \left( (2 \alpha K_{il} + 2 \beta_k
+%      {}^{(3)}\Gamma^k_{il}) - 2 \beta^j {}^{(3)}\Gamma_{jil} \right)
+%      \delta^l_{\nu} \right\}.
+%\end{eqnarray}
+%
+%The coefficient of $T^{0i} + T^{i0}$ is expanded in a similar
+%fashion. Here we note that we only pick up one partial derivative of
+%the lapse (as there is a specific ordering on that term) but that
+%symmetry gives us two Christoffel symbols,
+%\begin{eqnarray}
+%  \label{eq:SourceT4a}
+%  \partial_i \alpha - 2 \alpha {}^{(4)}\Gamma^0_{i0} & = & \partial_i
+%  \alpha + \frac{1}{\alpha} \left( (\beta^k \beta_k - \alpha^2)_{,i} -
+%    2 \beta^j (\partial_i \beta_j - \beta_k {}^{(3)}\Gamma^k_{ij} -
+%    \alpha K_{ij}) \right) \\
+%  \label{eq:SourceT4b}
+%  & = & 2 \beta^j K_{ij} - \partial_i \alpha + \frac{1}{\alpha} \left(
+%    \partial_i (\beta^k \beta_k) - 2 \beta^j (\partial_i \beta_j -
+%    \beta_k {}^{(3)}\Gamma^k_{ij} ) \right). 
+%\end{eqnarray}
+%We then have to show that the term in brackets vanishes identically.
+%Just expanding gives
+%\begin{eqnarray}
+%  \label{eq:SourceT4c}
+%  \left(\dots\right) & = & 2 \beta^k \partial_i \beta_k + \beta^k
+%  \beta^l \partial_i \gamma_{kl} - 2 \beta^j \left( \gamma_{jk}
+%    \partial_i \beta^k + \beta^k \partial_i \gamma_{jk} - \beta_k
+%    \gamma^{kl} (\partial_i \gamma_{lj} + \partial_j \gamma_{il} -
+%    \partial_l \gamma_{ij}) \right) \\
+%  \label{eq:SourceT4d}
+%  & = & \beta^j \beta^l (\partial_j \gamma_{il} - \partial_l
+%  \gamma_{ij} )
+%\end{eqnarray}
+%which is zero by symmetry.
+%
+%Finally we have the $T^{lm}$ coefficient. Again a simple expansion
+%gives
+%\begin{eqnarray}
+%  \label{eq:SourceT5a}
+%  -\alpha {}^{(4)}\Gamma^0_{lm} & = & \frac{1}{2\alpha} \left( 2
+%   \alpha K_{lm} + 2 \beta_k {}^{(3)}\Gamma^k_{lm} - 2 \beta^j
+%   {}^{(3)} \Gamma_{jlm} \right) \\
+%  \label{eq:SourceT5b}
+%  & = & K_{lm}.
+%\end{eqnarray}
+%Once again we had to make use of equation~(\ref{eq:SourceADMg}).
+
+
+\subsection{Conversion from conservative to primitive variables}
+\label{sec:con2prim}
+
+As noted in section~\ref{sec:phys} the variables that are evolved are
+the conserved variables $D, S_i, \tau$. But in order to calculate the
+fluxes and sources we require the primitive variables $\rho, v_i, P$.
+Conversion from primitive to conservative is given analytically by
+equation~(\ref{eq:prim2con}). Converting in the other direction is not
+possible in a closed form except in certain special circumstances.
+
+There are a number of methods for converting from conservative to
+primitive variables; see~\cite{livrevsrrfd}. Here we use a
+Newton-Raphson type iteration. If we are using a general equation of
+state such as an ideal gas, then we find a root of the pressure
+equation. Given an initial guess for the pressure $\bar{P}$ we find
+the root of the function
+\begin{equation}
+  \label{eq:pressure1}
+  f = \bar{P} - P(\bar{\rho}, \bar{\epsilon}),
+\end{equation}
+where the approximate density and specific internal energy are given
+by 
+\begin{eqnarray}
+  \label{eq:press1gives}
+  \bar{\rho} & = & \frac{\tilde{D}}{\tilde{\tau} + \bar{P} + \tilde{D}}
+  \sqrt{ (\tilde{\tau} + \bar{P} + \tilde{D})^2 - S^2 }, \\
+  \bar{W} & = & \frac{\tilde{\tau} + \bar{P} + \tilde{D}}{\sqrt{
+      (\tilde{\tau} + \bar{P} + \tilde{D})^2 - S^2 }}, \\
+  \bar{\epsilon} & = & \tilde{D}^{-1} \left( \sqrt{ (\tilde{\tau} +
+      \bar{P} + \tilde{D})^2 - S^2 } - \bar{P} \bar{W} - \tilde{D}
+  \right). 
+\end{eqnarray}
+Here the conserved variables are all ``undensitized'', {\it e.g.},
+\begin{equation}
+  \label{eq:undens}
+  \tilde{D} = \gamma^{-1/2} D,
+\end{equation}
+where $\gamma$ is the determinant of the 3-metric, and $S^2$ is given
+by 
+\begin{equation}
+  \label{eq:s2}
+  S^2 = \gamma^{ij}\tilde{S}_i\tilde{S}_j.
+\end{equation}
+
+In order to perform a Newton-Raphson iteration we need the derivative
+of the function with respect to the dependent variable, here the
+pressure. This is given by
+\begin{equation}
+  \label{eq:df}
+  f' = 1 - \frac{\partial P}{\partial \rho}\frac{\partial
+  \rho}{\partial P} - \frac{\partial P}{\partial
+  \epsilon}\frac{\partial \epsilon}{\partial P}, 
+\end{equation}
+where $\frac{\partial P}{\partial \rho}$ and $\frac{\partial
+  P}{\partial \epsilon}$ given by calls to {\tt EOS\_Base}, and
+\begin{eqnarray}
+  \label{eq:df2}
+  \frac{\partial \rho}{\partial P} & = & \frac{\tilde{D}
+      S^2}{\sqrt{(\tilde{\tau} + \bar{P} + \tilde{D})^2 -
+      S^2}(\tilde{\tau} + \bar{P} + \tilde{D})^2}, \\
+  \frac{\partial \epsilon}{\partial P} & = & \frac{\bar{P}
+      S^2}{\rho\left((\tilde{\tau} + \bar{P} + \tilde{D})^2 -
+      S^2\right)(\tilde{\tau} + \bar{P} + \tilde{D})}. \\
+\end{eqnarray}
+
+For a polytropic type equation of state, the function is given by
+\begin{equation}
+  \label{eq:polyf}
+  f = \bar{\rho}\bar{W} - \tilde{D},
+\end{equation}
+where $\bar{\rho}$ is the variable solved for, the pressure, specific
+internal energy and enthalpy $\bar{h}$ are set from the EOS and the
+Lorentz factor is found from
+\begin{equation}
+  \label{eq:polyw}
+  \bar{W} = \sqrt{1 + \frac{S^2}{(\tilde{D}\bar{h})^2}}.
+\end{equation}
+The derivative is given by
+\begin{equation}
+  \label{eq:dpolyf}
+  f' = \bar{W} - \frac{\bar{\rho}S^2 \bar{h}'}{\bar{W} \tilde{D}^2
+  \bar{h}^3}, 
+\end{equation}
+where
+\begin{equation}
+  \label{eq:dpolyenth}
+  \bar{h}' = \bar{\rho}^{-1}\frac{\partial P}{\partial \rho}.
+\end{equation}
+
+\subsection{A note on the Roe and Marquina Riemann Solvers}
+\label{sec:rsnote}
+
+Finding the Roe or Marquina fluxes as given is
+section~\ref{sec:riemann} requires the left eigenvectors to either be
+supplied analytically or calculated numerically. 
+
+When this is done by inverting the matrix of right
+eigenvectors, in the actual code this is combined with the calculation
+of, {\it e.g.}, the characteristic jumps $\Delta {\bf w}$.
+Normally the eigenvalues and vectors are ordered lexicographically.
+However for the polytropic equation of state one of the equations is
+redundant, so the matrix formed by these eigenvectors is linearly
+dependent and hence singular. It turns out that this is only a minor
+problem; by rearranging the order of the eigenvalues and vectors it is
+possible to numerically invert the matrix. 
+This means that no specific ordering of the eigenvalues should be
+assumed. It also explains the slightly strange ordering in the
+routines {\tt GRHydro\_EigenProblem*.F90}.
+
+The current default is that the left eigenvectors are calculated
+analytically - for the expressions see Font~\cite{livrevgrrfd}. For
+both the Roe and the Marquina solvers an optimized version of the flux
+calculation has been implemented. For more details on the analytical
+form and the optimized flux calculation see Ib{\'a}{\~n}ez et
+al.~\cite{Iban01}, Aloy et al.~\cite{Aloy99} and Frieben et
+al.~\cite{Frie02}.
+
+\subsection{The atmosphere}
+\label{sec:atmosphere}
+
+In simulations of compact objects, often the matter is located only on a (small) portion of the
+numerical grid. In fact, over much of the evolved domain the physical situation is likely to be
+sufficiently well approximated by vacuum. However, in the vacuum limit the continuity equations
+describing the fluid break down. The speed of sound tends to the speed of light and everything fails
+(especially the conversion from conserved to primitive variables).
+
+To avoid this problem it is customary to introduce an atmosphere. In our implementation, this is a
+low-density region surrounding the compact objects and initially it has no velocity and is in equilibrium. The
+introduction of an atmosphere is managed by the initial data thorns.
+
+However {\tt GRHydro} itself also knows about the atmosphere, of course. If the conserved variables
+$D$ or $\tau$ are beneath some minimum value, or an evolution step might push them below such a
+value, then the relevant cell is not evolved. Also, if the density should fall below a minimum value
+in the routine that converts from conservative to primitive variables, all the variables are reset
+to the values adopted for the atmosphere.
+
+Probably the hardest part of using {\tt GRHydro} is to correctly set these
+atmosphere values. In the current implementation the atmosphere is
+used in three separate places. These are
+\begin{enumerate}
+\item {\bf Set up of the initial data}. Initial-data routines should set an atmosphere consistent
+  with the one that will be evolved.
+\item {\bf In the routine that converts from conserved variables to
+    primitive variables}. This is where the majority of the atmosphere
+  resets will occur. 
+
+  If the equation of state is polytropic then an
+  attempt is made to convert to primitive variables. If the iterative
+  algorithm returns a negative (and hence unphysical) value of $\rho$,
+  then $\rho$ is reset to the atmosphere value, the velocities are set
+  to zero, and $P$, $\epsilon$, $S_i$ and $\tau$ are reset to be
+  consistent with $\rho$ (and $D$). Note that even though the
+  polytropic equation of state gives us sufficient information to
+  calculate a consistent value of $D$, this is not done.
+
+  If the equation of state is the more general type (such as that of an ideal fluid) and if $\rho$
+  is less than the specified minimum, then, as above, we assume we are in the atmosphere and call
+  the routine that changes from the conserved to the primitive variables for the polytrope.
+
+\item {\bf When applying the update}. If the calculated update terms
+  for a specific cell would lead to either $D$ or $\tau$ becoming
+  negative, then two steps are taken. First, we do not update this
+  specific cell. Second, the data in this cell is reset to be the
+  atmosphere. 
+\end{enumerate}
+
+The reason why the routine that converts to the primitive variables
+does not ensure that $D$ is consistent with the other variables is
+practical rather than accurate. If the value of the variables is set
+such that they all lie precisely on the atmosphere, then small errors
+(typically initially of the order of $10^{-25}$ for a $64^3$-point TOV star
+in octant symmetry) would move certain cells above the atmosphere
+values. Combined with the necessary atmosphere treatment this leads to
+high-frequency noise. This will lead to waves of matter falling onto
+the star. Despite their extremely low density (typically only an
+order of magnitude higher than the floor) they will result in visible
+secondary overtones in the oscillations of, {\it e.g.}, the central
+density. 
+
+The parameters controlling the atmosphere are the following.
+\begin{itemize}
+\item {\tt GRHydro::rho\_abs\_min}. An absolute value for $\rho$ in the
+  atmosphere. Defaults to -1. Any negative value will be ignored, and
+  the value of {\tt rho\_rel\_min} used instead.
+\item {\tt GRHydro::rho\_rel\_min}. A relative value for $\rho$ in the
+  atmosphere. Defaults to $10^{-7}$. Only used if {\tt rho\_abs\_min}
+  is negative, which is the default behaviour. The actual value of the
+  atmosphere will be $\rho =${\tt rho\_rel\_min}$\times${\tt
+    GRHydro\_rho\_max}, where {\tt GRHydro::GRHydro\_rho\_max}
+  is a variable containing the maximum value of $\rho$ on the numerical grid at time zero.
+\item {\tt initial\_rho\_abs\_min}. An absolute value for rho in the initial atmosphere. It is used
+  only by initial data routines. Unused if negative.
+\item {\tt initial\_rho\_rel\_min}. A relative (to the initial maximum rest-mass density) value for rho
+  in the atmosphere. It is used only by initial data routines and only if it is positive and {\tt
+  initial\_rho\_abs\_min} is negative.
+\item {\tt initial\_atmosphere\_factor}. A relative (to the initial atmosphere) value for rho in the
+  atmosphere. It is used only by initial data routines. It multiplies the atmosphere value used by
+  the initial data solver. Unused if negative.
+\item {\tt GRHydro\_atmo\_tolerance}. A parameter useful mostly in mesh-refined simulations. A point
+  is set to the atmosphere values in the conservative to primitive routines if its rest-mass density
+  is such that $\rho <$ {\tt GRHydro\_rho\_min}$*(1+${\tt GRHydro\_atmo\_tolerance}). This avoids
+  occasional spurious oscillations in ({\tt Carpet}) buffer zones lying in the atmosphere (because
+  prolongation happens on conserved variables).
+\end{itemize}
+
+The motivation for these parameters referring only to the initial data is that it is sometimes best
+to set the initial atmosphere to slightly below the atmosphere cutoff used during evolution, as this
+avoids truncation error and metric evolution leading to low density waves travelling across the
+atmosphere.
+
+The routines essential to the atmosphere are contained in {\tt
+GRHydro\_Minima.F90, GRHydro\_Con2Prim.F90, GRHydro\_UpdateMask.F90}. 
+
+\subsection{Advection of passive scalars ('tracers')}
+\label{sec:tracer}
+
+For some astrophysical problems it is necessary to advect passive
+compositional scalars such as the electron fraction $Y_e$ (number of
+electrons per baryon). For a generic tracer $X_k$, the evolution
+equation looks like
+
+%%%\begin{eqnarray}
+%%%  \label{eq:tracer}
+%%%   D &=& \sqrt{\gamma}W\rho \nonumber \\
+%%%   S^i &=& \sqrt{\gamma} \rho h W^2 v^i \nonumber \\
+%%%   \tau &=& \sqrt{\gamma}\left( \rho h W^2 - p\right) - D, 
+%%%\end{eqnarray}
+
+\begin{equation}
+  \label{eq:tracer}
+  \partial_t { ( D X_k )} + \partial_{x^j} {\bf f}^{(j)} ({D X_k}) = 0\, ,
+\end{equation}
+where $D$ is the generalized particle number density as defined in
+Eq.~(\ref{eq:prim2con}). {\tt GRHydro} currently supports any number of
+independent tracer variables. The following parameters have to be
+set to use the tracers:
+
+\begin{itemize}
+  \item {\tt GRHydro::evolve\_tracer}. Boolean. Set to {\tt yes} if
+    you want the tracers to be active.
+  \item {\tt GRHydro::number\_of\_tracers}. Integer. Defaults to 0. To
+    use tracers, set to at least 1.
+\end{itemize}
+
+Note, that your initial data thorn must set initial data for
+{\tt GRHydro::tracer[k]} and {\tt GRHydro::cons\_tracer[k]} for all tracers
+you want to advect. {\tt GRHydro::cons\_tracer[k]} stores $D X_k$.
+
+\subsubsection{Implementation and Limitations}
+
+\begin{itemize}
+  \item Reconstruction: Currently only TVD and PPM reconstruction of the
+    tracers $X_k$ are implemented. Since for most astrophysical problems one
+    will associate the tracer with some compositional variable it might
+    be better to reconstruct $\rho X_k$.
+
+  \item Riemann Solvers: Only HLLE and Marquina are supported. In HLLE,
+    the fluxes as given in Eq.~(\ref{eq:tracer}) are computed for each tracer.
+    In the Marquina solver, we multiply the $D$-flux by each tracer to get
+    the individual tracer fluxes according to the following prescription:
+
+    \begin{equation}
+      \label{eq:marquinatracer}
+      \begin{array}[l]{l}
+	{\bf If}\ \, F_{i+1/2} (D) > 0 \,\, {\bf then} \\
+	  \qquad \qquad \begin{array}[c]{l}
+	    \qquad \qquad F_{i+1/2} (D X_k) = X_{k_i}^+ F_{i+1/2} (D)
+	  \end{array} \\
+		 {\bf else} \\
+		 \qquad \qquad \begin{array}[c]{r c l}
+		   \qquad \qquad F_{i+1/2} (D X_k) = X_{k_{i+1}}^- F_{i+1/2} (D)
+		 \end{array} \\
+			{\bf end if} \\
+      \end{array} \\
+    \end{equation}
+
+    The above was suggested by Miguel Aloy and first implemented and
+    tested by Harry Dimmelmeier in his code (CoCoNuT), then by Christian~D.~Ott
+    in {\tt GRHydro}.
+
+\end{itemize}
+
+
+\section{History}
+
+The approximate time line is something like this:
+\begin{itemize}
+\item ~1995: Valencia group hydrodynamics code, fixed spacetime.
+\item ~1997: Ported to Cactus, extensively rewritten for the Binary
+  Neutron Star Grand Challenge. Primarily written by Mark Miller.
+  Released as {\tt GR3D} as public domain code.
+\item ~1998-: Developed as Cactus thorn {\tt MAHC} inside the
+  GR{\tt Astro\_Hydro} arrangement at Washington University, primarily by
+  Mark Miller.
+\item 2002-2008: {\tt Whisky} written based on {\tt GR3D}.
+\item 2008-: {\tt GRHydro} based on the public version of {\tt Whisky}
+\end{itemize}
+
+This is necessarily only a sketch; many people have contributed to
+the history of this code, and the present authors were not around for most of it...
+
+\subsection{Thorn Source Code}
+
+This was initially written by Luca Baiotti, Ian Hawke and Pedro
+Montero with considerable assistance from Luciano Rezzolla, Toni Font,
+Nick Stergioulas and Ed Seidel. This led to the basic {\tt GRHydro} thorns,
+{\tt GRHydro} itself, {\tt GRHydro\_Init\_Data} and {\tt GRHydro\_RNSID}.
+
+Since then most of the maintenance has been done by Ian Hawke, Luca Baiotti and Frank L\"offler. Various
+people have contributed to the development. In particular
+\begin{itemize}
+\item The PPM reconstruction methods were written by Ian Hawke heavily
+  based on the code of Toni Font. They were later expanded by Christian D. Ott and Luca Baiotti.
+\item The Roe and Marquina solvers were made considerably more
+  efficient thanks to Joachim Frieben.
+\item The current atmosphere algorithm is a mixture of ideas from the
+  {\tt GR3D} code, Luciano Rezzolla, Toni Font and Nick
+  Stergioulas. The current setup was written by Ian Hawke and Luca Baiotti.
+\item The 1-dimensional TOV solver {\tt GRHydro\_TOVSolver} was written
+  by Ian Hawke based on a short paper by Thomas Baumgarte.
+%\item The use of the equation of state, in particular the routines to
+%  ensure the initial hydrodynamic consistency, were due to the work of
+%  Harald Dimmelmeier and Christian Ott.
+\end{itemize}
+
+\subsection{Thorn Documentation}
+
+This documentation was first written largely by Ian Hawke and Scott Hawley in 2002. Long due,
+rather necessary and considerably large updates were made in 2008 by Luca Baiotti.
+
+
+\subsection{Acknowledgements}
+
+As already mentioned, the history behind this code leads to a long list
+of people to be acknowledged.
+
+Firstly, without the work of the Valencia group this sort of code
+would be impossible. 
+
+Secondly, the incomparable work of Mark Miller and the Washington
+University - AEI Collaboration in producing the {\tt GR3D} and {\tt
+GRAstro\_Hydro} codes gave an essential benchmark to aim for, and
+encouragement that it was possible!
+
+Thirdly, the support of the Cactus team, especially Tom Goodale,
+Gabrielle Allen and Thomas Radke made life a
+lot easier.
+
+Finally, for their work in coding, ideas and suggestions, or just
+plain encouragement, we would like to thank all at the AEI and in the
+EU Network, especially Toni Font, Luciano Rezzolla, Nick Stergioulas,
+Ed Seidel, Carsten Gundlach and Jos\'e-Maria Ib{\'a}{\~n}ez.
+
+Originally Ed Seidel and then Luciano Rezzolla and Gabrielle Allen and many others 
+have been granting (in addition to valuable
+scientific advice) financial support and human resources to the development of the code.
+
+\begin{thebibliography}{20}
+
+\bibitem{Aloy99b}
+Aloy M.A., Ib{\'a}nez J.M., Mart\'\i J.M., M{\"u}ller E.
+\newblock {\em Astroph. J. Supp.\/}, {\bf 122}: 151 (1999).
+
+\bibitem{Aloy99} 
+M.~A. Aloy, J.~A. Pons, and J.~M. Ib{\'a}{\~n}ez.
+\newblock An efficient implementation of flux formulae in multidimensional
+  relativistic hydrodynamical codes.
+\newblock {\em Comput. Phys. Commun.}, {\bf 120}:\penalty0 115--121, 1999.
+
+\bibitem{Banyuls97}
+Banyuls F., Font J.A., Ib{\'a}nez J.M., Mart\'{\i} J.M., Miralles J.A.
+\newblock {\em Astrophys. J.\/}, {\bf 476}: 221 (1997).
+
+\bibitem{ppm}
+P. Colella and P.~R. Woodward.
+\newblock The {P}iecewise {P}arabolic {M}ethod ({PPM}) for
+{G}as-{D}ynamical {S}imulations.
+\newblock {\em J. Comput. Phys.}, {\bf 54}, 174--201, 1984.
+
+\bibitem{Cook00}
+G. Cook
+\newblock Initial Data for Numerical Relativity
+\newblock {\em Living Rev. Relativity}, {\bf 3}, 2000.
+\newblock [Article in on-line journal], cited on 31/08/02,
+  http://www.livingreviews.org/ Articles/Volume3/2000-5cook/index.html.
+
+\bibitem{Marquina1}
+R.~Donat and A.~Marquina.
+\newblock Capturing shock reflections: An improved flux formula.
+\newblock {\em J. Comput. Phys.}, {\bf 125}:\penalty0 42--58, 1996.
+
+\bibitem{Einfeldt88}
+Einfeldt B.
+\newblock {\em Journal of Computational Physics\/}, {\bf 25}: 294 (1988).
+
+\bibitem{Eulderink94}
+Eulderink F., Mellema G.
+\newblock {\em Astron. Astrophys.\/}, {\bf 284}: 652 (1994).
+
+\bibitem{livrevgrrfd}
+J.~A. Font.
+\newblock Numerical hydrodynamics in {G}eneral {R}elativity.
+\newblock {\em Living Rev. Relativity}, {\bf 3}, 2000.
+\newblock [Article in on-line journal], cited on 31/07/01,
+  http://www.livingreviews.org/ Articles/Volume3/2000-2font/index.html.
+
+\bibitem{Frie02}
+J. Frieben, J.~M. Ib{\'a}{\~n}ez, and J. Pons.
+\newblock {\em in preparation}
+
+\bibitem{eno}
+A.~Harten, B.~Engquist, S.~Osher, and S.~R. Chakravarthy.
+\newblock Uniformly high order accurate essentially non-oscillatory schemes,
+  {III}.
+\newblock {\em J. Comput. Phys.}, {\bf 71}:\penalty0 231--303, 1987.
+
+\bibitem{Iban01}
+J.~M. Ib{\'a}{\~n}ez et al.
+\newblock in {\em Godunov Methods: Theory and Applications}.
+\newblock New York, 485--503, (2001)
+
+\bibitem{Tadmor00}
+A. Kurganov and E. Tadmor.
+\newblock {\em New high-resolution central schemes for nonlinear conservation laws and
+  convection-diffusion equations}.
+\newblock {\em J. Comput. Phys.}, {\bf 160}:241, 2000.
+
+\bibitem{laney}
+C.~B. Laney.
+\newblock {\em Computational {G}asdynamics}.
+\newblock Cambridge University Press, 1998.
+
+\bibitem{leveque}
+R.~J. LeVeque.
+\newblock {N}onlinear conservation laws and finite volume methods for
+  astrophysical fluid flow.
+\newblock In O.~Steiner and A.~Gautschy, editors, {\em {C}omputational
+  {M}ethods for {A}strophysical {F}luid {F}low}. Springer-Verlag, 1998.
+
+\bibitem{livrevsrrfd}
+J.~M. Mart{\'{\i}} and E.~M{\"u}ller.
+\newblock Numerical hydrodynamics in {S}pecial {R}elativity.
+\newblock {\em Living Rev. Relativity}, {\bf 2}, 1999.
+\newblock [Article in on-line journal], cited on 31/7/01,
+  http://www.livingreviews.org/Articles/Volume2/1999-3marti/index.html.
+
+\bibitem{Quirk}
+J.~J. Quirk.
+\newblock A contribution to the great {R}iemann solver debate.
+\newblock {\em Int. J. Numer. Methods Fluids}, {\bf 18}:\penalty0 555--574,
+  1994.
+
+\bibitem{Roe81}
+Roe P.L.
+\newblock {\em J. Comput. Phy.\/}, {\bf 43}: 357 (1981).
+
+\bibitem{shueno}
+C. Shu.
+\newblock {H}igh {O}rder {ENO} and {WENO} {S}chemes for
+{C}omputational {F}luid {D}ynamics.
+\newblock In T.~J. Barth and H. Deconinck, editors {\em High-Order
+  Methods for Computational Physics}. Springer, 1999.
+\newblock A related on-line version can be found under {\em Essentially
+  {N}on-{O}scillatory and {W}eighted {E}ssentially {N}on-{O}scillatory
+  {S}chemes for {H}yperbolic {C}onservation {L}aws} at {\tt
+  http://www.icase.edu/library/reports/rdp/97/97-65RDP.tex.refer.html}. 
+
+\bibitem{toro}
+E.~F. Toro.
+\newblock {\em {R}iemann {S}olvers and {N}umerical {M}ethods for {F}luid
+  {D}ynamics}.
+\newblock {S}pringer-{V}erlag, 2nd edition, 1999.
+
+\end{thebibliography}
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

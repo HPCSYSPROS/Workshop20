@@ -1,0 +1,3 @@
+MICFLAGS = -DNAMD_MIC
+MIC = $(MICFLAGS)
+CXXMICOPTS = -offload-option,mic,compiler,-vec -offload-option,mic,compiler,-restrict -openmp

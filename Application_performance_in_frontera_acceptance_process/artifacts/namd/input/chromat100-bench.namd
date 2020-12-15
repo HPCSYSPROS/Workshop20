@@ -1,0 +1,126 @@
+#############################################################
+## ADJUSTABLE PARAMETERS                                   ##
+#############################################################
+
+set outputdir "./"
+#set nsteps "2000"
+
+set nsteps "80000"
+
+ldBalancer hybrid
+
+pairlistMinProcs   100
+maxSelfPart 1
+maxPairPart 1
+pmeProcessors [numNodes]
+
+#genCompressedPsf on
+#usePluginIO yes
+#structure          final.js
+
+useCompressedPsf on
+structure          final.js.inter
+
+#firsttimestep      43000
+bincoordinates     chromat100-in.coor
+binvelocities      chromat100-in.vel
+extendedSystem     chromat100-in.xsc
+
+#DCDfile $outputdir/chromat100.dcd
+#DCDfreq 1000
+#velDCDfile $outputdir/chromat100.vel.dcd
+#velDCDfreq 1000
+#forceDCDfile $outputdir/chromat100.force.dcd
+#forceDCDfreq 1000
+
+numsteps $nsteps
+
+ldbPeriod 60000
+#############################################################
+## SIMULATION PARAMETERS                                   ##
+#############################################################
+
+paraTypeCharmm on
+#parameters par_parm99_SB_BSC0_mod_prot.prm
+#parameters          par_all27_prot_na.inp
+parameters parameters/all27_prot_lipid_cmap.par
+#parameters parameters/all27_prot_lipid_cmap-test.par
+parameters parameters/all27_prot_lipid_cmap-wcofactors.par
+parameters parameters/cofactors.par
+#parameters parameters/par_all22_prot_cmap.inp
+#parameters parameters/par_all27_prot_lipid_cmap.inp
+#parameters parameters/par_all27_prot_lipid_na.inp
+#parameters parameters/par_all27_prot_lipid.prm
+parameters parameters/par_all27_prot_na.inp
+parameters parameters/par_all27_prot_na.prm
+parameters parameters/par_all36_lipid.prm
+parameters parameters/par_fes.inp
+parameters parameters/par_heme.inp
+#parameters parameters/qh2.par
+parameters parameters/rhodopin-glucoside.par
+parameters parameters/tail-endcap.par
+parameters parameters/tail-internal-unit.par
+
+#temperature         298
+
+
+# Force-Field Parameters
+exclude             scaled1-4
+1-4scaling          1.0
+cutoff              12.
+switching           on
+switchdist          10.
+pairlistdist        13.5
+
+
+# Integrator Parameters
+rigidBonds          all
+timestep            2.0
+nonbondedFreq       1
+fullElectFrequency  4  
+stepspercycle       20
+
+
+# Constant Temperature Control
+langevin            on    ;# do langevin dynamics
+langevinDamping     5     ;# damping coefficient (gamma) of 5/ps
+langevinTemp        298
+langevinHydrogen    off    ;# don't couple langevin bath to hydrogens
+seed 3141
+
+
+# Constant Pressure Control (variable volume)
+useGroupPressure      yes ;# needed for rigidBonds
+useFlexibleCell       no
+useConstantArea       no
+
+langevinPiston        on
+langevinPistonTarget  1.01325 ;#  in bar -> 1 atm
+langevinPistonPeriod  100.
+langevinPistonDecay   50.
+langevinPistonTemp    298
+langevinPistonBarrier off
+
+cellBasisVector1  1012.    0.    0.
+cellBasisVector2     0. 1012.    0.
+cellBasisVector3     0.    0. 1012.
+cellOrigin           0.    0.    0. 
+
+PME                  on
+PMEGridSizeX         512
+PMEGridSizeY         512
+PMEGridSizeZ         512
+PMEInterpOrder       8
+PMEGridSpacing       2.1
+
+# Output
+wrapAll             yes
+outputName          $outputdir/chromat100-out
+restartfreq         90000
+
+outputEnergies      200
+outputTiming        200
+
+numinputprocs 32
+numoutputprocs 32
+numoutputwriters 32

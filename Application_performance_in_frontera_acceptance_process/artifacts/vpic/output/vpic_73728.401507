@@ -1,0 +1,775 @@
+Mon Nov  6 15:07:30 CST 2017
+TACC: Starting up job 401507
+TACC: Starting parallel tasks...
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(240)[0]: Setting up species. 
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(247)[0]: Setting up materials. 
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(259)[0]: Finalizing Field Advance
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(266)[0]: ***********************************************
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(267)[0]: * Topology:                       48 48 32
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(268)[0]: L_di   = 0.5
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(269)[0]: Ti/Te = 1
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(270)[0]: wpe/wce = 2
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(271)[0]: mi/me = 100
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(272)[0]: theta = 0
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(273)[0]: taui = 2
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(274)[0]: num_step = 4683
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(275)[0]: Lx/di = 40
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(276)[0]: Lx/de = 400
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(277)[0]: Ly/di = 40
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(278)[0]: Ly/de = 400
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(279)[0]: Lz/di = 15
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(280)[0]: Lz/de = 150
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(281)[0]: nx = 1536
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(282)[0]: ny = 1536
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(283)[0]: nz = 1536
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(284)[0]: damp = 0
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(285)[0]: courant = 0.99
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(286)[0]: nproc = 73728
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(287)[0]: nppc = 160
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(288)[0]:  b0 = 0.5
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(289)[0]:  di = 10
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(290)[0]:  Ne = 5.79821e+11
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(291)[0]: total # of particles = 1.15964e+12
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(292)[0]:  qi = 4.13921e-05
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(293)[0]:  qe = -4.13921e-05
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(294)[0]: dt*wpe = 0.0854119
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(295)[0]: dt*wce = 0.0427059
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(296)[0]: dt*wci = 0.000427059
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(297)[0]:  energies_interval: 500
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(298)[0]: dx/de = 0.260417
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(299)[0]: dy/de = 0.260417
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(300)[0]: dz/de = 0.0976562
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(301)[0]: dx/rhoe = 0.868056
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(302)[0]: L/debye = 33.3333
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(303)[0]: dx/debye = 1.73611
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(304)[0]: n0 = 1
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(305)[0]: vthi/c = 0.015
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(306)[0]: vthe/c = 0.15
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(412)[0]: Loading fields
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(421)[0]: Loading particles
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(432)[0]: -> Force Free Sheet
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(464)[0]: Finished loading particles
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(490)[0]: Fields output format = band
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(494)[0]: Electron species output format = band
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(498)[0]: Ion species output format = band
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(547)[0]: Fields x-stride 1
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(548)[0]: Fields y-stride 1
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(549)[0]: Fields z-stride 1
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(564)[0]: Electron species x-stride 1
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(565)[0]: Electron species y-stride 1
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(566)[0]: Electron species z-stride 1
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(578)[0]: Ion species x-stride 1
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(579)[0]: Ion species y-stride 1
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(580)[0]: Ion species z-stride 1
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(635)[0]: Fields variable list: Electric Field, Magnetic Field
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(639)[0]: Electron species variable list: Current Density, Charge Density, Stress Tensor
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(643)[0]: Ion species variable list: Current Density, Charge Density, Stress Tensor
+/work/02664/damon/stampede2/src/vpic-407/builds/s2_skx_intel-17.0.4_impi-17.0.3_core_avx512/../../input_files/test_73728.cxx(663)[0]: *** Finished with user-specified initialization ***
+../../../src/vpic/initialize.cxx(29): Checking interdomain synchronization
+../../../src/vpic/initialize.cxx(31): Error = 9.921877e-09 (arb units)
+../../../src/vpic/initialize.cxx(33): Checking magnetic field divergence
+../../../src/vpic/initialize.cxx(36): RMS error = 7.217011e-07 (charge/volume)
+../../../src/vpic/initialize.cxx(37): trying clean_div_b
+../../../src/vpic/initialize.cxx(39): succeeded clean_div_b
+../../../src/vpic/initialize.cxx(42): Initializing radiation damping fields
+../../../src/vpic/initialize.cxx(45): Initializing bound charge density
+../../../src/vpic/initialize.cxx(53): Checking electric field divergence
+../../../src/vpic/initialize.cxx(56): RMS error = 0.000000e+00 (charge/volume)
+../../../src/vpic/initialize.cxx(59): Double checking interdomain synchronization
+../../../src/vpic/initialize.cxx(61): Error = 0.000000e+00 (arb units)
+../../../src/vpic/initialize.cxx(65): Uncentering particles
+../../../src/vpic/initialize.cxx(71): Initialization complete
+../../../src/vpic/dump.cxx(153): Dumping grid to "rundata/grid"
+../../../src/vpic/dump.cxx(109): Dumping materials to "rundata/materials"
+../../../src/vpic/dump.cxx(91): Dumping species to "rundata/species"
+../../src/main.cxx(86): **** Beginning simulation advance with 1 tpp ****
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 9.643683e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 4.732233e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.536534e-07 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 7.651820e-07 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 9.223176e-07 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.964572e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 4.233790e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.559195e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.103684e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.591113e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 200 of 4683 (p=1.00e+02,s=8.11e+00,g=1.21e+01,f=6.15e+00,u=2.11e+01)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.834109e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 4.075074e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.900941e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.523585e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.623105e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.785309e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 4.005963e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.982766e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.662618e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.629866e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 400 of 4683 (p=1.00e+02,s=8.30e+00,g=1.26e+01,f=6.76e+00,u=3.48e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.763542e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.970813e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 9.006748e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.721487e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.635652e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.751909e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.950590e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 9.011582e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.749782e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.637001e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 600 of 4683 (p=1.00e+02,s=8.40e+00,g=1.20e+01,f=6.27e+00,u=3.70e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.745460e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.938092e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 9.007991e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.763926e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.640969e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.741274e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.929582e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 9.003021e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.771674e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.642710e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 800 of 4683 (p=1.00e+02,s=8.43e+00,g=1.04e+01,f=5.97e+00,u=4.23e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.738744e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.923724e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.998748e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.776737e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.644852e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.736804e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.919420e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.993909e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.779711e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.648502e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 1000 of 4683 (p=1.00e+02,s=8.47e+00,g=1.19e+01,f=6.69e+00,u=2.00e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.735821e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.916211e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.989806e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.781720e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.650617e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.735068e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.913783e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.986479e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.783222e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.652465e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 1200 of 4683 (p=1.00e+02,s=8.39e+00,g=1.09e+01,f=5.87e+00,u=4.97e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.734548e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.911909e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.981922e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.783633e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.654171e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.734384e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.910446e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.976461e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.783163e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.654438e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 1400 of 4683 (p=1.00e+02,s=8.34e+00,g=1.05e+01,f=7.25e+00,u=1.85e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.734241e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.909227e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.972492e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.782828e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.656249e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.734256e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.908278e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.967290e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.781826e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.656173e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 1600 of 4683 (p=1.00e+02,s=8.44e+00,g=1.01e+01,f=5.55e+00,u=4.57e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.734309e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.907344e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.962803e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.780901e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.656697e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.734404e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.906749e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.959779e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.780384e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.657923e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 1800 of 4683 (p=1.00e+02,s=8.49e+00,g=1.22e+01,f=6.32e+00,u=2.85e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.734649e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.906213e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.955480e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.779315e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.657846e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.734716e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.905735e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.952818e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.778866e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.659056e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 2000 of 4683 (p=1.00e+02,s=8.43e+00,g=1.11e+01,f=6.04e+00,u=3.62e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.734931e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.905342e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.949995e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.778158e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.659346e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.735234e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.905019e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.947315e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.777629e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.659863e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 2200 of 4683 (p=1.00e+02,s=8.46e+00,g=9.73e+00,f=6.22e+00,u=3.96e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.735773e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.904977e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.945060e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.776949e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.660544e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.736023e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.904696e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.943305e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.776512e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.661844e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 2400 of 4683 (p=1.00e+02,s=8.41e+00,g=1.04e+01,f=6.90e+00,u=2.22e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.736756e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.904733e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.941121e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.775917e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.662336e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.736713e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.904474e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.939459e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.775491e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.662771e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 2600 of 4683 (p=1.00e+02,s=8.42e+00,g=1.14e+01,f=5.60e+00,u=5.18e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.737223e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.904401e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.938715e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.775339e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.663586e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.737678e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.904329e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.936712e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.774847e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.663852e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 2800 of 4683 (p=1.00e+02,s=8.41e+00,g=1.53e+01,f=4.98e+00,u=1.89e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.738196e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.904418e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.935650e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.774597e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.664331e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.738520e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.904383e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.934929e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.774416e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.665555e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 3000 of 4683 (p=1.00e+02,s=8.34e+00,g=1.37e+01,f=3.72e+00,u=3.67e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.738996e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.904480e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.933256e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.774024e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.665787e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.739464e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.904427e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.932531e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.773889e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.666534e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 3200 of 4683 (p=1.00e+02,s=8.48e+00,g=1.32e+01,f=6.11e+00,u=2.80e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.739806e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.904452e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.931320e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.773593e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.666360e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.740471e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.904721e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.930159e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.773172e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.667214e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 3400 of 4683 (p=1.00e+02,s=8.38e+00,g=9.57e+00,f=6.20e+00,u=3.95e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.740939e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.904751e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.928517e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.772534e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.667218e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.741295e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.904806e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.927260e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.772133e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.667749e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 3600 of 4683 (p=1.00e+02,s=8.45e+00,g=1.02e+01,f=6.19e+00,u=3.39e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.741971e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.905000e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.925644e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.771566e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.667784e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.742339e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.904937e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.923400e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.770771e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.667454e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 3800 of 4683 (p=1.00e+02,s=8.45e+00,g=1.05e+01,f=6.26e+00,u=2.88e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.742838e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.905176e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.921897e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.770167e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.667866e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.743287e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.905288e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.919494e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.769234e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.667387e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 4000 of 4683 (p=1.00e+02,s=8.45e+00,g=9.46e+00,f=6.17e+00,u=3.95e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.743747e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.905355e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.917325e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.768386e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.667531e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.744276e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.905555e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.914814e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.767195e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.667293e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 4200 of 4683 (p=1.00e+02,s=8.44e+00,g=1.33e+01,f=6.12e+00,u=2.64e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.744768e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.905806e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.912022e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.766116e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.666760e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.745162e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.905788e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.908786e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.764661e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.665984e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 4400 of 4683 (p=1.00e+02,s=8.49e+00,g=1.07e+01,f=5.84e+00,u=4.32e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.745517e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.905819e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.905344e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.763196e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.665432e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.746186e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.906138e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.901827e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.761533e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.664696e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(207): Completed step 4600 of 4683 (p=1.00e+02,s=8.44e+00,g=1.53e+01,f=6.06e+00,u=2.73e+00)
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(150): Divergence cleaning electric field
+../../../src/vpic/advance.cxx(157): Initial rms error = 8.746662e-07 (charge/volume)
+../../../src/vpic/advance.cxx(162): Cleaned rms error = 3.906336e-07 (charge/volume)
+../../../src/vpic/advance.cxx(170): Divergence cleaning magnetic field
+../../../src/vpic/advance.cxx(173): Initial rms error = 8.897716e-06 (charge/volume)
+../../../src/vpic/advance.cxx(178): Cleaned rms error = 4.759692e-06 (charge/volume)
+../../../src/vpic/advance.cxx(186): Synchronizing shared tang e, norm b, rho_b
+../../../src/vpic/advance.cxx(189): Domain desynchronization error = 1.663613e-03 (arb units)
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "ion".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../../src/vpic/advance.cxx(45): Performance sorting "electron".
+../../src/main.cxx(94): simulation time: 3239.348384
+
+../../src/main.cxx(103): Maximum number of time steps reached.  Job has completed.
+ 
+TACC: Shutdown complete. Exiting.
+
+real	55m18.645s
+user	2612m23.423s
+sys	6m31.794s

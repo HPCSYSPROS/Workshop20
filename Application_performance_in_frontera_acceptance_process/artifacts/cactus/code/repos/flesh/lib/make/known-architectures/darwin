@@ -1,0 +1,332 @@
+#! /bin/sh
+# /*@@
+#   @file    darwin
+#   @date    Sat 27 March 2004
+#   @author  John Shalf, Gabrielle Allen, Tom Goodale
+#   @desc
+#            Known architecture stuff for MacOS X (Darwin)
+#   @enddesc
+#   @version $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/known-architectures/darwin,v 1.21 2010-03-30 16:16:50 schnetter Exp $
+# @@*/
+
+if test "$CCTK_CONFIG_STAGE" = 'preferred-compilers' ; then
+
+  # Try to work out which FPP we need to use 
+  if test -z "$FPP" -a -z "$FPPFLAGS"; then
+    FPP='/usr/bin/cpp'
+
+    FPP_VERSION="`$FPP --version | awk '{print $3; exit}'`"
+    FPP_VERSION_MAJOR="`echo $FPP_VERSION | sed 's:\([^. ]*\)\.\([^. ]*\).*:\1:'`"
+    FPP_VERSION_MINOR="`echo $FPP_VERSION | sed 's:\([^. ]*\)\.\([^. ]*\).*:\2:'`"
+
+    if test $FPP_VERSION_MAJOR -lt 3 ; then
+	FPP="$(PERL) $(CCTK_HOME)/lib/sbin/cpp.pl"
+	FPPFLAGS=
+	FPP_VERSION="`$FPP --version | awk '{print $3; exit}'`"
+	FPP_VERSION_MAJOR="`echo $FPP_VERSION | sed 's:\([^. ]*\)\.\([^. ]*\).*:\1:'`"
+	FPP_VERSION_MINOR="`echo $FPP_VERSION | sed 's:\([^. ]*\)\.\([^. ]*\).*:\2:'`"
+    else
+	FPPFLAGS='-traditional'
+    fi
+
+    echo Setting FPP to $FPP
+    echo Setting FPPFLAGS to $FPPFLAGS
+  fi
+
+else
+
+  if test "`$CC --version 2>&1 | head -n 1 | grep -i gcc`" ; then
+      MAC_C_COMP=gcc
+  elif test "`$CC --version 2>&1 | head -n 1 | grep -i clang`" ; then
+      MAC_C_COMP=clang
+  elif test "`$CC -version 2>&1 | grep xlc`" ; then
+      MAC_C_COMP=ibm
+  elif test "`$CC -V 2>&1 | grep -i intel`" ; then
+      MAC_C_COMP=intel
+  else
+      MAC_C_COMP=unknown
+  fi
+
+  if test "`$CXX --version 2>&1 | head -n 1 | grep -i gcc`" ; then
+      MAC_CXX_COMP=gcc
+  elif test "`$CXX --version 2>&1 | head -n 1 | grep -i clang`" ; then
+      MAC_CXX_COMP=clang
+  elif test "`$CXX -version 2>&1 | grep xlc`" ; then
+      MAC_CXX_COMP=ibm
+  elif test "`$CXX -V 2>&1 | grep -i intel`" ; then
+      MAC_CXX_COMP=intel
+  else
+      MAC_CXX_COMP=unknown
+  fi
+
+  # Find out which CPP we are using and its version
+
+  if test "`$CPP --version | grep -i gcc`"; then 
+      CPP_VENDOR=GNU
+      CPP_VERSION="`cpp --version | awk '{print $3; exit}'`"
+      CPP_VERSION_MAJOR="`echo $CPP_VERSION | sed 's:\([^. ]*\)\.\([^. ]*\).*:\1:'`"
+      CPP_VERSION_MINOR="`echo $CPP_VERSION | sed 's:\([^. ]*\)\.\([^. ]*\).*:\2:'`"
+  elif test "`$CPP --version | grep -i clang`"; then 
+      CPP_VENDOR=LLVM
+      CPP_VERSION="`cpp --version | awk '{print $3; exit}'`"
+      CPP_VERSION_MAJOR="`echo $CPP_VERSION | sed 's:\([^. ]*\)\.\([^. ]*\).*:\1:'`"
+      CPP_VERSION_MINOR="`echo $CPP_VERSION | sed 's:\([^. ]*\)\.\([^. ]*\).*:\2:'`"
+  elif test "`$CPP --version | grep -i Cactus`"; then
+      CPP_VENDOR=Cactus
+      CPP_VERSION="`cpp --version | awk '{print $3; exit}'`"
+      CPP_VERSION_MAJOR="`echo $CPP_VERSION | sed 's:\([^. ]*\)\.\([^. ]*\).*:\1:'`"
+      CPP_VERSION_MINOR="`echo $CPP_VERSION | sed 's:\([^. ]*\)\.\([^. ]*\).*:\2:'`"
+  fi
+
+  if test "$MAC_C_COMP" = "gcc" -o "$MAC_C_COMP" = "clang" ; then
+    : ${C_DEPEND='$(CC) -M -MP $(CPPFLAGS) $(CFLAGS)'}
+    : ${CXX_DEPEND='$(CXX) -M -MP $(CPPFLAGS) $(CXXFLAGS)'}
+  elif test "$MAC_C_COMP" = "intel" ; then
+    : ${C_DEPEND='$(CC) -M $(CPPFLAGS) $(CFLAGS)'}
+    : ${CXX_DEPEND='$(CXX) -M $(CPPFLAGS) $(CXXFLAGS)'}
+  else
+    : ${C_DEPEND='$(PERL) $(CCTK_HOME)/lib/sbin/cpp.pl -M $(CPPFLAGS)'}
+    : ${CXX_DEPEND='$(PERL) $(CCTK_HOME)/lib/sbin/cpp.pl -M $(CPPFLAGS)'}
+  fi
+
+  # Determine which Fortran 90 compiler is in use
+  MAC_F90_COMP=none
+  if test -n "$F90" && test "$F90" != 'none' ; then
+    if test "`$F90 -version 2>&1 | grep xlf`" ; then
+      MAC_F90_COMP=ibm
+    elif test "`$F90 -? 2>&1 | grep -i absoft`" ; then
+      MAC_F90_COMP=absoft
+    elif test "`$F90 --version 2>&1 | head -n 1 | grep -i gcc`" ; then
+      MAC_F90_COMP=gcc
+    elif test "`$F90 --version 2>&1 | head -n 1 | grep -i clang`" ; then
+      MAC_F90_COMP=clang
+    elif test "`$F90 -V 2>&1 | grep -i intel`" ; then
+      MAC_F90_COMP=intel
+    else
+      # Ok, those were the easy ones, now try more
+      # obscure things
+
+      # The test below always returns "absoft" since, if there is no Absoft
+      # compiler installed, the error message is
+      # "/opt/absoft/bin/f95: No such file or directory".
+      # We disable the test.
+
+      #echo "      subroutine foo" > foo.f
+      #echo "      end subroutine foo" >> foo.f
+      #
+      #if test "`/opt/absoft/bin/f95 -V foo.f 2>&1 | grep -i absoft`" ; then
+      #  MAC_F90_COMP=absoft
+      #else
+      #  echo Unknown MacOS X f90 compiler.
+      #  echo Please add appropriate information to
+      #  echo $srcdir/known-architectures/darwin
+      #  echo and send the updated file to CactusMaint
+      #  echo We will try anyway ...
+      #fi
+      #rm foo.f
+      if test "x$90" != 'xnone'; then
+        echo Unknown MacOS X f90 compiler.
+        echo Please add appropriate information to
+        echo $srcdir/known-architectures/darwin
+        echo and send the updated file to CactusMaint
+        echo We will try anyway ...
+      fi
+    fi
+  elif test -n "$F77" ; then
+    if test "`$F77 -version 2>&1 | grep xlf`" ; then
+      MAC_F77_COMP=ibm77
+    elif test "`$F77 -? 2>&1 | grep -i absoft`" ; then
+      MAC_F77_COMP=absoft77
+    elif test "`$F77 --version 2>&1 | head -n 1 | grep -i gcc`" ; then
+      MAC_F77_COMP=gcc
+    elif test "`$F77 --version 2>&1 | head -n 1 | grep -i clang`" ; then
+      MAC_F77_COMP=clang
+    elif test "`$F77 -V 2>&1 | grep -i intel`" ; then
+      MAC_F77_COMP=intel
+    else
+      if test "x$F77" != 'xnone'; then
+        echo Unknown MacOS X f77 compiler.
+        echo Please add appropriate information to
+        echo $srcdir/known-architectures/darwin
+        echo and send the updated file to CactusMaint
+        echo We will try anyway ...
+      fi
+    fi
+  fi
+
+  # Set the appropriate flags for C
+ 
+  case "$MAC_C_COMP" in
+    gcc)
+      CC_VERSION="`$CC --version 2>&1 | head -n 1`"
+      # : ${CFLAGS="-no-cpp-precomp -mlongcall"}
+      # : ${CFLAGS="-mlongcall"}
+      : ${CFLAGS=-std=gnu99}
+      ;;
+    clang)
+      CC_VERSION="`$CC --version 2>&1 | head -n 1`"
+      # : ${CFLAGS="-no-cpp-precomp -mlongcall"}
+      # : ${CFLAGS="-mlongcall"}
+      : ${CFLAGS=-std=gnu99}
+      ;;
+    intel)
+      CC_VERSION="`$CC --version 2>&1 | head -n 1`"
+      : ${CFLAGS="-align"}
+      : ${C_DEBUG_FLAGS='-g -fp'}
+      : ${C_OPTIMISE_FLAGS="-O3 -xP"}
+      if test "$DEBUG" = 'no'; then
+        : ${C_OPTIMISE_FLAGS="$C_OPTIMISE_FLAGS -ip"}
+      fi
+      if test "$OPTIMISE" = 'no'; then
+        : ${C_DEBUG_FLAGS="$C_DEBUG_FLAGS -O0"}
+      fi
+      ;;
+    *)
+      :
+      ;;
+  esac
+
+  case "$MAC_CXX_COMP" in
+    gcc)
+      CXX_VERSION="`$CXX --version 2>&1 | head -n 1`"
+      # : ${CXXFLAGS="-no-cpp-precomp -mlongcall"}
+      # : ${CXXFLAGS="-mlongcall"}
+      : ${CXXFLAGS=-std=gnu++0x}
+      ;;
+    clang)
+      CXX_VERSION="`$CXX --version 2>&1 | head -n 1`"
+      # : ${CXXFLAGS="-no-cpp-precomp -mlongcall"}
+      # : ${CXXFLAGS="-mlongcall"}
+      : ${CXXFLAGS=-std=gnu++0x}
+      ;;
+    intel)
+      CXX_VERSION="`$CXX --version 2>&1 | head -n 1`"
+      : ${CXXFLAGS="-align -std=c++0x"}
+      : ${CXX_DEBUG_FLAGS='-g -fp'}
+      : ${CXX_OPTIMISE_FLAGS="-O3 -xP"}
+      if test "$DEBUG" = 'no'; then
+        : ${CXX_OPTIMISE_FLAGS="$CXX_OPTIMISE_FLAGS -ip"}
+      fi
+      if test "$OPTIMISE" = 'no'; then
+        : ${CXX_DEBUG_FLAGS="$CXX_DEBUG_FLAGS -O0"}
+      fi
+      ;;
+    *)
+      :
+      ;;
+  esac  
+
+  #Set the appropriate flags for Fortran
+  case "$MAC_F90_COMP" in
+    absoft)
+      : ${LIBS='f90math fio f77math m'}
+      : ${F90FLAGS='-N11'}
+      : ${F77FLAGS='-N11'}
+      : ${F90_OPTIMISE_FLAGS='-s -O'}
+      : ${F77_OPTIMISE_FLAGS='-s -O'}
+      : ${F77_DEBUG_FLAGS='-g'}
+      : ${F90_DEBUG_FLAGS='-g'}
+      : ${F77_WARN_FLAGS='-m0'}
+      : ${F90_WARN_FLAGS='-m0'}
+      if test -z "$LIBDIRS" ; then
+	  LIBDIRS="`which $F90 | sed 's,/bin/.*,/lib,'`"
+      fi
+      ;;
+    absoft77)
+      : ${LIBS='fio f77math m'}
+      : ${F90FLAGS='-f'}
+      # Test if it is a version of the absoft compiler which has the library 
+      # in a custom place.
+      if test -n "$ABSOFT" ; then
+        : ${LIBDIRS='$(ABSOFT)/lib'}
+      fi
+      : ${F77_DEBUG_FLAGS='-g'}
+      : ${F90_DEBUG_FLAGS='-g'}
+      : ${F77_WARN_FLAGS='-m0'}
+      : ${F90_WARN_FLAGS='-m0'}
+      ;;
+    gcc)
+      F77_VERSION="`$F77 --version 2>&1 | head -n 1`"
+      F90_VERSION="`$F90 --version 2>&1 | head -n 1`"
+      : ${F77_DEPEND='$(FPP) -M -MP $(FPPFLAGS)'}
+      : ${F_DEPEND='$(FPP) -M -MP $(FPPFLAGS)'}
+      # : ${F77FLAGS='-mlongcall'}
+      # : ${F90FLAGS='-mlongcall'}
+      : ${LIBS='gfortran'}
+      ;;
+    ibm)
+#      : ${LD='xlC'}
+      : ${LIBS='xlf90 xlfmath m'}
+
+      if test -z "$LIBDIRS" ; then
+        : ${LIBDIRS="`which $F90 | sed 's,/bin/.*,/lib,'`"}
+      fi
+#      : ${LIBDIRS='/opt/ibmcmp/lib'}
+#      : ${ARFLAGS='-rucs'}
+                    # suppress congratulatory message on successful compilation
+      : ${F90FLAGS='-qnullterm -qsuffix=f=f -qsuppress=1501-510:cmpmsg'}
+      : ${F77FLAGS='-qnullterm -qsuffix=f=f -qsuppress=1501-510:cmpmsg'}
+                    # -O3 -qhot moves some instructions...but improves speed
+                    # -qarch etc optimises for the architecture on which code
+                    #        is compiled
+      : ${F90_OPTIMISE_FLAGS='-O3 -qhot -qarch=auto -qtune=auto -qcache=auto'}
+      : ${F77_OPTIMISE_FLAGS='-O3 -qhot -qarch=auto -qtune=auto -qcache=auto'}
+      : ${F90_SUFFIX='f'}
+
+      CCTK_WriteLine make.arch.defn 'F90FLAGS += $(DARWIN_$(subst .,,$(suffix $<))_FLAGS)'
+      CCTK_WriteLine make.arch.defn 'F77FLAGS += $(DARWIN_$(subst .,,$(suffix $<))_FLAGS)'
+      CCTK_WriteLine make.arch.defn 'DARWIN_F90_FLAGS = -qfree'
+      CCTK_WriteLine make.arch.defn 'DARWIN_f90_FLAGS = -qfree'
+      CCTK_WriteLine make.arch.defn 'DARWIN_F77_FLAGS = -qfixed'
+      CCTK_WriteLine make.arch.defn 'DARWIN_f77_FLAGS = -qfixed'
+      CCTK_WriteLine make.arch.defn 'DARWIN_F_FLAGS = -qfixed'
+      CCTK_WriteLine make.arch.defn 'DARWIN_f_FLAGS = -qfixed'
+      ;;
+    intel)
+      : ${F77FLAGS='-align -w95'}
+      : ${F90FLAGS='-align -w95'}
+      : ${F77_DEBUG_FLAGS='-g -fp'}
+      : ${F90_DEBUG_FLAGS='-g -fp'}
+      : ${F77_OPTIMISE_FLAGS="-O3 -xP"}
+      : ${F90_OPTIMISE_FLAGS="-O3 -xP"}
+      if test "$DEBUG" = 'no'; then
+        : ${F77_OPTIMISE_FLAGS="$F77_OPTIMISE_FLAGS -ip"}
+        : ${F90_OPTIMISE_FLAGS="$F90_OPTIMISE_FLAGS -ip"}
+      fi
+      if test "$OPTIMISE" = 'no'; then
+        : ${F77_DEBUG_FLAGS="$F77_DEBUG_FLAGS -O0"}
+        : ${F90_DEBUG_FLAGS="$F90_DEBUG_FLAGS -O0"}
+      fi
+
+      intel_dir="$(dirname $(dirname $(which $F90)))"
+
+      intel_subdir=""
+      if [ ! -d "$intel_dir/lib" -a -d "$(dirname $intel_dir)/lib" ]; then
+          intel_subdir="/$(basename $(dirname $(which $F90)))"
+          intel_dir="$(dirname $intel_dir)"
+      fi
+      intel_libdir="$intel_dir/lib$intel_subdir"
+
+      # add the libpath
+      : ${LIBDIRS="$intel_libdir"}
+      : ${LIBS='ifcore imf svml m'}
+
+      F77_VERSION="`$F77 -V 2>&1 | grep -i version | head -n1`"
+      F90_VERSION="`$F90 -V 2>&1 | grep -i version | head -n1`"
+      ;;
+    *)
+      : ${LIBS='m'}
+      ;;
+  esac
+
+  # Darwin's ar command doesn't understand the '-s' flag
+  # so we have to use ranlib to add a table of contents to libraries
+  : ${ARFLAGS='ruc'}
+  : ${USE_RANLIB='yes'}
+
+  # MPI stuff
+  #
+  # Darwin has no native MPI, so we don't set any NATIVE_MPI_XXX variables.
+  # This is caught later on by lib/make/extras/MPI/NATIVE.
+
+fi

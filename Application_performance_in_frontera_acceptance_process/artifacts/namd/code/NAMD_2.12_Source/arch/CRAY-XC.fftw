@@ -1,0 +1,6 @@
+
+FFTDIR=$(HOME)/fftw
+FFTINCL=-I$(FFTDIR)/include
+FFTLIB=-L$(FFTDIR)/lib -lsrfftw -lsfftw
+FFTFLAGS=-DNAMD_FFTW
+FFT=$(FFTINCL) $(FFTFLAGS)

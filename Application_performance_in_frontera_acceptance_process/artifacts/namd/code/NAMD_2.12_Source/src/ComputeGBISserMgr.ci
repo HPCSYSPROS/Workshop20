@@ -1,0 +1,35 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+/*******************************************************************************
+ *******************************************************************************
+  This serial version of GBIS is out of date and hasn't been vetted;
+  it is to be used as a way of testing new implicit solvent models
+  since all atomic coordinates are gathered into a single Compute.
+ *******************************************************************************
+ ******************************************************************************/
+
+module ComputeGBISserMgr {
+
+  message GBISCoordMsg {
+    ComputeGBISAtom coord[];
+  };
+  message GBISForceMsg {
+    ExtForce force[];
+    ExtForce slowForce[];
+  };
+
+  group ComputeGBISserMgr {
+
+    entry ComputeGBISserMgr(void);
+
+    entry void recvCoord(GBISCoordMsg *);
+    entry void recvForce(GBISForceMsg *);
+
+  };
+
+}
+

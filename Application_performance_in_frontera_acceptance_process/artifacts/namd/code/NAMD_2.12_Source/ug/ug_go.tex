@@ -1,0 +1,172 @@
+\section{Structure based simulations}
+
+\subsection{Hybrid MD-Go Simulation}
+\label{section:Go simulation}
+
+\subsubsection{Hybrid MD-Go model}
+
+\NAMD\ incorporates a hybrid MD-Go model (hereby referred to as Go)
+ to study the conformation changes in biomolecular systems.  The method replaces the physical-based
+nonbonded interactions with a smoother knowledge-based potential energy surface.  
+Bonded interactions are taken from the classical force fields.
+By removing energetic traps along a MD trajectory,
+the system will be able to sample states not normally accessible to classical MD simulations.
+
+\subsubsection{Hybrid MD-Go considerations}  
+Typically, Go simulations are conducted in the \textbf{absence of solvent} and with
+ \textbf{electrostatic and van der Waals forces} in the system \textbf{turned off}
+ to improve conformational space exploration.  Due to the current implementation of Go, 
+the partial charges and van der Waals radii need to be set to zero in the psf and parameter file
+to remove the physical nonbonded interactions.  Additionally, \NAMD\ uses a \textbf{reference PDB structure} 
+to construct the Go pairwise potential between atoms.  \\
+\\
+Finally, the Go model in \NAMD\ introduces the idea of chain types.
+Consider modeling a protein-nucleic acid complex.  Using classical all-atom MD, a single force field
+ describes all possible nonbonded interactions.  With Go, however, one can create separate nonbonded force fields to describe the protein 
+and nucleic acid interactions.  In order to create separate force fields, atoms are grouped together using chain types where the
+chain types are taken from the occupancy field of the reference PDB file.  For argument sake, assume that the protein atoms have
+an occupancy value of 1.0 and that the nucleic acid atoms have an occupancy value of 2.0.  One now must define three separate Go potentials
+for intra-protein, intra-nucleic acid, and inter-protein-nucleic acid interactions.  In terms of chain types, this corresponds to 
+ (1) between atom pairs fully in chain 1, (2) between atom pairs fully in chain 2, (3) between atom pairs where one atom is in chain 1 and 
+the other atom is in chain 2 respectively.  To run Go, a minimum of one chain type must be defined.
+
+\subsubsection{Configuration file modifications} 
+
+The following configuration parameters are used to setup and run a Go simulation:
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{GoForcesOn}{Are Go forces turned on?}{{\tt on} or {\tt off}}{\tt off}
+{Specifies whether or not Go forces should be calculated.  If turned {\tt `off'}, 
+Go forces will not be calculated.  If turned {\tt `on'}, Go forces will be calculated.  By default,
+the Go forces will be calculated in addition to the electrostatic and van der Waals forces.  
+To simulate a system using only Go forces, the partial charges and Lennard-Jones parameters can be set to zero in the force field files.}
+
+\item
+\NAMDCONF{GoParameters}{Parameter file defining Go potential}{file}
+{File contains parameters to define the Go pairwise forces between different chain types.
+All possible chain type pairing combinations must be enumerated.
+Chain types are defined in the GoCoordinates file.
+The format for the GoParameters file is described in the next section.}
+
+\item
+\NAMDCONF{GoCoordinates}{Reference structure for Go simulation}{PDB file}
+{PDB file contains the reference structure used to define the Go potential.  
+The file need not be the same file used to initialize the coordinates of the MD simulation; however,
+it must contain the same number of atoms in the same order as given in the structure (.psf) and coordinates (.coor) file.
+Additionally, the occupancy fields of the PDB file will be read to determine which chain type an individual atom belongs to, and, thus,
+which pairwise Go potential to use to calculate forces.  By default, the occupancy value of 0.0 turns off the Go potential
+for that particular atom.
+}
+
+\item
+\NAMDCONF{GoMethod}{controls method for storing Go contact information}{{\tt lowmem} or {\tt matrix}}
+{Specifies whether the Go contacts should be calculated on the fly or stored in a matrix respectively.
+In most cases, {\tt `lowmem'} will be sufficient.  However, for smaller systems, the {\tt `matrix'}
+does offer a slight performance speedup  in terms of wall time.
+  Variable is only used if GoForcesOn is {\tt `on'}}
+
+\end{itemize}
+
+The following sections describe the format of the GoParameter file.
+\subsubsection{GoParameter format}
+
+When running a Go simulation, the atoms are partitioned into chains according to the occupancy value given in the GoCoordinates file.
+For every possible pairwise combination between chains, a Go potential is defined by the following equations:
+
+Let $r^{ref}_{i,j}$ be the pairwise distance between atoms i and j in the reference structure.
+If $r^{ref}_{i,j}$ is less than the Go cutoff distance, the pairwise potential between atoms i and j is given by: \\\\
+$$V_{Go}(r_{i,j},\epsilon,\sigma^{ref}_{i,j},a,b)
+ = 4 \epsilon \Biggl[ \Bigl( \frac{\sigma^{ref}_{i,j}} {r_{i,j}} \Bigr)^a
+ - \Bigl( \frac{\sigma^{ref}_{i,j}} {r_{i,j}} \Bigr)^b \Biggr]$$ \\\\
+where $\sigma^{ref}_{i,j}$ is given as $\left(\frac{b}{a}\right)^{\frac{1}{b-a}}r^{ref}_{i,j}$.
+If $r^{ref}_{i,j}$ is greater than the Go cutoff distance, the pairwise potential between atoms i and j is given by: \\\\ 
+$$V_{Go}(r_{i,j},\epsilon^{rep},\sigma^{rep},expRep) = 4 \epsilon^{rep} (\frac{\sigma^{rep}_{i,j}}{r_{i,j}})^{expRep}$$ 
+
+For each pairwise chain combination, the following parameters are needed to define the Go potential:
+\begin{itemize}
+\item{\textbf{chaintypes (2 floats):}}
+ (\textit{first\_chain second\_chain}) Defines the pairwise chain interaction
+\item{\textbf{epsilon (1 float):}}
+ (\textit{$\epsilon$}) Determines the $\epsilon$ constant of the Go potential in units of $kcal \cdot mol^{-1} \cdot \AA^{-2}$ 
+\item{\textbf{exp\_a (1 integer):}}
+ (\textit{a}) Determines the `a' constant for the Go potential 
+\item{\textbf{exp\_b (1 integer):}}
+ (\textit{b}) Determines the `b' constant for the Go potential 
+\item{\textbf{expRep (1 integer):}}
+ (\textit{expRep}) Determines the `expRep' constant for the Go potential 
+\item{\textbf{sigmaRep (1 float):}}
+ (\textit{$\sigma^{rep}$}) Determines the $\sigma^{rep}$ constant for the Go potential in units of $\AA$ 
+\item{\textbf{epsilonRep (1 float):}}
+ (\textit{$\epsilon^{rep}$}) Determines the $\epsilon^{rep}$ constant for the Go potential in units of $kcal \cdot mol^{-1} \cdot \AA^{-2}$ 
+\item{\textbf{cutoff (1 float):}}
+ (\textit{cutoff}) Defines the Go cutoff distance for this particular pairwise chain in units of $\AA$
+\item{\textbf{[Optional] restriction (1 integer):}}
+ Determines if interactions between the $i^{th}$ and $i^{th} + \textit{integer}$
+ adjacent residue should be excluded.  Multiple restriction between adjacent residues can be defined within a chaintype.
+Each additional new restriction is given on its own line.
+\end{itemize}
+
+Each pairwise chaintype should be written in its own block of text with each entry given its own line.  
+It is recommended that individual pairwise potential be separated by a blank line.
+
+
+\subsection{Running SMOG simulations}
+\label{section:SMOG simulation}
+
+\subsubsection{SMOG model considerations}
+
+\NAMD\ supports the SMOG model from published from Onuchic's lab~\cite{Whitford2009aaa,Whitford2009nhf}.
+The input files for SMOG can be generated from the SMOG website (http://smog-server.org)~\cite{Noel2010ssd}.
+It is recommended to run these simulations with 1-4 exclusions (as opposed to scaled 1-4), a 0.5fs timestep,
+and with a 0.5fs timestep (as described in~\cite{Whitford2009aaa,Whitford2009nhf}).  
+
+\subsubsection{Configuration file modifications} 
+
+As the SMOG model uses GROMACS topology and coordinate files, the GROMACS
+ configuration parameters---{\tt gromacs}, {\tt grotopfile}, {\t grocoorfile}---must be defined.
+The description for the GROMACS configuration parameters are reproduced below:
+
+\begin{itemize}
+\item
+\NAMDCONFWDEF{gromacs}{use GROMACS format force field?}{on or off}{off}
+{
+If {\tt gromacs} is set to on, then {\tt grotopfile} must be defined,
+and {\tt structure} and {\tt parameters} should not be defined.
+}
+\item
+\NAMDCONF{grotopfile}{GROMACS format topology/parameter file}{UNIX filename}
+{
+This file contains complete topology and parameter information of
+the system.
+}
+
+\item
+\NAMDCONF{grocoorfile}{GROMACS format coordinate file}{UNIX filename}
+{
+This file contains the coordinates of all the atoms. Note that
+{\tt coordinates} can also be used for PDB format coordinate
+file. When {\tt gromacs} is set to {\tt on}, either {\tt grocoorfile}
+or {\tt coordinates} must be defined, but not both.
+}
+\end{itemize}
+
+To run a SMOG simulation, the following extra parameters must be defined.
+
+\begin{itemize}
+\item
+\NAMDCONFWDEF{GromacsPair}{Are GROMACS pair forces turned on?}{{\tt on} or {\tt off}}{\tt off}
+{
+This variable determines if the pair section of the GROMACS topology file {grotopfile} is evaluated.
+ Currently, only Lennard-Jones type pairs are supported.
+Variable is only used if gromacs variable is {\tt `on'}.
+}
+
+\item
+\NAMDCONFWDEF{staticAtomAssignment}{Optimization to fix atoms onto a specific node}{{\tt on} or {\tt off}}{\tt off}
+{
+Specifies if atoms should be statically fixed to a node.  This will change the internode communication and will give a significant
+speed-up to MD simulations if the atoms are moving rapidly.  It is suggested that SMOG simulations use the staticAtomAssignment flag.
+}
+\end{itemize}

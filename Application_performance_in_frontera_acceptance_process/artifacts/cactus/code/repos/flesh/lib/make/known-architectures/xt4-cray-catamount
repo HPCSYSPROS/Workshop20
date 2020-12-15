@@ -1,0 +1,12 @@
+#! /bin/sh
+#  /*@@
+#    @file      xt4-cray-catamount
+#    @date      April 3 12:38:45 2005
+#    @author    John Shalf
+#    @desc 
+#   
+#    @enddesc
+#    @version $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/known-architectures/xt4-cray-catamount,v 1.1 2007-04-04 01:11:35 jshalf Exp $
+#  @@*/
+
+. $srcdir/known-architectures/xt3-cray-catamount

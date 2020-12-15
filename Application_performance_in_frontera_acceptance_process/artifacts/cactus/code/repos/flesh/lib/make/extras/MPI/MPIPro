@@ -1,0 +1,20 @@
+#! /bin/sh
+# /*@@
+#   @file    MPIPro
+#   @date    Tue Dec 12 18:36:57 2000
+#   @author  Tom Goodale
+#   @desc
+#            Configure for MPIPro under Windows
+#   @enddesc
+#   @version $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/extras/MPI/MPIPro,v 1.2 2003-08-29 15:59:38 tradke Exp $
+# @@*/
+
+
+echo '  MPIPro MPI selected'
+
+MPI_LIBS='MPIPro'
+
+# If MPIPro has been installed then the below already appear in the
+# INCLUDE and LIB environment variables used by the Windows compilers
+MPI_LIB_DIRS=''
+MPI_INC_DIRS=''

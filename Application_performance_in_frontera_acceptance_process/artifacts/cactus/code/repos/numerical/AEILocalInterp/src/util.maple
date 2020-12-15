@@ -1,0 +1,329 @@
+# util.maple -- misc utility routines
+# $Header$
+
+#
+# fix_rationals - convert numbers to RATIONAL() calls
+# nonmatching_names - find names in a list which *don't* have a specified prefix
+# sprint_numeric_list - convert a numeric list to a valid C identifier suffix
+# print_name_list_dcl - print C declarations for a list of names
+#
+# hypercube_points - compute all (integer) points in an N-dimensional hypercube
+#
+# ftruncate - truncate a file to zero length
+#
+
+################################################################################
+################################################################################
+################################################################################
+
+#
+# This function converts all {integer, rational} subexpressions of its
+# input except integer exponents and -1 factors in products, into function
+# calls
+#	RATIONAL(num,den)
+# This is useful in conjunction with the  C() library function, since
+#
+#	C( (1/3) * foo * bar )
+#		t0 = foo*bar/3;
+#
+# generates a (slow) division (and runs the risk of mixed-mode-arithmetic
+# problems), while
+#
+#	C((1.0/3.0) * foo * bar);
+#	     t0 = 0.3333333333*foo*bar;
+#
+# suffers from roundoff error.  With this function,
+#
+#	fix_rationals((1/3) * foo * bar);
+#	     RATIONAL(1,3) foo bar
+#	C(%);
+#	     t0 = RATIONAL(1.0,3.0)*foo*bar;
+#
+# which a C preprocessor macro can easily convert to the desired
+#
+#	     t0 = (1.0/3.0)*foo*bar;
+#
+# Additionally, this function can be told to leave certain types of
+# subexpressions unconverged.  For example,
+#	fix_rationals(expr, type, specfunc(integer, DATA));
+# will leave all subexpressions of the form  DATA(integer arguments)
+# unconverted.
+#
+# Arguments:
+# expr = (in) The expression to be converted.
+# inert_fn = (optional in)
+#	     If specified, this argument should be a Boolean procedure
+#	     or the name of a Boolean procedure.  This procedure should
+#	     take one or more argument, and return true if and only if
+#	     the first argument should *not* be converted, i.e. if we
+#	     should leave this expression unchanged.  See the last
+#	     example above.
+# ... = (optional in)
+#	Any further arguments are passed as additional arguments to
+#	the inert_fn procedure.
+#
+fix_rationals :=
+proc(
+    expr::{
+	        algebraic, name = algebraic,
+	  list({algebraic, name = algebraic}),
+	  set ({algebraic, name = algebraic})
+	  },
+    inert_fn::{name, procedure}
+    )
+local nn, k,
+      base, power, fbase, fpower,
+      fn, fn_args_list,
+      num, den, mult;
+
+# do we want to convert this expression?
+if ((nargs >= 2) and inert_fn(expr, args[3..nargs]))
+   then return expr;
+end if;
+
+# recurse over lists and sets
+if (type(expr, {list,set}))
+   then return map(fix_rationals, expr, args[2..nargs]);
+end if;
+
+# recurse over equation right hand sides
+if (type(expr, name = algebraic))
+   then return ( lhs(expr) = fix_rationals(rhs(expr), args[2..nargs]) );
+end if;
+
+# recurse over functions other than  RATIONAL()
+if (type(expr, function))
+   then
+	fn := op(0, expr);
+	if (fn <> 'RATIONAL')
+	   then
+		fn_args_list := [op(expr)];
+		fn_args_list := map(fix_rationals, fn_args_list, args[2..nargs]);
+		fn; return '%'( op(fn_args_list) );
+	end if;
+end if;
+
+nn := nops(expr);
+
+# recurse over sums
+if (type(expr, `+`))
+   then return sum('fix_rationals(op(k,expr), args[2..nargs])', 'k'=1..nn);
+end if;
+
+# recurse over products
+# ... leaving leading -1 factors intact, i.e. not converted to RATIONAL(-1,1)
+if (type(expr, `*`))
+   then
+	if (op(1, expr) = -1)
+	   then return -1*fix_rationals(remove(type, expr, 'identical(-1)'),
+				        args[2..nargs]);
+	   else return product('fix_rationals(op(k,expr), args[2..nargs])',
+			       'k'=1..nn);
+	end if;
+end if;
+
+# recurse over powers
+# ... leaving integer exponents intact
+if (type(expr, `^`))
+   then
+	base := op(1, expr);
+	power := op(2, expr);
+
+	fbase := fix_rationals(base, args[2..nargs]);
+	if (type(power, integer))
+	   then fpower := power;
+	   else fpower := fix_rationals(power, args[2..nargs]);
+	end if;
+	return fbase ^ fpower;
+end if;
+
+# fix integers and fractions
+if (type(expr, integer))
+   then return 'RATIONAL'(expr, 1);
+end if;
+if (type(expr, fraction))
+   then
+	num := op(1, expr);
+	den := op(2, expr);
+
+	return 'RATIONAL'(num, den);
+end if;
+
+# turn Maple floating-point into integer fraction, then recursively fix that
+if (type(expr, float))
+   then
+	mult := op(1, expr);
+	power := op(2, expr);
+	return fix_rationals(mult * 10^power, args[2..nargs]);
+end if;
+
+# identity op on names
+if (type(expr, name))
+   then return expr;
+end if;
+
+# unknown type
+error "%0",
+      "unknown type for expr!",
+      "   whattype(expr) = ", whattype(expr),
+      "   expr = ", expr;
+end proc;
+
+################################################################################
+
+#
+# This function finds names in a list which *don't* have a specified prefix.
+#
+# Arguments:
+# name_list = A list of the names.
+# prefix = The prefix we want to filter out.
+#
+# Results:
+# This function returns the subset list of names which don't have the
+# specified prefix.
+# 
+nonmatching_names :=
+proc( name_list::list({name,string}), prefix::{name,string} )
+
+select(   proc(n)
+	  evalb(not StringTools[IsPrefix](prefix,n));
+	  end proc
+	,
+	  name_list
+      );
+end proc;
+
+################################################################################
+
+#
+# This function converts a numeric list to a string which is a valid
+# C identifier suffix: elements are separated by "_", decimal points are
+# replaced by "x", and all nonzero values have explicit +/- signs, which
+# are replaced by "p"/"m".
+#
+# For example, [0,-3.5,+4] --> "0_m3x5_p4".
+#
+sprint_numeric_list :=
+proc(nlist::list(numeric))
+
+# generate preliminary string, eg "+0_-3.5_+4"
+map2(sprintf, "%+a", nlist);
+ListTools[Join](%, "_");
+cat(op(%));
+
+# fixup bad characters
+StringTools[SubstituteAll](%, "+0", "0");
+StringTools[CharacterMap](".+-", "xpm", %);
+
+return %;
+end proc;
+
+################################################################################
+
+#
+# This function prints a sequence of C declarations for a list of names.
+#
+# Argument:
+# name_list = A list of the names.
+# type_name = The C type of the names, eg. "double".
+# file_name = The file name to write the declaration to.  This is
+#	      truncated before writing.
+#
+print_name_list_dcl :=
+proc( name_list::list({name,string}),
+      type_name::string,
+      file_name::string )
+local blanks, separator_string;
+
+ftruncate(file_name);
+
+map(
+       proc(var::{name,string})
+       fprintf(file_name,
+	       "%s %s;\n", 
+	       type_name, var);
+       end proc
+     ,
+       name_list
+   );
+
+fclose(file_name);
+NULL;
+end proc;
+
+################################################################################
+################################################################################
+################################################################################
+
+#
+# This function computes a list of all the (integer) points in an
+# N-dimensional hypercube, in lexicographic order.  The present
+# implementation requires N <= 4.
+#
+# Arguments:
+# cmin,cmax = N-element lists of cube minimum/maximum coordinates.
+#
+# Results:
+# The function returns a set of d-element lists giving the coordinates.
+# For example,
+#	hypercube([0,0], [2,1]
+# returns
+#	{ [0,0], [0,1], [1,0], [1,1], [2,0], [2,1] }
+hypercube_points :=
+proc(cmin::list(integer), cmax::list(integer))
+local N, i,j,k,l;
+
+N := nops(cmin);
+if (nops(cmax) <> N)
+   then error 
+	"must have same number of dimensions for min and max coordinates!";
+fi;
+
+if   (N = 1)
+   then return [seq([i], i=cmin[1]..cmax[1])];
+elif (N = 2)
+   then return [
+		 seq(
+		   seq([i,j], j=cmin[2]..cmax[2]),
+		   i=cmin[1]..cmax[1])
+	       ];
+elif (N = 3)
+   then return [
+		 seq(
+		   seq(
+		     seq([i,j,k], k=cmin[3]..cmax[3]),
+		     j=cmin[2]..cmax[2] ),
+		   i=cmin[1]..cmax[1])
+	       ];
+elif (N = 4)
+   then return [
+		 seq(
+		   seq(
+		     seq(
+		       seq([i,j,k,l], l=cmin[4]..cmax[4]),
+		       k=cmin[3]..cmax[3] ),
+		     j=cmin[2]..cmax[2]),
+		   i=cmin[1]..cmax[1])
+	       ];
+else
+	error "implementation restriction: must have N <= 4, got %1!", N;
+fi;
+end proc;
+
+################################################################################
+################################################################################
+################################################################################
+
+#
+# This function truncates a file to 0 length if it exists, or creates
+# it at that length if it doesn't exist.
+#
+# Arguments:
+# file_name = (in) The name of the file.
+#
+ftruncate :=
+proc(file_name::string)
+fopen(file_name, 'WRITE');
+fclose(%);
+NULL;
+end proc;

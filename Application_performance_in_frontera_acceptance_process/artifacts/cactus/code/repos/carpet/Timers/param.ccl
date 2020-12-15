@@ -1,0 +1,36 @@
+# Parameter definitions for thorn Timers
+
+SHARES: IO
+
+USES STRING out_dir
+
+
+
+PRIVATE:
+
+BOOLEAN verbose "Output (debug) messages when a timer is started or stopped" STEERABLE=always
+{
+} "no"
+
+BOOLEAN disable_cactus_timer_set "Disable Cactus timer set" STEERABLE=recover
+{
+} "no"
+
+BOOLEAN disable_timer_trees "Disable timer trees" STEERABLE=recover
+{
+} "no"
+
+STRING xml_clock "Which clock to use in the XML timer output file" STEERABLE=always
+{
+  ".*" :: "must be a legal clock name"
+} "gettimeofday"
+
+CCTK_REAL threshold_percentage "The percentage of the root timer below which timers are omitted" STEERABLE=always
+{
+  0:* :: ""
+} 1.0
+
+INT output_precision "Number of decimal places to use in standard output for timer tree" STEERABLE=always
+{
+  1:* :: "number of decimal places"
+} 1

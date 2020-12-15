@@ -1,0 +1,77 @@
+Cactus Code Thorn Vectors
+Author(s)    : Erik Schnetter <schnetter@cct.lsu.edu>
+Maintainer(s): Erik Schnetter <schnetter@cct.lsu.edu>
+Licence      : LGPLv2.1 or later
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Provide C macro definitions and a C++ class template that help
+vectorisation.
+
+
+
+2. Build-time choices
+
+Several choices can be made via configuration options, which can be
+set to "yes" or "no":
+
+VECTORISE (default "no"): Vectorise. Otherwise, scalar code is
+generated, and the other options have no effect.
+
+
+
+VECTORISE_ALIGNED_ARRAYS (default "no", experimental): Assume that all
+arrays have an extent in the x direction that is a multiple of the
+vector size. This allows aligned load operations e.g. for finite
+differencing operators in the y and z directions. (Setting this
+produces faster code, but may lead to segfaults if the assumption is
+not true.)
+
+VECTORISE_ALWAYS_USE_UNALIGNED_LOADS (default "no", experimental):
+Replace all aligned load operations with unaligned load operations.
+This may simplify some code where alignment is unknown at compile
+time. This should never lead to better code, since the default is to
+use aligned load operations iff the alignment is known to permit this
+at build time. This options is probably useless.
+
+VECTORISE_ALWAYS_USE_ALIGNED_LOADS (default "no", experimental):
+Replace all unaligned load operations by (multiple) aligned load
+operations and corresponding vector-gather operations. This may be
+beneficial if unaligned load operations are slow, and if vector-gather
+operations are fast.
+
+VECTORISE_INLINE (default "no"): Inline functions into the loop body
+as much as possible.  This can cause some compilers to run out of
+memory for complex codes. (Enabling this may increase code size, which
+can degrade performance if the instruction cache is small, but may
+lead to increased performance due to omission of function-call
+overhead.)
+
+VECTORISE_STREAMING_STORES (default "yes"): Use streaming stores, i.e.
+use store operations that bypass the cache. (Disabling this produces
+slower code.)
+
+VECTORISE_EMULATE_AVX (default "no", experimental): Emulate AVX
+instructions with SSE2 instructions. This produces slower code, but
+can be used to test AVX code on systems that don't support AVX.
+
+
+
+3. Tests
+
+Correctness testing is run at startup (in CCTK_PARAMCHECK) provided the
+Vectors thorn is in the list of ActiveThorns. This aims to test all vector
+operations by comparing the results with the same operations done using a
+scalar implementation. The number of passed tests is always reported. If any
+test fails, the run is aborted immediately.
+
+
+
+4. Related software
+
+[1] Vc: portable, zero-overhead SIMD library for C++,
+<http://compeng.uni-frankfurt.de/index.php?id=88>
+
+[2] SLEEF - SIMD Library for Evaluating Elementary Functions,
+<http://shibatch.sourceforge.net>

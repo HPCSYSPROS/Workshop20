@@ -1,0 +1,264 @@
+% *======================================================================*
+%  Thorn documentation in the latex file doc/documentation.tex 
+%  will be included in ThornGuides built with the Cactus make system.
+%  The scripts employed by the make system automatically include 
+%  pages about variables, parameters and scheduling parsed from the 
+%  relevant thorn CCL files.
+%  
+%  This template contains guidelines which help to assure that your     
+%  documentation will be correctly added to ThornGuides. More 
+%  information is available in the Cactus UsersGuide.
+%                                                    
+%  Guidelines:
+%   - Do not change anything before the line
+%       % START CACTUS THORNGUIDE",
+%     except for filling in the title, author, date etc. fields.
+%        - Each of these fields should only be on ONE line.
+%        - Author names should be separated with a \\ or a comma
+%   - You can define your own macros are OK, but they must appear after
+%     the START CACTUS THORNGUIDE line, and do not redefine standard 
+%     latex commands.
+%   - To avoid name clashes with other thorns, 'labels', 'citations', 
+%     'references', and 'image' names should conform to the following 
+%     convention:          
+%       ARRANGEMENT_THORN_LABEL
+%     For example, an image wave.eps in the arrangement CactusWave and 
+%     thorn WaveToyC should be renamed to CactusWave_WaveToyC_wave.eps
+%   - Graphics should only be included using the graphix package. 
+%     More specifically, with the "includegraphics" command. Do
+%     not specify any graphic file extensions in your .tex file. This 
+%     will allow us (later) to create a PDF version of the ThornGuide
+%     via pdflatex. |
+%   - References should be included with the latex "bibitem" command. 
+%   - use \begin{abstract}...\end{abstract} instead of \abstract{...}
+%   - For the benefit of our Perl scripts, and for future extensions, 
+%     please use simple latex.     
+%
+% *======================================================================* 
+% 
+% Example of including a graphic image:
+% \begin{figure}[ht]
+%  \begin{center}
+%   \includegraphics[width=6cm]{MyArrangement_MyThorn_MyFigure}
+%  \end{center}
+%  \caption{Illustration of this and that}
+%  \label{MyArrangement_MyThorn_MyLabel}
+% \end{figure}
+%
+% Example of using a label:
+%   \label{MyArrangement_MyThorn_MyLabel}
+%
+% Example of a citation:
+%    \cite{MyArrangement_MyThorn_Author99}
+%
+% Example of including a reference
+%   \bibitem{MyArrangement_MyThorn_Author99}
+%   {J. Author, {\em The Title of the Book, Journal, or periodical}, 1 (1999), 
+%   1--16. {\tt http://www.nowhere.com/}}
+%
+% *======================================================================* 
+
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+% The author of the documentation
+\author{Tanja Bode \textless tanja.bode@physics.gatech.edu\textgreater\\
+        Frank L\"offler \textless knarf@cct.lsu.edu\textgreater}
+
+% The title of the document (not necessarily the name of the Thorn)
+\title{HydroBase}
+
+% the date your document was last changed, if your document is in CVS, 
+% please use:
+\date{April 29, 2010}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+% Add all definitions used in this documentation here 
+%   \def\mydef etc
+
+% Add an abstract for this thorn's documentation
+\begin{abstract}
+
+HydroBase extends the CactusEinstein framework to include an interface for magnetohydrodynamics to 
+work within.  HydroBase's main function is to store the primitive variables, common among 
+hydrodynamic simulations, commonly needed parameters, and schedule groups for the main 
+functions of a hydrodynamics code.  This has been done with an eye on Whisky, but can be used 
+to implement any hydrodynamics formulation.
+
+\end{abstract}
+
+% The following sections are suggestive only.
+% Remove them or add your own.
+
+\section{Introduction}
+
+The idea behind this thorn is to create a slim, common set of variables, parameters and
+scheduling groups which can then be used by different hydrodynamics codes. It should contain
+the common concepts of different hydrodynamics codes, but at the same time it should be
+as slim as possible to remain as general as possible. HydroBase should not contain the
+actual source code of typical routines of hydrodynamics codes, it should merely provide
+a common setup in which hydrodynamics codes can put their routines.
+
+Because there exist different formulations of the hydrodynamics equations and not all of
+them involve concepts like conserved variabled or treat them
+differently, which is the reason why these variables are not defined in HydroBase but this
+is left to the hydrodynamics codes.
+
+One of the advantages of such a common base is that modules of hydrodynamics codes only
+working with entities defined in HydroBase could be used interchangeably. Prime examples
+for this are initial data solvers or importers and analysis modules.
+Another advantage is that the format of output generated by different hydrodynamics
+codes in Cactus would be the same, including variable names and unit conventions, which
+would improve the ability to compare results of different codes directly a lot.
+
+\section{Using this Thorn}
+
+HydroBase is to be used as a central part of hydrodynamics fields just as ADMBase is used as a 
+central part of spacetime evolution and analysis codes. HydroBase only stores variables which
+are common to most if not all hydrodynamics codes solving the Euler
+equations, the so called primitive variables. These are also the variables which are needed
+to couple to a spacetime solver and which are usually needed by analysis thorns. The usage of
+a common set of variables by different hydrodynamics codes creates the possibility to share
+parts of the code, e.g.\ initial data solvers or analysis routines. 
+
+Currently the defined primitive variables are (see~\cite{livrevgrrfd} for
+details):
+\begin{itemize}
+ \item \verb|rho|: rest mass density $\varrho$
+ \item \verb|press|: pressure $p$
+ \item \verb|eps|: specific internal energy $\epsilon$
+ \item \verb|vel[3]|: contravariant fluid three velocity $v^i$ with respect 
+to the Eulerian observer defined as
+  \begin{equation}
+      v^i = \frac{u^i}{\alpha u^0} + \frac{\beta^i}{\alpha}
+  \end{equation}
+  in terms of the four-velocity $u^\mu$, lapse $\alpha$, and shift vector
+  $\beta^i$.
+ \item \verb|Y_e|: electron fraction $Y_e$
+ \item \verb|temperature|: temperature $T$
+ \item \verb|entropy|: specific entropy per particle $s$
+ \item \verb|Bvec[3]|: contravariant magnetic field vector defined as 
+  \begin{equation}
+      B^i = \frac{1}{\sqrt{4\pi}} n_{\nu} F^{*\nu i}
+  \end{equation}
+  in terms of the dual 
+  $F^{*\mu\nu} = \frac{1}{2}\varepsilon^{\mu\nu\alpha\beta}F_{\alpha\beta}$ 
+  to the Faraday tensor and the unit normal of the foliation of spacetime
+  $n^\mu$.
+\end{itemize}
+
+HydroBase also sets up scheduling blocks that organize the main functions which modules of a 
+hydrodynamics code may need. All of those scheduling blocks are optional, however if used,
+they might simplify existing codes and make them more interoperable. HydroBase itself does
+not schedule something inside most of the groups which it provides.
+
+Currently the scheduling blocks are:
+\begin{itemize}
+ \item Initializing the primitive variables
+ \item Converting primitive variables to conservative variables
+ \item Calculating the right hand side (RHS) in the method of lines (MoL)
+ \item Setting and updating an excision mask
+ \item Applying boundary conditions
+\end{itemize}
+
+In this way the initiation of the primitive variables, methods to recover the conservative
+variables, and basic atmosphere handling can be implemented in different thorns while allowing
+a central access point for analysis thorns.
+
+\section{Units}
+
+HydroBase does not require a specific set of units itself. However 
+so that there are no misunderstandings between thorns a specific 
+set of units is suggested.  These units are derived from the
+conventions
+\begin{eqnarray}
+  M_{\mathrm{sun}} = 1 &;& c = G = 1
+\end{eqnarray}
+which are commonly used in astrophysics and in relativity.
+The former sets the mass scale to the solar one and the latter
+adopts the same units for time, length and mass.
+
+We assume the following definitions and constants of nature:
+\begin{eqnarray}
+  c             & = & 299792458\, \mathrm{m/s}
+  \\
+  G             & = & 6.67428\cdot 10^{-11}\, \mathrm{m^3/kg/s^2}
+  \\
+  \mu_0         & = & 4 \pi 10^{-7}\, \mathrm{N/A^2}
+  \\
+  \epsilon_0    & = & \frac{1}{\mu_0 c^2}
+  \\
+  M_{\mathrm{sun}} & = & 1.98892\cdot10^{30}\, \mathrm{kg}
+\end{eqnarray}
+
+This corresponds to the following units for mass, length, time, and
+magnetic field:
+\begin{eqnarray}
+  [M] & = & M_{\mathrm{sun}}
+  \\{}
+  [L] & = & [M]\; G/c^2
+  \\{}
+  [T] & = & [L]\; / c
+  \\{}
+  [B] & = & 1/[L]\; / \sqrt{\epsilon_0 G / c^2} \qquad (\mathrm{SI})
+  \\{}
+  [B] & = & c^2/[L]\; / \sqrt{G} \qquad \qquad (\mathrm{Gaussian})
+\end{eqnarray}
+
+Inserting the SI units into the above unit correspondences, 
+we find the following conversion factors:
+\begin{eqnarray}
+  [L] & = & 1\, M_{\mathrm{sun}} \equiv 1.477\, \mathrm{km}
+  \\{}
+  [T] & = & 1\, M_{\mathrm{sun}} \equiv 4.92673\, \mathrm{\mu s}
+  \\{}
+  [B] & = & 1\, \sqrt{\mu_0/4\pi} /M_{\mathrm{sun}} \equiv 2.35537\cdot 
+            10^{15}\, \mathrm{T},  \qquad (\mathrm{SI})
+  \\{}
+  [B] & = & 1\, M^{-1}_{\mathrm{sun}} \equiv 2.35537\cdot 10^{19}\, \mathrm{G}, 
+            \qquad \qquad \qquad (\mathrm{Gaussian})
+\end{eqnarray}
+where T (Tesla) is the magnetic field unit in SI, 
+$1\,\mathrm{T}=1\,\mathrm{N/(A\cdot m)}$, and G (Gauss) is its cgs equivalent,
+$1\,\mathrm{Tesla} = 10^4\,\mathrm{Gauss}$. 
+
+
+\section{Acknowledgments}
+
+This thorn was produced by Tanja Bode, Roland Haas, Frank L\"offler, and Erik Schnetter.
+
+\begin{thebibliography}{9}
+\bibitem{livrevgrrfd}
+    J.~A. Font.
+    \newblock Numerical hydrodynamics in {G}eneral {R}elativity.
+    \newblock {\em Living Rev. Relativity}, {\bf 3}, 2000.
+    \newblock [Article in on-line journal], cited on 31/07/01,
+      http://www.livingreviews.org/ Articles/Volume3/2000-2font/index.html.
+\bibitem{valenciaHD}
+    F. Banyuls, J.~A. Font, J.~M.~A. Ibanez, J.~M.~A. Marti, and 
+	J.~A. Miralles. 
+    \newblock Numerical 3+1 General Relativistic Hydrodynamics: A Local Characteristic Approach.
+    \newblock {\em ApJ}, {\bf 476}, 221, 1997.
+\bibitem{valenciaMHD}
+    L. Ant{\'o}n, O. Zanotti, J.~A. Miralles,  
+	J.~M. Mart{\'{\i}}, J.~M. Ib{\'a}{\~n}ez, J.~A. Font, and 
+	 J.~A Pons.
+    \newblock Numerical 3+1 General Relativistic Magnetohydrodynamics: A Local Characteristic Approach.
+    \newblock {\em ApJ}, {\bf 637}, 296 -- 312, 2006.
+\end{thebibliography}
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

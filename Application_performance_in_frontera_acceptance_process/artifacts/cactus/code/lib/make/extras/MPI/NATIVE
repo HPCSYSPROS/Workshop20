@@ -1,0 +1,23 @@
+#! /bin/sh
+# /*@@
+#   @file    NATIVE
+#   @date    Wed Jul 21 13:27:07 1999
+#   @author  Tom Goodale
+#   @desc
+#            Configuration options for MPI=NATIVE
+#   @enddesc
+#   @version $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/extras/MPI/NATIVE,v 1.4 2003-08-29 15:59:38 tradke Exp $
+# @@*/
+
+echo '  Native MPI selected'
+
+# This should be filled out by the know-architecture stuff.
+
+if test -z "$NATIVE_MPI_LIBS" ; then
+  echo '  ERROR: NATIVE MPI selected, but this architecture has no native MPI'
+  exit 2
+fi
+
+MPI_LIBS="$NATIVE_MPI_LIBS"
+MPI_LIB_DIRS=${NATIVE_MPI_LIB_DIRS:-""}
+MPI_INC_DIRS=${NATIVE_MPI_INC_DIRS:-""}

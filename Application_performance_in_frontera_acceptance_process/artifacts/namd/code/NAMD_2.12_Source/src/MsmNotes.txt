@@ -1,0 +1,15 @@
+To enable parallel MSM using Charm MSA (multiphase shared arrays):
+
+0.  Build the MSA module into your Charm library
+
+1.  In Makefile, uncomment "CHARM_MODULES" that has "-module msa" and 
+    uncomment "MSA"
+
+2.  In src/main.ci, uncomment line "extern module ComputeMsmMgr;"
+
+3.  Recommended approach:  "make clean ; make depends ; make"
+    to make sure that all of the dependencies are correct.
+
+    Old approach:  "(cd src ; touch `cat MsmTouch.txt`) ; make"
+    to rebuild just the affected files.
+

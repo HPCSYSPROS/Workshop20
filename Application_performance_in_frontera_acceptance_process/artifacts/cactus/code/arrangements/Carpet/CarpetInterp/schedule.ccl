@@ -1,0 +1,6 @@
+# Schedule definitions for thorn CarpetInterp
+
+schedule CarpetInterpStartup at STARTUP
+{
+  LANG: C
+} "Startup routine"

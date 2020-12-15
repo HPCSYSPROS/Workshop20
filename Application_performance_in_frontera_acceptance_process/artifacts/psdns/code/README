@@ -1,0 +1,29 @@
+PSDNS Code
+==========
+
+***VERY IMPORTANT*** Before compiling the code, make sure that BW is the target
+machine for compilation in the makefile. To do this you can comment out all
+"MACHINE" lines except "MACHINE = BW". Also, comment out the line
+"CPPFLAGS += -DMHD" in the input file.
+
+To compile the code, 
+
+   module load fftw
+   module load cray-hdf5-parallel
+   module load craype-hugepages2M
+   make srcmake
+   make
+
+
+Notes on the Input File and Case Setup
+--------------------------------------
+
+   - When changing the problem size, make sure nxpad, nypad, and nzpad in the
+     input file match nx, ny, and nz.
+   - If testing with I/O for checkpointing, make sure to run the prep_dirs
+     script to make the proper number of directories for processed-based
+     checkpointing (we can include instructions later for writing
+     communicator-based checkpoint files). For 2**N MPI tasks, the argument to
+     prep_dirs should be 2**(N/2), where N/2 uses integer division. For example,
+     for 2**5=32 MPItasks, you should use "./prep_dirs 4" to make the output
+     directories.

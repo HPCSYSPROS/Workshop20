@@ -1,0 +1,5 @@
+# Parameter definitions for thorn CycleClock
+
+BOOLEAN register_clock "Register cycle counter as Cactus clock" STEERABLE=recover
+{
+} "yes"

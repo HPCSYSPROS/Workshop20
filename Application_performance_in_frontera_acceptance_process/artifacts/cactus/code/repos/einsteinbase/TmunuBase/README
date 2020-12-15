@@ -1,0 +1,9 @@
+Cactus Code Thorn TmunuBase
+Author(s)    : Erik Schnetter
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+This thorn provides grid functions for the stress-energy tensor.

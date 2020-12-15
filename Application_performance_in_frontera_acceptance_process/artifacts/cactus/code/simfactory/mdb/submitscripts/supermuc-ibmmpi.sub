@@ -1,0 +1,23 @@
+#! /bin/bash
+#@ job_type = parallel
+#@ checkpoint = no
+#@ restart = no
+#@ wall_clock_limit = @WALLTIME@
+#@ class = @(@NODES@ <= 32 ? 'micro' : 'general')@
+#@ node = @NODES@
+#@ total_tasks = @(@PROCS_REQUESTED@/@NUM_THREADS@)@
+#@ node_usage = not_shared
+#@ network.MPI = sn_all,not_shared,us
+#@ job_name = @SIMULATION_NAME@
+#@ notify_user = @EMAIL@
+#@ notification = always
+#@ shell = /bin/bash
+#@ initialdir = @RUNDIR@
+#@ input = /dev/null
+#@ output = @RUNDIR@/@SIMULATION_NAME@.out
+#@ error = @RUNDIR@/@SIMULATION_NAME@.err
+#@ energy_policy_tag = Cactus
+#@ minimize_time_to_solution = yes
+#@ queue
+cd @SOURCEDIR@
+@SIMFACTORY@ run @SIMULATION_NAME@ --machine=@MACHINE@ --basedir=@BASEDIR@ --restart-id=@RESTART_ID@ @FROM_RESTART_COMMAND@

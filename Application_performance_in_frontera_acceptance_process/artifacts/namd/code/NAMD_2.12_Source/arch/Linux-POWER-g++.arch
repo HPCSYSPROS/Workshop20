@@ -1,0 +1,8 @@
+NAMD_ARCH = Linux-POWER
+CHARMARCH = multicore-linux-ppc
+
+CXX = g++ -m64 -O3 -std=c++11
+CXXOPTS = -fexpensive-optimizations -ffast-math 
+CC = gcc -m64 -O3
+COPTS = -fexpensive-optimizations -ffast-math
+

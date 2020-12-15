@@ -1,0 +1,3 @@
+This directory contains the inputs for the small case for PSDNS.   
+
+The only difference between these runs are the task counts, 32x64, 32x128, and 32x256.  The difference input file is just the name of the input directory where the code was run.  The 32x128 case is the original case from Blue Waters.

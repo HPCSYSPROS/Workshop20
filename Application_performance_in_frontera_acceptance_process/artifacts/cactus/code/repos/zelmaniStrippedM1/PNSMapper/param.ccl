@@ -1,0 +1,97 @@
+# Parameter definitions for thorn PNSMapper
+
+BOOLEAN initial_vel_zero "set initial velocity to zero"
+{
+} "no"
+
+CCTK_INT Num_Max_Radial "The number of radial points of the input PNS profile"
+{
+ 1:* :: "Greater than 0"
+} 2000
+
+CCTK_INT Num_1D "The number of radial points for the internal solver"
+{
+ 1:* :: "Greater than 0"
+} 1000
+
+CCTK_INT nz_vel_smooth "Number of radial points to average the input velocity over"
+{
+ 0:* :: "0 or greater"
+} 0
+
+CCTK_REAL Rad_1D "Maximum radius for the internal solver [in M]"
+{
+ 0.0:* :: "Greater than 0"
+} 100.0e0
+
+CCTK_REAL Y_e_min "Minimum Y_e that we allow"
+{
+ 0.0:* :: "Greater than 0"
+} 0.05e0
+
+STRING Profile_File "Profile File Name"
+{
+ .* ::  "1D Model File"
+} "PNSinput.dat"
+
+KEYWORD Profile_Type "Type of Profile"
+{
+ "GR1Dspecial"  :: "Evan's GR1D format"
+ "GR1Dspecial2"  :: "Evan's GR1D format, version 2.0"
+ "GR1Dformat2"  :: "Ott's GR1D format 2"
+ "GR1DShort"    :: ".short type from GR1D"
+} "GR1Dspecial"
+
+
+shares: ADMBase
+
+EXTENDS KEYWORD initial_data ""
+{
+  "pnsmapper"  :: "Construnct stationary initial data with pnsmapper"
+}
+
+EXTENDS KEYWORD initial_lapse ""
+{
+  "pnsmapper"  :: "Construnct stationary initial data with pnsmapper"
+}
+
+EXTENDS KEYWORD initial_shift ""
+{
+  "pnsmapper"  :: "Construnct stationary initial data with pnsmapper"
+}
+
+shares: HydroBase
+
+EXTENDS KEYWORD initial_hydro
+{
+  "pnsmapper"     :: "Pnsmapper CFC Initial Data"
+}
+
+EXTENDS KEYWORD initial_Y_e
+{
+  "pnsmapper"     :: "Pnsmapper CFC Initial Data"
+}
+
+EXTENDS KEYWORD initial_temperature
+{
+  "pnsmapper"     :: "Pnsmapper CFC Initial Data"
+}
+
+EXTENDS KEYWORD initial_entropy
+{
+  "pnsmapper"     :: "Pnsmapper CFC Initial Data"
+}
+
+
+
+shares: GRHydro
+
+USES REAL GRHydro_hot_atmo_temp
+USES REAL GRHydro_hot_atmo_Y_e
+USES REAL rho_abs_min
+
+shares: ZelmaniM1
+
+USES INT ngroups
+USES INT nspecies
+

@@ -1,0 +1,185 @@
+#! /bin/sh
+#  /*@@
+#    @file      aix
+#    @date      Wed Jul 14 12:38:45 1999
+#    @author    Tom Goodale
+#    @desc
+#               Known-architectures file for IBM AIX systems
+#    @enddesc
+#    @version   $Header$
+#  @@*/
+
+if test "$CCTK_CONFIG_STAGE" = 'preferred-compilers' ; then
+
+  # default to building 64-bit executables using the native AIX compilers
+  if test -z "$AIX_BITS" ; then
+    AIX_BITS=64
+  fi
+
+  if test -z "$CC"; then
+    echo Setting C compiler to xlc
+    CC=xlc_r
+  fi
+
+  if test -z "$CXX"; then
+    echo Setting C++ compiler to xlC
+    CXX=xlC_r
+  fi
+
+  if test -z "$F77"; then
+    echo Setting F77 compiler to xlf77
+    F77=xlf77
+  fi
+
+  if test -z "$F90"; then
+    echo Setting F90 compiler to xlf90
+    F90=xlf90
+  fi
+
+  # use the Cactus preprocessor for Fortran
+  if test -z "$FPP"; then
+    FPP='$(PERL) $(CCTK_HOME)/lib/sbin/cpp.pl'
+    echo Setting FPP to $FPP
+  fi
+
+else
+
+  if test "X$AIX_BITS" != 'X32' -a "X$AIX_BITS" != 'X64' ; then
+    echo "Invalid setting '$AIX_BITS' for AIX_BITS (must be either '32' or '64')"
+    exit 1
+  fi
+
+  # Fortran compilers
+  # suppress congratulatory message on successful compilation
+  : ${F90FLAGS="-q$AIX_BITS -qextname -qsuppress=1501-510:cmpmsg"}
+  : ${F77FLAGS="-q$AIX_BITS -qextname -qsuppress=1501-510:cmpmsg"}
+  : ${F90_DEBUG_FLAGS='-g'}
+  : ${F77_DEBUG_FLAGS='-g'}
+
+  : ${F90_SUFFIX='f'}
+  CCTK_WriteLine make.arch.defn 'F90FLAGS += $(AIX_$(subst .,,$(suffix $<))_FLAGS)'
+  CCTK_WriteLine make.arch.defn 'F77FLAGS += $(AIX_$(subst .,,$(suffix $<))_FLAGS)'
+  CCTK_WriteLine make.arch.defn 'AIX_F90_FLAGS = -qfree'
+  CCTK_WriteLine make.arch.defn 'AIX_f90_FLAGS = -qfree'
+  CCTK_WriteLine make.arch.defn 'AIX_F77_FLAGS = -qfixed'
+  CCTK_WriteLine make.arch.defn 'AIX_f77_FLAGS = -qfixed'
+  CCTK_WriteLine make.arch.defn 'AIX_F_FLAGS = -qfixed'
+  CCTK_WriteLine make.arch.defn 'AIX_f_FLAGS = -qfixed'
+
+  : ${FPP='$(PERL) $(CCTK_HOME)/lib/sbin/cpp.pl'}
+  : ${F_DEPEND='$(FPP) -M $(FPPFLAGS)'}
+  : ${F77_DEPEND=$F_DEPEND}
+
+  F77_VERSION=`$F77 -qversion 2>&1 | head -n1`
+  F90_VERSION=`$F90 -qversion 2>&1 | head -n1`
+
+  # NOTE IBM XLC/XLF optimizations.
+  # Tested -02 through -O5.  On BSSNCarpet runs, "-O3 -qhot" performed
+  # best--but beware, it moves instructions. While turning on -qstrict
+  # fixes this, it also degrades performance. The -qarch=auto causes the
+  # code to be customized for the architecture on which it is compiled.
+  # The higher levels turn on -qipa which does global optimizations and
+  # work best if this option is also supplied at link time. --SW
+
+  # C/C++ compilers
+  case $(basename "$CC") in
+    gcc)
+     : ${C_DEPEND_OUT=' > $@'}
+     CC_VERSION="`$CC -v 2>&1 | grep -i version | tail -n1`"
+     ;;
+    cc|xlc|xlc_r)
+     : ${C_DEPEND='$(CC) -E -M $(CPPFLAGS) $(CFLAGS)'}
+     : ${C_DEPEND_OUT=' > /dev/null ; mv $(basename $(basename $@)).u $@'}
+     : ${CFLAGS="-q$AIX_BITS -qlanglvl=stdc99"}
+     : ${C_OPTIMISE_FLAGS="-O3 -qarch=auto -qtune=auto -qcache=auto -qhot"}
+     : ${C_OPENMP_FLAGS='-qsmp=omp'}
+     CC_VERSION=`$CC -qversion 2>&1 | head -n1`
+     ;;
+    *)
+     ;;
+  esac
+
+  case $(basename "$CXX") in
+    'g++'|'c++')
+     : ${CXX_DEPEND_OUT=' > $@'}
+     CXX_VERSION="`$CXX -v 2>&1 | grep -i version | tail -n1`"
+     ;;
+    xlC|xlC_r)
+     : ${CXX_DEPEND='$(CXX) -E -M $(CPPFLAGS) $(CXXFLAGS)'}
+     : ${CXX_DEPEND_OUT=' > /dev/null ; mv $(basename $(basename $@)).u $@'}
+     : ${CXXFLAGS="-q$AIX_BITS"}
+     : ${CXX_OPTIMISE_FLAGS="-O3 -qarch=auto -qtune=auto -qcache=auto -qhot"}
+     : ${CXX_OPENMP_FLAGS='-qsmp=omp'}
+     CXX_VERSION=`$CXX -qversion 2>&1 |head -n1`
+     ;;
+    *)
+     ;;
+  esac
+
+  case $(basename "$F90") in
+    xlf|xlf_r|xlf90|xlf90_r|xlf95|xlf95_r)
+     : ${F90FLAGS="-q$AIX_BITS"}
+     : ${F90_OPTIMISE_FLAGS="-O3 -qarch=auto -qtune=auto -qcache=auto -qhot"}
+     : ${F90_OPENMP_FLAGS='-qsmp=omp'}
+     ;;
+    *)
+     : ${F90_OPTIMISE_FLAGS="-O3"}
+     ;;
+  esac
+
+  case $(basename "$F77") in
+    xlf|xlf_r|xlf77|xlf77_r|xlf90|xlf90_r|xlf95|xlf95_r)
+     : ${FF77LAGS="-q$AIX_BITS"}
+     : ${F77_OPTIMISE_FLAGS="-O3 -qarch=auto -qtune=auto -qcache=auto -qhot"}
+     : ${F77_OPENMP_FLAGS='-qsmp=omp'}
+     ;;
+    *)
+     : ${F77_OPTIMISE_FLAGS="-O3"}
+     ;;
+  esac
+
+  # Linker
+  : ${ARFLAGS="-X$AIX_BITS -rucs"}
+  if test -z "$LIBS" -a "$LD" != 'xlf90' ; then
+    LIBS=xlf90
+  fi
+
+  # in 32-bit mode: allow each process to use up to 2 GB of virtual memory
+  # (default is only 256 MB)
+  if test "$LD" != 'g++' -a "$LD" != 'c++'; then
+    if test "$AIX_BITS" = 32; then
+      : ${LDFLAGS="-q$AIX_BITS -bmaxdata:0x80000000"}
+    else
+      : ${LDFLAGS="-q$AIX_BITS"}
+    fi
+  fi
+
+  # MPI stuff
+  if test -n "$MPI" ; then
+    # must not set linker flags for 64-bit configurations
+    # (LD will figure these out)
+    if test "X$AIX_BITS" = "X32" ; then
+      NATIVE_MPI_LIBS='mpi'
+      NATIVE_MPI_LIB_DIRS='/usr/lpp/ppe.poe/lib'
+    else
+      NATIVE_MPI_LIBS=' '
+    fi
+    NATIVE_MPI_INC_DIRS='/usr/lpp/ppe.poe/include'
+    if test "X$MPI" = 'XNATIVE' ; then
+      case "`basename $CC`:`basename $CXX`" in
+        "xlc:xlC"|"cc:xlC")
+          LD="mpCC -q$AIX_BITS"
+          ;;
+        "xlc_r:xlC_r")
+          LD="mpCC_r -q$AIX_BITS"
+          ;;
+         *)
+        echo 'NATIVE MPI requires xlc and xlC'
+        echo 'Please reconfigure with these compilers'
+        exit 1
+         ;;
+      esac
+    fi
+  fi
+
+fi

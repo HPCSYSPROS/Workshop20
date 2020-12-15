@@ -1,0 +1,13 @@
+NAMD_ARCH = Linux-ARM64
+CHARMARCH = multicore-arm7
+
+#FLOATOPTS = -O2 -ffast-math -funsafe-math-optimizations -fomit-frame-pointer -march=armv7-a -mcpu=cortex-a9 -mtune=cortex-a9
+FLOATOPTS = -O2 -ffast-math -funsafe-math-optimizations -fomit-frame-pointer
+
+CXX = g++ -std=c++11
+CXXOPTS = $(FLOATOPTS)
+CXXNOALIASOPTS = $(FLOATOPTS) -fno-strict-aliasing
+
+CC = gcc
+COPTS = $(FLOATOPTS)
+

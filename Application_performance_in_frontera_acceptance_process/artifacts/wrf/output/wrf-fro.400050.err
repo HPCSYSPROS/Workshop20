@@ -1,0 +1,12 @@
+
+Due to MODULEPATH changes, the following have been reloaded:
+  1) python/2.7.13
+
+
+Inactive Modules:
+  1) netcdf     2) python
+
+
+Activating Modules:
+  1) netcdf/4.3.3.1
+

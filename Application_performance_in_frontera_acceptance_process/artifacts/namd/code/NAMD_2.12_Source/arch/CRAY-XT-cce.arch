@@ -1,0 +1,39 @@
+NAMD_ARCH = CRAY-XT
+CHARMARCH = gemini_gni-crayxe-smp-craycc
+
+# CrayCC doesn't handle NAMD's SSE2 scheme.
+# Disable SSE results in it being about 10% slower than Gnu.
+# 
+# Users of psfgen might also need to do 'module remove acml' in order for 
+# the the psfgen compilation to succeed.
+#
+
+CXX = CC -DNOHOSTNAME -DNO_GETPWUID -DNAMD_DISABLE_SSE
+CXXOPTS = 
+
+CC = cc
+COPTS = 
+
+
+#
+# ensure that required modules are loaded
+#
+
+$(info $(NAMD_PLATFORM))
+
+loaded_modules := $(subst :, ,$(LOADEDMODULES))
+
+module := $(filter rca/%,$(loaded_modules))
+ifeq (,$(module))
+  $(error module rca is not loaded)
+else
+  $(info found module $(module))
+endif
+
+module := $(filter PrgEnv-cray/%,$(loaded_modules))
+ifeq (,$(module))
+  $(error module PrgEnv-cray is not loaded)
+else
+  $(info found module $(module))
+endif
+

@@ -1,0 +1,12 @@
+#! /bin/sh
+# /*@@
+#   @file      openbsd3.0
+#   @date      Wed May 15 18:45:49 CEST 2002
+#   @author    Jonathan Thornburg
+#   @desc
+#              known-architectures file for OpenBSD 3.0
+#   @enddesc 
+#   @version $Header$
+# @@*/
+
+. $srcdir/known-architectures/openbsd

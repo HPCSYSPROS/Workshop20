@@ -1,0 +1,34 @@
+# Schedule definitions for thorn Boundary
+# $Header$
+
+schedule Boundary_Check at CCTK_PARAMCHECK
+{
+  LANG: C
+} "Check dimension of grid variables"
+
+schedule Boundary_RegisterBCs at CCTK_WRAGH
+{
+  LANG: C
+  OPTIONS: global
+} "Register boundary conditions that this thorn provides"
+
+# New boundary infrastructure:
+
+schedule GROUP ApplyBCs
+{
+} "Apply boundary conditions"
+
+schedule GROUP BoundaryConditions in ApplyBCs BEFORE Boundary_ClearSelection
+{
+} "Execute all boundary conditions"
+
+schedule Boundary_ApplyPhysicalBCs in BoundaryConditions
+{
+  LANG: C
+} "Apply all requested local physical boundary conditions"
+
+schedule Boundary_ClearSelection in ApplyBCs
+{
+  LANG: C
+  OPTIONS: level
+} "Unselect all grid variables for boundary conditions"

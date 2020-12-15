@@ -1,0 +1,406 @@
+% *======================================================================*
+%  Cactus Thorn template for ThornGuide documentation
+%  Author: Ian Kelley
+%  Date: Sun Jun 02, 2002
+%  $Header$
+%
+%  Thorn documentation in the latex file doc/documentation.tex
+%  will be included in ThornGuides built with the Cactus make system.
+%  The scripts employed by the make system automatically include
+%  pages about variables, parameters and scheduling parsed from the
+%  relevant thorn CCL files.
+%
+%  This template contains guidelines which help to assure that your
+%  documentation will be correctly added to ThornGuides. More
+%  information is available in the Cactus UsersGuide.
+%
+%  Guidelines:
+%   - Do not change anything before the line
+%       % START CACTUS THORNGUIDE",
+%     except for filling in the title, author, date, etc. fields.
+%        - Each of these fields should only be on ONE line.
+%        - Author names should be separated with a \\ or a comma.
+%   - You can define your own macros, but they must appear after
+%     the START CACTUS THORNGUIDE line, and must not redefine standard
+%     latex commands.
+%   - To avoid name clashes with other thorns, 'labels', 'citations',
+%     'references', and 'image' names should conform to the following
+%     convention:
+%       ARRANGEMENT_THORN_LABEL
+%     For example, an image wave.eps in the arrangement CactusWave and
+%     thorn WaveToyC should be renamed to CactusWave_WaveToyC_wave.eps
+%   - Graphics should only be included using the graphicx package.
+%     More specifically, with the "\includegraphics" command.  Do
+%     not specify any graphic file extensions in your .tex file. This
+%     will allow us to create a PDF version of the ThornGuide
+%     via pdflatex.
+%   - References should be included with the latex "\bibitem" command.
+%   - Use \begin{abstract}...\end{abstract} instead of \abstract{...}
+%   - Do not use \appendix, instead include any appendices you need as
+%     standard sections.
+%   - For the benefit of our Perl scripts, and for future extensions,
+%     please use simple latex.
+%
+% *======================================================================*
+%
+% Example of including a graphic image:
+%    \begin{figure}[ht]
+% 	\begin{center}
+%    	   \includegraphics[width=6cm]{MyArrangement_MyThorn_MyFigure}
+% 	\end{center}
+% 	\caption{Illustration of this and that}
+% 	\label{MyArrangement_MyThorn_MyLabel}
+%    \end{figure}
+%
+% Example of using a label:
+%   \label{MyArrangement_MyThorn_MyLabel}
+%
+% Example of a citation:
+%    \cite{MyArrangement_MyThorn_Author99}
+%
+% Example of including a reference
+%   \bibitem{MyArrangement_MyThorn_Author99}
+%   {J. Author, {\em The Title of the Book, Journal, or periodical}, 1 (1999),
+%   1--16. \texttt{http://www.nowhere.com/}}
+%
+% *======================================================================*
+
+% If you are using CVS use this line to give version information
+% $Header$
+
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+\title{ADMMacros}
+\author{Original code by Gabrielle Allen,\\
+	later enhancements by Denis Pollney}
+\date{$ $Date$ $}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+% Add all definitions used in this documentation here
+%   \def\mydef etc
+\def\ie{i.e.\hbox{}}
+\def\del{\nabla}
+
+% get size/spacing of "++" right, cf online C++ FAQ question 35.1
+\def\Cplusplus{\hbox{C\raise.25ex\hbox{\footnotesize ++}}}
+
+
+\begin{abstract}
+Provides macros for common relativity calculations, using the
+\textbf{ADMBase} variables.
+\end{abstract}
+
+
+\section{Purpose}
+
+This thorn provides various macros which can be used to calculate
+quantities, such as the Christoffel Symbol or Riemann Tensor
+components, using the basic variables of thorn \textbf{ADMBase}.
+The macros can be used in both
+Fortran and C code.  The macros work pointwise to calculate quantities
+at the grid point $(\texttt{i},\texttt{j},\texttt{k})$; it's up to you
+to loop over all the grid points where you want computations done.
+The macros are written in such a way that within any single loop,
+quantities which have already been calculated are automagically
+reused as needed in later calculations.
+
+\subsection{Finite Differencing}
+
+By default, the macros use centered 2nd~order finite differencing,
+with 3-point finite difference molecules.
+That is, when finite differencing the the grid-point indices
+$\texttt{i} \pm 1$, $\texttt{j} \pm 1$, and $\texttt{k} \pm 1$
+must also be valid, and \texttt{driver::ghost\_size} must be set
+to at least $1$.
+
+Some of the macros also support centered 4th~order finite differencing;
+This is selected with the parameter \verb|spatial_order|.  This may be
+set to either~$2$ or~$4$; it defaults to~$2$.  If it's set to~$4$, then
+5-point finite difference molecules are used, so the grid-point indices
+$\texttt{i} \pm 2$, $\texttt{j} \pm 2$, and $\texttt{k} \pm 2$
+must also be valid, and \texttt{driver::ghost\_size} must be set
+to at least $2$.  The only save way to be certain which macros support
+4th~order finite differencing is to check the source code; the macros
+which don't support it simply hard-code 2nd~order finite differencing
+and ignore the \texttt{spatial\_order} parameter.
+
+At present 4th~order finite differencing is only supported for Fortran
+code.  (That is, at present the C~versions of the macros all ignore the
+\texttt{spatial\_order} parameter.)
+
+
+\section{Using ADM Macros}
+
+Each macro described in Section~\ref{admmacros:macros} is implemented
+using three include files:
+\begin{description}
+\item[\texttt{<MACRONAME>\_declare.h}]
+        sets up the declarations for the internal macro variables.
+        All the internal (hidden) variables have names beginning
+        with the macro name. This file should be included in the
+        declarations section of your routine.
+
+\item[\texttt{<MACRONAME>\_guts.h}]
+	is the actual included source code which will calculate the quantities.
+
+\item[\texttt{<MACRONAME>\_undefine.h}]
+	resets the macros. This file \textbf{must} be \texttt{\#include}d
+	at the end of every loop using macros.  Without this, a second loop
+        using macros would assume that quantities have already been calculated
+	(and thus get wrong results).
+\end{description}
+
+The macros which compute derivatives also use the following variables;
+you should avoid using these in your code, in either lower or upper case:
+\begin{verbatim}
+di2, dj2, dk2        /* only in C, not in Fortran */
+dt, dx, dy, dz
+idx, idy, idz
+i2dx, i2dy, i2dz
+i12dx, i12dy, i12dz
+idxx, idxy, idxz, idyy, idyz, idzz
+i12dxx, i12dyy, i12dzz
+i36dxy, i36dxz, i36dyz
+\end{verbatim}
+
+To use the macros, first find the name of the macro from the table in
+Section~\ref{admmacros:macros} and put the include files in the
+correct place following the instructions above. Note that all ADMMacro
+include files are in the directory \texttt{EinsteinBase/ADMMacros/src/macro/},
+so you include the macros with lines such as
+\begin{verbatim}
+#include "EinsteinBase/ADMMacros/src/macro/<MACRONAME>_<TYPE>.h"
+\end{verbatim}
+(Recall that Cactus uses a C-style preprocessor for Fortran as well as
+C/\Cplusplus{} code; you use the same \texttt{\#include}s for all these
+languages.)
+
+Each variable that the macro calculates is listed in the table of
+Section~\ref{admmacros:macros}.  Note that these variable names are
+themselves macros and are case sensitive. \textbf{Always use the macro
+variables on the right hand sides of equations, never redefine them
+yourself, since they may be used in later (hidden) calculations.}
+
+\subsection{Fortran}
+
+If you are using the macros inside a Fortran function then the
+\texttt{i}, \texttt{j} and \texttt{k} indices are used directly.
+
+If you're using (either directly or indirectly) any macro which computes
+derivatives, you also need to \texttt{\#include} two additional files:
+\begin{description}
+\item[\texttt{ADM\_Spacing\_declare.h}]\mbox{}\\
+	This must be \texttt{\#include}d \textbf{before} any of the
+	other \texttt{<MACRONAME>\_declare.h} files.
+\item[\texttt{ADM\_Spacing.h}]\mbox{}\\
+	This must be \texttt{\#include}d \textbf{after} all of the
+	other \texttt{<MACRONAME>\_declare.h} and \textbf{before}
+	any of the \texttt{<MACRONAME>\_guts.h} files.
+\end{description}
+
+The Fortran example below should make this clear(er).
+
+\subsection{C}
+
+If you are using the macros inside a C function then you must define
+the grid-function subscripting index \texttt{ijk}, which can be found
+from \texttt{i}, \texttt{j} and \texttt{k} using the macro
+\texttt{CCTK\_GFINDEX3D(cctkGH,i,j,k)}.  Of course, since \texttt{ijk}
+depends on \texttt{i}, \texttt{j} and \texttt{k}, you have to assign
+\texttt{ijk} its value \textbf{inside} the loop-over-grid-points loops.
+
+You must also define the grid-function strides \texttt{di}, \texttt{dj}
+and \texttt{dk} to give the grid-function subscripting index offsets of
+the grid points $(i+1,j,k)$, $(i,j+1,k)$, and $(i,j,k+1)$ (respectively)
+relative to $(i,j,k)$.  That is, you should define \texttt{di = 1},
+\texttt{dj = cctk\_lsh[0]}, and \texttt{dk = cctk\_lsh[0]*cctk\_lsh[1]}.
+Since these don't depend on \texttt{i}, \texttt{j} and \texttt{k},
+they can be assigned values once outside the loop-over-grid-points loops.
+
+The C example below should make this clear(er).
+
+Note that you should assign all these variables their values \textbf{before}
+\texttt{\#include}ing the \texttt{<MACRONAME>\_guts.h} macro (it may do
+calculations which use these values).
+
+
+\section{Examples}
+
+\subsection{Fortran}
+
+This example comes from thorn \texttt{CactusArchive/Maximal} and uses
+the $trK$ macro to calculate the trace of the extrinsic curvature.
+
+\newpage	% we'd like the entire example to fit on a single page
+\begin{verbatim}
+c     Declarations for macros.
+#include "EinsteinBase/ADMMacros/src/macro/TRK_declare.h"
+
+c we're not taking any derivatives here, but if we were,
+c we would also need the following line:
+#include "EinsteinBase/ADMMacros/src/macro/ADM_Spacing_declare.h"
+
+c we're not taking any derivatives here, but if we were,
+c we would also need the following line:
+#include "EinsteinBase/ADMMacros/src/macro/ADM_Spacing.h"
+
+<CUT>
+
+c     Add the shift term: N = B^i D_i(trK).
+      if ((maxshift).and.(shift_state.eq.1)) then
+         do k=1,nz
+            do j=1,ny
+               do i=1,nx
+#include "EinsteinBase/ADMMacros/src/macro/TRK_guts.h"
+                  K_temp(i,j,k) = TRK_TRK
+                end do
+             end do
+         end do
+#include "EinsteinBase/ADMMacros/src/macro/TRK_undefine.h"
+\end{verbatim}
+
+\subsection{C}
+
+This function computes the curved-space Laplacian of a scalar field $\phi$,
+$\del^i \del_i \phi
+	= g^{ij} \partial_{ij} \phi - g^{ij} \Gamma^k_{ij} \partial_k \phi$,
+assuming that the partial derivatives $\partial_{ij} \phi$ and $\partial_k \phi$
+have already been computed:
+
+\newpage	% we'd like the entire example to fit on a single page
+\begingroup
+\footnotesize
+\begin{verbatim}
+/*
+ * This function computes the curved-space Laplacian of a scalar field,
+ * $\del^i \del_i \phi
+ *     = g^{ij} \partial_{ij} \phi - g^{ij} \Gamma^k_{ij} \partial_k \phi$
+ * at the interior grid points only; it doesn't do anything at all on the
+ * boundaries.
+ *
+ * This function uses the following Cactus grid functions:
+ *    input:   dx_phi, dy_phi, dz_phi       # 1st derivatives of phi
+ *             dxx_phi, dxy_phi, dxz_phi,   # 2nd derivatives of phi
+ *                      dyy_phi, dyz_phi,
+ *                               dzz_phi
+ *    output:  Laplacian_phi
+ */
+void compute_Laplacian(CCTK_ARGUMENTS)
+{
+DECLARE_CCTK_ARGUMENTS
+int i,j,k;
+
+/* contracted Christoffel symbols $\Gamma^k = g^{ij} \Gamma^k_{ij}$ */
+CCTK_REAL Gamma_u_x, Gamma_u_y, Gamma_u_z;
+
+/* grid-function strides for ADMMacros */
+const int di = 1;
+const int dj = cctk_lsh[0];
+const int dk = cctk_lsh[0]*cctk_lsh[1];
+
+/* declare the ADMMacros variables for $g^{ij}$ and $\Gamma^k_{ij}$ */
+#include "EinsteinBase/ADMMacros/src/macro/UPPERMET_declare.h"
+#include "EinsteinBase/ADMMacros/src/macro/CHR2_declare.h"
+
+    for (k = 1 ; k < cctk_lsh[2]-1 ; ++k)
+    {
+    for (j = 1 ; j < cctk_lsh[1]-1 ; ++j)
+    {
+    for (i = 1 ; i < cctk_lsh[0]-1 ; ++i)
+    {
+    const int ijk = CCTK_GFINDEX3D(cctkGH,i,j,k);   /* grid-function subscripting index for ADMMacros */
+                                                    /* (must be assigned inside the i,j,k loops) */
+
+    /* compute the ADMMacros $g^{ij}$ and $\Gamma^k_{ij}$ variables at the (i,j,k) grid point */
+    #include "EinsteinBase/ADMMacros/src/macro/UPPERMET_guts.h"
+    #include "EinsteinBase/ADMMacros/src/macro/CHR2_guts.h"
+
+    /* compute the contracted Christoffel symbols $\Gamma^k = g^{ij} \Gamma^k_{ij}$ */
+    Gamma_u_x =
+      UPPERMET_UXX*CHR2_XXX + 2.0*UPPERMET_UXY*CHR2_XXY + 2.0*UPPERMET_UXZ*CHR2_XXZ
+                            +     UPPERMET_UYY*CHR2_XYY + 2.0*UPPERMET_UYZ*CHR2_XYZ
+                                                        +     UPPERMET_UZZ*CHR2_XZZ;
+    Gamma_u_y =
+      UPPERMET_UXX*CHR2_YXX + 2.0*UPPERMET_UXY*CHR2_YXY + 2.0*UPPERMET_UXZ*CHR2_YXZ
+                            +     UPPERMET_UYY*CHR2_YYY + 2.0*UPPERMET_UYZ*CHR2_YYZ
+                                                        +     UPPERMET_UZZ*CHR2_YZZ;
+    Gamma_u_z =
+      UPPERMET_UXX*CHR2_ZXX + 2.0*UPPERMET_UXY*CHR2_ZXY + 2.0*UPPERMET_UXZ*CHR2_ZXZ
+                            +     UPPERMET_UYY*CHR2_ZYY + 2.0*UPPERMET_UYZ*CHR2_ZYZ
+                                                        +     UPPERMET_UZZ*CHR2_ZZZ;
+
+    /* compute the Laplacian */
+    Laplacian_phi[ijk] =
+      UPPERMET_UXX*dxx_phi[ijk] + 2.0*UPPERMET_UXY*dxy_phi[ijk] + 2.0*UPPERMET_UXZ*dxz_phi[ijk]
+                                +     UPPERMET_UYY*dyy_phi[ijk] + 2.0*UPPERMET_UYZ*dyz_phi[ijk]
+                                                                +     UPPERMET_UZZ*dzz_phi[ijk]
+      -  Gamma_u_x*dx_phi[ijk]  -        Gamma_u_y*dy_phi[ijk]  -        Gamma_u_z*dz_phi[ijk];
+    }
+    }
+    }
+
+#include "EinsteinBase/ADMMacros/src/macro/UPPERMET_undefine.h"
+#include "EinsteinBase/ADMMacros/src/macro/CHR2_undefine.h"
+}
+\end{verbatim}
+\endgroup
+
+
+\section{Macros}
+\label{admmacros:macros}
+Macros exist for the following quantities
+
+\begin{tabular}{p{5cm}p{5cm}p{5cm}}
+\textbf{Calculates} & \textbf{Macro Name} & \textbf{Sets variables} \\
+All first spatial derivatives of lapse, $\alpha_{,i}$: & DA & DA\_DXDA, DA\_DYDA, DA\_DZDA\\
+All second spatial derivatives of lapse, $\alpha_{,ij}$: & DDA & DDA\_DXXDA, DDA\_DXYDA, DDA\_DXZDA, DDA\_DYYDA, DDA\_DYZDA, DDA\_DZZDA\\
+All second covariant spatial derivatives of lapse, $\alpha_{;ij}$: & CDCDA &\\
+All first spatial derivatives of shift, $\beta^{i}_{\;\;j}$: & DB &\\
+All first covariant derivatives of the extrinsic curvature, $K_{ij;kl}$ & CDK &\\
+First covariant derivatives of the extrinsic curvature, $K_{ij;x}$, $K_{ij;y}$, $K_{ij;z}$ & CDXCDK, CDYCDK, CDZCDK &\\
+Determinant of 3-metric: & DETG &\\
+Upper 3-metric, $g{ij}$:& UPPERMET &\\
+Trace of extrinsic curvature $trK$: & TRK &\\
+Trace of stress energy tensor: & TRT &\\
+Hamiltonian constraint: & HAMADM & \\
+Partial derivatives of extrinsic curvature, $K_{ij,x}$, $K_{ij,y}$, $K_{ij,z}$: & DXDK, DYDK, DZDK &\\
+First partial derivatives of 3-metric, $g_{ij,x}$, $g_{ij,y}$, $g_{ij,z}$: & DXDG, DYDG, DZDG & \\
+All first partial derivatives of 3-metric, $g_{ij,k}$: & DG &\\
+First covariant derivatives of 3-metric, $g_{ij;x}$, $g_{ij;y}$, $g_{ij;z}$: & DXDCG, DYDCG, DZDCG &\\
+Second partial derivatives of 3-metric, $g_{ij,xx}$, $g_{ij,xy}$, $g_{ij,xz}$: & DXXDG, DXYDG, DXZDG, DYYDG, DYZDG, DZZDG& \\
+All second partial derivative of 3-metric, $g_{ij,lm}$ & DDG &\\
+Ricci tensor $R_{ij}$: & RICCI &\\
+Trace of Ricci tensor $R$: & TRRICCI &\\
+Christoffel symbols of first kind: $\Gamma_{cab}$ & CHR1&\\
+Christoffel symbols of second kind $\Gamma^{c}_{\;\;ab}$: & CHR2& \\
+Momentum constraints & MOMX, MOMY, MOMZ&\\
+Source term in evolution equation for conformal metric, $\tilde{g}_{ij,t}$: & DCGDT &\\
+
+\end{tabular}
+
+
+\section{Definitions}
+
+\begin{equation}
+\Gamma_{cab} = \frac{1}{2}\left(g_{ac,b} + g_{bc,a} - g_{ab,c}\right)
+\end{equation}
+
+\begin{equation}
+\Gamma^{c}_{\;\;ab} = g^{cd}\Gamma_{dab} = \frac{1}{2} g^{cd} \left(g_{ad,b} + g_{bd,a} - g_{ab,d}\right)
+\end{equation}
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+\end{document}

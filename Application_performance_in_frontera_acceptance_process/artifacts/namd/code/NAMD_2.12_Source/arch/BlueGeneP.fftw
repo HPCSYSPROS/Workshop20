@@ -1,0 +1,7 @@
+
+FFTDIR=/soft/apps/fftw-2.1.5-float
+FFTINCL=-I$(FFTDIR)/include
+FFTLIB=-L$(FFTDIR)/lib -lsrfftw -lsfftw
+FFTFLAGS=-DNAMD_FFTW
+FFT=$(FFTINCL) $(FFTFLAGS)
+

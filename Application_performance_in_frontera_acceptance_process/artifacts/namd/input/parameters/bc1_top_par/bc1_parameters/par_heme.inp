@@ -1,0 +1,151 @@
+* CHARMM27 Custom Parameter File
+* Heme for Cytochrome c
+* Felix Autenrieth, Emad Tajkhorshid, Jerome Baudry, Zan Luthey-Schulten; last update 12/19/2005
+* Classical force field parameters for the heme prosthetic group of cytochrome c. 
+* Journal of Computational Chemistry, 25, 1613-1622 (2004)
+* Journal of Physical Chemistry B, 108, 20376-20387 (2004)
+
+BONDS
+!
+!V(bond) = Kb(b - b0)**2
+!
+!Kb: kcal/mole/A**2
+!b0: A
+!
+!atom type Kb          b0
+!
+! added for cyt c HEME 
+! Felix Autenrieth, Emad Tajkhorshid, Jerome Baudry, Zan Luthey-Schulten
+
+S    FE    300.000     2.4500 ! ALLOW   ALI SUL ION
+                ! from DFT calculation
+S    CT1   240.000     1.8100 ! ALLOW   ALI SUL ION
+                ! fitted to C-S s   9/26/92 (FL)
+NR2  FE     65.000     2.0000 ! ALLOW HEM
+                ! Heme (6-liganded): His ligand (KK 11/12/03)
+                ! Vibration comparison with RAI 2003
+NPH  FE    270.200     2.000 ! ALLOW HEM
+                ! Heme (6-liganded): porphyrin macrocycle (KK 11/12/03)
+CPB  CT1   450.000     1.3800 ! Copied from "CPB C", 
+                ! Heme (6-liganded): substituents (KK 05/13/91)
+
+ANGLES
+!
+!V(angle) = Ktheta(Theta - Theta0)**2
+!
+!V(Urey-Bradley) = Kub(S - S0)**2
+!
+!Ktheta: kcal/mole/rad**2
+!Theta0: degrees
+!Kub: kcal/mole/A**2 (Urey-Bradley)
+!S0: A
+!
+!atom types     Ktheta    Theta0   Kub     S0
+!
+! added for cyt c HEME 
+! Felix Autenrieth, Emad Tajkhorshid, Jerome Baudry, Zan Luthey-Schulten
+
+CT1   S     CT2     34.000    95.00    
+                ! expt. MeEtS,    3/26/92 (FL) 
+CPB   CT1   S       58.000   114.50   !
+                ! expt. MeEtS,    3/26/92 (FL)
+CT3   CT1   S       58.000   114.50   !
+                ! expt. MeEtS,     3/26/92 (FL)
+S     CT1   HA      65.000   126.74 ! copied from "S C HA". 
+                ! expt. MeEtS,    3/26/92 (FL)
+CPA  CPB  CT1      70.000   126.7400 ! copied from "CPA  CPB  C ".  
+                ! Heme (6-liganded): substituents (KK 05/13/91)
+CPB  CT1    CT3      70.000   121.5000 ! copied from "CPB  C    C". 
+                ! Heme (6-liganded): substituents (KK 05/13/91)
+CPB  CPB  CT1      70.000   126.7500 ! copied from "CPB CPB C". 
+                ! Heme (6-liganded): substituents (KK 05/13/91)
+HA   CT1  CPB    50.000   120.0000 ! copied from "HA   C    CPB". 
+                ! Heme (6-liganded): substituents (KK 05/13/91)
+CT2   S     CT2     34.000    95.00   ! ALLOW   ALI SUL ION
+                ! expt. MeEtS,    3/26/92 (FL)
+CT2   S     FE      34.000    90.00   ! ALLOW HEM
+                ! Heme (6-liganded): ligand links (KK 05/13/91)
+CT3   S     FE      34.000    90.00   ! ALLOW HEM
+                ! Heme (6-liganded): ligand links (KK 05/13/91)
+NR2   FE    S       50.000   177.00   ! 
+S     FE    NPH     50.000    89.00   ! 
+FE    S     FE      34.000    90.00
+S     FE    S       34.000    90.00
+DIHEDRALS
+!
+!V(dihedral) = Kchi(1 + cos(n(chi) - delta))
+!
+!Kchi: kcal/mole
+!n: multiplicity
+!delta: degrees
+!
+!atom types             Kchi    n   delta
+!
+! added for cyt c HEME 
+! Felix Autenrieth, Emad Tajkhorshid, Jerome Baudry, Zan Luthey-Schulten
+
+NPH     FE   NR2   CPH2        0.047    4     0.00 ! FROM DFT dihedral drive 
+NPH     FE   NR2   CPH1        0.047    4     0.00 ! FROM DFT dihedral drive
+
+NPH     FE   S     CT3        0.04     4     0.00 ! FROM DFT dihedral drive 
+                ! Heme (6-liganded): 
+NPH     FE   S     CT2        0.04     4     0.00 ! FROM DFT dihedral drive 
+                ! Heme (6-liganded): 
+!! -----------------------------------------------------------------
+!! We are going to remove the following 0-barrier, and change the atom types
+!! and  introduce a new term for the dihedral angle here. 
+! -----------------------------------------------------------
+!CT2  S  C  CPB     0.0000     2   180.00 ! ALLOW AR
+!                ! Force constant set to zero 
+!CT2  S  C  CPB    0.0000     2   180.00 ! ALLOW AR
+!                ! Force constant set to zero 
+!CT3  S  C  CPB     0.0000     2   180.00 ! ALLOW AR
+!                ! Force constant set to zero 
+!CT3  S  C  CPB    0.0000     2   180.00 ! ALLOW AR
+!                ! Force constant set to zero 
+! -----------------------------------------------------------
+CT1  S  CT2 CT1   0.24 1 180 ! adopted from "C C S C" bonds in charmm
+CT1  S  CT2 CT1   0.37 3   0 ! adopted from "C C S C" bonds in charmm
+CT2  S  CT1 CPB   0.24 1 180 ! adopted from "C C S C" bonds in charmm
+CT2  S  CT1 CPB   0.37 3   0 ! adopted from "C C S C" bonds in charmm
+CT3  S  CT1 CPB   0.24 1 180 ! adopted from "C C S C" bonds in charmm
+CT3  S  CT1 CPB   0.37 3   0 ! adopted from "C C S C" bonds in charmm
+CT2  S  CT1 CT3   0.24 1 180 ! adopted from "C C S C" bonds in charmm
+CT2  S  CT1 CT3   0.37 3   0 ! adopted from "C C S C" bonds in charmm
+CT2  S  CT1 HA    0.28 3   0 ! adopted from "C S C H" bonds in charmm
+CT1  S  CT2 HA    0.28 3   0 ! adopted from "C S C H" bonds in charmm
+! -----------------------------------------------------------
+! -----------------------------------------------------------
+
+X    CPB  CT1    X        3.0000  2   180.00 ! copied from "X    CPB  C    X". 
+                ! Heme (6-liganded): substituents (KK 05/13/91)
+NR2  FE  S  CT2 0.0000  0  140.0
+FE  S  CT2 CT2 0.0000  0  112.0
+NR2  FE  S  CT3 0.0000  0  119.0
+FE  S  CT2  HA  0.0000  3  60
+FE  S  CT3  HA  0.0000  3  60
+FE NR2 CPH2 NR1 0.0000  0  180
+FE NR2 CPH2 HR1 0.0000  0  0
+FE NR2 CPH1 CPH1 0.0000 0  180
+FE NR2 CPH1 HR3 0.0000  0  0
+
+
+
+IMPROPER
+!
+!V(improper) = Kpsi(psi - psi0)**2
+!
+!Kpsi: kcal/mole/rad**2
+!psi0: degrees
+!note that the second column of numbers (0) is ignored
+!
+!atom types           Kpsi                   psi0
+!
+! added for cyt c HEME 
+! Felix Autenrieth, Emad Tajkhorshid, Jerome Baudry, Zan Luthey-Schulten
+
+NR2 CPH1 CPH2 FE      29.4000         0      0.0000
+
+CPB  X    X    CT1      90.0000         0      0.0000 !copied from "CPB  X    X    C". 
+                ! Heme (6-liganded): substituents (KK 05/13/91)
+               

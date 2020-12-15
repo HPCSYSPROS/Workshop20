@@ -1,0 +1,9 @@
+# Main make.code.defn file for thorn ZelmaniAnalysis
+# $Header:$
+
+# Source files in this directory
+SRCS = hydro.c init.c entropy.F90
+#SRCS = adm_mass_volume.c hydro.c init.c hydro.F90
+
+# Subdirectories containing source files
+SUBDIRS = 

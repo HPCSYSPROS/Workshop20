@@ -1,0 +1,15 @@
+NAMD_ARCH = BlueGeneP
+CHARMARCH = bluegenep
+
+BGL_INC=/auto/BGX/floor/bglsys/include
+BGL_LIB=/auto/BGX/floor/bglsys/lib
+BGL_BIN=/auto/BGX/floor/blrts-gnu/bin
+
+BGL_CFLAGS=-I$(BGL_INC) -gdwarf-2 -Wno-deprecated
+
+CXX = $(BGL_BIN)/powerpc-bgl-blrts-gnu-g++ $(BGL_CFLAGS) -DNO_SOCKET  -DDUMMY_VMDSOCK -DNOHOSTNAME -DNO_STRSTREAM_H -DNO_GETPWUID -DNO_CHDIR -DUSE_TOPOMAP=1
+#CXXOPTS = -O3 
+CXXOPTS = -O1 
+CC = $(BGL_BIN)/powerpc-bgl-blrts-gnu-gcc $(BGL_CFLAGS)
+COPTS = -O4 
+

@@ -1,0 +1,132 @@
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+\title{StaticConformal}
+\author{Tom Goodale et al}
+\date{$ $Date$ $}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+\begin{abstract}
+Base thorn to provide the variables for the static conformal factor
+\end{abstract}
+
+\section{Purpose}
+
+This thorn provides the variables defining a static conformal factor
+which is used to transform the physical metric.  If this thorn is
+active and the {\tt ADMBase::metric\_type} parameter is set to {\tt
+static conformal}, then the {\tt ADMBase::g...} variables are the
+conformal values as opposed to the physical values.
+
+The transformation is
+
+$$ g_{ij}^{\mbox{physical}} = \psi^4 g_{ij}^{\mbox{conformal}} $$
+
+The extrinsic curvature is not transformed.
+
+Memory is provided for the conformal factor {\tt psi}, its first
+derivatives {\tt psix}, {\tt psiy}, {\tt psiz}, and its second
+derivatives {\tt psixx}, {\tt psixy}, {\tt psixz}, {\tt psiyy}, {\tt
+psiyz}, and {\tt psizz} depending on the setting of the {\tt
+conformal\_storage} parameter.
+
+Note that the first and second ``derivative'' grid functions have an
+additional factor of $1 / \psi$ normalisation since this is the most
+common use of the derivative.  I.e., the grid functions are
+
+\begin{eqnarray*}
+ {\tt psi} &=& \psi, \\
+ {\tt psix} &=& \psi_x/\psi, \qquad \mbox{etc}\\
+ {\tt psixx} &=& \psi_{ij}/\psi \qquad \mbox{etc}
+\end{eqnarray*}
+
+Thorns need to check the value of the grid scalar 
+{\tt conformal\_state} to determine how many levels of these variables have
+actually been calculated before using the conformal factor:
+
+\begin{description}
+\item[{\tt conformal\_state=0}] 
+No conformal factor has been calculated --- thorns may
+assume the conformal factor is 1 at all points.
+(I.e., the metric is physical.)
+\item[{\tt conformal\_state=1}] 
+The conformal factor has been calulated, but no derivatives.
+\item[{\tt conformal\_state=2}]
+The conformal factor and its first derivatives have been calculated.
+\item[{\tt conformal\_state=3}]
+The conformal factor and its first and second derivatives have been calculated.
+\end{description}
+
+Note that this means that if you only want to know whether {\tt psi} contains 
+the values for the conformal factor you can check for {\tt
+conformal\_state > 0}.
+
+\section{Utilities}
+
+{\tt StaticConformal} provides aliased functions to convert between
+physical and conformal 3-metric values.  It is very important to
+understand that these functions apply the conversion {\em in place}.
+That is, if {\tt gxx} contains the conformal metric value, when the
+routine is exited it will now contain the physical metric value.
+These functions {\em do not} change the value of {\tt
+conformal\_state} and should be used with due care.  (These functions
+are for example used by some analysis thorns who work only with the
+physical metric, they apply the transformation on entry to the
+analysis routine and switch it back on exit).
+
+\begin{description}
+
+\item[Convert from conformal to physical:]
+
+{\tt
+\begin{verbatim}
+
+subroutine ConfToPhysInPlace (nx, ny, nz,
+                              psi,
+                              gxx, gxy, gxz, gyy, gyz, gzz)
+   implicit none
+   CCTK_INT,                         intent(in)    :: nx, ny, nz
+   CCTK_REAL, dimension(nx, ny, nz), intent(in)    :: psi
+   CCTK_REAL, dimension(nx, ny, nz), intent(inout) :: gxx, gxy, gxz, gyy, gyz, gzz
+end subroutine ConfToPhysInPlace
+\end{verbatim}
+}
+
+\item[Convert from physical to conformal:]
+
+{\tt
+\begin{verbatim}
+
+subroutine PhysToConfInPlace (nx, ny, nz,
+                              psi,
+                              gxx, gxy, gxz, gyy, gyz, gzz)
+   implicit none
+   CCTK_INT,                         intent(in)    :: nx, ny, nz
+   CCTK_REAL, dimension(nx, ny, nz), intent(in)    :: psi
+   CCTK_REAL, dimension(nx, ny, nz), intent(inout) :: gxx, gxy, gxz, gyy, gyz, gzz
+end subroutine ConfToPhysInPlace
+\end{verbatim}
+}
+
+\end{description}
+
+\section{Comments}
+
+The {\tt StaticConformal} thorn itself does not calculate any conformal
+factor, but does initialise the {\tt conformal\_state} variable to 0. 
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

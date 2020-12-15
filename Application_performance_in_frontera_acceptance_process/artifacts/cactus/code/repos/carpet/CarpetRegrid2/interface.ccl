@@ -1,0 +1,159 @@
+# Interface definition for thorn CarpetRegrid2
+
+IMPLEMENTS: CarpetRegrid2
+
+USES INCLUDE HEADER: Timer.hh
+
+USES INCLUDE HEADER: bbox.hh
+USES INCLUDE HEADER: bboxset.hh
+USES INCLUDE HEADER: defs.hh
+USES INCLUDE HEADER: dh.hh
+USES INCLUDE HEADER: gh.hh
+USES INCLUDE HEADER: mpi_string.hh
+USES INCLUDE HEADER: region.hh
+USES INCLUDE HEADER: vect.hh
+
+USES INCLUDE HEADER: carpet.hh
+
+
+
+# The location of the boundary points
+CCTK_INT FUNCTION GetBoundarySpecification \
+    (CCTK_INT IN        size,              \
+     CCTK_INT OUT ARRAY nboundaryzones,    \
+     CCTK_INT OUT ARRAY is_internal,       \
+     CCTK_INT OUT ARRAY is_staggered,      \
+     CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION GetBoundarySpecification
+
+# The overall size of the domain
+CCTK_INT FUNCTION GetDomainSpecification \
+    (CCTK_INT  IN        size,           \
+     CCTK_REAL OUT ARRAY physical_min,   \
+     CCTK_REAL OUT ARRAY physical_max,   \
+     CCTK_REAL OUT ARRAY interior_min,   \
+     CCTK_REAL OUT ARRAY interior_max,   \
+     CCTK_REAL OUT ARRAY exterior_min,   \
+     CCTK_REAL OUT ARRAY exterior_max,   \
+     CCTK_REAL OUT ARRAY spacing)
+USES FUNCTION GetDomainSpecification
+
+# Conversion between boundary types
+CCTK_INT FUNCTION ConvertFromPhysicalBoundary \
+    (CCTK_INT  IN        size,                \
+     CCTK_REAL IN  ARRAY physical_min,        \
+     CCTK_REAL IN  ARRAY physical_max,        \
+     CCTK_REAL OUT ARRAY interior_min,        \
+     CCTK_REAL OUT ARRAY interior_max,        \
+     CCTK_REAL OUT ARRAY exterior_min,        \
+     CCTK_REAL OUT ARRAY exterior_max,        \
+     CCTK_REAL IN  ARRAY spacing)
+USES FUNCTION ConvertFromPhysicalBoundary
+
+# The location of the boundary points
+CCTK_INT FUNCTION MultiPatch_GetBoundarySpecification \
+    (CCTK_INT IN        map,                          \
+     CCTK_INT IN        size,                         \
+     CCTK_INT OUT ARRAY nboundaryzones,               \
+     CCTK_INT OUT ARRAY is_internal,                  \
+     CCTK_INT OUT ARRAY is_staggered,                 \
+     CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION MultiPatch_GetBoundarySpecification
+
+# The overall size of the domain
+CCTK_INT FUNCTION MultiPatch_GetDomainSpecification \
+    (CCTK_INT  IN        map,                       \
+     CCTK_INT  IN        size,                      \
+     CCTK_REAL OUT ARRAY physical_min,              \
+     CCTK_REAL OUT ARRAY physical_max,              \
+     CCTK_REAL OUT ARRAY interior_min,              \
+     CCTK_REAL OUT ARRAY interior_max,              \
+     CCTK_REAL OUT ARRAY exterior_min,              \
+     CCTK_REAL OUT ARRAY exterior_max,              \
+     CCTK_REAL OUT ARRAY spacing)
+USES FUNCTION MultiPatch_GetDomainSpecification
+
+# Conversion between boundary types
+CCTK_INT FUNCTION MultiPatch_ConvertFromPhysicalBoundary \
+    (CCTK_INT  IN        map,                            \
+     CCTK_INT  IN        size,                           \
+     CCTK_REAL IN  ARRAY physical_min,                   \
+     CCTK_REAL IN  ARRAY physical_max,                   \
+     CCTK_REAL OUT ARRAY interior_min,                   \
+     CCTK_REAL OUT ARRAY interior_max,                   \
+     CCTK_REAL OUT ARRAY exterior_min,                   \
+     CCTK_REAL OUT ARRAY exterior_max,                   \
+     CCTK_REAL IN  ARRAY spacing)
+USES FUNCTION MultiPatch_ConvertFromPhysicalBoundary
+
+
+
+# The true prototype of the routine below:
+#   int Carpet_Regrid (cGH const * cctkGH,
+#                      gh::rregs * superregss,
+#                      gh::mregs * regsss,
+#                      int         force);
+CCTK_INT FUNCTION Carpet_Regrid           \
+    (CCTK_POINTER_TO_CONST IN cctkGH,     \
+     CCTK_POINTER          IN superregss, \
+     CCTK_POINTER          IN regsss,     \
+     CCTK_INT              IN force)
+PROVIDES FUNCTION Carpet_Regrid WITH CarpetRegrid2_Regrid LANGUAGE C
+
+# The true prototype of the routine below:
+#   int Carpet_Regrid (cGH const          * cctkGH,
+#                      vector <gh::rregs> * superregsss,
+#                      vector <gh::mregs> * regssss,
+#                      int                  force)
+CCTK_INT FUNCTION Carpet_RegridMaps        \
+    (CCTK_POINTER_TO_CONST IN cctkGH,      \
+     CCTK_POINTER          IN superregsss, \
+     CCTK_POINTER          IN regssss,     \
+     CCTK_INT              IN force)
+PROVIDES FUNCTION Carpet_RegridMaps WITH CarpetRegrid2_RegridMaps LANGUAGE C
+
+
+
+CCTK_INT last_iteration "Last iteration at which there was a regridding"
+CCTK_INT last_map "Last map at which there was a regridding at last_iteration"
+
+
+
+PUBLIC:
+
+CCTK_INT active[10] TYPE=scalar "Whether this centre is active"
+
+CCTK_INT num_levels[10] TYPE=scalar "Number of refinement levels"
+
+CCTK_REAL positions[10] TYPE=scalar
+{
+  position_x position_y position_z
+} "Positions of refined regions"
+
+CCTK_REAL radii[10] TYPE=array DIM=1 SIZE=30 DISTRIB=constant
+{
+  radius
+} "Radii of refined regions for each level"
+
+CCTK_REAL radiixyz[10] TYPE=array DIM=1 SIZE=30 DISTRIB=constant
+{
+  radius_x radius_y radius_z
+} "Radii of refined regions for each level"
+
+CCTK_REAL level_mask TYPE=gf TAGS='checkpoint="no" prolongation="none"' "Requested refinement level for this grid point"
+
+PRIVATE:
+
+CCTK_INT old_active[10] TYPE=scalar "Old whether this centre is active"
+
+CCTK_INT old_num_levels[10] TYPE=scalar "Old number of refinement levels"
+
+CCTK_REAL old_positions[10] TYPE=scalar
+{
+  old_position_x old_position_y old_position_z
+} "Old positions of refined regions"
+
+CCTK_REAL old_radiixyz[10] TYPE=array DIM=1 SIZE=30 DISTRIB=constant
+{
+  old_radius_x old_radius_y old_radius_z
+} "Old radii of refined regions for each level"

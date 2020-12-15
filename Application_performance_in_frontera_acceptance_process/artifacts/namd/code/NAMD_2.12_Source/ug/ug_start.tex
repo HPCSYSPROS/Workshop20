@@ -1,0 +1,460 @@
+
+\section{Getting Started}
+\label{section:start}
+
+\subsection{What is needed}
+
+Before running \NAMD, explained in section \ref{section:run}, 
+the following are be needed:
+\begin{itemize}
+\item A CHARMM force field in either CHARMM or X-PLOR format.
+\item
+An X-PLOR format PSF file describing the molecular structure.
+\item
+The initial coordinates of the molecular system in the form of a PDB file.  
+\item
+A \NAMD\ configuration file.
+\end{itemize}
+
+\NAMD\ provides the \verb#psfgen# utility,
+documented in Section~\ref{section:psfgen},
+which is capable of generating the required PSF and PDB files by
+merging PDB files and guessing coordinates for missing atoms.
+If \verb#psfgen# is insufficient for your system,
+we recommend that you obtain access to either CHARMM or X-PLOR,
+both of which are capable of generating the required files.
+
+\subsection{\NAMD\ configuration file}
+\label{section:config}
+
+Besides these input and output files, \NAMD\ also uses 
+a file referred to as the {\it configuration file\/}.  
+This file specifies what dynamics options and values that 
+\NAMD\ should use, such as the number of timesteps to perform, 
+initial temperature, etc.  
+The options and values in this file control how 
+the system will be simulated.  
+The NAMD configuration file is specified on the NAMD command line,
+either before or after the various parallel execution options described
+in section \ref{section:run}.
+
+A \NAMD\ configuration file contains a set of options and values.  
+The options and values specified determine the exact behavior of
+\NAMD, what features are active or inactive, how long the simulation
+should continue, etc.  Section \ref{section:configsyntax} describes how
+options are specified within a \NAMD\ configuration file.  Section
+\ref{section:requiredparams} lists the parameters which are required
+to run a basic simulation.  Section \ref{section:xplorequiv}
+describes the relation between specific \NAMD\ and X-PLOR dynamics
+options.  Several sample \NAMD\ configuration files are shown
+in section \ref{section:sample}.
+
+During execution NAMD will change to the directory containing the
+configuration file so that all file paths in the configuration file
+are relative to the configuration file directory.
+Multiple configuration files may be specified on the command line
+and the will be read in order, but all file paths will be relative
+to the first configuration file to call a ``run'' (or ``minimize'' or ``startup'') command, or
+to the last configuration file if ``run'' is not called.
+
+Commands or parameters may also be specified directly on the
+command line via \verb#--keyword value# argument pairs, for example
+\verb#--outputenergies 100# \verb#--run 100# \verb#-- checkpoint#.
+This may be used to include multiple configuration files without altering the
+working directory via \verb#--source /path/to/second.conf#.
+Note that escaping or quoting of command line parameter values
+containing spaces may be difficult or impossible on some systems due
+to multiple levels of scripts called during the NAMD parallel launch process
+and because the keyword and value are simply merged into a single string
+that is passed to the Tcl interpreter.
+
+If the argument \verb#--tclmain# is present, all following arguments will
+be passed to the Tcl interpreter as a script file and arguments accessible
+via the standard argc and argv variables.
+Note that Charm++ arguments such as \verb#+pemap# are processed during
+Charm++ startup and will not be passed to Tcl.
+
+If the first argument is \verb#+tclsh#,
+Charm++ argument parsing and startup are not performed,
+the Tcl interpreter is initialized without NAMD scripting features,
+and all following arguments are passed to Tcl.
+Statically linked packages such as psfgen are available via ``package require ...''.
+
+\subsubsection{Configuration parameter syntax}
+\label{section:configsyntax}
+Each line
+in the configuration files consists of a $keyword$ identifying the option
+being specified, and a $value$ which is a parameter to be used for this
+option.  The keyword and value can be separated by only white space:
+\begin{verbatim}
+keyword            value
+\end{verbatim}
+or the keyword and value can be separated by an equal sign and white space:
+\begin{verbatim}
+keyword      =     value
+\end{verbatim}
+Blank lines in the configuration file are ignored.  Comments are prefaced by
+a \verb!#! and may appear on the end of a line with actual values:
+\begin{verbatim}
+keyword            value          #  This is a comment
+\end{verbatim}
+or may be at the beginning of a line:
+\begin{verbatim}
+#  This entire line is a comment . . . 
+\end{verbatim}
+Some keywords require several lines of data.
+These are generally implemented to either allow the data to be read from a file:
+\begin{verbatim}
+keyword            filename
+\end{verbatim}
+or to be included inline using Tcl-style braces:
+\begin{verbatim}
+keyword {
+  lots of data
+}
+\end{verbatim}
+
+The specification of the keywords is case insensitive 
+so that any combination of 
+upper and lower case letters will have the same meaning.  
+Hence, {\tt DCDfile} and {\tt dcdfile} 
+are equivalent.  The capitalization in the values, however, may be important.
+Some values indicate file names, in which capitalization is critical.  
+Other values such as {\tt on} or {\tt off} are case insensitive.
+
+\subsubsection{Tcl scripting interface and features}
+\label{section:tclscripting}
+
+When compiled with Tcl (all released binaries) the config file
+is parsed by Tcl in a fully backwards compatible manner with the
+added bonus that any Tcl command may also be used.  This alone allows:
+\begin{itemize}
+ \item the ``\icommand{source}'' command to include other files (works w/o Tcl too!),
+ \item the ``\icommand{print}'' command to display messages (``puts'' to stdout fails on some platforms),
+ \item environment variables through the env array (``\$env(USER)''), and
+ \item user-defined variables (``set base sim23'', ``dcdfile \${base}.dcd'').
+\end{itemize}
+
+Additional features include:
+\begin{itemize}
+ \item The ``\icommand{callback}'' command takes a 2-parameter Tcl procedure which
+    is then called with a list of labels and a list of values during
+    every timestep, allowing analysis, formatting, whatever.
+ \item The ``\icommand{run}'' command takes a number of steps to run (overriding the
+    now optional numsteps parameter, which defaults to 0) and can be
+    called repeatedly.  You can ``run 0'' just to get energies.
+    Normally the preceeding timestep is repeated to account for any modifications to the
+    energy function; this can be avoided with ``\icommand{run norepeat}''.
+ \item The ``\icommand{minimize}'' command is similar to ``run'' and performs
+    minimization for the specified number of force evaluations.
+ \item The ``\icommand{startup}'' command will trigger simulation startup
+    as would the first ``run'' or ``minimize'' command, but without any force/energy evaluation.
+ \item Configuration file parameter introspection is supported by
+   invoking a (case-insensitive) parameter keyword with no argument (e.g., ``numsteps'')
+   and by the helper commands ``\icommand{isset}'' and ``\icommand{istrue}''.
+   Note that keywords are not parsed until the first ``run'' command, and
+   before this values are treated as unformatted strings, so for example
+   ``eFieldOn'' and ``eField'' may return ``yes'' and ``1 2 3'' before
+   the first ``run'' command, but ``1'' and ``1.0 2.0 3.0'' after parsing
+   (``istrue eFieldOn'' would return ``1'' in both cases).
+   Similarly, ``isset badparam'' will return ``0'' before parsing
+   but raise an ``unknown parameter'' error after.
+ \item Between ``run'' commands the \iparam{reassignTemp},
+    \iparam{rescaleTemp}, and
+    \iparam{langevinTemp} parameters can be changed to allow simulated
+    annealing protocols within a single config file.
+    The \iparam{useGroupPressure}, \iparam{useFlexibleCell},
+    \iparam{useConstantArea}, \iparam{useConstantRatio},
+    \iparam{LangevinPiston}, \iparam{LangevinPistonTarget},
+    \iparam{LangevinPistonPeriod}, \iparam{LangevinPistonDecay},
+    \iparam{LangevinPistonTemp}, \iparam{SurfaceTensionTarget},
+    \iparam{BerendsenPressure}, \iparam{BerendsenPressureTarget},
+    \iparam{BerendsenPressureCompressibility}, and
+    \iparam{BerendsenPressureRelaxationTime}
+    parameters may be changed to allow pressure equilibration.
+    The \iparam{fixedAtoms}, \iparam{constraintScaling}, and
+    \iparam{nonbondedScaling} parameters may be
+    changed to preserve macromolecular conformation during minimization and
+    equilibration (fixedAtoms may only be disabled, and requires that
+    \iparam{fixedAtomsForces} is enabled to do this).
+    The \iparam{consForceScaling} parameter may be changed to vary steering forces
+    or to implement a time-varying electric field that affects specific atoms.
+    The \iparam{eField}, \iparam{eFieldFreq}, and
+    \iparam{eFieldPhase} parameters may be changed to implement
+    at time-varying electric field that affects all atoms.
+    The \iparam{alchLambda} and \iparam{alchLambda2}
+    parameters may be changed during alchemical free energy runs.
+    The \iparam{DCDfile} may be changed to write binary coordinate trajectory
+    output to separate files.
+    The \iparam{restartname} may be changed to write restart output to separate files.
+ \item The ``\icommand{checkpoint}'' and ``revert'' commands (no arguments) allow
+    a scripted simulation to save and restore (in memory) to a single prior state.
+    The ``output'' and ``reinitatoms'' commands support multiple saved states using files.
+    Multiple saved states in memory are supported by the commands
+    ``\icommand{checkpointStore}'', ``\icommand{checkpointLoad}'', ``\icommand{checkpointSwap}'', and
+    ``\icommand{checkpointFree}'', all of which take a string key as an argument,
+    plus an optional second argument that is either
+    replica index (the checkpoint is stored asynchronously on the target replica)
+    or the keyword ``global'' (the target replica is computed as a hash of the key).
+ \item The ``\icommand{output}'' command takes an output file basename and causes
+    .coor, .vel, and .xsc files to be written with that name.
+    Alternatively, ``\icommand{output withforces}'' and
+    ``\icommand{output onlyforces}'' will write a .force file
+    either in addition to or instead of the regular files.
+ \item The ``\icommand{reinitatoms}'' command reinitializes coordinates,
+    velocities, and periodic cell dimensions to those initially read in
+    (random velocities are generated if they were not read from a file).
+    An optional file basename argument (matching that passed to the \icommand{output} command)
+    causes .coor, .vel, and .xsc files to be read,
+    assuming the format indicated by the \iparam{binaryoutput} parameter.
+ \item The ``\icommand{move}'' command repositions individual atoms, including fixed atoms.
+    Arguments are a 1-based atom ID, ``to'' or ``by'', and a list of three numbers,
+    e.g., ``move 1 by \{0.4 0.2 -0.1\}''.
+    Atoms may not be moved by more than a single patch between ``run'' commands.
+ \item The ``\icommand{exit}'' command writes output files and exits cleanly.
+ \item The ``\icommand{abort}'' command concatenates its arguments into
+    an error message and exits immediately without writing output files.
+ \item The ``\icommand{numPes}'', ``\icommand{numNodes}'', and
+    ``\icommand{numPhysicalNodes}'' commands allow performance-tuning
+    parameters to be set based on the parallel execution environment.
+ \item The ``\icommand{reinitvels}'' command reinitializes velocities to a
+    random distribution based on the given temperature.
+ \item The ``\icommand{rescalevels}'' command rescales velocities by
+    the given factor.
+ \item The ``\icommand{reloadCharges}'' command reads new atomic charges from
+    the given file, which should contain one number for each atom, separated
+    by spaces and/or line breaks.
+ \item The ``\icommand{consForceConfig}'' command takes a list of
+    0-based atom indices and a list of forces which replace the existing
+    set of constant forces (\iparam{constantForce} must be on).
+ \item The ``\icommand{measure}'' command allows user-programmed calculations to
+    be executed in order to facilitate automated methods.  (For
+    example, to revert or change a parameter.)  A number of measure
+    commands are included in the NAMD binary; the module has been designed
+    to make it easy for users to add additional measure commands.  
+ \item The ``\icommand{coorfile}'' command allows NAMD to perform force and energy
+    analysis on trajectory files.  ``coorfile open dcd {\tt filename}'' opens
+    the specified DCD file for reading.  ``coorfile read'' reads the next
+    frame in the opened DCD file, replacing NAMD's atom coordinates with the
+    coordinates in the frame, and returns 0 if successful or -1 if  
+    end-of-file was reached.  ``coorfile skip'' skips past one frame in the
+    DCD file; this is significantly faster than reading coordinates and 
+    throwing them away.  ``coorfile close'' closes the file.   
+    The ``coorfile'' command is not available on the Cray T3E.
+
+    Force and energy analysis are especially useful in the context of 
+    pair interaction calculations; see Sec.~\ref{section:pairinteraction}
+    for details, as well as the example scripts in Sec.~\ref{section:sample}.
+\end{itemize}
+
+
+Please note that while NAMD has traditionally allowed comments to be
+started by a \# appearing anywhere on a line, Tcl only allows comments
+to appear where a new statement could begin.  With Tcl config file
+parsing enabled (all shipped binaries) both NAMD and Tcl comments are
+allowed before the first ``run'' command.  At this point only pure Tcl
+syntax is allowed.  In addition, the ``;\#'' idiom for Tcl comments will
+only work with Tcl enabled.  NAMD has also traditionally allowed
+parameters to be specified as ``param=value''.  This is supported, but
+only before the first ``run'' command.  Some examples:
+
+\begin{verbatim}
+# this is my config file                            <- OK
+reassignFreq 100 ; # how often to reset velocities  <- only w/ Tcl
+reassignTemp 20 # temp to reset velocities to       <- OK before "run"
+run 1000                                            <- now Tcl only
+reassignTemp 40 ; # temp to reset velocities to     <- ";" is required
+\end{verbatim}
+
+NAMD has also traditionally allowed parameters to be specified as
+``param=value'' as well as ``param value''.  This is supported, but only
+before the first ``run'' command.  For an easy life, use ``param value''.
+
+
+\subsubsection{Multiple-copy/replica-exchange scripting interface}
+\label{section:replicascripting}
+
+Multiple-copy (or replica-based) algorithms are supported by the following commands,
+which utilize two-sided semantics modeled on MPI:
+
+\begin{itemize}
+  \item \icommand{myReplica}
+  \item \icommand{numReplicas}
+  \item \icommand{replicaBarrier}
+  \item \icommand{replicaSend} {\em data} {\em dest}
+  \item \icommand{replicaRecv} {\em source}
+  \item \icommand{replicaSendrecv} {\em data} {\em dest} {\em source}
+  \item \icommand{replicaAtomSend} {\em dest}
+  \item \icommand{replicaAtomRecv} {\em source}
+  \item \icommand{replicaAtomSendrecv} {\em dest} {\em source}
+\end{itemize}
+
+The replicaSend/Sendrecv {\em data} argument may be any string,
+and hence any Tcl object (e.g., a list) that can be represented as a string.
+Data received from the {\em source} replica is returned by replicaRecv/Sendrecv.
+In order to ensure message ordering, replicaSend/Sendrecv will block
+until the corresponding remote receive call (except when replicaSend
+is called from inside replicaEval, as discussed below).
+
+The parameter {\iparam{replicaUniformPatchGrids}} must be true for 
+atom exchange (replicaAtom...) or remote checkpointing (checkpoint... with a second argument, see below).
+
+The following additional commands utilize one-sided semantics,
+and should provide a complete feature set for running a simulation with
+fewer NAMD replica partitions than logical replicas:
+
+\begin{itemize}
+  \item \icommand{checkpointStore} {\em key} ?{\em replica} or global?
+  \item \icommand{checkpointLoad} {\em key} ?{\em replica} or global?
+  \item \icommand{checkpointSwap} {\em key} ?{\em replica} or global?
+  \item \icommand{checkpointFree} {\em key} ?{\em replica} or global?
+  \item \icommand{replicaEval} {\em replica} {\em script}
+  \item \icommand{replicaYield} ?{\em seconds}?
+  \item \icommand{replicaDcdFile} {\em index}|off ?{\em filename}?
+\end{itemize}
+
+The {\em key} can be any string.
+By default the checkpoint is stored in the memory of the replica the command is called on.
+If you specify a replica index the checkpoint is stored asynchronously in that replica's memory.
+If you specify ``global'' a hash is computed based on the key to select the replica on which
+to store the checkpoint.
+You can have checkpoints with the same key stored on multiple replicas at once if you really want to.
+The checkpoint... commands will not return until the checkpoint operation has completed.
+
+Storing checkpoints is not atomic.
+If two replicas try to store a checkpoint with the same key on the same replica at the same
+time you may end up with a mix of the two (and probably duplicate/missing atoms).
+If one replica tries to load a checkpoint while another replica is storing it the same may happen.
+You cannot store a checkpoint on a replica until that replica has created its own patch data structures.
+This can be guaranteed by calling ``startup'' and ``replicaBarrier'' before any remote checkpoint calls.
+
+The replicaEval command asynchronously executes its script in the top-level context
+of the target replica's Tcl interpreter and returns the result or error.
+This should be general enough to build any kind of work scheduler or shared data structure you need.
+If you want to call replicaEval repeatedly, e.g., to check if some value has been set,
+you should call ``replicaYield {\em seconds}'' in between, as this will introduce a delay but
+still enable processing of asynchronous calls from other replicas.
+Potentially blocking functions such as replicaRecv should not be called from within replicaEval,
+nor should functions such as run, checkpointLoad/Store, and replicaAtomSend/Recv that would
+require the simulation of the remote replica to be halted.
+It is allowed to call replicaSend (but not replicaSendrecv) from within replicaEval, since
+replicaSend is non-blocking and one-sided (but potentially overtaking) in this context.
+Rather than polling a remote replica (e.g., for work) via replicaEval, it is more efficient
+to register a request via replicaEval and then call replicaRecv to wait for notification.
+
+The replicaDcdFile command is similar to the \icommand{dcdFile} command in that it changes the
+trajectory output file, but the file is actually opened by a different replica partition
+and may be written to by any other partition that calls replicaDcdFile with the same index
+but no filename argument.  If a filename argument is given, any file currently associated
+with the index is closed and a new file created, even if the new and old filenames are the same.
+The new file is created only when the next trajectory frame is written,
+not during the replicaDcdFile command itself.
+The caller must ensure that an index is not used before it is associated with a filename,
+and that each index is in use by only one replica at a time.
+The keyword ``off'' will return to writing the local trajectory file set by the dcdFile command.
+
+
+\subsubsection{Python scripting interface and features}
+\label{section:pythonscripting}
+
+NAMD may be compiled with an embedded Python interpreter
+via the config script option \verb$--$with\verb$-$python.
+The default embedded Tcl interpreter is also required to enable Python scripting.
+Released NAMD binaries do not support Python scripting at this time
+due to portability issues with the extensive Python library.
+
+Python scripting is accessed via the Tcl ``\icommand{python}'' command,
+which functions in either expression mode or script mode.
+When passed a single-line string,
+the Python interpreter will evaluate the expression in the string and return the result.
+Python containers (tuples, lists, etc.) are converted to Tcl lists
+and all other values are converted to their string representation,
+which is typically compatible with Tcl.
+For example, ``[python ( 1 + 1, 'abc' + '123' )]'' evaluates to the Tcl list ``2 abc123''.
+
+When the python command is passed a single multi-line string (typically enclosed in braces),
+the Python interpreter will execute the code in the string and return nothing.
+Because of Python's indentation-sensitive syntax the enclosed code can not be indented.
+
+Calls to Tcl from Python code are supported by the tcl module functions
+\icommand{tcl.call()}, which takes the Tcl command name and its arguments as separate arguments
+and performs limited container and string conversions as described above,
+and \icommand{tcl.eval()}, which passes a single string unmodified to the Tcl interpreter.
+Both functions return the result as a string, so numerical results must be explicitly
+cast to float or int as appropriate.
+
+NAMD simulation parameters and commands are wrapped for convenience by the ``namd'' object.
+Any NAMD simulation parameter may be set by assigning to the corresponding case-insensitive
+attribute of the namd object, e.g., ``namd.timestep = 1.0'', and similarly
+read (as a string) by access, e.g., ``ts = float(namd.TimeStep)''.
+Assignment corresponds exactly to normal config file parsing, i.e., ``timestep 1.0'',
+and hence multiple assignment will generate an error just as would repeated parameters.
+For convenience, multiple parameters may be set at once by passing them as keyword arguments,
+e.g., ``namd(langevin=True, langevinDamping=5., langevinTemp=100.)''.
+NAMD (and other) commands in the Tcl interpreter may be called as a method of the namd object,
+e.g., ``namd.run(1000)'' and ``namd.output('myfile')''.
+
+The NAMD 1-4scaling parameter is incompatible with Python syntax, but may be accessed
+several other ways, e.g., ``namd.param('1-4scaling',1.0)'', ``tcl.call('1-4scaling',1.0)'',
+or ``tcl.eval('1-4scaling 1.0')''.
+
+The following example illustrates various aspects of the Python scripting interface:
+\begin{verbatim}
+set a 1
+cutoff 12.0
+python {
+# do not indent
+namd.pairlistDist = float(namd.Cutoff) + float(tcl.eval("set a")) # cast strings to float
+b = 2
+namd(switching=True, switchdist = float(namd.cutoff) - b) # case insensitive
+}
+set c [python $a + b]
+\end{verbatim}
+
+\subsubsection{Required \NAMD\ configuration parameters}
+\label{section:requiredparams}
+
+The following parameters are {\em required} for every
+\NAMD\ simulation:
+
+\begin{itemize}
+
+\item
+{\tt numsteps} (page \pageref{param:numsteps}),
+
+\item
+{\tt coordinates} (page \pageref{param:coordinates}),
+
+\item
+{\tt structure} (page \pageref{param:structure}),
+
+\item
+{\tt parameters} (page \pageref{param:parameters}),
+
+\item
+{\tt exclude} (page \pageref{param:exclude}), 
+
+\item
+{\tt outputname} (page \pageref{param:outputname}), 
+
+\item
+one of the following three:
+\begin{itemize}
+\item
+{\tt temperature} (page \pageref{param:temperature}),
+
+\item
+{\tt velocities} (page \pageref{param:velocities}),
+
+\item
+{\tt binvelocities} (page \pageref{param:binvelocities}).
+\end{itemize}
+
+\end{itemize}
+
+\noindent These required parameters specify the most basic properties of
+the simulation.  %  that is to be performed.
+In addition, it is highly recommended that 
+{\tt pairlistdist} be specified with a 
+value at least one greater than {\tt cutoff}.
+

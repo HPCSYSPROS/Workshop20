@@ -1,0 +1,50 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+module PatchMgr {
+  // Handles messages to Patch(s)
+
+  message [packed] MovePatchesMsg;
+  message [packed] MigrateAtomsMsg;
+  message [packed] MigrateAtomsCombinedMsg;
+  message MoveAtomMsg;
+  message MoveAllByMsg;
+  message SetLatticeMsg;
+
+  message CheckpointAtomsReqMsg {
+    char key[];
+  };
+  message CheckpointAtomsMsg {
+    FullAtom atoms[];
+    char key[];
+  };
+
+  message ExchangeAtomsReqMsg;
+  message ExchangeAtomsMsg {
+    FullAtom atoms[];
+  };
+
+  group PatchMgr
+  {
+    entry PatchMgr(void);
+    entry void recvMovePatches(MovePatchesMsg *);
+    entry void recvAtoms(MovePatchesMsg *);
+    // entry void recvMigrateAtoms(MigrateAtomsMsg *);
+    entry void recvMigrateAtomsCombined(MigrateAtomsCombinedMsg *);
+    entry void moveAtom(MoveAtomMsg *);
+    entry void moveAllBy(MoveAllByMsg *);
+    entry void setLattice(SetLatticeMsg *);
+
+    entry void recvCheckpointReq(CheckpointAtomsReqMsg*);
+    entry void recvCheckpointLoad(CheckpointAtomsMsg*);
+    entry void recvCheckpointStore(CheckpointAtomsMsg*);
+    entry void recvCheckpointAck(CheckpointAtomsReqMsg*);
+
+    entry void recvExchangeReq(ExchangeAtomsReqMsg*);
+    entry void recvExchangeMsg(ExchangeAtomsMsg*);
+  } ;
+}
+

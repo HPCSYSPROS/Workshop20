@@ -1,0 +1,183 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+module PmeFFTLib {
+
+  message OptPmeFFTMsg {
+    float qgrid[];
+  };
+  message OptPmeGridMsg {
+    float qgrid[];
+  };
+  message OptPmeDummyMsg;
+  message OptPmePencilInitMsg;
+
+  array [3D] OptPmeZPencil {
+    entry OptPmeZPencil();
+    entry [expedited] void recvGrid(OptPmeGridMsg *);
+    entry [expedited] void recvUntrans(OptPmeFFTMsg *);
+    entry [expedited] void many_to_manyRecvUntrans (OptPmeDummyMsg *);
+    entry [expedited] void many_to_manyRecvGrid (OptPmeDummyMsg *);
+    entry void dummyRecvGrid(int pe, int done = 0);
+    entry void init(OptPmePencilInitMsg *initmsg) {
+      atomic {
+	base_init(initmsg); delete initmsg;
+	fft_init();
+	// now count how many nodes send us data
+	imsg = 0; grid_msgs.resize(0);
+      }
+      while ( ! imsg ) {
+        when dummyRecvGrid(int pe, int done) atomic {
+          if ( done ) imsg = 1;
+          else {
+            grid_msgs.add(0);  // increment size
+          }
+        }
+      }
+      //atomic {CkPrintf ("%d,%d:Start iteration %d grid msgs\n", thisIndex.x, thisIndex.y, grid_msgs.size());}		
+      atomic { _iter = 0; }
+      // ready to go
+      while ( 1 ) {
+        atomic { _iter ++; }  //Update the iteration
+	if ( _iter <= many_to_many_start ) {	
+     	  for ( imsg=0; imsg < grid_msgs.size(); ++imsg ) {
+            when recvGrid(OptPmeGridMsg *msg) atomic {
+              recv_grid(msg); grid_msgs[imsg] = msg;
+	    }
+	  }	
+	  atomic { forward_fft(); }
+	  atomic { send_trans(); }
+	  for ( imsg=0; imsg < initdata.zBlocks; ++imsg ) {
+	      when recvUntrans(OptPmeFFTMsg *msg) atomic {
+	        recv_untrans(msg); delete msg;
+	      }
+	  }
+          atomic { backward_fft(); }	
+	  //atomic {CkPrintf ("%d,%d:Calling %d SendUngrids\n", thisIndex.x, thisIndex.y, grid_msgs.size());}
+	  atomic {
+	    for ( imsg=0; imsg < grid_msgs.size(); ++imsg ) {
+	      OptPmeGridMsg *msg = grid_msgs[imsg];
+	      send_ungrid(msg);
+	    }	  
+          }
+        }
+	else {
+	  when many_to_manyRecvGrid(OptPmeDummyMsg *msg) atomic { many_to_many_recv_grid (); }
+	  atomic { forward_fft(); }
+	  atomic { many_to_many_send_trans(); }
+	  when many_to_manyRecvUntrans(OptPmeDummyMsg *msg) atomic { many_to_many_recv_untrans(); }
+	  atomic { backward_fft(); }	
+	  atomic { many_to_many_send_ungrid (); }
+        }
+      }
+    };
+  };
+
+  array [3D] OptPmeYPencil {
+    entry OptPmeYPencil();
+    entry [expedited] void recvTrans(OptPmeFFTMsg *);
+    entry [expedited] void recvUntrans(OptPmeFFTMsg *);
+    entry [expedited] void many_to_manyRecvUntrans (OptPmeDummyMsg *msg);
+    entry [expedited] void many_to_manyRecvTrans (OptPmeDummyMsg *msg);
+    entry void init(OptPmePencilInitMsg *initmsg) {
+      atomic {
+      //CkPrintf("y pencil init %d %d %d on %d\n",
+	//	thisIndex.x, thisIndex.y, thisIndex.z, CkMyPe());
+      base_init(initmsg); delete initmsg;
+      fft_init();
+      }
+
+      atomic { _iter = 0; }
+      while ( 1 ) {
+        atomic { _iter ++; }  //Update the iteration
+	if ( _iter <= many_to_many_start ) {	
+          for ( imsg=0; imsg < initdata.yBlocks; ++imsg ) {
+            when recvTrans(OptPmeFFTMsg *msg) atomic {
+              recv_trans(msg); delete msg;
+            }
+          }
+	  atomic { forward_fft(); }
+	  atomic { send_trans(); }
+          for ( imsg=0; imsg < initdata.yBlocks; ++imsg ) {
+            when recvUntrans(OptPmeFFTMsg *msg) atomic {
+              recv_untrans(msg); delete msg;
+            }
+	  } 
+	  atomic { backward_fft(); }
+          atomic { send_untrans(); }
+        }
+	else {
+	  when many_to_manyRecvTrans(OptPmeDummyMsg *msg) atomic { many_to_many_recv_trans();}
+	  atomic { forward_fft(); }
+          atomic { many_to_many_send(PHASE_XF); } 
+          when many_to_manyRecvUntrans(OptPmeDummyMsg *msg) atomic {many_to_many_recv_untrans();} 
+	  atomic { backward_fft(); }
+          atomic { many_to_many_send(PHASE_ZB); } 
+        }
+      }
+    };
+  };
+
+  array [3D] OptPmeXPencil {
+    entry OptPmeXPencil();
+    entry [expedited] void recvTrans(OptPmeFFTMsg *);
+    entry [expedited] void many_to_manyRecvTrans (OptPmeDummyMsg *);
+    entry [expedited] void recvLattice(Lattice l);
+    entry void init(OptPmePencilInitMsg *initmsg) {
+      atomic {
+      //CkPrintf("x pencil init %d %d %d on %d\n",
+	//	thisIndex.x, thisIndex.y, thisIndex.z, CkMyPe());
+      base_init(initmsg); delete initmsg;
+      fft_init();
+      }
+      
+      atomic { _iter = 0; }
+      while ( 1 ) {
+        atomic { _iter ++; }  //Update the iteration
+
+	if (constant_pressure) {
+	   when recvLattice (Lattice l) atomic {
+	   	lattice = l;
+	   }
+	}
+        if (_iter <= many_to_many_start) {
+          for ( imsg=0; imsg < initdata.xBlocks; ++imsg ) {
+            when recvTrans(OptPmeFFTMsg *msg) atomic {
+              recv_trans(msg); delete msg;
+            }
+          }
+    	  atomic { forward_fft(); }
+          atomic { pme_kspace(); }
+          atomic { backward_fft(); }
+          atomic { send_untrans(); }
+	  atomic { submit_evir(); }
+        }
+	else {
+	  when many_to_manyRecvTrans(OptPmeDummyMsg *msg) atomic { many_to_many_recv_trans(); }
+	  atomic { forward_fft(); }
+          atomic { pme_kspace(); }
+          atomic { backward_fft(); }
+	  atomic { many_to_many_send_untrans(); }
+	  atomic { submit_evir(); }
+	}
+      }
+    };
+  };
+
+  //PME Maps
+  group OptPmePencilMapX : CkArrayMap {
+        entry  OptPmePencilMapX(int xblock, int yblock, int zblock);
+  };
+
+  group OptPmePencilMapY : CkArrayMap {
+        entry  OptPmePencilMapY(int xblock, int yblock, int zblock);
+  };
+
+  group OptPmePencilMapZ : CkArrayMap {
+        entry  OptPmePencilMapZ(int xblock, int yblock, int zblock);
+  };
+}
+

@@ -1,0 +1,38 @@
+# Schedule definitions for thorn TriggerTermination
+# $Header: /home/cvs/cccc/CCCCThorns/TriggerTerminationManual/schedule.ccl,v 1.5 2006/06/30 03:20:29 schnetter Exp $
+
+STORAGE: watchminutes
+
+if (on_remaining_walltime > 0)
+{
+  schedule TriggerTerminationManual_StartTimer at BASEGRID
+  {
+    LANG:C
+  } "Start timer"
+
+  schedule TriggerTerminationManual_ResetMinutes at POST_RECOVER_VARIABLES
+  {
+    LANG:C
+  } "Reset Watchtime"
+
+  schedule TriggerTermination_CheckWalltime at EVOL
+  {
+    LANG:C
+  } "Check elapsed job walltime"
+}
+
+if (termination_from_file)
+{
+  schedule TriggerTerminationFile at POSTSTEP
+  {
+    LANG:C
+  } "Check termination file"
+}
+
+schedule TriggerTerminationManual_SayAllGood at CCTK_TERMINATE AFTER CarpetIOHDF5_TerminationCheckpoint
+{
+ LANG:C
+ OPTION: global
+} "Write out status file that things are all good"
+
+

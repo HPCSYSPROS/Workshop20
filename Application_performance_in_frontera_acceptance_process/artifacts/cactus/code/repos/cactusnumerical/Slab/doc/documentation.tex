@@ -1,0 +1,522 @@
+% *======================================================================*
+%  Cactus Thorn template for ThornGuide documentation
+%  Author: Ian Kelley
+%  Date: Sun Jun 02, 2002
+%
+%  Thorn documentation in the latex file doc/documentation.tex 
+%  will be included in ThornGuides built with the Cactus make system.
+%  The scripts employed by the make system automatically include 
+%  pages about variables, parameters and scheduling parsed from the 
+%  relevent thorn CCL files.
+%  
+%  This template contains guidelines which help to assure that your     
+%  documentation will be correctly added to ThornGuides. More 
+%  information is available in the Cactus UsersGuide.
+%                                                    
+%  Guidelines:
+%   - Do not change anything before the line
+%       % START CACTUS THORNGUIDE",
+%     except for filling in the title, author, date etc. fields.
+%        - Each of these fields should only be on ONE line.
+%        - Author names should be sparated with a \\ or a comma
+%   - You can define your own macros are OK, but they must appear after
+%     the START CACTUS THORNGUIDE line, and do not redefine standard 
+%     latex commands.
+%   - To avoid name clashes with other thorns, 'labels', 'citations', 
+%     'references', and 'image' names should conform to the following 
+%     convention:          
+%       ARRANGEMENT_THORN_LABEL
+%     For example, an image wave.eps in the arrangement CactusWave and 
+%     thorn WaveToyC should be renamed to CactusWave_WaveToyC_wave.eps
+%   - Graphics should only be included using the graphix package. 
+%     More specifically, with the "includegraphics" command. Do
+%     not specify any graphic file extensions in your .tex file. This 
+%     will allow us (later) to create a PDF version of the ThornGuide
+%     via pdflatex. |
+%   - References should be included with the latex "bibitem" command. 
+%   - use \begin{abstract}...\end{abstract} instead of \abstract{...}
+%   - For the benefit of our Perl scripts, and for future extensions, 
+%     please use simple latex.     
+%
+% *======================================================================* 
+% 
+% Example of including a graphic image:
+%    \begin{figure}[ht]
+% 	\begin{center}
+%    	   \includegraphics[width=6cm]{MyArrangement_MyThorn_MyFigure}
+% 	\end{center}
+% 	\caption{Illustration of this and that}
+% 	\label{MyArrangement_MyThorn_MyLabel}
+%    \end{figure}
+%
+% Example of using a label:
+%   \label{MyArrangement_MyThorn_MyLabel}
+%
+% Example of a citation:
+%    \cite{MyArrangement_MyThorn_Author99}
+%
+% Example of including a reference
+%   \bibitem{MyArrangement_MyThorn_Author99}
+%   {J. Author, {\em The Title of the Book, Journal, or periodical}, 1 (1999), 
+%   1--16. {\tt http://www.nowhere.com/}}
+%
+% *======================================================================* 
+
+% If you are using CVS use this line to give version information
+
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+% The author of the documentation
+\author{Erik Schnetter \textless eschnetter@perimeterinstitute.ca\textgreater}
+
+% The title of the document (not necessarily the name of the Thorn)
+\title{Generic Hyperslabbing}
+
+% the date your document was last changed, if your document is in CVS, 
+% please use:
+\date{$ $Date$ $}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+% Add all definitions used in this documentation here 
+%   \def\mydef etc
+
+% Add an abstract for this thorn's documentation
+\begin{abstract}
+The Slab thorn provides generic slabbing facilities.  A slab is a
+sub-array of another array.  Both the array and the slab can be
+multidimensional, and the slab can have a non-unit stride.  The Slab
+thorn provides a routine to copy a slab from one array into a slab of
+another array, while possibly transposing or mirroring the slab.  The
+processor distribution of the arrays can be specified freely, so that
+the Slab thorn can be used to interface to non-Cactus libraries with
+different data layouts.
+
+The Slab thorn is driver independent, i.e., not tied to PUGH or
+Carpet, and does not require MPI for single-processor configurations.
+\end{abstract}
+
+% The following sections are suggestive only.
+% Remove them or add your own.
+
+
+
+\section{Introduction}
+
+A \emph{Slab} is a subarray of another array.  This concept is used in
+many places with many different names.  Fortran has so-called ``array
+subscript triplets'', which represent the same thing.  In BLAS, the
+``leading dimension'' arguments are used to described slabs.  Slabs
+are sometimes also called ``array views'' in object oriented
+applications.  Slabs are rectangular in shape, and can be rotated with
+regard to their containing array by multiples of 90 degrees.  They can
+also be mirrored, i.e., the direction of axes can be inverted.
+
+It is often necessary to copy slabs from one array into other arrays,
+or to copy one slab of an array to another slab of the same array.
+This can be used to change the processor distribution of some data, or
+to apply symmetry or periodicity boundary conditions, or to collect
+data onto a single processor to process it more easily.
+
+
+
+\section{Using This Thorn}
+
+\begin{FunctionDescription}{Slab\_Transfer}{}
+Transfer a slab contained in one array to a (possibly different) slab
+of another (possibly the same) array
+
+\begin{SynopsisSection}
+\begin{Synopsis}{C}
+\begin{verbatim}
+INHERITS: Slab
+USES INCLUDE HEADER: Slab.h
+
+#include "cctk.h"
+#include "Slab.h"
+
+struct slabinfo {
+  int gsh;
+  int lbnd, lsh;
+  int ash;
+  int lbbox, ubbox, nghostzones;
+  int off, str, len;
+};
+
+struct xferinfo {
+  struct slabinfo src, dst;
+  int xpose;
+  int flip;
+};
+
+int Slab_Transfer (cGH                   * restrict const cctkGH,
+                   int                              const dim,
+                   struct xferinfo const * restrict const xferinfo,
+                   int                              const options,
+                   int                              const srctype,
+                   void            const *          const srcptr,
+                   int                              const dsttype,
+                   void                  *          const dstptr);
+\end{verbatim}
+\end{Synopsis}
+\end{SynopsisSection}
+
+\begin{ResultSection}
+\begin{Result}{0}
+Success
+\end{Result}
+\begin{Result}{nonzero}
+Failure
+\end{Result}
+\end{ResultSection}
+
+\begin{ParameterSection}
+\begin{Parameter}{cctkGH}
+Pointer to the CCTK grid hierarchy
+\end{Parameter}
+
+\begin{Parameter}{dim}
+Number of dimensions of the arrays and slabs.  Must be nonnegative.
+\end{Parameter}
+
+\begin{Parameter}{xferinfo[dim]}
+Describes the layout of the slab transfer, i.e., the shape and
+distribution of the source and destination arrays, and the locations
+of the source and destination slabs, and a possible transformation
+between the slabs.  Each dimension is described separately.  See the
+entries \texttt{xferinfo[d].*} below.
+\end{Parameter}
+
+\begin{Parameter}{xferinfo[d].src}
+Describes the source array and source slab.  See the \textit{slabinfo}
+entries below.
+\end{Parameter}
+
+\begin{Parameter}{xferinfo[d].dst}
+Describes the destination array and destination slab.  See the
+\textit{slabinfo} entries below.
+\end{Parameter}
+
+\begin{Parameter}{xferinfo[d].xpose}
+Describes how to transpose the slab, i.e., possibly permuting the slab
+axes, as in $(x,y) \rightarrow (y,x)$.  \texttt{xferinfo[d].xpose}
+contains an integer value in the range \texttt{0\ldots dim-1},
+specifying the source axis corresponding to the destination axis
+\texttt{d}.  Specify \texttt{xferinfo[d].xpose = d} for no
+transposition.  No two values of \texttt{xferinfo[*].xpose} may be the
+same.
+\end{Parameter}
+
+\begin{Parameter}{xferinfo[d].flip}
+Describes how to mirror the slab, i.e., possibly inverting the slab
+axes, as in $(x) \rightarrow (-x)$.  \texttt{xferinfo[d].flip}
+containes a boolean value specifying whether the axis in direction
+\texttt{d} should be inverted, i.e., either \texttt{0} or \texttt{1},
+where \texttt{0} indicates no inversion, and \texttt{1} indicates
+inversion.
+
+When axes are both transposed and inverted while a slab is copied,
+then the transposing happens first, and the axis inversion later.
+That is, the sequence of ``actions'' is: extract slab, transpose,
+invert, insert slab.  For example, when transposing the $x$ and $z$
+axes and inverting the $x$ axis, then the destination slab's $x$ axis
+is the source slab's flipped $z$ axis, while the destination $z$ axis
+is the unflipped source $x$ axis.
+\end{Parameter}
+
+\begin{Parameter}{\textit{slab}}
+Describes the shape and processor distribution of one dimension of an
+array, and the location of this dimension of a slab.  The shape and
+distribution is specified in the same manner as in the \texttt{cGH}
+structure.  See the entries \texttt{\textit{slab}.*} below.
+\end{Parameter}
+
+\begin{Parameter}{\textit{slab}.gsh}
+Global shape of the array; the overall number of grid points
+\end{Parameter}
+
+\begin{Parameter}{\textit{slab}.lbnd}
+Lower boundary of the array; the global index of the lower boundary of
+the processor-local part of the array
+\end{Parameter}
+
+\begin{Parameter}{\textit{slab}.lsh}
+Local shape of the array; the number of grid points on this processor
+\end{Parameter}
+
+\begin{Parameter}{\textit{slab}.ash}
+Local allocated shape of the array; the number of grid points on this
+processor including padding
+\end{Parameter}
+
+\begin{Parameter}{\textit{slab}.lbbox}
+Lower bounding box of the array; whether the lower boundary of the
+array is an outer boundary.  This corresponds to the even entries in
+Cactus' \texttt{bbox} array.  Must be \texttt{0} or \texttt{1}.
+\end{Parameter}
+
+\begin{Parameter}{\textit{slab}.ubbox}
+Upper bounding box of the array; whether the upper boundary of the
+array is an outer boundary.  This corresponds to the odd entries in
+Cactus' \texttt{bbox} array.  Must be \texttt{0} or \texttt{1}.
+\end{Parameter}
+
+\begin{Parameter}{\textit{slab}.nghostzones}
+Number of ghost zones of the array; the number of grid points on this
+processor that are only copied from neighbouring processors
+\end{Parameter}
+
+\begin{Parameter}{\textit{slab}.off}
+Slab offset; the global index of the lowest grid point of the slab
+\end{Parameter}
+
+\begin{Parameter}{\textit{slab}.str}
+Slab stride; the distance between two grid points making up the slab.
+Specify \texttt{\textit{slab}.str = 1} for a unit stride.  Must be
+positive.
+\end{Parameter}
+
+\begin{Parameter}{\textit{slab}.len}
+Slab length; the number of grid points that make up the slab.  This
+does not count the grid points that are skipped if the slab has a
+non-unit stride.  Must be nonnegative.
+\end{Parameter}
+
+\begin{Parameter}{options}
+Handle of an option table.  Two options are understood,
+\texttt{CCTK\_INT useghosts} and \texttt{CCTK\_POINTER comm}.
+\texttt{useghosts} (see below) specifies whether values in ghost zones
+may be used in the source array.  \texttt{comm} is a pointer to an MPI
+communicator that should be used instead of \texttt{MPI\_COMM\_WORLD}
+or the communicator returned by the aliased function
+\texttt{GetMPICommWorld}.
+\end{Parameter}
+
+\begin{Parameter}{srctype}
+Type of the source array.  Pass the corresponding
+\texttt{CCTK\_VARIABLE\_*} constant.
+\end{Parameter}
+
+\begin{Parameter}{srcptr}
+Pointer to the source array
+\end{Parameter}
+
+\begin{Parameter}{dsttype}
+Type of the destination array.  Pass the corresponding
+\texttt{CCTK\_VARIABLE\_*} constant.
+\end{Parameter}
+
+\begin{Parameter}{dstptr}
+Pointer to the destination array
+\end{Parameter}
+\end{ParameterSection}
+
+\begin{Discussion}
+\texttt{Slab\_Transfer} copies one slab from one array onto a possibly
+different slab in possibly the same array.  The shape and processor
+distribution of the arrays can be specified freely, as long as each
+processor holds a rectangular subset of grid points.  The location of
+the slab can also be specified freely, and the slab can be rotated (by
+multiples of 90 degrees) or inverted before it is copied.  The source
+and destination slab are allowed to overlap.
+
+By default, \texttt{Slab\_Transfer} is conservative with regard to
+synchronisation.  It assumes that the ghost zones of the source array
+are not valid, but will correctly fill in the ghost zones in the
+destination slab.  This can be changed by setting the option
+\texttt{useghosts} in the option table.
+
+There are currently some restrictions, which can be remedied if the
+need arises: The dimension must be 3 (lower dimensions can easily be
+padded).  The communication schedule is set up for every slab
+transfer, which is expensive.  The number of ghost zones along the
+lower and upper boundary is assumed to be the same.  There is no
+Fortran interface.
+\end{Discussion}
+
+\begin{SeeAlsoSection}
+\begin{SeeAlso}{CarpetSlab}
+The hyperslabbing thorn of the driver Carpet.
+\end{SeeAlso}
+
+\begin{SeeAlso}{PUGHSlab}
+The hyperslabbing thorn of the driver CactusPUGH.
+\end{SeeAlso}
+
+\begin{SeeAlso}{New hyperslabbing API}
+The web page
+\texttt{http://www.cactuscode.org/Development/Current.html} contains a
+hyperlink to the new proposed hyperslabbing API\@.  This API is slightly
+different from the one used here.
+\end{SeeAlso}
+\end{SeeAlsoSection}
+
+\begin{ExampleSection}
+\begin{Example}{C}
+The identity transfer: copy a whole 3D grid function without
+transforming it
+
+\begin{verbatim}
+INHERITS: Slab
+USES INCLUDE HEADER: Slab.h
+
+#include <assert.h>
+#include "cctk.h"
+#include "cctk_Arguments.h"
+
+#include "Slab.h"
+
+DECLARE_CCTK_ARGUMENTS;
+
+struct xferinfo info[3];
+int d;
+int ierr;
+
+/* Set up the array descriptors */
+assert (cctk_dim <= 3);
+for (d=0; d<cctk_dim; ++d) {
+  info[d].src.gsh = cctk_gsh[d];
+  info[d].src.lbnd = cctk_lbnd[d];
+  info[d].src.lsh = cctk_lsh[d];
+  info[d].src.ash = cctk_ash[d];
+  info[d].src.lbbox = cctk_bbox[2*d];
+  info[d].src.ubbox = cctk_bbox[2*d+1];
+  info[d].src.nghostzones = cctk_nghostzones[d];
+  info[d].dst.gsh = cctk_gsh[d];
+  info[d].dst.lbnd = cctk_lbnd[d];
+  info[d].dst.lsh = cctk_lsh[d];
+  info[d].dst.ash = cctk_ash[d];
+  info[d].dst.lbbox = cctk_bbox[2*d];
+  info[d].dst.ubbox = cctk_bbox[2*d+1];
+  info[d].dst.nghostzones = cctk_nghostzones[d];
+}
+
+/* Set up the slab and transformation descriptors */
+assert (cctk_dim <= 3);
+for (d=0; d<cctk_dim; ++d) {
+  info[d].src.off = 0;
+  info[d].src.len = cctk_gsh[d];
+  info[d].src.str = 1;
+  info[d].dst.off = 0;
+  info[d].dst.len = cctk_gsh[d];
+  info[d].dst.str = 1;
+  info[d].xpose = d;
+  info[d].flip = 0;
+}
+
+/* Transfer the slab */
+ierr = Slab_Transfer
+  (cctkGH, cctk_dim, info, -1,
+   CCTK_VARIABLE_REAL, gf1, CCTK_VARIABLE_REAL, gf2);
+assert (!ierr);
+\end{verbatim}
+\end{Example}
+
+\begin{Example}{C}
+A complicated transfer: copy a subarray, transposing the $x$ and $z$
+axes, and inverting the $x$ axis
+
+\begin{verbatim}
+INHERITS: Slab
+USES INCLUDE HEADER: Slab.h
+
+#include <assert.h>
+#include "cctk.h"
+#include "cctk_Arguments.h"
+
+#include "Slab.h"
+
+DECLARE_CCTK_ARGUMENTS;
+
+struct xferinfo info[3];
+int d;
+int ierr;
+
+/* Set up the array descriptors (same as above) */
+assert (cctk_dim <= 3);
+for (d=0; d<cctk_dim; ++d) {
+  info[d].src.gsh = cctk_gsh[d];
+  info[d].src.lbnd = cctk_lbnd[d];
+  info[d].src.lsh = cctk_lsh[d];
+  info[d].src.ash = cctk_ash[d];
+  info[d].src.lbbox = cctk_bbox[2*d];
+  info[d].src.ubbox = cctk_bbox[2*d+1];
+  info[d].src.nghostzones = cctk_nghostzones[d];
+  info[d].dst.gsh = cctk_gsh[d];
+  info[d].dst.lbnd = cctk_lbnd[d];
+  info[d].dst.lsh = cctk_lsh[d];
+  info[d].dst.ash = cctk_ash[d];
+  info[d].dst.lbbox = cctk_bbox[2*d];
+  info[d].dst.ubbox = cctk_bbox[2*d+1];
+  info[d].dst.nghostzones = cctk_nghostzones[d];
+}
+
+/* Set up the slab and transformation descriptors */
+info[0].src.off = 5;
+info[1].src.off = 5;
+info[2].src.off = 1;
+info[0].src.str = 1;
+info[1].src.str = 1;
+info[2].src.str = 1;
+info[0].src.len = 2;
+info[1].src.len = 3;
+info[2].src.len = 2;
+
+info[0].dst.off = 2;
+info[1].dst.off = 3;
+info[2].dst.off = 4;
+info[0].dst.str = 1;
+info[1].dst.str = 1;
+info[2].dst.str = 1;
+info[0].dst.len = 2;
+info[1].dst.len = 3;
+info[2].dst.len = 2;
+
+info[0].xpose = 2;
+info[1].xpose = 1;
+info[2].xpose = 0;
+info[0].flip = 1;
+info[1].flip = 0;
+info[2].flip = 0;
+
+/* Transfer the slab */
+ierr = Slab_Transfer
+  (cctkGH, cctk_dim, info, -1,
+   CCTK_VARIABLE_REAL, gf1, CCTK_VARIABLE_REAL, gf2);
+assert (!ierr);
+\end{verbatim}
+\end{Example}
+\end{ExampleSection}
+
+\end{FunctionDescription}
+
+
+
+\section{Obtaining This Thorn}
+
+This thorn is available from the \texttt{CactusNumerical} arrangement in the
+\texttt{arrangements} directory on the \texttt{svn.cactuscode.org}
+CVS server via anonymous pserver access.
+
+
+\section{Support and Feedback}
+
+This thorn was written by Erik Schnetter \textless
+eschnetter@perimeterinstitute.ca\textgreater\ in 2002.  Contact me for
+questions and comments.
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

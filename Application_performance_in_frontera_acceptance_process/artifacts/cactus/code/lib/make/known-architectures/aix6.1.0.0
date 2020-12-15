@@ -1,0 +1,12 @@
+#!/bin/sh
+# /*@@
+#   @file    aix6.1.0.0
+#   @date    2010-02-25
+#   @author  Erik Schnetter
+#   @desc
+#            Known-architecture file for AIX 6.1.0.0
+#   @enddesc
+#   @version $Header$
+# @@*/
+
+. $srcdir/known-architectures/aix

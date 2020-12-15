@@ -1,0 +1,4 @@
+# Configuration definition for thorn CactusEinstein/ADMBase
+# $Header$
+
+REQUIRES CartGrid3D Boundary

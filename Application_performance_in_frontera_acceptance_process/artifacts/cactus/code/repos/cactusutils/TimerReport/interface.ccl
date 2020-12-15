@@ -1,0 +1,10 @@
+# Interface definition for thorn TimerReport
+# $Header$
+
+implements: timerreport
+
+
+
+CCTK_INT FUNCTION IO_TruncateOutputFiles (CCTK_POINTER_TO_CONST IN cctkGH)
+
+REQUIRES FUNCTION IO_TruncateOutputFiles

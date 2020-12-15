@@ -1,0 +1,54 @@
+#! /bin/sh
+# /*@@
+#   @file      openbsd
+#   @date      Wed May 15 18:45:49 CEST 2002
+#   @author    Jonathan Thornburg
+#   @desc
+#              generic known-architectures file for all versions of OpenBSD
+#   @enddesc 
+#   @version $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/known-architectures/openbsd,v 1.5 2006-01-31 17:09:37 jthorn Exp $
+# @@*/
+
+if test "$CCTK_CONFIG_STAGE" = "preferred-compilers" ; then
+
+:
+
+else
+
+  # Determine which Fortran 77 compiler is in use
+  if test -n "$F77" -a "`$F77 --version 2>&1 | grep -i g77`" ; then
+    : ${F77_WARN_FLAGS='-Wall'}
+    : ${LIBS='g2c m'}
+  fi
+
+  # Determine which Fortran 90/95 compiler is in use
+  if test -n "$F90" -a "`$F90 --version 2>&1 | grep -i 'GNU Fortran'`" ; then
+    : ${F90_WARN_FLAGS='-Wall'}
+    : ${LIBS='gfortran m'}
+  ##echo "##DEBUG## got LIBS :${LIBS}:"
+  fi
+
+  ARFLAGS=-ruc
+  USE_RANLIB=yes
+  RANLIBFLAGS=
+
+  # Cache stuff
+  # ... there doesn't seem to be any way to find out the cache size
+  #     under OpenBSD -- JT will ask about this on the OpenBSD mailing lists
+  if test -z "$CACHELINE_BYTES" ; then
+    CACHELINE_BYTES=0
+    echo "Setting CACHELINE_BYTES to $CACHELINE_BYTES"
+  fi
+
+  if test -z "$CACHE_SIZE" ; then
+    CACHE_SIZE="0*1024"
+    echo "Setting CACHE_SIZE to $CACHE_SIZE bytes"
+  fi
+
+
+  # MPI stuff
+  #
+  # OpenBSD has no native MPI, so we don't set any NATIVE_MPI_XXX variables.
+  # This is caught by lib/make/extras/MPI/NATIVE then.
+
+fi

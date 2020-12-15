@@ -1,0 +1,1 @@
+/opt/apps/autotools/1.1/share/libtool/build-aux/ltmain.sh

@@ -1,0 +1,39 @@
+Cactus Code Thorn LocalInterp
+Author(s)    : David Radice
+               Thomas Radke
+               Jonathan Thornburg
+               Erik Schnetter
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+This thorn does processor-local interpolation of N-dimensional data
+arrays.  In general there may be many input arrays (all defined on the
+same uniform Cartesian grid) all being interpolated to the same set
+of interpolation points.
+
+
+History
+=======
+
+This interpolator was written by Thomas Radke in early 2001 (drawing
+on older code by Paul Walker), and supports the interpolation operator
+  "uniform cartesian"
+for the new Cactus interpolation API CCTK_InterpLocalUniform().
+(Note that the word "cartesian" is in lower case here!)
+
+This interpolator originally lived in the PUGHInterp thorn, but
+it turned to have very little to do with PUGH, so was moved here in
+winter 2001-2002.
+
+From winter 2001-2002 to July 2003 this thorn also contained another
+interpolator written by Jonathan Thornburg, but in July 2003 that
+interpolator was moved to AEIThorns/AEILocalInterp because it was
+(is) GPL and Cactus policies are that this arrangement (CactusBase)
+is reserved for code under the Cactus-flesh license (= GPL except
+that it's like LGPL for linking with other thorns).
+
+At the beginning of 2015 the low-level interpolation kernels of this
+thorn were rewritten in C++ by David Radice.

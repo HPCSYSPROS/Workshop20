@@ -1,0 +1,66 @@
+#! /bin/sh
+# /*@@
+#   @file      unicosmp
+#   @date      Thu Feb 25 09:53:22 2004
+#   @author    John Shalf
+#   @desc 
+#   
+#   @enddesc 
+#   @version $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/known-architectures/unicosmp,v 1.5 2004-05-13 21:53:35 jshalf Exp $
+# @@*/
+
+if test "$CCTK_CONFIG_STAGE" = "preferred-compilers" ; then
+
+  if test -z "$F90"; then
+    F90="ftn"
+    echo Setting Fortran 90 compiler to $F90
+  fi
+  if test -z "$F77"; then
+    F77="ftn"
+    echo Setting Fortran 77 compiler to $F77
+  fi
+
+else
+
+  : ${CFLAGS=""}
+  : ${CXXFLAGS=""}
+  : ${FPPFLAGS="-N"}
+  : ${C_OPTIMISE_FLAGS=""} # optimization with C compiler is bad juju. (stick to default -O 2)
+  : ${CXX_OPTIMISE_FLAGS=""} # optimization with C++ compiler is bad juju. (stick to default -O 2)
+  : ${F90_OPTIMISE_FLAGS="-V -F -O inline3,scalar3,vector3,stream3,task0 -rm"}
+  : ${F77_OPTIMISE_FLAGS="-V -F -O inline3,scalar3,vector3,stream3,task0 -rm"}
+  : ${C_DEBUG_FLAGS="-g"}
+  : ${CXX_DEBUG_FLAGS="-g"}
+  : ${F77_DEBUG_FLAGS="-g"}
+  : ${F90_DEBUG_FLAGS="-g"}
+  : ${C_WARN_FLAGS="-h msglevel_0"}
+  : ${CXX_WARN_FLAGS="-h msglevel_0"}
+  : ${F77_WARN_FLAGS="-m 0"}
+  : ${F90_WARN_FLAGS="-m 0"}
+
+  # The Cray fortran compiler puts module info in .o files by default.
+  # The -em flag makes it create a .mod file.
+  : ${F90FLAGS="-em"} 
+
+# Cache stuff
+  if test -z "$CACHELINE_BYTES" ; then
+    CACHELINE_BYTES=16
+    echo "Setting CACHELINE_BYTES to $CACHELINE_BYTES"
+  fi
+
+  if test -z "$CACHE_SIZE" ; then
+    CACHE_SIZE="512*1024"
+    echo "Setting CACHE_SIZE to $CACHE_SIZE bytes"
+  fi
+
+# MPI stuff
+
+  if test -n "$MPI" ; then
+#   Don't need to set anything for compiling with native MPI on the T3E
+#   We just set NATIVE_MPI_LIBS to non-null so that it passes the
+#   check in lib/make/extras/MPI/NATIVE.
+    NATIVE_MPI_LIBS=" "
+  fi
+
+fi
+

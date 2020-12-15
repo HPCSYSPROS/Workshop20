@@ -1,0 +1,305 @@
+shares:GRHydro
+
+USES REAL GRHydro_Y_e_min "" 
+{
+}
+
+USES REAL GRHydro_Y_e_max "" 
+{
+}
+
+# Parameter definitions for thorn ZelmaniM1
+restricted:
+
+INT ngroups "Total number of groups"
+{
+ 1:* :: "At least use 1 group"
+} 12
+
+INT nspecies "Total number of species"
+{
+ 1:* :: "Could just use one species"
+} 3
+
+INT spec_idx[20] "specify species type (nue=1,nueb=2,nux=3,nuxb=4)" STEERABLE=ALWAYS
+{
+ 1:4 :: ""
+ -1  :: "Use the old indexing convention"
+} -1
+
+INT sgroup "Starting group number (c style indexing)" STEERABLE=ALWAYS
+{
+ 0:* :: "must be zero or greater"
+} 0
+
+STRING nulib_table_name "NuLib table name (hdf5)" STEERABLE=RECOVER
+{
+ .* :: "Can be anything"
+} "blah.h5"
+
+BOOLEAN read_table_on_single_process "read table on one process only and bcast data" STEERABLE=ALWAYS
+{
+} "no"
+
+INT reader_process "read table on this process and bcast data" STEERABLE=ALWAYS
+{
+  0:* :: "read on process N"
+} 0
+
+# used in schedule.ccl so only STEERABLE=RECOVER
+BOOLEAN do_M1 "Actually do direct M1" STEERABLE=RECOVER
+{
+} "no"
+
+# used in schedule.ccl so only STEERABLE=RECOVER
+BOOLEAN do_opac "Update opacities?" STEERABLE=RECOVER
+{
+} "no"
+
+# steerable on RECOVER only since used in the schedule
+BOOLEAN do_gray "Update opacities using simple gray opacities?" STEERABLE=RECOVER
+{
+} "no"
+
+# used in schedule.ccl so only STEERABLE=RECOVER
+BOOLEAN do_m1_eps_backreact "Allow radiation to change internal energy of fluid?" STEERABLE=RECOVER
+{
+} "no"
+
+BOOLEAN do_m1_advect "Allow advection of radiation at high optical depth?" STEERABLE=ALWAYS
+{
+} "yes"
+
+# used in schedule.ccl so only STEERABLE=RECOVER
+BOOLEAN do_m1_scon_backreact "Allow radiation to change momentum of fluid?" STEERABLE=RECOVER
+{
+} "no"
+
+BOOLEAN do_m1_GRsource "Include GR sources?" STEERABLE=ALWAYS
+{
+} "yes"
+
+# used in schedule.ccl so only STEERABLE=RECOVER
+BOOLEAN DG_limit "Limit DG slopes?" STEERABLE=RECOVER
+{
+} "no"
+
+REAL rho_opac_min "Minimum density in g/cc for non-zero opacities" 
+{
+  0.0:* :: "anything larger than or equal to zero"
+} 0.0e0
+
+REAL scon_backreact_taper_on_time "time for scon backreaction to reach full strength (1-exp(-t/taper_on_time))" 
+{
+  0.0:* :: "anything larger than or equal to zero"
+} 0.0e0
+
+REAL closure_transition_radius "Radius at which to transition from diffusion to free streaming" STEERABLE=ALWAYS
+{
+  0.0:* :: "anything larger than or equal to zero"
+} 0.0e0
+
+REAL closure_transition_scale "Distance over which to transition from diffusion to free streaming" STEERABLE=ALWAYS
+{
+  1.0:* :: "anything larger than or equal to one"
+} 1.0e0
+
+BOOLEAN do_fixed_closure "Use an externally specified Eddington tensor" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN force_radial "Force the free streaming portion of the Eddington tensor to be radial" STEERABLE=ALWAYS
+{
+} "no"
+
+
+# used in schedule.ccl so only STEERABLE=RECOVER
+BOOLEAN do_m1_ye_backreact "Allow radiation to change lepton number of fluid?" STEERABLE=RECOVER
+{
+} "no"
+
+BOOLEAN do_m1_RK2 "Do implicit RK2 time stepping" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN do_m1_redshift "Include momentum space divergence of radiation" STEERABLE=ALWAYS
+{
+} "no"
+
+# used in schedule.ccl so only STEERABLE=RECOVER
+BOOLEAN do_m1_reflux "Do refluxing" STEERABLE=RECOVER
+{
+} "no"
+
+BOOLEAN zm1_verbose "Lots of output?" STEERABLE=ALWAYS
+{
+} "no"
+
+# used in schedule.ccl so only STEERABLE=RECOVER
+BOOLEAN use_nuTmunu "Let neutrinos contribute to the stress energy tensor?" STEERABLE=RECOVER
+{
+} "yes"
+
+BOOLEAN use_zerov "Use zero velocity expressions for neutrino transport" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN update_zm1_rhs "Calculate contributions to radiation RHSs" STEERABLE=ALWAYS
+{
+} "yes"
+
+# used in schedule.ccl so only STEERABLE=RECOVER
+BOOLEAN set_equilibrium "Set the initial neutrino energy density to equilibrium values" STEERABLE=RECOVER
+{
+} "no"
+
+
+
+KEYWORD reconstruction_type "which reconstruction type to use" STEERABLE=ALWAYS
+{
+  "PC" :: "piecewise constant"
+  "TVD-minmod" :: "TVD minmod"
+  "TVD-MC"     :: "TVD monotonized-centered"
+  "TVD-MC-FoE"     :: "TVD monotonized-centered F/E"
+  "TVD-minmod-FoE" :: "TVD minmod F/E"
+} "TVD-minmod"
+
+REAL spherical_radius "Radius after which to force the fluxes to be radial" STEERABLE=ALWAYS
+{
+  0.0:* :: "Zero or larger"
+} 1000000000000.0
+
+REAL freestreaming_radius "Radius after which to force the closure to be one" STEERABLE=ALWAYS
+{
+  0.0:* :: "Zero or larger"
+} 1000000000000.0
+
+REAL spherical_spread "Spread in radius to shift from full 3D to spherical fluxes" STEERABLE=ALWAYS
+{
+  (0.0:* :: "Must be larger than 0"
+} 1.0
+
+KEYWORD prolongation_type "which prolongation operator to use" STEERABLE=recover
+{
+  "ENO" :: ""
+  "ENOG2" :: "ENO, but filling only 2 ghost zones"
+} "ENO"
+
+
+
+########################################################################
+# tests
+BOOLEAN do_M1_testing "Do test problems (internal initial data setup)"
+{
+} "no"
+
+KEYWORD zm1_test_type "Which test problem are we going to do?"
+{
+  "Homogeneous Sphere" :: "Homogeneous sphere test"
+  "Absorbing Sphere" :: "Absorbing sphere test"
+  "Advect Radiation" :: "Radiation advection test"
+  "Diffusion Pulse" :: "Radiation diffusion test"
+} "Homogeneous Sphere"
+
+# homogeneous sphere
+REAL zm1_spheretest_radius "Radius of sphere"
+{
+  (0.0:* :: "At least larger than zero"
+} 1.0
+
+REAL zm1_spheretest_kappa "Absorption opacity"
+{
+  (0.0:* :: "At least larger than zero"
+} 4.0
+
+REAL zm1_spheretest_b "emissivity constant"
+{
+  (0.0:* :: "At least larger than zero"
+} 0.8
+
+REAL zm1_test_velx "Advection velocity"
+{
+  * :: "At least larger than zero"
+} 0.0
+
+## Luminosity reduction parameters
+CCTK_INT nrad "Number of radial grid points on luminosity grid" STEERABLE=ALWAYS
+{
+  0:* :: ""
+} 600
+
+CCTK_REAL rad_max "Maximum radius for luminosity grid" STEERABLE=ALWAYS
+{
+  0:* :: ""
+} 300.0e0
+
+CCTK_INT lum_out_every "Output luminosity every n steps" STEERABLE=ALWAYS
+{
+ 0:* :: ""
+-1   :: "no output"
+} 32
+
+CCTK_REAL lum_out_radii[20] "output luminosity at these radii" STEERABLE=ALWAYS
+{
+ 0.0:* :: ""
+ -1.0  :: "radius not specified"
+} -1.0
+
+########################################################################
+# parameters for angle-averaged background
+
+CCTK_INT navrad "radial bins for angle-average profile" STEERABLE=ALWAYS
+{
+ 0:* :: ""
+} 500
+
+CCTK_REAL avradmax "maximum radius for angle-average profile" STEERABLE=ALWAYS
+{
+ 0.0:* :: ""
+} 300.0
+
+CCTK_INT update_av_closure_every "how frequently to update angle-averaged closure" STEERABLE=ALWAYS
+{
+ 0:* :: ""
+} 1
+
+########################################################################
+# stuff under the hood
+
+INT zm1_ghost "number of ghost zones"
+{
+ 2:* :: "At least use 2 ghost zones"
+} 2
+
+KEYWORD zm1_bound_type "type of boundary"
+{
+ "none"  :: "do not update boundary; keep t=0 values"
+ "flat"  :: "copy from last normal zone"
+ "Robin" :: "1/r^2 fall off"
+} "none"
+
+
+shares: MethodOfLines
+
+USES CCTK_INT MoL_Num_Evolved_Vars
+USES CCTK_INT MoL_Num_Evolved_Vars_Slow
+USES CCTK_INT MoL_Num_Constrained_Vars
+USES CCTK_INT MoL_Num_SaveAndRestore_Vars
+USES CCTK_INT MoL_Max_Evolved_Array_Size
+USES CCTK_INT MoL_Num_ArrayEvolved_Vars
+
+restricted:
+
+CCTK_INT zm1_MaxNumConstrainedVars "The maximum number of constrained variables used by ZelmaniM1" ACCUMULATOR-BASE=MethodofLines::MoL_Num_Constrained_Vars
+{
+  4:1000          :: "A small range, depending on testing or not"
+} 15
+
+
+shares: IO
+
+USES STRING out_dir
+
+shares: GRHydro
+
+USES BOOLEAN sync_conserved_only

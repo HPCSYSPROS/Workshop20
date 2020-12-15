@@ -1,0 +1,43 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+echo "Checking:"
+pwd
+hostname
+date
+
+echo "Environment:"
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export GMON_OUT_PREFIX=gmon.out
+export OMP_NUM_THREADS=@NUM_THREADS@
+
+if [ ! -z "$MPI_NODEFILE" ]; then
+    cat ${MPI_NODEFILE} > SIMFACTORY/NODES
+    export MPI_NODEFILE=${TMPDIR}/machines
+
+    uniq ${MPI_NODEFILE} > PROC_NODES
+
+    for node in $(cat PROC_NODES); do
+        for (( proc=0; $proc<@(@PPN_USED@/@NUM_THREADS@)@; proc=$proc+1)); do
+            echo ${node}
+        done
+    done > ${MPI_NODEFILE}
+fi
+
+env | sort > SIMFACTORY/ENVIRONMENT
+
+export CACTUS_STARTTIME=$(date +%s)
+echo "Starting:"
+
+time srun -n @NUM_PROCS@  @EXECUTABLE@ -L 3 @PARFILE@
+
+echo "Stopping:"
+date
+
+echo "Done."

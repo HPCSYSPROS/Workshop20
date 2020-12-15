@@ -1,0 +1,79 @@
+
+The aim of this file is to describe the environment necessary to build
+the CCTK on an XP, NT (or Windows 2000) platform.
+
+Apart from the required software noted in the manual, you must install
+the Cygwin package available from http://www.cygwin.com.
+
+IMPORTANT: After installing Cygwin, you must make sure that the GNU
+CPP is somewhere on your path, and that the directory path leading to
+it contains no names containing un-escaped spaces -- these would
+confuse the autoconf program.  Failure to do this will result in
+bizarre errors in the dependency generation.
+
+Additionally, if you want the -clean, -realclean, and -cleandeps
+targets to work, you need to make sure that the GNU find comes before
+the microsoft find in your path.
+
+In principle now all you need to do is start bash, checkout the CCTK,
+and run make.
+
+Please note that paths to additional include files or libraries must
+contain no spaces.  However the INCLUDE and LIB environment variables,
+which are used by the Windows compilers, may include spaces in path
+names.  The INCLUDE environment variable MUST NOT, however, have a
+semicolon (;) with no text after it, e.g. it must not end with a
+semicolon.  This situation used to be avoided by putting
+
+INCLUDE="`echo $INCLUDE | sed -e 's/;\+/;/' | sed -e 's/;$//'`"
+
+in your .bashrc file.  However, on recent Cygwin versions this does
+not change the value of $INCLUDE, and the following works
+
+echo $INCLUDE | sed -e 's/\\;/;/g' | sed -e 's/;$//' | sed -e 's/^\(.*\)/INCLUDE="\1"/' > /tmp/$$.foo
+
+. /tmp/$$.foo
+rm /tmp/$$.foo
+
+
+
+KNOWN PROBLEMS:
+---------------
+
+One of the Microsoft headers, oaidl.h, contains C++ comments after
+some preprocessing tokens.  This causes an error while generating
+dependency information.  This is non-citical, but you will need to run
+make again (once for each file which includes this), to complete the
+build.
+
+Cygwin 1.0 comes with make 3.77.  This dumps core in the make system
+and should be updated to 3.79.1, or later.
+
+Make 3.81-1 also has problems on Cygwin.  As described on
+https://projects.coin-or.org/BuildTools/wiki/current-issues, it
+reports errors about "multiple target patterns".  The solution is
+described on this web page; apparently the older version make 3.80
+works fine.
+
+
+
+Tested Software:
+----------------
+
+Cygwin:
+-------
+Cygwin beta 20.1.
+Cygwin 1.0 (but with an updated make, see below)
+Cygwin 1.1.6
+Cygwin 1.3.10
+
+C/C++:
+------
+Microsoft Visual C 6.0
+Intel C/C++ version 4.5 (configure with CC=icl CXX="icl /TP")
+
+Fortran:
+--------
+Digital Fortran 6.0 
+Compaq Fortran 6.1
+Intel Fortran 4.5 

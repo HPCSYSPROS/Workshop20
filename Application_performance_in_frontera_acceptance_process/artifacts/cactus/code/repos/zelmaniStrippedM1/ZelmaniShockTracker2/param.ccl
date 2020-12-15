@@ -1,0 +1,195 @@
+# Parameter definitions for thorn ZelmaniShockTracker2
+
+BOOLEAN verbose "to be verbose or not" STEERABLE=ALWAYS
+{
+} "no"
+
+CCTK_INT compute_every "perform shock radius computation every n-th timestep" STEERABLE=ALWAYS
+{
+        1:* :: "Greater then or equal to 1, I guess"
+       -1   :: "Never extract"
+} 32
+
+CCTK_INT verbose_level "verbosity level" STEERABLE=ALWAYS
+{
+        1:* :: "Greater then or equal to 1, I guess"
+} 1
+
+CCTK_REAL start_time "Start at time [M]" STEERABLE=ALWAYS
+{
+     0.0:* :: "Greater then or equal to 0.0, I guess"
+} 0.0
+
+
+CCTK_REAL start_time_inner_rad "Start at time [M] at which we enforce a min radius" STEERABLE=ALWAYS
+{
+     0.0:* :: "Greater then or equal to 0.0, I guess"
+} 0.0
+
+CCTK_REAL inner_min_radius "Assume min shock radius greater than this [M]" STEERABLE=ALWAYS
+{
+        0.0:* :: "Greater then or equal to 0.0, I guess"
+} 0.0e0
+
+
+KEYWORD mode "Shocktracking mode" STEERABLE=RECOVER
+{
+   "full"   :: "Use velocity and entropy for shocktracking"
+   "simple" :: "Only use velocity for shocktracking; useful for runs without microphysics"
+} full
+
+############ grid for shock finding
+
+CCTK_REAL entropy_value "value of entropy to use as a criterion for the shock location" STEERABLE=ALWAYS
+{
+ 0.0:* :: ""
+} 5.0e0
+
+CCTK_INT nrad "Number of radial grid points on equidistant part of tau grid" STEERABLE=ALWAYS
+{
+  0:* :: ""
+} 600
+
+CCTK_INT nrad_outer "Number of radial grid points on nonequidistant part of tau grid" STEERABLE=ALWAYS
+{
+  0:* :: ""
+} 300
+
+CCTK_INT ntheta "Number of grid points in the theta direction" STEERABLE=ALWAYS
+{
+  0:* :: ""
+} 3
+
+CCTK_INT nphi "Number of grid points in the phi direction" STEERABLE=ALWAYS
+{
+  0:* :: ""
+} 1
+
+CCTK_REAL rad_max "Maximum radius for equidistant part of tau" STEERABLE=always
+{
+  0:* :: ""
+} 300.0e0
+
+CCTK_REAL rad_max_outer "Maximum radius for non-equidistant part of tau" STEERABLE=always
+{
+  0:* :: ""
+} 2000.0
+
+KEYWORD symm "Symmetry"  STEERABLE=always
+{
+ "octant" :: "Octant symmetry"
+ "bitant" :: "Bitant symmetry"
+ "full"   :: "Full grid"
+} "full"
+
+STRING interpolator "Interpolator" STEERABLE=always
+{
+  "" :: "must be a registered interpolator"
+} "Lagrange polynomial interpolation"
+
+STRING interpolator_options "Options for the interpolator" STEERABLE=always
+{
+  "" :: "must be a valid options specification"
+} "order=1"
+
+STRING coordinate_system "Coordinate system" STEERABLE=always
+{
+  "" :: "must be a registered coordinate system"
+} "cart3d"
+
+
+############ For steered-regridding
+
+CCTK_REAL start_time_tracking "time _after bounce_ at which we start tracking" STEERABLE=ALWAYS
+{
+  0:*  :: "Anything after bounce"
+} 0.0
+
+CCTK_INT check_tracking_every "perform checks every N iterations" STEERABLE=ALWAYS
+{
+ -1   :: "no tracking"
+  1:* :: "better greater than or equal to 1"
+} 1
+
+CCTK_INT zst_regrid_every "set CarpetRegrid2::regrid_every to this value" STEERABLE=ALWAYS
+{
+   1:* :: ""
+} 64
+
+CCTK_INT track_n_levels "number of reflevels to track" STEERABLE=ALWAYS
+{
+  0:* :: "at least 0, I would say..."
+} 0
+
+
+CCTK_INT track_levels[20] "reflevel ids we are tracking" STEERABLE=ALWAYS
+{
+  -1:* :: "at least 0, I would say..."
+} -1
+
+CCTK_INT track_level_type[20] "type of tracking" STEERABLE=ALWAYS
+{
+  -1   :: "no tracking"
+  0    :: "always outside shock"
+#  1    :: "always inside shock"
+#  2    :: "inside or outside shock"
+  3    :: "always outside shock, put only as much as need"
+} -1
+
+CCTK_REAL track_level_min_rad[20] "minimum radius of a given level" STEERABLE=ALWAYS
+{
+  0.0:* :: "greater than or equal to zero"
+} 0.0
+
+CCTK_REAL track_level_max_rad[20] "minimum radius of a given level" STEERABLE=ALWAYS
+{
+  0.0:* :: "greater than or equal to zero"
+} 1.0d30
+
+CCTK_INT track_level_min_zones[20] "minimum number of zones of a given level" STEERABLE=ALWAYS
+{
+ -1   :: "disregard"
+  1:* :: "greater than or equal to zero"
+} -1
+
+CCTK_INT track_level_max_zones[20] "maximum number of zones of a given level" STEERABLE=ALWAYS
+{
+ -1   :: "disregard"
+  1:* :: "greater than or equal to zero"
+} -1
+
+CCTK_REAL track_level_out_dist[20] "minimum distance to shock if outside shock" STEERABLE=ALWAYS
+{
+  0.0:* :: "greater than or equal to zero"
+} 3.0
+
+CCTK_REAL track_level_in_dist[20] "minimum distance to shock if inside shock" STEERABLE=ALWAYS
+{
+  0.0:* :: "greater than or equal to zero"
+} 3.0
+
+CCTK_INT track_level_out_zones[20] "minimum number of zones between shock and boundary if outside shock" STEERABLE=ALWAYS
+{
+  5:* :: "greater than or equal to zero"
+} 10
+
+CCTK_INT track_level_in_zones[20] "minimum number of zones between shock and boundary if inside shock" STEERABLE=ALWAYS
+{
+  5:* :: "greater than or equal to zero"
+} 10
+
+CCTK_REAL track_level_dist_fac "factor with which to multiply/divide distances when regridding" STEERABLE=ALWAYS
+{
+  1.0:* :: "greater than or equal to zero"
+} 1.1
+
+CCTK_REAL track_start_time_pb "start this much after core bounce [in Cactii]" STEERABLE=ALWAYS
+{
+  0.0:* :: "greater than or equal to zero"
+} 406.0
+
+BOOLEAN do_regrid_z "regrid in z direction only" STEERABLE=ALWAYS
+{
+} "no"
+
+

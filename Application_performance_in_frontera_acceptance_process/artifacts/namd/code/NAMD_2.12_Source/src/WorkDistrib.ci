@@ -1,0 +1,73 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+module WorkDistrib {
+  // WorkDistributor - is a bit of a mishmash
+
+  message LocalWorkMsg;
+  message FinishWorkMsg;
+  message ComputeMapChangeMsg {
+    int newNodes[];
+    char newNumPartitions[];
+  };
+  message PatchMapMsg {
+    char patchMapData[];
+  };
+  message ComputeMapMsg {
+    ComputeMap::ComputeData computeMapData[];
+  };
+
+  group WorkDistrib
+  {
+    entry WorkDistrib(void);
+    entry void peOrderingReady();
+    entry void savePatchMap(PatchMapMsg *);
+    entry void saveComputeMap(ComputeMapMsg *);
+    entry void recvComputeMapChanges(ComputeMapChangeMsg *);
+    entry void doneSaveComputeMap(CkReductionMsg *);
+    entry void enqueueWork(LocalWorkMsg *);
+    entry void enqueueExcls(LocalWorkMsg *);
+    entry void enqueueBonds(LocalWorkMsg *);
+    entry void enqueueAngles(LocalWorkMsg *);
+    entry void enqueueDihedrals(LocalWorkMsg *);
+    entry void enqueueImpropers(LocalWorkMsg *);
+    entry void enqueueThole(LocalWorkMsg *);  // Drude model
+    entry void enqueueAniso(LocalWorkMsg *);  // Drude model
+    entry void enqueueCrossterms(LocalWorkMsg *);
+    // JLai
+    entry void enqueueGromacsPair(LocalWorkMsg *);
+    // End of JLai
+    entry void enqueueCUDA(LocalWorkMsg *);
+    entry void enqueueCUDAP2(LocalWorkMsg *);
+    entry void enqueueCUDAP3(LocalWorkMsg *);
+    entry void finishCUDAPatch(FinishWorkMsg *);
+    entry [expedited] void finishCUDA(LocalWorkMsg *);
+    entry [expedited] void finishCUDAP2(LocalWorkMsg *);
+    entry [expedited] void finishCUDAP3(LocalWorkMsg *);
+    entry void enqueueMIC(LocalWorkMsg *);
+    entry [expedited] void finishMIC(LocalWorkMsg *);
+    entry void enqueuePme(LocalWorkMsg *);
+    entry void enqueueSelfA1(LocalWorkMsg *);
+    entry void enqueueSelfA2(LocalWorkMsg *);
+    entry void enqueueSelfA3(LocalWorkMsg *);
+    entry void enqueueSelfB1(LocalWorkMsg *);
+    entry void enqueueSelfB2(LocalWorkMsg *);
+    entry void enqueueSelfB3(LocalWorkMsg *);
+    entry void enqueueWorkA1(LocalWorkMsg *);
+    entry void enqueueWorkA2(LocalWorkMsg *);
+    entry void enqueueWorkA3(LocalWorkMsg *);
+    entry void enqueueWorkB1(LocalWorkMsg *);
+    entry void enqueueWorkB2(LocalWorkMsg *);
+    entry void enqueueWorkB3(LocalWorkMsg *);
+    entry void enqueueWorkC(LocalWorkMsg *);
+    entry void enqueueLCPO(LocalWorkMsg *);
+
+    // MIC-Specific
+    entry void initHostDeviceLDB();
+    entry void contributeHostDeviceLDB(int peSetLen, int peSet[peSetLen]);
+    entry void setDeviceLDBParams(int dt, int hs, int sp1, int pp1, int pp2);
+  } ;
+}

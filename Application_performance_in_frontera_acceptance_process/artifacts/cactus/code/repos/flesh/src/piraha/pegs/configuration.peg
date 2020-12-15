@@ -1,0 +1,32 @@
+# The skipper is a crucial sub-pattern
+# that is activated by any whitespace in the
+# grammar file
+skipper = \b([\ \t\n\r\b]|\#[^\n]*|\\[\r\n])*
+
+any = [^]
+keywords = \b(?i:script|lang|provides|requires|optional)\b
+name = (?!{-keywords})(?i:[a-z_][a-z0-9_\.]*\b)
+num = [+\-]?[0-9]+
+script = (?i: script( {name}|))
+lang = (?i: lang( {name}|))
+
+option = {name}
+
+provides = (?i:
+    provides {name} \{
+        ({script}?
+         {lang}
+         ( options {option}( {option})* |)|)
+    \}
+  )
+
+requires = (?i:
+    requires (thorns:|) {name}([ \t]*{name})*
+  )
+
+ifactive = (?i:_ifactive)
+optional = (?i:
+    optional{ifactive}? {name}([ \t]+{name})* \{ ( {name} )* \}
+  )
+
+config = ({provides} |{requires} |{optional} )* $

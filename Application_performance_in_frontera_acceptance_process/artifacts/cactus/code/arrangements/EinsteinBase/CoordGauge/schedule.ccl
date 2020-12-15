@@ -1,0 +1,53 @@
+# Schedule definitions for thorn CoordGauge
+# $Header$
+
+STORAGE: slicing_flags
+
+# Old stuff
+schedule Einstein_ActivateSlicing at CCTK_WRAGH
+{
+  LANG: C
+} "Initialize slicing, setup priorities for mixed slicings"
+
+schedule Einstein_SetNextSlicing at CCTK_WRAGH after Einstein_ActivateSlicing
+{
+   LANG: C
+} "Identify the slicing for the next iteration"
+
+schedule Einstein_SetNextSlicing at CCTK_PRESTEP
+{
+   LANG: C
+} "Identify the slicing for the next iteration"
+
+#New stuff
+
+if(CCTK_Equals(lapse_evolution_method, "coordgauge")||
+   CCTK_Equals(shift_evolution_method, "coordgauge"))
+{
+  SCHEDULE GROUP CoordGauge AT CCTK_PRESTEP
+  {
+  } "Coordinate Gauge group"
+
+
+  if(CCTK_Equals(lapse_evolution_method, "coordgauge"))
+  {
+    SCHEDULE GROUP LapseSelect IN CoordGauge BEFORE PickCoordGauge
+    {
+    } "Lapse Selection Group"
+
+    SCHEDULE GROUP LapseApply  IN CoordGauge AFTER  PickCoordGauge
+    {
+    } "Lapse Application Group"
+  }
+
+  if(CCTK_Equals(shift_evolution_method, "coordgauge"))
+  {
+    SCHEDULE GROUP ShiftSelect IN CoordGauge BEFORE PickCoordGauge
+    {
+    } "Shift Selection Group"
+
+    SCHEDULE GROUP ShiftApply  IN CoordGauge AFTER  PickCoordGauge
+    {
+    } "Shift Application Group"
+  }
+}

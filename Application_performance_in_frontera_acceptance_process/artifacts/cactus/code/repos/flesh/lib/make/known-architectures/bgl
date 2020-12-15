@@ -1,0 +1,121 @@
+#! /bin/sh
+#  /*@@
+#    @file      bgl
+#    @date      Wed Oct 6 15:35:45 2005
+#    @author    Tom Goodale
+#    @desc
+#               Known-architectures file for IBM Bluegene/L systems
+#    @enddesc
+#    @version   $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/known-architectures/bgl,v 1.5 2008-01-19 13:52:01 schnetter Exp $
+#  @@*/
+
+if test "$CCTK_CONFIG_STAGE" = 'preferred-compilers' ; then
+
+  if test -z "$CC"; then
+    CC=blrts_xlc
+    echo Setting C compiler to $CC
+  fi
+
+  if test -z "$CXX"; then
+    CXX=blrts_xlC
+    echo Setting C++ compiler to $CXX
+  fi
+
+  if test -z "$F77"; then
+    F77=blrts_xlf77
+    echo Setting F77 compiler to $F77
+  fi
+
+  if test -z "$F90"; then
+    F90=blrts_xlf90
+    echo Setting F90 compiler to $F90
+  fi
+
+  if test -z "$FPP" -a -z "$FPPFLAGS"; then
+    FPP='/lib/cpp'
+    FPPFLAGS='-traditional'
+    echo "Setting FPP to $FPP"
+    echo "Setting FPPFLAGS to $FPPFLAGS"
+  fi
+
+else
+
+  cross_compiling=yes
+  # Fortran compilers
+  : ${F90FLAGS="-qmaxmem=64000"}
+  : ${F77FLAGS="-qmaxmem=64000"}
+  : ${F90_OPTIMISE_FLAGS='-O2 -qarch=440'}
+  : ${F77_OPTIMISE_FLAGS='-O2 -qarch=440'}
+  : ${F90_DEBUG_FLAGS='-g'}
+  : ${F77_DEBUG_FLAGS='-g'}
+
+  : ${F90_SUFFIX='f'}
+  CCTK_WriteLine make.arch.defn 'F90FLAGS += $(BGL_$(subst .,,$(suffix $<))_FLAGS)'
+  CCTK_WriteLine make.arch.defn 'F77FLAGS += $(BGL_$(subst .,,$(suffix $<))_FLAGS)'
+  CCTK_WriteLine make.arch.defn 'BGL_F90_FLAGS ='
+  CCTK_WriteLine make.arch.defn 'BGL_f90_FLAGS ='
+  CCTK_WriteLine make.arch.defn 'BGL_F77_FLAGS = -qfixed'
+  CCTK_WriteLine make.arch.defn 'BGL_f77_FLAGS = -qfixed'
+  CCTK_WriteLine make.arch.defn 'BGL_F_FLAGS = -qfixed'
+  CCTK_WriteLine make.arch.defn 'BGL_f_FLAGS = -qfixed'
+
+  F77_VERSION=`$F77 2>&1 | head -n1`
+  F90_VERSION=`$F90 2>&1 | head -n1`
+
+  # C/C++ compilers
+  case "$CC" in
+    blrts_xlc)
+     : ${C_DEPEND='$(CC) -M $(CPPFLAGS) $(CFLAGS)'}
+     : ${C_DEPEND_OUT=' 2> /dev/null; mv $(basename $(basename $@)).d $@'}
+     : ${CFLAGS="-qmaxmem=64000 -qlanglvl=stdc99"}
+     : ${C_OPTIMISE_FLAGS='-O2 -qarch=440'}
+     CC_VERSION=`$CC 2>&1 | head -n1`
+     ;;
+    *)
+     ;;
+  esac
+
+  case "$CXX" in
+    blrts_xlC)
+     : ${CXX_DEPEND='$(CXX) -M $(CPPFLAGS) $(CXXFLAGS)'}
+     : ${CXX_DEPEND_OUT=' 2> /dev/null; mv $(basename $(basename $@)).d $@'}
+     : ${CXXFLAGS="-qmaxmem=64000 -qlanglvl=stdc99"}
+     : ${CXX_OPTIMISE_FLAGS='-O2 -qarch=440'}
+     CXX_VERSION=`$CXX 2>&1 | head -n1`
+     ;;
+    *)
+     ;;
+  esac
+
+  # Linker
+  if test -z "$LIBS" -a "$LD" != 'xlf90' ; then
+    BGL_f90_path="`which  $F90 | sed -e 's:/bin/.*::'`"
+    LIBDIRS="$BGL_f90_path/blrts_lib"
+    LIBS="xlf90 xlfmath m"
+  fi
+
+  if test "x$cross_compiling" = 'xyes' ; then
+    ENDIAN=big
+    SIZEOF_LONG_LONG=8
+    SIZEOF_LONG_INT=4
+    SIZEOF_INT=4
+    SIZEOF_SHORT_INT=2
+
+    SIZEOF_LONG_DOUBLE=8
+    SIZEOF_DOUBLE=8
+    SIZEOF_FLOAT=4
+
+    SIZEOF_POINTER=4
+
+    NULL_DEVICE='/dev/null'
+  fi
+
+  # MPI stuff
+  if test -n "$MPI" ; then
+    BGL_MPI_BASE="`which mpicc | sed -e 's:/bin/.*::'`"
+    NATIVE_MPI_LIBS='mpich.rts msglayer.rts devices.rts rts.rts devices.rts rts.rts'
+    NATIVE_MPI_LIB_DIRS=$BGL_MPI_BASE/lib
+    NATIVE_MPI_INC_DIRS=$BGL_MPI_BASE/include
+  fi
+
+fi

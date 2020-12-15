@@ -1,0 +1,20 @@
+#! /bin/bash
+
+# @ shell=/bin/bash
+#
+# @ error = @RUNDIR@/@SIMULATION_NAME@.err
+# @ output = @RUNDIR@/@SIMULATION_NAME@.out
+# @ job_type = parallel
+# @ job_name = @SHORT_SIMULATION_NAME@
+# @ node_usage= not_shared
+# @ node = @NODES@
+# @ tasks_per_node = @NODE_PROCS@
+# @ resources = ConsumableCpus(@NUM_THREADS@)
+# @ network.MPI = sn_all,not_shared,us
+# @ wall_clock_limit = @WALLTIME@
+# @ notification = always
+# @ notify_user = @EMAIL@
+# @ queue
+
+cd @SOURCEDIR@
+@SIMFACTORY@ run @SIMULATION_NAME@ --machine=@MACHINE@ --basedir=@BASEDIR@ --restart-id=@RESTART_ID@ @FROM_RESTART_COMMAND@

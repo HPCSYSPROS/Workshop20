@@ -1,0 +1,7 @@
+STORAGE: process_memory, process_memory_mb, process_memory_kb
+
+schedule SystemStatistics_Collect at CCTK_ANALYSIS
+{
+  LANG: C
+  OPTIONS: GLOBAL
+} "Collect system statistics"

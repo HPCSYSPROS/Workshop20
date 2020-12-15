@@ -1,0 +1,5 @@
+# Interface definition for thorn Fortran
+
+IMPLEMENTS: Fortran
+
+INCLUDES SOURCE: fortran.h IN fortran.h

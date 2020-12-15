@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# Build and test the current revision to determine if a given test
+# passes. Used with "git bisect run".  For example,
+#
+#   git bisect start <bad> <good>
+#   git bisect run bisect-test manifest/einsteintoolkit.th ML_BSSN_MP_O8_bh 12 
+
+# TODO: move this into simfactory
+
+# TODO: Should trap any unexpected errors and return an exit code >
+# 128 to tell git to abort the bisection process
+set -e
+
+function usage()
+{
+    echo "Usage: $0 <thornlist> <test> <procs>"
+    echo "  thornlist Thornlist to test"
+    echo "  test      Test name, i.e. parameter file basename without extension"
+    echo "  procs     Number of cores the test should be run on"
+}
+
+if [ $# != 3 ]; then
+    usage
+    exit 255
+fi
+
+thornlist=$1; shift
+test=$1; shift
+procs=$1; shift
+
+export PATH=simfactory/bin:$PATH
+sim=bisect
+config=bisect
+
+# This doesn't work because the output directory has the parameter file name added to the end
+#simoutput=$(sim get-output-dir $sim | awk '$1=="Output" && $2=="directory:" {print $3}')
+
+# This doesn't work because the basedir still contains @USER@
+#machine=$(sim whoami|awk '{print $3}')
+#basedir=$(sim print-mdb-entry $machine |grep '^[ \t]*basedir[ \t]*=[ \t]\(.*\)[\t ]*$'|awk '{print $3}')
+
+basedir=~/simulations # You might need to change this
+
+# Git should really do this during bisection, but it doesn't.  TODO:
+# Would prefer not to have git dependency here.
+git submodule update
+
+if ! sim build $config --thornlist=$thornlist --reconfig; then
+    echo "Build failure; commit cannot be tested"
+    exit 125
+fi
+
+if [ -r $basedir/$sim ]; then
+    sim purge $sim
+fi
+
+# TODO: Would be better to specify --processes, but simfactory does not support this yet
+if ! sim create-run --config $config $sim --testsuite --select-tests ${test}.par --procs $procs; then
+    echo "Test run failure; commit cannot be tested"
+    exit 125
+fi
+
+nfailed=$(grep "Number failed" $basedir/$sim/output-0000/TEST/$config/summary.log |awk '{print $4}')
+
+if [ $nfailed = 0 ]; then
+    echo "Test passed"
+    exit 0
+elif [ $nfailed = 1 ]; then
+    echo "Test failed"
+    exit 1
+else
+    echo "Unrecognised test result"
+    exit 200
+fi

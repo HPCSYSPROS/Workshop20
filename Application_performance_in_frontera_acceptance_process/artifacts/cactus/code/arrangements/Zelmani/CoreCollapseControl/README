@@ -1,0 +1,10 @@
+Cactus Code Thorn CoreCollapseControl
+Thorn Author(s)     : C. D. Ott <cott@stellarcollapse.org>
+Thorn Maintainer(s) : C. D. Ott <cott@stellarcollapse.org>
+Licence      : TBD
+--------------------------------------------------------------------------
+
+Purpose of the thorn: 
+
+Controls output frequency and grid structure based on the different stages of a
+core collaspe simulations.

@@ -1,0 +1,6 @@
+# Schedule definitions for thorn hwloc
+
+#SCHEDULE hwloc_lstopo AT startup
+#{
+#  LANG: C
+#} "Output hardware locality information"

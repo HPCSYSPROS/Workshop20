@@ -1,0 +1,155 @@
+# INPUT
+coordinates             solv_benz_namd.pdb 
+structure               solv_benz_namd.psf
+parameters              par_all22_prot_cmap.inp 
+paraTypeCharmm          on
+
+# INITIAL CONDITIONS
+
+# PME
+
+PME                     yes
+PMETolerance            10e-6
+PMEInterpOrder          6
+PMEGridSpacing          1.0
+
+# Periodic Boundary Conditions
+cellBasisVector1    23.0    0.   0.
+cellBasisVector2     0.    23.0   0.
+cellBasisVector3     0.    0    23.0
+cellOrigin          0.0 0.0 0.0
+
+wrapAll                 on
+
+langevin                on
+langevinTemp            300.0 
+langevinDamping         1.0
+LangevinPiston          on
+LangevinPistonTarget    1
+LangevinPistonPeriod    100
+LangevinPistonDecay     100
+LangevinPistonTemp      300.0 
+StrainRate              0.0 0.0 0.0
+useGroupPressure        yes
+useflexiblecell         no
+splitpatch              hydrogen
+hgroupcutoff            2.8
+stepspercycle           10
+margin                  0.0
+switching               on
+switchdist              12.0
+cutoff                  13.0
+pairlistdist            14.0
+
+exclude                 scaled1-4
+1-4scaling              1.0
+
+# RESPA PROPAGATOR
+
+timestep                2.0
+
+#fullElectFrequency      2
+#nonbondedFreq           1
+
+
+# SHAKE
+
+rigidbonds              water
+
+# COM
+
+commotion               no
+
+tclForces           on
+
+tclForcesScript {
+
+  global kforce
+
+# Set constants
+# To_change: be consistent with the number of atoms in the molecule perturbed
+  set natom  12
+  set kforce  10.0 ;  # kcal/mol/AA Force constant for the restraint
+ 
+# Output parameters
+
+#  set ofile "com_restr.out" ;      # name of output file
+#  set freq  1000 ;             # frequency for writing
+
+   set selecom {} 
+   for {set i 1 } {$i <= $natom } {incr i 1} {
+        set id $i
+        lappend selecom $id
+        addatom $id
+print  $id
+}
+
+## group indices with addgroup
+
+  set grp [addgroup $selecom]
+
+# Set reference value of com coordinates
+
+  set xc0   0.000
+  set yc0   0.000
+  set zc0   0.000    
+  
+   proc calcforces {} {
+    global grp xc0 yc0 zc0
+    global kforce
+    global freq fout ofile
+
+    loadcoords coords
+
+    # DO COM RESTRAINT
+  
+    # get com coords
+    set rc $coords($grp)
+    set xc [lindex $rc 0]
+    set yc [lindex $rc 1]
+    set zc [lindex $rc 2]
+
+    # calculate forces on com
+    set diffx [expr {$xc0 - $xc}]
+    set diffy [expr {$yc0 - $yc}]
+    set diffz [expr {$zc0 - $zc}]
+    set f {}
+    set fx [expr {$kforce*$diffx}]
+    set fy [expr {$kforce*$diffy}]
+    set fz [expr {$kforce*$diffz}]
+    lappend f $fx $fy $fz
+
+    # distribute force proportionally to atoms
+    # in group grp (NAMD does this automatically)
+    addforce $grp $f
+
+    # add energy
+    addenergy [expr {0.5*$kforce*$diffx*$diffx}]
+    addenergy [expr {0.5*$kforce*$diffy*$diffy}]
+    addenergy [expr {0.5*$kforce*$diffz*$diffz}]
+
+    # Print out stuff
+#    set currstep [getstep]
+#    if {[expr {$currstep % $freq}] == 0} {
+#    set fout [open $ofile a+]
+#        puts $fout [format "%f %f %f %f %f %f %f" $currstep $xc0 $yc0 $zc0 $xc $yc $zc]
+#    close $fout
+#    }
+
+    return
+    }
+} 
+
+# FEP PARAMETERS
+alch                    on
+alchType                FEP
+alchEnsembleAvg         off
+#EnsembleAverage         off
+alchFepWhamOn           on
+alchFile                solv_benz.fep 
+alchCol                 B
+alchOutFreq             1
+
+alchDecouple            on
+
+alchEquilSteps          0

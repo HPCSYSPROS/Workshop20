@@ -1,0 +1,13 @@
+#! /bin/sh
+#  /*@@
+#    @file      aix4.2.0.0
+#    @date      Wed Jul 14 12:38:45 1999
+#    @author    Tom Goodale
+#    @desc 
+#   
+#    @enddesc
+#    @version $Header$
+#  @@*/
+
+. $srcdir/known-architectures/aix
+

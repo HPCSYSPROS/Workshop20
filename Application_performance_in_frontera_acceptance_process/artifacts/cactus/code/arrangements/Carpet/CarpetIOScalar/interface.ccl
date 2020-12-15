@@ -1,0 +1,39 @@
+# Interface definition for thorn CarpetIOScalar
+
+IMPLEMENTS: IOScalar
+
+CCTK_INT last_output_iteration TYPE=scalar
+CCTK_REAL last_output_time TYPE=scalar
+CCTK_INT this_iteration TYPE=scalar
+
+USES INCLUDE HEADER: Timer.hh
+
+USES INCLUDE HEADER: carpet.hh
+USES INCLUDE HEADER: typecase.hh
+USES INCLUDE HEADER: typeprops.hh
+
+# function to check whether existing output files should be truncated or not
+CCTK_INT FUNCTION IO_TruncateOutputFiles \
+  (CCTK_POINTER_TO_CONST IN GH)
+
+REQUIRES FUNCTION IO_TruncateOutputFiles
+
+
+
+# Return a pointer to an unmodifiable C string
+# which contains a unique ID for this build
+CCTK_POINTER_TO_CONST \
+FUNCTION UniqueBuildID (CCTK_POINTER_TO_CONST IN  cctkGH)
+USES FUNCTION UniqueBuildID
+
+# Return a pointer to an unmodifiable C string
+# which contains a unique ID for this simulation
+CCTK_POINTER_TO_CONST \
+FUNCTION UniqueSimulationID (CCTK_POINTER_TO_CONST IN  cctkGH)
+USES FUNCTION UniqueSimulationID
+
+# Return a pointer to an unmodifiable C string
+# which contains a unique ID for this run
+CCTK_POINTER_TO_CONST \
+FUNCTION UniqueRunID (CCTK_POINTER_TO_CONST IN  cctkGH)
+USES FUNCTION UniqueRunID

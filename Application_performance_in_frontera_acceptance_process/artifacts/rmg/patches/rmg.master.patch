@@ -1,0 +1,76 @@
+diff -Naur rmg-release_2.2.1.orig/CMakeLists.txt rmg-release_2.2.1/CMakeLists.txt
+--- rmg-release_2.2.1.orig/CMakeLists.txt	2017-08-01 12:34:45.000000000 -0500
++++ rmg-release_2.2.1/CMakeLists.txt	2017-11-18 12:57:48.000000000 -0600
+@@ -13,7 +13,8 @@
+ #
+ #
+ 
+-cmake_minimum_required (VERSION 2.8) 
++cmake_minimum_required (VERSION 2.8)
++cmake_policy(SET CMP0046 OLD) 
+ 
+ enable_language(Fortran)
+ project (RMG C CXX Fortran) 
+@@ -38,6 +39,8 @@
+ set (USE_OPENBABEL_LIBS 1)
+ set (USE_SVN 0)
+ 
++add_definitions(-D_BSD_SOURCE=1)
++
+ # Load custom cmake modules
+ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake/Modules)
+ 
+@@ -280,7 +283,7 @@
+ 
+ # For various math libraries start by looking for Intel MKL. No good cmake module currently for MKL.
+ # Check if environment variable is set
+-#set(MKLROOT $ENV{MKLROOT})
++set(MKLROOT $ENV{MKLROOT})
+ if (NOT MKLROOT)
+     if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+         # Check the default location
+@@ -310,7 +313,7 @@
+         else(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+             if(EXISTS "${MKL_LIB64}")
+                 set(USE_LINUX_MKL_LIBS 1)
+-                target_link_libraries (${rmg} -Wl,--start-group ${MAGMA_LIBRARIES} ${MKL_LIB64}/libmkl_scalapack_lp64.a ${MKL_LIB64}/libmkl_intel_lp64.a ${MKL_LIB64}/libmkl_core.a ${MKL_LIB64}/libmkl_gnu_thread.a ${MKL_LIB64}/libmkl_blacs_openmpi_lp64.a -Wl,--end-group)
++                target_link_libraries (${rmg} ${MKL_LIB64}/libmkl_scalapack_lp64.a -Wl,--start-group ${MAGMA_LIBRARIES} ${MKL_LIB64}/libmkl_intel_lp64.a ${MKL_LIB64}/libmkl_intel_thread.a ${MKL_LIB64}/libmkl_core.a ${MKL_LIB64}/libmkl_blacs_intelmpi_lp64.a /opt/intel/compilers_and_libraries/linux/lib/intel64/libiomp5.a -Wl,--end-group -lpthread -lm -ldl)
+                 add_definitions(-DSCALAPACK_LIBS=1)
+                 set(RMG_MATH_LIBS "done")
+             else(EXISTS "${MKL_LIB64}")
+@@ -591,13 +594,13 @@
+ # file.
+ include("SubprojectIncludes/CMakeLists.txt.rmg.inc")
+ if(USE_LINUX_MKL_LIBS)
+-    target_link_libraries (${rmg} ${MKL_LIB64}/libmkl_scalapack_lp64.a -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a ${MKLROOT}/lib/intel64/libmkl_gnu_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a ${MKLROOT}/lib/intel64/libmkl_blacs_openmpi_lp64.a  -Wl,--end-group)
++    target_link_libraries (${rmg} ${MKL_LIB64}/libmkl_scalapack_lp64.a -Wl,--start-group ${MAGMA_LIBRARIES} ${MKL_LIB64}/libmkl_intel_lp64.a ${MKL_LIB64}/libmkl_intel_thread.a ${MKL_LIB64}/libmkl_core.a ${MKL_LIB64}/libmkl_blacs_intelmpi_lp64.a /opt/intel/compilers_and_libraries/linux/lib/intel64/libiomp5.a -Wl,--end-group -lpthread -lm -ldl)
+ endif(USE_LINUX_MKL_LIBS)
+ 
+ install(TARGETS ${rmg} 
+ DESTINATION bin)
+ 
+-install(FILES RmgLib/libRmgLibShared.so RmgLib/libRmgLib.a
++install(FILES ${PROJECT_BINARY_DIR}/RmgLib/libRmgLibShared.so ${PROJECT_BINARY_DIR}/RmgLib/libRmgLib.a
+ DESTINATION lib)
+ 
+ install(DIRECTORY Examples DESTINATION share/rmg)
+diff -Naur rmg-release_2.2.1.orig/RmgLib/CMakeLists.txt rmg-release_2.2.1/RmgLib/CMakeLists.txt
+--- rmg-release_2.2.1.orig/RmgLib/CMakeLists.txt	2017-08-01 12:34:45.000000000 -0500
++++ rmg-release_2.2.1/RmgLib/CMakeLists.txt	2017-11-18 12:57:48.000000000 -0600
+@@ -62,12 +62,12 @@
+ add_library (RmgLib STATIC ${RmgLibSources})
+ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+ 
+-    add_executable (poisson_pbc examples/Poisson/poisson_pbc.cpp)
+-    target_link_libraries (poisson_pbc ${Boost_LIBRARIES} RmgLibShared)
++    #add_executable (poisson_pbc examples/Poisson/poisson_pbc.cpp)
++    #target_link_libraries (poisson_pbc ${Boost_LIBRARIES} RmgLibShared)
+     if(DEFINED ENV{CRAY_LIBSCI_VERSION})
+-        target_link_libraries (poisson_pbc ${Boost_LIBRARIES} RmgLibShared)
++        #target_link_libraries (poisson_pbc ${Boost_LIBRARIES} RmgLibShared)
+     else(DEFINED ENV{CRAY_LIBSCI_VERSION})
+-        target_link_libraries (poisson_pbc ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES} RmgLibShared)
++        #target_link_libraries (poisson_pbc ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES} RmgLibShared)
+     endif()
+ 
+ endif()

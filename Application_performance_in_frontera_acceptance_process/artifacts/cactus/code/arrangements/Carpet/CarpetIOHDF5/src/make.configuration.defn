@@ -1,0 +1,2 @@
+# add the Carpet HDF5-to-ASCII converter/slicer/recombiner
+ALL_UTILS += hdf5toascii_slicer hdf5tobinary_slicer hdf5_slicer hdf5_recombiner

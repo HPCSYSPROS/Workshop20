@@ -1,0 +1,163 @@
+% *======================================================================*
+%  Cactus Thorn template for ThornGuide documentation
+%  Author: Ian Kelley
+%  Date: Sun Jun 02, 2002
+%  $Header$                                                             
+%
+%  Thorn documentation in the latex file doc/documentation.tex 
+%  will be included in ThornGuides built with the Cactus make system.
+%  The scripts employed by the make system automatically include 
+%  pages about variables, parameters and scheduling parsed from the 
+%  relevant thorn CCL files.
+%  
+%  This template contains guidelines which help to assure that your     
+%  documentation will be correctly added to ThornGuides. More 
+%  information is available in the Cactus UsersGuide.
+%                                                    
+%  Guidelines:
+%   - Do not change anything before the line
+%       % START CACTUS THORNGUIDE",
+%     except for filling in the title, author, date, etc. fields.
+%        - Each of these fields should only be on ONE line.
+%        - Author names should be separated with a \\ or a comma.
+%   - You can define your own macros, but they must appear after
+%     the START CACTUS THORNGUIDE line, and must not redefine standard 
+%     latex commands.
+%   - To avoid name clashes with other thorns, 'labels', 'citations', 
+%     'references', and 'image' names should conform to the following 
+%     convention:          
+%       ARRANGEMENT_THORN_LABEL
+%     For example, an image wave.eps in the arrangement CactusWave and 
+%     thorn WaveToyC should be renamed to CactusWave_WaveToyC_wave.eps
+%   - Graphics should only be included using the graphicx package. 
+%     More specifically, with the "\includegraphics" command.  Do
+%     not specify any graphic file extensions in your .tex file. This 
+%     will allow us to create a PDF version of the ThornGuide
+%     via pdflatex.
+%   - References should be included with the latex "\bibitem" command. 
+%   - Use \begin{abstract}...\end{abstract} instead of \abstract{...}
+%   - Do not use \appendix, instead include any appendices you need as 
+%     standard sections. 
+%   - For the benefit of our Perl scripts, and for future extensions, 
+%     please use simple latex.     
+%
+% *======================================================================* 
+% 
+% Example of including a graphic image:
+%    \begin{figure}[ht]
+% 	\begin{center}
+%    	   \includegraphics[width=6cm]{MyArrangement_MyThorn_MyFigure}
+% 	\end{center}
+% 	\caption{Illustration of this and that}
+% 	\label{MyArrangement_MyThorn_MyLabel}
+%    \end{figure}
+%
+% Example of using a label:
+%   \label{MyArrangement_MyThorn_MyLabel}
+%
+% Example of a citation:
+%    \cite{MyArrangement_MyThorn_Author99}
+%
+% Example of including a reference
+%   \bibitem{MyArrangement_MyThorn_Author99}
+%   {J. Author, {\em The Title of the Book, Journal, or periodical}, 1 (1999), 
+%   1--16. {\tt http://www.nowhere.com/}}
+%
+% *======================================================================* 
+
+% If you are using CVS use this line to give version information
+% $Header$
+
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+% The author of the documentation
+\author{Erik Schnetter \textless schnetter@aei.mpg.de\textgreater, Bernard Kelly \textless bernard.j.kelly@nasa.gov\textgreater}
+
+% The title of the document (not necessarily the name of the Thorn)
+\title{Dissipation}
+
+% the date your document was last changed, if your document is in CVS, 
+% please use:
+\date{$ $Date$ $}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+% Add all definitions used in this documentation here 
+%   \def\mydef etc
+
+% Add an abstract for this thorn's documentation
+\begin{abstract}
+Add $n$th-order Kreiss-Oliger dissipation to the right hand side of
+evolution equations.  This thorn is intended for time evolutions that
+use MoL.
+\end{abstract}
+
+% The following sections are suggestive only.
+% Remove them or add your own.
+
+\section{Physical System}
+For a description of Kreiss-Oliger artificial dissipation, see \cite{kreiss-oliger}.
+
+The additional dissipation terms appear as follows, for a general grid function $U$. Here, the
+tensor character of the field is irrelevant: each component of, say, $\tilde{\gamma}_{ij}$ is
+treated as an independent field for dissipation purposes.
+%
+\begin{eqnarray*}
+\partial_t U &=& \partial_t U + (-1)^{(p+3)/2} \epsilon \frac{1}{2^{p+1}} \left( h_x^{p} \frac{\partial^{(p+1)}}{\partial x^{(p+1)}} + h_y^{p} \frac{\partial^{(p+1)}}{\partial y^{(p+1)}} +
+h_z^{p} \frac{\partial^{(p+1)}}{\partial z^{(p+1)}}\right) U, \\
+             &=& \partial_t U + (-1)^{(p+3)/2} \epsilon \frac{h^{p}}{2^{p+1}} \left( \frac{\partial^{(p+1)}}{\partial x^{(p+1)}} + \frac{\partial^{(p+1)}}{\partial y^{(p+1)}} +
+\frac{\partial^{(p+1)}}{\partial z^{(p+1)}}\right) U,
+\end{eqnarray*}
+%
+where $h_x$, $h_y$, and $h_z$ are the local grid spacings in each Cartesian direction, and the
+second equality holds in the usual situation where the three are equal: $h_x = h_y = h_z = h$.
+
+\section{Implementation in Cactus}
+
+The \texttt{Dissipation} thorn's dissipation rate is controlled by a small number of parameters:
+%
+\begin{itemize}
+  \item \texttt{order} is the order $p$ of the dissipation, implying the use of the $(p+1)$-st spatial derivatives;
+  \item \texttt{epsdiss} is the overall dissipation strength $\epsilon$.
+\end{itemize}
+
+Currently available values of \texttt{order} are $p \in \{1, 3, 5, 7, 9\}$. To apply dissipation at
+order $p$ requires that we have at least $(p+1)/2$ ghostzones --- $\{1, 2, 3, 4, 5\}$, respectively.
+
+The list of fields to be dissipated is specified in the parameter \texttt{vars}. The thorn does
+not allow for individually tuned dissipation strengths for different fields. However, the
+dissipation strength $\epsilon$ can be varied according to refinement level, using the parameter
+array \texttt{epsdis\_for\_level}, which overrides \texttt{epsdiss} if set.
+
+The thorn also allows for enhanced dissipation within the apparent horizons, triggered by the
+boolean parameter \texttt{extra\_dissipation\_in\_horizons}, and near the outer boundary,
+triggered by the boolean parameter \texttt{extra\_dissipation\_at\_outerbound}. Both of these
+default to ``no''.
+
+\subsection{Acknowledgements}
+I thank Scott Hawley who wrote a very similar thorn
+\texttt{HawleyThorns/Dissipation} for evolutions that do not use MoL;
+this thorn here is modelled after his.
+
+\begin{thebibliography}{9}
+\bibitem{kreiss-oliger}
+H. Kreiss and J. Oliger, \emph{Methods for the Approximate Solution of
+Time Dependent Problems}, vol.\ 10 of Global Atmospheric Research
+Programme (GARP): GARP Publication Series (GARP Publication, 1973)
+\end{thebibliography}
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

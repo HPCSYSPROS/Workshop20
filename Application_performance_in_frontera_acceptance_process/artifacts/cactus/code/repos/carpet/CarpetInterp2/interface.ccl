@@ -1,0 +1,131 @@
+# Interface definition for thorn CarpetInterp2
+
+IMPLEMENTS: interp2
+
+INCLUDE HEADER: fasterp.hh IN carpetinterp2.hh
+
+
+
+USES INCLUDE HEADER: nompi.h
+
+USES INCLUDE HEADER: cacheinfo.hh
+USES INCLUDE HEADER: defs.hh
+USES INCLUDE HEADER: typeprops.hh
+USES INCLUDE HEADER: vect.hh
+
+USES INCLUDE HEADER: carpet.hh
+uses include header: Timer.hh
+
+
+
+# Get access to communicators
+CCTK_POINTER_TO_CONST FUNCTION                        \
+    GetMPICommWorld (CCTK_POINTER_TO_CONST IN cctkGH)
+REQUIRES FUNCTION GetMPICommWorld
+
+# Access coordinate information (on the coarse level)
+CCTK_INT FUNCTION                          \
+    GetCoordRange                          \
+        (CCTK_POINTER_TO_CONST IN  cctkGH, \
+         CCTK_INT              IN  m,      \
+         CCTK_INT              IN  ml,     \
+         CCTK_INT              IN  size,   \
+         CCTK_INT        ARRAY OUT gsh,    \
+         CCTK_REAL       ARRAY OUT lower,  \
+         CCTK_REAL       ARRAY OUT upper,  \
+         CCTK_REAL       ARRAY OUT delta)
+REQUIRES FUNCTION GetCoordRange
+
+
+
+CCTK_INT FUNCTION                               \
+    MultiPatch_LocalToGlobal                    \
+        (CCTK_POINTER_TO_CONST IN cctkGH,       \
+         CCTK_INT              IN ndims,        \
+         CCTK_INT              IN npoints,      \
+         CCTK_INT        ARRAY IN patch,        \
+         CCTK_POINTER_TO_CONST IN localcoords,  \
+         CCTK_POINTER          IN globalcoords, \
+         CCTK_POINTER          IN dxda,         \
+         CCTK_POINTER          IN det_dxda,     \
+         CCTK_POINTER          IN dadx,         \
+         CCTK_POINTER          IN ddxdada,      \
+         CCTK_POINTER          IN ddadxdx,      \
+         CCTK_POINTER          IN dddxdadada)
+USES FUNCTION MultiPatch_LocalToGlobal
+
+CCTK_INT FUNCTION                                \
+    MultiPatch_GlobalToLocal                     \
+        (CCTK_POINTER_TO_CONST IN  cctkGH,       \
+         CCTK_INT              IN  ndims,        \
+         CCTK_INT              IN  npoints,      \
+         CCTK_POINTER_TO_CONST IN  globalcoords, \
+         CCTK_INT        ARRAY OUT patch,        \
+         CCTK_POINTER          IN  localcoords,  \
+         CCTK_POINTER          IN  dadx,         \
+         CCTK_POINTER          IN  ddadxdx)
+USES FUNCTION MultiPatch_GlobalToLocal
+
+CCTK_INT FUNCTION                                      \
+    InterpGridArrays                                   \
+        (CCTK_POINTER_TO_CONST IN cctkGH,              \
+         CCTK_INT              IN N_dims,              \
+         CCTK_INT              IN order,               \
+         CCTK_INT              IN N_interp_points,     \
+         CCTK_POINTER_TO_CONST IN interp_coords,       \
+         CCTK_INT              IN N_input_arrays,      \
+         CCTK_INT        ARRAY IN input_array_indices, \
+         CCTK_INT              IN N_output_arrays,     \
+         CCTK_POINTER          IN output_arrays)
+PROVIDES FUNCTION InterpGridArrays      \
+    WITH CarpetInterp2_InterpGridArrays \
+    LANGUAGE C
+
+CCTK_INT FUNCTION                                      \
+    MultiPatchInterpGridArrays                         \
+        (CCTK_POINTER_TO_CONST IN cctkGH,              \
+         CCTK_INT              IN N_dims,              \
+         CCTK_INT              IN order,               \
+         CCTK_INT              IN N_interp_points,     \
+         CCTK_INT        ARRAY IN interp_maps,         \
+         CCTK_POINTER_TO_CONST IN interp_coords,       \
+         CCTK_INT              IN N_input_arrays,      \
+         CCTK_INT        ARRAY IN input_array_indices, \
+         CCTK_INT              IN N_output_arrays,     \
+         CCTK_POINTER          IN output_arrays)
+PROVIDES FUNCTION MultiPatchInterpGridArrays      \
+    WITH CarpetInterp2_MultiPatchInterpGridArrays \
+    LANGUAGE C
+
+
+
+CCTK_POINTER FUNCTION                                  \
+    Interp2GridArraysSetup                             \
+        (CCTK_POINTER_TO_CONST IN cctkGH,              \
+         CCTK_INT              IN N_dims,              \
+         CCTK_INT              IN order,               \
+         CCTK_INT              IN N_interp_points,     \
+         CCTK_POINTER_TO_CONST IN interp_coords)
+PROVIDES FUNCTION Interp2GridArraysSetup      \
+    WITH CarpetInterp2_Interp2GridArraysSetup \
+    LANGUAGE C
+
+CCTK_INT FUNCTION                                      \
+    Interp2GridArrays                                  \
+        (CCTK_POINTER_TO_CONST IN cctkGH,              \
+         CCTK_POINTER_TO_CONST IN interp_handle,       \
+         CCTK_INT              IN N_input_arrays,      \
+         CCTK_INT        ARRAY IN input_array_indices, \
+         CCTK_INT              IN N_output_arrays,     \
+         CCTK_POINTER          IN output_arrays)
+PROVIDES FUNCTION Interp2GridArrays      \
+    WITH CarpetInterp2_Interp2GridArrays \
+    LANGUAGE C
+
+CCTK_INT FUNCTION                                      \
+    Interp2GridArraysFree                              \
+        (CCTK_POINTER_TO_CONST IN cctkGH,              \
+         CCTK_POINTER          IN interp_handle)
+PROVIDES FUNCTION Interp2GridArraysFree      \
+    WITH CarpetInterp2_Interp2GridArraysFree \
+    LANGUAGE C

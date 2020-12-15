@@ -1,0 +1,181 @@
+% *======================================================================*
+%  Cactus Thorn template for ThornGuide documentation
+%  Author: Ian Kelley
+%  Date: Sun Jun 02, 2002
+%  $Header$
+%
+%  Thorn documentation in the latex file doc/documentation.tex
+%  will be included in ThornGuides built with the Cactus make system.
+%  The scripts employed by the make system automatically include
+%  pages about variables, parameters and scheduling parsed from the
+%  relevent thorn CCL files.
+%
+%  This template contains guidelines which help to assure that your
+%  documentation will be correctly added to ThornGuides. More
+%  information is available in the Cactus UsersGuide.
+%
+%  Guidelines:
+%   - Do not change anything before the line
+%       % BEGIN CACTUS THORNGUIDE",
+%     except for filling in the title, author, date etc. fields.
+%   - You can define your own macros are OK, but they must appear after
+%     the BEGIN CACTUS THORNGUIDE line, and do not redefine standard
+%     latex commands.
+%   - To avoid name clashes with other thorns, 'labels', 'citations',
+%     'references', and 'image' names should conform to the following
+%     convention:
+%       ARRANGEMENT_THORN_LABEL
+%     For example, an image wave.eps in the arrangement CactusWave and
+%     thorn WaveToyC should be renamed to CactusWave_WaveToyC_wave.eps
+%   - Graphics should only be included using the graphix package.
+%     More specifically, with the "includegraphics" command. Do
+%     not specify any graphic file extensions in your .tex file. This
+%     will allow us (later) to create a PDF version of the ThornGuide
+%     via pdflatex. |
+%   - References should be included with the latex "bibitem" command.
+%   - For the benefit of our Perl scripts, and for future extensions,
+%     please use simple latex.
+%
+% *======================================================================*
+%
+% Example of including a graphic image:
+%    \begin{figure}[ht]
+% 	\begin{center}
+%    	   \includegraphics[width=6cm]{MyArrangement_MyThorn_MyFigure}
+% 	\end{center}
+% 	\caption{Illustration of this and that}
+% 	\label{MyArrangement_MyThorn_MyLabel}
+%    \end{figure}
+%
+% Example of using a label:
+%   \label{MyArrangement_MyThorn_MyLabel}
+%
+% Example of a citation:
+%    \cite{MyArrangement_MyThorn_Author99}
+%
+% Example of including a reference
+%   \bibitem{MyArrangement_MyThorn_Author99}
+%   {J. Author, {\em The Title of the Book, Journal, or periodical}, 1 (1999),
+%   1--16. {\tt http://www.nowhere.com/}}
+%
+% *======================================================================*
+
+% If you are using CVS use this line to give version information
+% $Header$
+
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% The author of the documentation
+\author{Thomas Radke}
+
+% The title of the document (not necessarily the name of the Thorn)
+\title{Thorn Guide for the {\bf LocalInterp} Thorn}
+
+% the date your document was last changed, if your document is in CVS,
+% please us:
+%    \date{$ $Date$ $}
+\date{$ $Date$ $}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+% Add all definitions used in this documentation here
+%   \def\mydef etc
+
+% Add an abstract for this thorn's documentation
+\begin{abstract}
+This thorn does processor-local interpolation of N-dimensional data
+arrays.  In general there may be many input arrays (all defined on the
+same uniform Cartesian grid) all being interpolated to the same set
+of interpolation points.
+\end{abstract}
+
+% The following sections are suggestive only.
+% Remove them or add your own.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}
+
+This thorn provides processor-local interpolation, using the interpolation
+operator
+\begin{verbatim}
+  "uniform cartesian"
+\end{verbatim}
+for the Cactus local interpolation API \verb|CCTK_InterpLocalUniform()|.
+(Note that the word ``{\tt cartesian}'' is in lower case here!)
+It supports 1, 2, and 3-dimensional interpolation.
+
+See the Cactus Reference Manual
+for a full description of the \verb|CCTK_InterpLocalUniform()| API,
+and some examples of how to use it.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{History}
+
+This interpolator was written by Thomas Radke in early 2001 (drawing
+on older code by Paul Walker).  It originally lived in the PUGHInterp
+thorn, but it turned to have very little to do with PUGH, so was moved
+here in winter 2001-2002.
+
+From winter 2001-2002 to July 2003 this thorn also contained another
+interpolator written by Jonathan Thornburg, but in July 2003 that
+interpolator was moved to {\bf AEIThorns/AEILocalInterp/} because it was
+(is) GPL and Cactus policies are that this arrangement ({\bf CactusBase})
+is reserved for code under the Cactus-flesh license (= GPL except
+that it's like LGPL for linking with other thorns).
+
+At the beginning of 2015 the low-level interpolation kernels of this
+thorn were rewritten in C++ by David Radice.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Implementation}
+
+Internally, this interpolator always does 3-D interpolation, inserting
+zero coordinates as appropriate for lower dimensionalities.  The
+interpolation is done by successive 1-D interpolations along each
+axis.%%%
+\footnote{%%%
+	 Note that this means that different axes are treated
+	 slightly differently by the interpolator.  In other
+	 words, at the level of finite differencing errors,
+	 interpolation does {\em not\/} commute with permuting
+	 the axes.  However, in practice the differences are
+	 likely to be small, at least for smooth input data.
+	 }%%%
+{}  See the \verb|README| file in the \verb|src/| directory
+for further details.
+
+\subsection{Additional information passed in as table options}
+
+The \verb|CCTK_InterpLocalUniform()| API accepts a table handle as one of its
+arguments which can be used to pass additional information to the local
+interpolator via table options.
+
+The only table option supported so far by {\bf LocalInterp}'s {\tt "uniform
+cartesian"} operator is the interpolation order which must be
+passed as a CCTK\_INT value with key {\tt "order"}. Options with keys
+{\tt "N\_boundary\_points\_to\_omit", "boundary\_off\_centering\_tolerance"}, or
+{\tt "boundary\_extrapolation\_tolerance"} (which are usually passed by a
+global interpolator) are also recognized but silently ignored (a level-4 warning
+message will be issued in this case).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

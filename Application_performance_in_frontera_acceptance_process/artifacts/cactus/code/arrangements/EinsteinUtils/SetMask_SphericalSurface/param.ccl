@@ -1,0 +1,33 @@
+# Parameter definitions for thorn SetMask_SphericalSurface
+
+STRING SetMask_MaskName "Full variable name of the mask to be set" STEERABLE=always
+{
+  ".+" :: "Any full Cactus variable name, GF of type CCTK_BYTE"
+} "HydroBase::hydro_excision_mask"
+
+#BOOLEAN SetMask_ResetAll "'yes' (default): Overwrite complete mask, 'no': Only set excision points"
+#{
+#} "yes"
+
+CCTK_INT SetMask_SurfaceIndex[10] "Index of spherical surface to use to set mask" STEERABLE=always
+{
+  -1:* :: "-1 to disable (default), >=0 for index"
+} -1
+
+CCTK_String SetMask_SurfaceName[10] "Name of spherical surface to use to set mask" STEERABLE=always
+{
+  ".*":: "emtpy to use SetMask_SurfaceIndex, any other string to use"
+} ""
+
+CCTK_REAL SetMask_RadiusFactor[10] "Factor to modify radius of surface for mask" STEERABLE=always
+{
+  0:* :: "Some positive factor, default: 1"
+} 1
+
+BOOLEAN SetMask_TrueShape[10] "Use more sophisticated algorithm to closely resemble the 3d shape of the given spherical surface" STEERABLE=always
+{
+} false
+
+shares: SphericalSurface
+uses CCTK_INT maxntheta
+uses CCTK_INT maxnphi

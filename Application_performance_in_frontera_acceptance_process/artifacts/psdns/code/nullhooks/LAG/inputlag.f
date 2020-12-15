@@ -1,0 +1,3 @@
+       subroutine inputlag
+       return
+       end

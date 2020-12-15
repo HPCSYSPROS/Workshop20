@@ -1,0 +1,67 @@
+# Interface definition for thorn CCCCGlobalModes
+# $Header: /home/cvs/cccc/CCCCThorns/CCCCGlobalModes/interface.ccl,v 1.6 2006/06/10 17:49:10 cott Exp $
+
+implements: CCCCGlobalModes
+
+inherits: grhydro Grid CoreCollapseControl Coordinates
+
+CCTK_REAL total_mass TYPE=SCALAR
+
+CCTK_REAL center_of_mass_helpers TYPE=GF TIMELEVELS=3 tags='prolongation="none"'
+{
+ dMx,dMy,dMz,dMass
+}
+
+CCTK_REAL total_momentum_helpers TYPE=GF TIMELEVELS=3 tags='prolongation="none"'
+{
+ dPx,dPy,dPz
+}
+
+CCTK_REAL shibata_helpers TYPE=GF TIMELEVELS=3 tags='prolongation="none"'
+{
+  dIxx,dIyy,dIxy
+} "Integrand GFs for Shibata Method"
+
+
+CCTK_REAL saijo_helpers TYPE=GF TIMELEVELS=3 tags='prolongation="none"'
+{
+  ddi_re,ddi_im,
+  dquad_re,dquad_im,
+  dsextu_re,dsextu_im
+} "Integrand GFs for Saijo Method"
+
+
+CCTK_REAL saijo_integrals TYPE=SCALAR tags='tensortypealias="Scalar" prolongation="none"'
+{
+	di_re,di_im,quad_re,quad_im,sextu_re,sextu_im
+} "Saijo Integrals"
+
+
+CCTK_REAL shibata_integrals TYPE=SCALAR tags='tensortypealias="Scalar" prolongation="none"'
+{
+	Ixx,Iyy,Ixy,eta_plus,eta_cross,eta
+}
+
+CCTK_REAL center_of_mass TYPE=SCALAR tags='tensortypealias="Scalar" prolongation="none"'
+{
+	Mx,My,Mz,Mr,Mass
+}
+
+CCTK_REAL total_momentum TYPE=SCALAR tags='tensortypealias="Scalar" prolongation="none"'
+{
+	Px,Py,Pz,Pr
+}
+
+
+CCTK_REAL multipole_moment_helpers TYPE=GF TIMELEVELS=3 tags='tensortypealias="Scalar" prolongation="none"'
+{
+   qlm_integrand_re 
+   qlm_integrand_im
+} "Integrand for qlm"
+
+
+CCTK_REAL multipole_moment TYPE=SCALAR tags='tensortypealias="Scalar" prolongation="none"'
+{
+   qlm_re
+   qlm_im
+} "q_lm for given l and m"

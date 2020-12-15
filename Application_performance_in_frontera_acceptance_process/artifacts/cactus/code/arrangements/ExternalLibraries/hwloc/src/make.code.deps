@@ -1,0 +1,10 @@
+# Main make.code.deps file for thorn HWLOC
+
+export HWLOC_INSTALL_DIR
+
+$(CCTK_TARGET) $(OBJS) $(SRCS:%=%.d): $(SCRATCH_BUILD)/done/$(THORN)
+
+ifneq ($(HWLOC_BUILD),)
+$(SCRATCH_BUILD)/done/$(THORN): $(SRCDIR)/build.sh
+	+$(SRCDIR)/build.sh
+endif

@@ -1,0 +1,62 @@
+# Interface definition for thorn CarpetIOASCII
+
+IMPLEMENTS: IOASCII
+
+uses include header: Timer.hh
+
+uses include header: carpet.hh
+
+uses include header: dist.hh
+
+uses include header: vect.hh
+
+uses include header: data.hh
+uses include header: gdata.hh
+
+uses include header: gf.hh
+uses include header: ggf.hh
+
+uses include header: typecase.hh
+uses include header: typeprops.hh
+
+CCTK_INT last_output_iteration[4] TYPE=scalar
+CCTK_REAL last_output_time[4] TYPE=scalar
+CCTK_INT this_iteration[4] TYPE=scalar
+
+
+# Check whether existing output files should be truncated or not
+CCTK_INT FUNCTION \
+    IO_TruncateOutputFiles (CCTK_POINTER_TO_CONST IN cctkGH)
+REQUIRES FUNCTION IO_TruncateOutputFiles
+
+
+
+# Determine which boundaries are symmetry boundaries
+CCTK_INT FUNCTION \
+    SymmetryTableHandleForGrid (CCTK_POINTER_TO_CONST IN cctkGH)
+REQUIRES FUNCTION SymmetryTableHandleForGrid
+
+CCTK_INT FUNCTION \
+    SymmetryTableHandleForGI (CCTK_POINTER_TO_CONST IN cctkGH, \
+                              CCTK_INT IN group_index)
+REQUIRES FUNCTION SymmetryTableHandleForGI
+
+
+
+# Return a pointer to an unmodifiable C string
+# which contains a unique ID for this build
+CCTK_POINTER_TO_CONST \
+FUNCTION UniqueBuildID (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION UniqueBuildID
+
+# Return a pointer to an unmodifiable C string
+# which contains a unique ID for this simulation
+CCTK_POINTER_TO_CONST \
+FUNCTION UniqueSimulationID (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION UniqueSimulationID
+
+# Return a pointer to an unmodifiable C string
+# which contains a unique ID for this run
+CCTK_POINTER_TO_CONST \
+FUNCTION UniqueRunID (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION UniqueRunID

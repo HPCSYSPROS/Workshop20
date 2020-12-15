@@ -1,0 +1,13 @@
+CVS info   : $Header:$
+
+Cactus Code Thorn ZelmaniAnalysis
+Thorn Author(s)     : Christian D. Ott <cott@tapir.caltech.edu>
+Thorn Maintainer(s) : Christian D. Ott <cott@tapir.caltech.edu>
+--------------------------------------------------------------------------
+
+Purpose of the thorn:
+
+This thorn computes a bunch of analysis quantities.
+This thorn mostly computes volume integrals.
+
+

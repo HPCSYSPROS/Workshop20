@@ -1,0 +1,27 @@
+
+CUDADIR=$(CRAY_CUDATOOLKIT_DIR)
+CUDAINCL=$(CRAY_CUDATOOLKIT_INCLUDE_OPTS)
+CUBDIR=.rootdir/cub
+CUBINCL=-I$(CUBDIR)
+CUDALIB=-lcudart -lcufft $(CRAY_CUDATOOLKIT_POST_LINK_OPTS)
+CUDAFLAGS=-DNAMD_CUDA
+CUDAOBJS=$(CUDAOBJSRAW)
+CUDA=$(CUDAFLAGS) -I. $(CUDAINCL) $(CUBINCL)
+CUDACC=$(CUDADIR)/bin/nvcc -O3 -ftz=true --maxrregcount 48 $(CUDAGENCODE) -Xcompiler "-m64" $(CUDA)
+CUDAGENCODE=-arch sm_35
+
+
+loaded_modules := $(subst :, ,$(LOADEDMODULES))
+
+module := $(filter cudatoolkit/%,$(loaded_modules))
+ifeq (,$(module))
+  $(error module cudatoolkit is not loaded)
+else
+  $(info found module $(module))
+endif
+
+module := $(filter gcc/%,$(loaded_modules))
+ifeq (gcc/4.8.2,$(module))
+  $(error found module gcc/4.8.2 with bad std::nth_element implementation)
+endif
+

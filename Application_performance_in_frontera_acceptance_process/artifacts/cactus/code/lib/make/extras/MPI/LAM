@@ -1,0 +1,115 @@
+#! /bin/sh
+# /*@@
+#   @file    LAM
+#   @date    Wed Jul 21 13:27:07 1999
+#   @author  Tom Goodale
+#   @desc
+#            Configure Cactus to compile with the LAM version of MPI.
+#   @enddesc
+#   @version $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/extras/MPI/LAM,v 1.15 2007-02-19 09:49:14 tradke Exp $
+# @@*/
+
+echo '  LAM selected'
+
+if test -z "$LAM_LIB_DIR" -o -z "$LAM_INC_DIR" ; then
+  if test -z "$LAM_DIR" ; then
+    echo '  LAM selected but no LAM_DIR set. Checking some places...'
+    if test -d '/usr/lib/lam/lib' -a -d '/usr/lib/lam/include' ; then
+      lam_libs='/usr/lib/lam/lib'
+      lam_includes='/usr/lib/lam/include'
+    elif test -d '/usr/include/lam' -a -d '/usr/lib/lam' ; then
+      lam_libs='/usr/lib/lam'
+      lam_includes='/usr/include/lam'
+    elif test -d '/usr/local/include/lam' -a -d '/usr/local/lib/lam' ; then
+      lam_libs='/usr/local/lib/lam'
+      lam_includes='/usr/local/include/lam'
+    else
+      CCTK_Search LAM_DIR "/usr/local/lam /usr/local/packages/lam /usr/local/apps/lam $HOME /usr/local /usr" include/lam_config.h
+      if test -z "$LAM_DIR" ; then
+        echo '  Unable to locate LAM installation - please set LAM_DIR or {LAM_INC_DIR, LAM_LIB_DIR}'
+        exit 2
+      fi
+    fi
+  fi
+
+  # set LAM_INC_DIR if not already set
+  if test -z "$LAM_INC_DIR" ; then
+
+    : ${lam_includes="$LAM_DIR/include"}
+
+    # search for mpi++.h which might be in an include subdirectory
+    if test ! -r "$lam_includes/mpi++.h" ; then
+      if test -r "$lam_includes/mpi2c++/mpi++.h" ; then
+        lam_cxx_includes="$lam_includes/mpi2c++"
+      elif test -r "$lam_includes/../mpi2c++/mpi++.h" ; then
+        lam_cxx_includes="$lam_includes/../mpi2c++"
+      fi
+    fi
+
+    # don't explicitely add standard include search paths
+    if test "$lam_includes" != '/usr/include' -a "$lam_includes" != '/usr/local/include'; then
+      LAM_INC_DIR="$lam_includes"
+    fi
+    if test -n "$lam_cxx_includes"; then
+      LAM_INC_DIR="$LAM_INC_DIR $lam_cxx_includes"
+    fi
+
+  fi
+
+  # set LAM_LIB_DIR if not already set
+  if test -z "$LAM_LIB_DIR" ; then
+    : ${lam_libs="$LAM_DIR/lib"}
+
+    # don't add standard library search paths   \
+    if test                                     \
+        "$lam_libs" != '/lib' -a                \
+        "$lam_libs" != '/lib64' -a              \
+        "$lam_libs" != '/usr/lib' -a            \
+        "$lam_libs" != '/usr/lib64' -a          \
+        "$lam_libs" != '/usr/local/lib' -a      \
+        "$lam_libs" != '/usr/local/lib64';      \
+        then
+      LAM_LIB_DIR="$lam_libs"
+    fi
+  fi
+
+  if test -z "$LAM_INC_DIR"; then
+    echo '  Using no explicit LAM include path'
+  else
+    echo "  Using \"$LAM_INC_DIR\" as LAM include path"
+  fi
+  if test -z "$LAM_LIB_DIR"; then
+    echo '  Using no explicit LAM library path'
+  else
+    echo "  Using \"$LAM_LIB_DIR\" as LAM library path"
+  fi
+fi
+
+# LAM libs changed in versions newer than 6.4
+if test -r "$LAM_LIB_DIR/libtrillium.a" ; then
+  MPI_LIBS='mpi tstdio args t trillium'
+else
+  MPI_LIBS='mpi lam dl pthread'
+
+  if test -r "$LAM_LIB_DIR/liblammpi++.a" ; then
+    MPI_LIBS="lammpi++ $MPI_LIBS"
+  fi
+
+  # if a LAM config header file exists, extract possible device libs and libdirs
+  if test -n "$LAM_INC_DIR"; then
+    lam_config_file="$LAM_INC_DIR/lam_config.h"
+  else
+    lam_config_file="$LAM_DIR/include/lam_config.h"
+  fi
+  if test -r "$lam_config_file" ; then
+    base_lib_list=`grep WRAPPER_EXTRA_LIBS $lam_config_file | perl -ne 's/WRAPPER_EXTRA_LIBS\s+"(.+)"/\1/; print'`
+    base_libdir_list=`grep WRAPPER_EXTRA_LDFLAGS $lam_config_file | perl -ne 's/WRAPPER_EXTRA_LDFLAGS\s+"(.+)"/\1/; print'`
+    LAM_DEVICE_LIBS=`echo "$base_lib_list" | perl -nae '@libs = (); foreach $lib (@F) { push (@libs, $lib) if ($lib =~ s/^-l(.+)/\1/) } print "@libs"'`
+    LAM_DEVICE_LIB_DIR=`echo "$base_libdir_list" | perl -nae '@libdirs = (); foreach $libdir (@F) { push (@libdirs, $libdir) if ($libdir =~ s/^-L(.+)/\1/) } print "@libdirs"'`
+    MPI_LIBS="$MPI_LIBS $LAM_DEVICE_LIBS"
+    LAM_LIB_DIR="$LAM_LIB_DIR $LAM_DEVICE_LIB_DIR"
+  fi
+fi
+
+MPI_INC_DIRS="$LAM_INC_DIR"
+MPI_LIB_DIRS="$LAM_LIB_DIR"

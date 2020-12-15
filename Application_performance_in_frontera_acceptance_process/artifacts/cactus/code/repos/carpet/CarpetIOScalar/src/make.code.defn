@@ -1,0 +1,7 @@
+# Main make.code.defn file for thorn CarpetIOScalar
+
+# Source files in this directory
+SRCS = ioscalar.cc
+
+# Subdirectories containing source files
+SUBDIRS = 

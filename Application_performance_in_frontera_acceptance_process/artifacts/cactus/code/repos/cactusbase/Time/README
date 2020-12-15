@@ -1,0 +1,20 @@
+Cactus Code Thorn Time
+Author(s)    : Gabrielle Allen
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Thorn Time sets the timestep for the simulation by either
+
+	- setting the timestep directly from a parameter value
+
+	- using a Courant-type condition to set the timestep based
+	  on the grid-spacing used.
+
+The Courant condition can be applied either once at the start of the
+simulation, or the timestep can be calculated dynamically before each timestep.
+
+
+

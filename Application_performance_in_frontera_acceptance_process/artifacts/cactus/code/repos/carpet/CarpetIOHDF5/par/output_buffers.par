@@ -1,0 +1,72 @@
+ActiveThorns = "Carpet CarpetLib CarpetRegrid2 CarpetSlab LoopControl GSL Boundary CoordBase InitBase SymBase CartGrid3D LocalInterp Slab Time MoL IOUtil CarpetIOBasic CarpetIOScalar HDF5 CarpetIOHDF5"
+
+
+Cactus::cctk_itlast = 0
+
+Driver::global_nx  = 7
+Driver::global_ny  = 7
+Driver::global_nz  = 7
+Driver::ghost_size = 1
+
+InitBase::initial_data_setup_method = "init_all_levels"
+
+Carpet::max_refinement_levels    = 3
+Carpet::prolongation_order_space = 1
+Carpet::prolongation_order_time  = 2
+Carpet::verbose  = no
+Carpet::veryverbose  = no
+Carpet::domain_from_coordbase = yes
+Carpet::use_buffer_zones      = "yes"
+
+CarpetRegrid2::num_centres = 2
+CarpetRegrid2::num_levels_1 = 2
+CarpetRegrid2::radius_x_1[1] = 0.125
+CarpetRegrid2::radius_y_1[1] = 0.25
+CarpetRegrid2::radius_z_1[1] = 0.25
+CarpetRegrid2::num_levels_2 = 2
+CarpetRegrid2::radius_x_2[1] = 0.125
+CarpetRegrid2::radius_y_2[1] = 0.125
+CarpetRegrid2::radius_z_2[1] = 0.125
+CarpetRegrid2::position_x_2 = 0.25
+CarpetRegrid2::position_y_2 = 0.0
+CarpetRegrid2::position_z_2 = 0.0
+
+
+Grid::domain = full
+Grid::type   = coordbase
+Grid::avoid_origin = no
+
+CoordBase::domainsize                   = minmax
+CoordBase::xmin                         = -0.5
+CoordBase::ymin                         = -0.5
+CoordBase::zmin                         = -0.5
+CoordBase::xmax                         = 0.5
+CoordBase::ymax                         = 0.5
+CoordBase::zmax                         = 0.5
+CoordBase::dx                           = 0.1
+CoordBase::dy                           = 0.1
+CoordBase::dz                           = 0.1
+CoordBase::boundary_size_x_lower        = 1
+CoordBase::boundary_size_y_lower        = 1
+CoordBase::boundary_size_z_lower        = 1
+CoordBase::boundary_size_x_upper        = 1
+CoordBase::boundary_size_y_upper        = 1
+CoordBase::boundary_size_z_upper        = 1
+
+Time::dtfac = 0.25
+MethodOfLines::MoL_Intermediate_Steps = 2
+
+
+IO::out_dir       = $parfile
+IO::verbose = full
+ 
+# HDF5 output only for initial data
+IOHDF5::out_every = 513
+IOHDF5::out_vars  = "grid::x grid::y grid::z"
+IOHDF5::out2d_every = 513
+IOHDF5::out2d_vars  = "grid::x grid::y grid::z"
+IOHDF5::out2d_xy = "yes"
+IOHDF5::output_symmetry_points = yes
+IOHDF5::output_ghost_points = yes
+IOHDF5::output_boundary_points = yes
+IOHDF5::output_buffer_points = no

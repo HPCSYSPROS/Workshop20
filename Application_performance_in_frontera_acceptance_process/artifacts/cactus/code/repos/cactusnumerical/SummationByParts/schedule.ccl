@@ -1,0 +1,39 @@
+# Schedule definitions for thorn SummationByParts
+# $Header$
+
+# Mask for norms
+STORAGE: normmask
+
+if (use_variable_deltas)
+{
+  STORAGE: deltas
+}
+
+SCHEDULE SBP_SetNormMask AT basegrid
+{
+  LANG: Fortran
+} "Setup the mask for the calculation of the norm"
+
+if (use_variable_deltas)
+{
+  SCHEDULE SBP_DeltaInitial AT basegrid
+  {
+    LANG: Fortran
+  } "Initialize dissipation deltas"
+}
+
+if (check_grid_sizes)
+{
+  SCHEDULE SBP_CheckGridSizes AT postinitial
+  {
+    LANG: Fortran
+  } "Check grid sizes and ghost zones"
+}
+
+if (use_dissipation)
+{
+  SCHEDULE SBP_DissipationAdd IN MoL_PostRHS
+  {
+    LANG: C
+  } "Add SBP compatible dissipation to the right hand sides"
+}

@@ -1,0 +1,9 @@
+Cactus Code Thorn CoordBase
+Author(s)    : Cactus team
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Provides generic handling of coordinates for grid variables.

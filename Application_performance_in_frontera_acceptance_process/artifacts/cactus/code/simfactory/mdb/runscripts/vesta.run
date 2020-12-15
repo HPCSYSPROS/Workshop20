@@ -1,0 +1,33 @@
+#! /bin/bash
+
+# NOTE: Node count etc. are given with qsub command; see mdb
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+echo "Checking:"
+pwd
+hostname
+date
+
+echo "Environment:"
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export OMP_NUM_THREADS=@NUM_THREADS@
+env | sort > SIMFACTORY/ENVIRONMENT
+
+# TODO: try
+# envs+="  OMP_WAIT_POLICY=ACTIVE "
+# envs+="  USE_FAST_WAKEUP=TRUE"
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+runjob -p @((@NUM_PROCS@ + @NODES@ - 1) / @NODES@)@ -n @NUM_PROCS@ --block $COBALT_PARTNAME --verbose=INFO --envs BG_SHAREDMEMSIZE=32MB --envs BG_THREADLAYOUT=2 --envs XL_BG_SPREADLAYOUT=YES --envs PAMID_VERBOSE=1 --envs OMP_NUM_THREADS=$OMP_NUM_THREADS --envs CACTUS_STARTTIME=$CACTUS_STARTTIME --envs CACTUS_NUM_PROCS=$CACTUS_NUM_PROCS --envs CACTUS_NUM_THREADS=$CACTUS_NUM_THREADS --envs LANG=en_US --envs NLSPATH=/soft/compilers/ibmcmp-may2013/msg/bg/%L/%N : @EXECUTABLE@ -L 3 @PARFILE@
+
+echo "Stopping:"
+date
+
+echo "Done."

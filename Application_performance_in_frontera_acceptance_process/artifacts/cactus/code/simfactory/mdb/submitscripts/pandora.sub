@@ -1,0 +1,25 @@
+#! /bin/bash
+#@ job_type = parallel
+#@ account_no = @ALLOCATION@
+#@ class = @QUEUE@
+#@ checkpoint = no
+#@ restart = no
+#@ wall_clock_limit = @WALLTIME@
+#@ node = @NODES@
+#@ tasks_per_node = @NODE_PROCS@
+#@ resources = ConsumableCpus(@(@NUM_THREADS@/@NUM_SMT@)@) ConsumableMemory(3500 mb)
+#@ requirements = (Arch == "POWER7")
+#@ node_usage = not_shared
+#@ network.MPI_LAPI = sn_single,not_shared,US,HIGH
+#@ job_name = @SIMULATION_NAME@
+#@ notify_user = @EMAIL@
+#@ notification = always
+#@ shell = /usr/bin/bash
+#@ environment = COPY_ALL; OMP_NUM_THREADS=@NUM_THREADS@
+#@ initialdir = @RUNDIR@
+#@ input = /dev/null
+#@ output = @RUNDIR@/@SIMULATION_NAME@.out
+#@ error = @RUNDIR@/@SIMULATION_NAME@.err
+#@ queue
+cd @SOURCEDIR@
+@SIMFACTORY@ run @SIMULATION_NAME@ --machine=@MACHINE@ --restart-id=@RESTART_ID@ @FROM_RESTART_COMMAND@

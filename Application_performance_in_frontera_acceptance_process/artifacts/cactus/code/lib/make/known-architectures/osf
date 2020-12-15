@@ -1,0 +1,62 @@
+#! /bin/sh
+#  /*@@
+#    @file      osf
+#    @date      Thu Mar 25 15:38:45 1999
+#    @author    Tom Goodale
+#    @desc
+#               known-architectures file for OSF systems
+#    @enddesc
+#    @version   $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/known-architectures/osf,v 1.14 2004-09-22 15:15:47 tradke Exp $
+#  @@*/
+
+if test "$CCTK_CONFIG_STAGE" = "preferred-compilers" ; then
+
+  if test -z "$CC"; then
+    echo Setting C compiler to cc
+    CC="cc"
+  fi
+
+else
+
+  STD_FLAGS='-std1'
+
+  # need to explicitly add '-O0' to switch off default optimization level
+  if test "X$OPTIMISE" = "Xno"; then
+    STD_FLAGS="$STD_FLAGS -O0"
+  fi
+
+  # PTHREADS need the '-pthread' flag set
+  if test "X$PTHREADS" = "Xyes" ; then
+    STD_FLAGS="$STD_FLAGS -pthread"
+  fi
+
+  if test "$CC" = "cc" ; then
+    if test "X$PTHREADS" = "Xyes" ; then
+      : ${C_DEPEND='$(CC) -pthread -E -M $(CPPFLAGS) $(CFLAGS)'}
+    fi
+    : ${CFLAGS="$STD_FLAGS"}
+    : ${C_OPTIMISE_FLAGS='-O5 -fast -writable_strings'}
+    : ${C_DEBUG_FLAGS='-g3'}
+  fi
+
+  if test "$CXX" = "cxx" ; then
+    if test "X$PTHREADS" = "Xyes" ; then
+      : ${CXX_DEPEND='$(CXX) -pthread -noimplicit_include -E -M $(CPPFLAGS) $(CXXFLAGS)'}
+    else
+      : ${CXX_DEPEND='$(CXX) -noimplicit_include -E -M $(CPPFLAGS) $(CXXFLAGS)'}
+    fi
+    : ${CXXFLAGS="$STD_FLAGS"}
+    : ${CXX_OPTIMISE_FLAGS='-O5 -fast -writable_strings'}
+    : ${CXX_DEBUG_FLAGS='-g3'}
+  fi
+
+  : ${F77FLAGS="$STD_FLAGS"}
+  : ${F90FLAGS="$STD_FLAGS"}
+  : ${F77_OPTIMISE_FLAGS='-O5 -fast'}
+  : ${F90_OPTIMISE_FLAGS='-O5 -fast'}
+  : ${F77_DEBUG_FLAGS='-g3'}
+  : ${F90_DEBUG_FLAGS='-g3'}
+
+  : ${LIBS="for m"}
+
+fi

@@ -1,0 +1,1619 @@
+
+Currently Loaded Modules:
+  1) intel/17.0.4    4) xalt/1.7.7    7) python/2.7.13
+  2) git/2.9.0       5) TACC          8) fftw3/3.3.6
+  3) autotools/1.1   6) impi/17.0.3   9) phdf5/1.8.16
+
+ 
+
+-----------------------------
+This will be used:
+ibrun is /scratch/hpc_tools/spp_ibrun/ibrun
+tacc_affinity is /scratch/hpc_tools/spp_ibrun/tacc_affinity
+ANTIAFFINITY = 0
+-----------------------------
+Thu Nov  2 02:27:16 CDT 2017
+TACC: Starting up job 386572
+TACC: Starting parallel tasks...
+ starting taskid=     0 date & time is  11/ 2/2017   2:27:29
+ flag_outcomm=           0
+ enter input
+ flag_outcomm=           0
+ after read nx...
+ after read nsteps...
+ after read stend...
+ after read fninit(1)...
+ after read indir_fn...
+ after read irz...
+ after read viscos...
+ after read a11...
+ after read beta1...
+ after read cfl...
+ after read dtout...
+ after read dtsave...
+ after read kshift...
+ after read tforce...
+ after read rrate...
+ after read iovor...
+ after read seed_input...   122929298
+ after read rkmethod...
+ rkmethod=           4
+ read nxpad...
+ input: tl_hat,kmaxeta=  0.150000000000000        1.40000000000000     
+ exit input
+ param_set: kfor=           1
+ User has selected:Runge Kutta Fourth Order Method         
+numtasks=   4096 nx= 2048 ny= 2048 nz= 2048 nc=0 nu= 5
+ main: Ntot,nxhp=                  1024        1025
+ mpisetup: taskid,ithr,num_thr=           0           0           1
+ Reading grid from file dims
+ starting taskid=  4095 date & time is  11/ 2/2017   2:27:29
+ Warning: invalid user-specified choice of iproc x jproc
+ Proceed by adjusting jproc, now equal to         128
+ mpisetup: iproc,jproc=          32         128
+ mpisetup: after create
+ mpisetup: after coords
+ mpisetup: b
+ mpisetup: c
+ mpisetup: A
+ taskid,Balance Period is            0           4
+ mpisetup: B
+ mpisetup: C
+  exit mpisetup
+ enter com_set
+ taskid,Balance Period is            1           4
+  exit com_set
+ after com_set
+ comp_set: max pads=           0           0           0
+ after comp_set
+ comsp_set: mxyz=        2048
+ after comsp_set
+ Using processor grid           32  x          128
+taskid, xist,xien,zjst,zjen=     0     1    32     1    16
+taskid, zist,zien,yjst,yjen=     0     1    64     1    16
+ Calling init; nxhpad=        1024
+ Calling waveno ,b11(2)=   1.00000000000000     
+ Calling mpisetup2
+ xz_tot=       61788
+     0: Num_al,xz_tot =       483     61788
+     1: Num_al,xz_tot =       478     61098
+    14: Num_al,xz_tot =       475     60754
+    15: Num_al,xz_tot =       483     61706
+    19: Num_al,xz_tot =       424     54198
+taskid, xist,xien,zjst,zjen=  3456     1    32  1729  1744
+taskid, zist,zien,yjst,yjen=  3456     1    64  1729  1744
+    26: Num_al,xz_tot =       303     38776
+    27: Num_al,xz_tot =       369     47168
+    28: Num_al,xz_tot =       415     53026
+    30: Num_al,xz_tot =       468     59854
+    31: Num_al,xz_tot =       480     61374
+     3: Num_al,xz_tot =       440     56246
+     5: Num_al,xz_tot =       355     45356
+     6: Num_al,xz_tot =       282     36088
+     8: Num_al,xz_tot =       100     12762
+    12: Num_al,xz_tot =       432     55264
+    18: Num_al,xz_tot =       453     57934
+taskid, xist,xien,zjst,zjen=  1536     1    32   769   784
+taskid, zist,zien,yjst,yjen=  1536     1    64   769   784
+    21: Num_al,xz_tot =       322     41190
+taskid, xist,xien,zjst,zjen=   256     1    32   129   144
+taskid, zist,zien,yjst,yjen=   256     1    64   129   144
+    22: Num_al,xz_tot =       231     29566
+taskid, xist,xien,zjst,zjen=  1920     1    32   961   976
+taskid, zist,zien,yjst,yjen=  1920     1    64   961   976
+    23: Num_al,xz_tot =         7       854
+    24: Num_al,xz_tot =         0         0
+    25: Num_al,xz_tot =       199     25440
+    29: Num_al,xz_tot =       447     57132
+     4: Num_al,xz_tot =       405     51740
+taskid, xist,xien,zjst,zjen=   384     1    32   193   208
+taskid, zist,zien,yjst,yjen=   384     1    64   193   208
+taskid, xist,xien,zjst,zjen=  1664     1    32   833   848
+taskid, zist,zien,yjst,yjen=  1664     1    64   833   848
+     9: Num_al,xz_tot =       259     33050
+taskid, xist,xien,zjst,zjen=  1408     1    32   705   720
+taskid, zist,zien,yjst,yjen=  1408     1    64   705   720
+    13: Num_al,xz_tot =       459     58646
+taskid, xist,xien,zjst,zjen=  1152     1    32   577   592
+taskid, zist,zien,yjst,yjen=  1152     1    64   577   592
+     7: Num_al,xz_tot =       159     20278
+    16: Num_al,xz_tot =       482     61576
+taskid, xist,xien,zjst,zjen=  3968     1    32  1985  2000
+taskid, zist,zien,yjst,yjen=  3968     1    64  1985  2000
+    17: Num_al,xz_tot =       472     60340
+    20: Num_al,xz_tot =       382     48828
+     2: Num_al,xz_tot =       464     59292
+taskid, xist,xien,zjst,zjen=  2048     1    32  1025  1040
+taskid, zist,zien,yjst,yjen=  2048     1    64  1025  1040
+    10: Num_al,xz_tot =       339     43380
+    11: Num_al,xz_tot =       394     50348
+taskid, xist,xien,zjst,zjen=  3712     1    32  1857  1872
+taskid, zist,zien,yjst,yjen=  3712     1    64  1857  1872
+taskid, xist,xien,zjst,zjen=   512     1    32   257   272
+taskid, zist,zien,yjst,yjen=   512     1    64   257   272
+main: taskid,num_al,num_fft0=    24     0     0
+main: taskid,num_al,num_fft0=    14   475   475
+main: taskid,num_al,num_fft0=    15   483   483
+main: taskid,num_al,num_fft0=    16   482   482
+main: taskid,num_al,num_fft0=    17   472   472
+main: taskid,num_al,num_fft0=    23     7     7
+main: taskid,num_al,num_fft0=     2   464   464
+main: taskid,num_al,num_fft0=     3   440   440
+main: taskid,num_al,num_fft0=     5   355   355
+main: taskid,num_al,num_fft0=    10   339   339
+main: taskid,num_al,num_fft0=    13   459   459
+main: taskid,num_al,num_fft0=    27   369   369
+main: taskid,num_al,num_fft0=    30   468   468
+main: taskid,num_al,num_fft0=     1   478   478
+main: taskid,num_al,num_fft0=     6   282   282
+main: taskid,num_al,num_fft0=    22   231   231
+main: taskid,num_al,num_fft0=    25   199   199
+main: taskid,num_al,num_fft0=     4   405   405
+main: taskid,num_al,num_fft0=     7   159   159
+main: taskid,num_al,num_fft0=     9   259   259
+main: taskid,num_al,num_fft0=    11   394   394
+main: taskid,num_al,num_fft0=    18   453   453
+main: taskid,num_al,num_fft0=    21   322   322
+main: taskid,num_al,num_fft0=    28   415   415
+main: taskid,num_al,num_fft0=    31   480   480
+main: taskid,num_al,num_fft0=    12   432   432
+main: taskid,num_al,num_fft0=    19   424   424
+main: taskid,num_al,num_fft0=    20   382   382
+main: taskid,num_al,num_fft0=    29   447   447
+main: taskid,num_al,num_fft0=    26   303   303
+main: taskid,num_al,num_fft0=     8   100   100
+taskid, xist,xien,zjst,zjen=  1280     1    32   641   656
+taskid, xist,xien,zjst,zjen=  1024     1    32   513   528
+taskid, xist,xien,zjst,zjen=  3072     1    32  1537  1552
+taskid, xist,xien,zjst,zjen=  2304     1    32  1153  1168
+taskid, zist,zien,yjst,yjen=  1280     1    64   641   656
+taskid, zist,zien,yjst,yjen=  1024     1    64   513   528
+taskid, zist,zien,yjst,yjen=  3072     1    64  1537  1552
+taskid, xist,xien,zjst,zjen=   896     1    32   449   464
+taskid, xist,xien,zjst,zjen=  2176     1    32  1089  1104
+taskid, zist,zien,yjst,yjen=  2304     1    64  1153  1168
+taskid, xist,xien,zjst,zjen=   768     1    32   385   400
+taskid, xist,xien,zjst,zjen=  2944     1    32  1473  1488
+taskid, xist,xien,zjst,zjen=   128     1    32    65    80
+taskid, xist,xien,zjst,zjen=  2432     1    32  1217  1232
+taskid, zist,zien,yjst,yjen=   768     1    64   385   400
+taskid, xist,xien,zjst,zjen=   640     1    32   321   336
+taskid, zist,zien,yjst,yjen=  2176     1    64  1089  1104
+taskid, zist,zien,yjst,yjen=   896     1    64   449   464
+taskid, xist,xien,zjst,zjen=  3200     1    32  1601  1616
+taskid, xist,xien,zjst,zjen=  3328     1    32  1665  1680
+taskid, xist,xien,zjst,zjen=  2688     1    32  1345  1360
+taskid, zist,zien,yjst,yjen=  2944     1    64  1473  1488
+taskid, xist,xien,zjst,zjen=  1792     1    32   897   912
+taskid, zist,zien,yjst,yjen=  3328     1    64  1665  1680
+taskid, zist,zien,yjst,yjen=  2688     1    64  1345  1360
+taskid, xist,xien,zjst,zjen=  3840     1    32  1921  1936
+taskid, zist,zien,yjst,yjen=   640     1    64   321   336
+taskid, zist,zien,yjst,yjen=  1792     1    64   897   912
+taskid, zist,zien,yjst,yjen=  2432     1    64  1217  1232
+taskid, zist,zien,yjst,yjen=  3200     1    64  1601  1616
+taskid, zist,zien,yjst,yjen=   128     1    64    65    80
+taskid, zist,zien,yjst,yjen=  3840     1    64  1921  1936
+taskid, xist,xien,zjst,zjen=  2560     1    32  1281  1296
+taskid, zist,zien,yjst,yjen=  2560     1    64  1281  1296
+taskid, xist,xien,zjst,zjen=  3584     1    32  1793  1808
+taskid, zist,zien,yjst,yjen=  3584     1    64  1793  1808
+taskid, xist,xien,zjst,zjen=  2816     1    32  1409  1424
+taskid, zist,zien,yjst,yjen=  2816     1    64  1409  1424
+main: taskid,num_al,num_fft0=     0   483   483
+ enter epfftw: MEASURE
+iyp1:       1
+iypi:      16
+ exit epfftw: taskid, time(secs) =            0   2.57397699356079     
+Wisdom saved in file wisdom
+ Calling masks
+ After masks
+        openf: before log      0 date & time is  11/ 2/2017   2:27:31
+ taskid,lu,fopen1: filename=           0           7 log
+               openf: log      0 date & time is  11/ 2/2017   2:27:31
+ taskid,lu,fopen1: filename=           0           8 courant
+           openf: courant      0 date & time is  11/ 2/2017   2:27:31
+ taskid,lu,fopen1: filename=           0          13 sptr1d
+            openf: sptr1d      0 date & time is  11/ 2/2017   2:27:31
+ taskid,lu,fopen1: filename=           0          14 corr1d
+            openf: corr1d      0 date & time is  11/ 2/2017   2:27:31
+ taskid,lu,fopen1: filename=           0          15 eulstat
+           openf: eulstat      0 date & time is  11/ 2/2017   2:27:31
+ taskid,lu,fopen1: filename=           0         996 rstensor
+          openf: rstensor      0 date & time is  11/ 2/2017   2:27:31
+ taskid,lu,fopen1: filename=           0         997 sptr3d
+            openf: sptr3d      0 date & time is  11/ 2/2017   2:27:31
+ taskid,lu,fopen1: filename=           0         998 tmij
+              openf: tmij      0 date & time is  11/ 2/2017   2:27:31
+ taskid,lu,fopen1: filename=           0         999 metrics
+           openf: metrics      0 date & time is  11/ 2/2017   2:27:31
+ taskid,lu,fopen1: filename=           0         991 spectrum.free
+     openf: spectrum.free      0 date & time is  11/ 2/2017   2:27:31
+ taskid,lu,fopen1: filename=           0          18 vgskew
+ taskid,lu,fopen1: filename=           0         190 vgmomt
+ taskid,lu,fopen1: filename=           0         191 vgmomtn
+ taskid,lu,fopen1: filename=           0          30 corrmat
+ taskid,lu,fopen1: filename=           0          31 trfsptr
+ taskid,lu,fopen1: filename=           0          35 vorstat
+ taskid,lu,fopen1: filename=           0          50 forcinp
+ taskid,lu,fopen1: filename=           0         751 dns_pdf_epsenst
+ taskid,lu,fopen1: filename=           0         752 dns_max_epsenst
+ taskid,lu,fopen1: filename=           0         753 vort_skewflat
+ main: before call incond
+ enter incond: b11(m)=   1.00000000000000     
+ enter field
+ incond: irz=           1
+    incond: before do 110      0 date & time is  11/ 2/2017   2:27:31
+    incond:  after do 110      0 date & time is  11/ 2/2017   2:27:31
+       incond: at barrier      0 date & time is  11/ 2/2017   2:27:32
+ enter pfield, taskid=           0        2048          64          16
+                  1024
+ using hook pfield: sinusoidal
+ pfield: rms x-vel=  0.353553390593274     
+ exit pfield
+ exit of inpvf
+     incond: before store      0 date & time is  11/ 2/2017   2:27:32
+ initial data fields in place
+ incond: b11(2)=   1.00000000000000     
+sptvar: taskid, x,y,z,a,uny=    0    1    2    1      1  1.2874E-22 -2.2276E-23
+sptvar: taskid, x,y,z,a,uny=    0    1 2048    1      1  1.2874E-22  2.2276E-23
+sptvar: taskid, x,y,z,a,uny=    0    1    1    2      2  2.3675E-22 -3.9065E-23
+sptvar: taskid, x,y,z,a,uny=    0    1    2    2      2  1.6911E-18 -1.1435E-23
+sptvar: taskid, x,y,z,a,uny=    0    1 2048    2      2  1.6911E-18  1.3089E-22
+sptvar: taskid, x,y,z,a,uny=  128    2    1    2      1 -4.5537E-20  1.1032E-17
+sptvar,taskid,x,y,z,uny= 128   2   2   2   3     1 -4.7804E-17 -1.2500E-01
+sptvar,taskid,x,y,z,uny= 128   22048   2   3     1 -1.1308E-17 -1.2500E-01
+sptvar: taskid, x,y,z,a,uny=   96    1    1 2048    482  2.3675E-22  3.9065E-23
+sptvar: taskid, x,y,z,a,uny=   96    1    2 2048    482  1.6911E-18 -1.3089E-22
+sptvar: taskid, x,y,z,a,uny=   96    1 2048 2048    482  1.6911E-18  1.1435E-23
+sptvar: taskid, x,y,z,a,uny=   96    2    1    1    483  7.8662E-23  5.7684E-21
+sptvar: taskid, x,y,z,a,uny=   96    2    2    1    483 -6.6967E-22  9.6974E-18
+sptvar: taskid, x,y,z,a,uny=   96    2 2048    1    483  2.2642E-21  9.6981E-18
+sptvar: taskid, x,y,z,a,uny=  224    2    1 2048    481 -8.1995E-20  1.1092E-17
+sptvar,taskid,x,y,z,uny= 224   2   22048   3   481 -1.6357E-17 -1.2500E-01
+sptvar,taskid,x,y,z,uny= 224   220482048   3   481  1.6471E-17 -1.2500E-01
+ sptvar: sum of spectrum=  0.375000000000000     
+  exit sptvar,istep,kstep=           0           2
+ enter sptr, io,b11(m)=           1   1.00000000000000     
+  0.125000000000000       0.125000000000000       0.500000000000000     
+  0.125000000000000       0.125000000000000       0.500000000000000     
+  0.125000000000000       0.125000000000000       0.500000000000000     
+ grdiss,size,epslon=  6.300000000000000E-003   1.00000000000000     
+  6.300000000000002E-003
+sptvar: taskid, x,y,z,a,uny=  128    2    1    2      1 -4.5537E-20  1.1032E-17
+sptvar,taskid,x,y,z,uny= 128   2   2   2   3     1 -4.7804E-17 -1.2500E-01
+sptvar,taskid,x,y,z,uny= 128   22048   2   3     1 -1.1308E-17 -1.2500E-01
+sptvar: taskid, x,y,z,a,uny=  224    2    1 2048    481 -8.1995E-20  1.1092E-17
+sptvar,taskid,x,y,z,uny= 224   2   22048   3   481 -1.6357E-17 -1.2500E-01
+sptvar,taskid,x,y,z,uny= 224   220482048   3   481  1.6471E-17 -1.2500E-01
+sptvar: taskid, x,y,z,a,uny=   96    1    1 2048    482  2.3675E-22  3.9065E-23
+sptvar: taskid, x,y,z,a,uny=   96    1    2 2048    482  1.6911E-18 -1.3089E-22
+sptvar: taskid, x,y,z,a,uny=   96    1 2048 2048    482  1.6911E-18  1.1435E-23
+sptvar: taskid, x,y,z,a,uny=   96    2    1    1    483  7.8662E-23  5.7684E-21
+sptvar: taskid, x,y,z,a,uny=   96    2    2    1    483 -6.6967E-22  9.6974E-18
+sptvar: taskid, x,y,z,a,uny=   96    2 2048    1    483  2.2642E-21  9.6981E-18
+  exit sptr
+ check_consym2: istep, difmax=           0 incond  5.423471495636721E-013
+ main: after call incond
+sptvar: taskid, x,y,z,a,uny=    0    1    2    1      1  1.2874E-22 -2.2276E-23
+sptvar: taskid, x,y,z,a,uny=    0    1 2048    1      1  1.2874E-22  2.2276E-23
+sptvar: taskid, x,y,z,a,uny=    0    1    1    2      2  2.3675E-22 -3.9065E-23
+sptvar: taskid, x,y,z,a,uny=    0    1    2    2      2  1.6911E-18 -1.1435E-23
+sptvar: taskid, x,y,z,a,uny=    0    1 2048    2      2  1.6911E-18  1.3089E-22
+ sptvar: sum of spectrum=  0.375000000000000     
+  exit sptvar,istep,kstep=           0           2
+ before time-stepping loop, kstep=           2
+istep=     1 taskid     0 date & time is  11/ 2/2017   2:27:33
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ call itransform
+ dudx       1    3.2784E-19    3.3750E+00
+ dwdz       1   -5.2917E-20    3.3750E+00
+ call transform, kstep=           1
+ istep,dt,time,cfl,velmax=     1 9.20410E-04 9.20410E-04 3.77000E+00 4.09600E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ call itransform_vel
+ enter itransform_vel, kstep=           2
+ call transform, kstep=           2
+ before itransform, vorflag= F
+ call itransform_vel
+ RK stage:            3 flagc= F
+ enter itransform_vel, kstep=           3
+ call transform, kstep=           3
+ before itransform, vorflag= F
+ call itransform_vel
+ RK stage:            4 flagc= F
+ enter itransform_vel, kstep=           4
+ call transform, kstep=           4
+istep=     2 taskid     0 date & time is  11/ 2/2017   2:27:39
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ call itransform_vel
+ istep,dt,time,cfl,velmax=     2 9.20418E-04 1.84083E-03 3.77000E+00 4.09597E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ call itransform_vel
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ call itransform_vel
+ before itransform, vorflag= F
+ call itransform_vel
+ RK stage:            4 flagc= F
+jstep, ncpusteps=      2   1  4.829E+00  4.829E+00
+istep=     3 taskid     0 date & time is  11/ 2/2017   2:27:44
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=     3 9.20426E-04 2.76125E-03 3.77000E+00 4.09593E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=      3   2  4.720E+00  9.549E+00
+istep=     4 taskid     0 date & time is  11/ 2/2017   2:27:48
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=     4 9.20434E-04 3.68169E-03 3.77000E+00 4.09589E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=      4   3  5.005E+00  1.455E+01
+istep=     5 taskid     0 date & time is  11/ 2/2017   2:27:53
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=     5 9.20442E-04 4.60213E-03 3.77000E+00 4.09586E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=      5   4  4.508E+00  1.906E+01
+istep=     6 taskid     0 date & time is  11/ 2/2017   2:27:58
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=     6 9.20451E-04 5.52258E-03 3.77000E+00 4.09582E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+jstep, ncpusteps=      6   5  5.281E+00  2.434E+01
+istep=     7 taskid     0 date & time is  11/ 2/2017   2:28: 3
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=     7 9.20461E-04 6.44304E-03 3.77000E+00 4.09577E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=      7   6  4.493E+00  2.884E+01
+istep=     8 taskid     0 date & time is  11/ 2/2017   2:28: 8
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=     8 9.20471E-04 7.36351E-03 3.77000E+00 4.09573E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=      8   7  4.795E+00  3.363E+01
+istep=     9 taskid     0 date & time is  11/ 2/2017   2:28:12
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=     9 9.20480E-04 8.28399E-03 3.77000E+00 4.09569E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+ Calling sptr, ioflag=           1
+ istep,iocount=           9           1
+ enter sptr, io,b11(m)=           1   1.00000000000000     
+  0.124990643844489       0.124980996986311       0.499933634491436     
+  0.124980996986311       0.124990643844489       0.499933634491436     
+  0.124990644933468       0.124990644933468       0.499943281640916     
+ grdiss,size,epslon=  6.299258342026512E-003   1.00000000000000     
+  6.299258342026512E-003
+  exit sptr
+ check_consym2: istep, difmax=           9 rk  0.181683567930657     
+jstep, ncpusteps_io=   9   1  5.007E+00  5.007E+00
+istep=    10 taskid     0 date & time is  11/ 2/2017   2:28:17
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ dudx      10    1.3178E-02    3.3751E+00
+ dwdz      10   -1.3178E-02    3.3752E+00
+ istep,dt,time,cfl,velmax=    10 9.20491E-04 9.20448E-03 3.77000E+00 4.09564E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     10   8  5.225E+00  3.886E+01
+istep=    11 taskid     0 date & time is  11/ 2/2017   2:28:23
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    11 9.20502E-04 1.01250E-02 3.77000E+00 4.09559E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     11   9  4.944E+00  4.380E+01
+istep=    12 taskid     0 date & time is  11/ 2/2017   2:28:28
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    12 9.20514E-04 1.10455E-02 3.77000E+00 4.09554E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     12  10  5.490E+00  4.929E+01
+istep=    13 taskid     0 date & time is  11/ 2/2017   2:28:33
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    13 9.20526E-04 1.19660E-02 3.77000E+00 4.09549E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     13  11  5.113E+00  5.440E+01
+istep=    14 taskid     0 date & time is  11/ 2/2017   2:28:38
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    14 9.20538E-04 1.28866E-02 3.77000E+00 4.09543E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     14  12  6.544E+00  6.095E+01
+istep=    15 taskid     0 date & time is  11/ 2/2017   2:28:46
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    15 9.20550E-04 1.38071E-02 3.77000E+00 4.09538E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     15  13  9.437E+00  7.038E+01
+istep=    16 taskid     0 date & time is  11/ 2/2017   2:28:56
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    16 9.20564E-04 1.47277E-02 3.77000E+00 4.09532E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     16  14  7.593E+00  7.798E+01
+istep=    17 taskid     0 date & time is  11/ 2/2017   2:29: 3
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    17 9.20577E-04 1.56483E-02 3.77000E+00 4.09526E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     17  15  5.887E+00  8.386E+01
+istep=    18 taskid     0 date & time is  11/ 2/2017   2:29: 9
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    18 9.20591E-04 1.65688E-02 3.77000E+00 4.09520E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+ Calling sptr, ioflag=           1
+ istep,iocount=          18           2
+ enter sptr, io,b11(m)=           1   1.00000000000000     
+  0.124997354644939       0.124958781929531       0.499873695443946     
+  0.124958781929531       0.124997354644939       0.499873695443946     
+  0.124997372061839       0.124997372061839       0.499912272818169     
+ grdiss,size,epslon=  6.298786706740301E-003   1.00000000000000     
+  6.298786706740301E-003
+  exit sptr
+ check_consym2: istep, difmax=          18 rk  0.185241325523682     
+jstep, ncpusteps_io=  18   2  5.563E+00  1.057E+01
+istep=    19 taskid     0 date & time is  11/ 2/2017   2:29:15
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ dudx      19    2.6348E-02    3.3752E+00
+ dwdz      19   -2.6354E-02    3.3758E+00
+ istep,dt,time,cfl,velmax=    19 9.20605E-04 1.74895E-02 3.77000E+00 4.09513E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     19  16  5.668E+00  8.953E+01
+istep=    20 taskid     0 date & time is  11/ 2/2017   2:29:23
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    20 9.20620E-04 1.84101E-02 3.77000E+00 4.09507E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     20  17  6.262E+00  9.579E+01
+istep=    21 taskid     0 date & time is  11/ 2/2017   2:29:29
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    21 9.20636E-04 1.93307E-02 3.77000E+00 4.09500E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     21  18  4.558E+00  1.004E+02
+istep=    22 taskid     0 date & time is  11/ 2/2017   2:29:34
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    22 9.20651E-04 2.02514E-02 3.77000E+00 4.09493E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     22  19  4.375E+00  1.047E+02
+istep=    23 taskid     0 date & time is  11/ 2/2017   2:29:38
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    23 9.20666E-04 2.11720E-02 3.77000E+00 4.09486E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     23  20  4.387E+00  1.091E+02
+istep=    24 taskid     0 date & time is  11/ 2/2017   2:29:42
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    24 9.20683E-04 2.20927E-02 3.77000E+00 4.09479E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     24  21  4.340E+00  1.135E+02
+istep=    25 taskid     0 date & time is  11/ 2/2017   2:29:47
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    25 9.20700E-04 2.30134E-02 3.77000E+00 4.09471E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     25  22  4.349E+00  1.178E+02
+istep=    26 taskid     0 date & time is  11/ 2/2017   2:29:51
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    26 9.20717E-04 2.39341E-02 3.77000E+00 4.09463E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     26  23  4.390E+00  1.222E+02
+istep=    27 taskid     0 date & time is  11/ 2/2017   2:29:56
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    27 9.20735E-04 2.48549E-02 3.77000E+00 4.09456E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+ Calling sptr, ioflag=           1
+ istep,iocount=          27           3
+ enter sptr, io,b11(m)=           1   1.00000000000000     
+  0.125020109853282       0.124933361534178       0.499820169208674     
+  0.124933361534178       0.125020109853282       0.499820169208674     
+  0.125020197989330       0.125020197989330       0.499906941101389     
+ grdiss,size,epslon=  6.298584931162493E-003   1.00000000000000     
+  6.298584931162493E-003
+  exit sptr
+ check_consym2: istep, difmax=          27 rk  0.194487482009067     
+jstep, ncpusteps_io=  27   3  4.577E+00  1.515E+01
+istep=    28 taskid     0 date & time is  11/ 2/2017   2:30: 0
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ dudx      28    3.9507E-02    3.3755E+00
+ dwdz      28   -3.9526E-02    3.3768E+00
+ istep,dt,time,cfl,velmax=    28 9.20753E-04 2.57756E-02 3.77000E+00 4.09448E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+jstep, ncpusteps=     28  24  5.234E+00  1.274E+02
+istep=    29 taskid     0 date & time is  11/ 2/2017   2:30: 5
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    29 9.20771E-04 2.66964E-02 3.77000E+00 4.09439E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     29  25  4.375E+00  1.318E+02
+istep=    30 taskid     0 date & time is  11/ 2/2017   2:30:10
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    30 9.20791E-04 2.76172E-02 3.77000E+00 4.09431E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+jstep, ncpusteps=     30  26  5.021E+00  1.368E+02
+istep=    31 taskid     0 date & time is  11/ 2/2017   2:30:15
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    31 9.20809E-04 2.85380E-02 3.77000E+00 4.09422E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     31  27  4.941E+00  1.418E+02
+istep=    32 taskid     0 date & time is  11/ 2/2017   2:30:20
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    32 9.20829E-04 2.94588E-02 3.77000E+00 4.09414E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     32  28  4.449E+00  1.462E+02
+istep=    33 taskid     0 date & time is  11/ 2/2017   2:30:24
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    33 9.20849E-04 3.03797E-02 3.77000E+00 4.09405E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     33  29  5.193E+00  1.514E+02
+istep=    34 taskid     0 date & time is  11/ 2/2017   2:30:29
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    34 9.20870E-04 3.13005E-02 3.77000E+00 4.09395E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     34  30  4.485E+00  1.559E+02
+istep=    35 taskid     0 date & time is  11/ 2/2017   2:30:34
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    35 9.20891E-04 3.22214E-02 3.77000E+00 4.09386E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+jstep, ncpusteps=     35  31  5.120E+00  1.610E+02
+istep=    36 taskid     0 date & time is  11/ 2/2017   2:30:39
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    36 9.20912E-04 3.31423E-02 3.77000E+00 4.09377E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+ Calling sptr, ioflag=           1
+ istep,iocount=          36           4
+ enter sptr, io,b11(m)=           1   1.00000000000000     
+  0.125058881094729       0.124904746227810       0.499773040029521     
+  0.124904746227810       0.125058881094729       0.499773040029521     
+  0.125059159522734       0.125059159522734       0.499927249359432     
+ grdiss,size,epslon=  6.298652928705258E-003   1.00000000000000     
+  6.298652928705257E-003
+  exit sptr
+ check_consym2: istep, difmax=          36 rk  0.191560248125370     
+jstep, ncpusteps_io=  36   4  4.739E+00  1.989E+01
+istep=    37 taskid     0 date & time is  11/ 2/2017   2:30:44
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ dudx      37    5.2648E-02    3.3760E+00
+ dwdz      37   -5.2693E-02    3.3783E+00
+ istep,dt,time,cfl,velmax=    37 9.20933E-04 3.40633E-02 3.77000E+00 4.09367E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+jstep, ncpusteps=     37  32  5.519E+00  1.665E+02
+istep=    38 taskid     0 date & time is  11/ 2/2017   2:30:49
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    38 9.20956E-04 3.49842E-02 3.77000E+00 4.09357E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+jstep, ncpusteps=     38  33  4.919E+00  1.714E+02
+istep=    39 taskid     0 date & time is  11/ 2/2017   2:30:54
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    39 9.20979E-04 3.59052E-02 3.77000E+00 4.09347E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     39  34  4.680E+00  1.761E+02
+istep=    40 taskid     0 date & time is  11/ 2/2017   2:30:59
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    40 9.21001E-04 3.68262E-02 3.77000E+00 4.09337E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     40  35  4.980E+00  1.811E+02
+istep=    41 taskid     0 date & time is  11/ 2/2017   2:31: 4
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    41 9.21025E-04 3.77472E-02 3.77000E+00 4.09327E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     41  36  4.575E+00  1.857E+02
+istep=    42 taskid     0 date & time is  11/ 2/2017   2:31: 9
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    42 9.21049E-04 3.86683E-02 3.77000E+00 4.09316E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     42  37  5.154E+00  1.908E+02
+istep=    43 taskid     0 date & time is  11/ 2/2017   2:31:14
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    43 9.21073E-04 3.95894E-02 3.77000E+00 4.09305E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     43  38  4.596E+00  1.954E+02
+istep=    44 taskid     0 date & time is  11/ 2/2017   2:31:18
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    44 9.21098E-04 4.05104E-02 3.77000E+00 4.09294E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+jstep, ncpusteps=     44  39  4.841E+00  2.003E+02
+istep=    45 taskid     0 date & time is  11/ 2/2017   2:31:23
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    45 9.21122E-04 4.14316E-02 3.77000E+00 4.09283E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+ Calling sptr, ioflag=           1
+ istep,iocount=          45           5
+ enter sptr, io,b11(m)=           1   1.00000000000000     
+  0.125113634190298       0.124872950147923       0.499732290056533     
+  0.124872950147923       0.125113634190299       0.499732290056533     
+  0.125114313619411       0.125114313619411       0.499973155781647     
+ grdiss,size,epslon=  6.298990689067935E-003   1.00000000000000     
+  6.298990689067936E-003
+  exit sptr
+ check_consym2: istep, difmax=          45 rk  0.190593589557966     
+jstep, ncpusteps_io=  45   5  4.959E+00  2.484E+01
+ Eulerian checkpointing begins
+Eulerian checkpointing: start date & time is  11/ 2/2017   2:31:28
+ velocities and scalars saved at t=  4.143157112435616E-002
+              enter store      0 date & time is  11/ 2/2017   2:31:28
+ store, icall,nrd=           2         108
+ store: enter icall=2
+ main: before call outpen           1
+ taskid,lu,fopen1: filename=           0           2 chkptou
+fclose: lu=   2
+ taskid,lu,fopen1: filename=           0          20 ranout
+ taskid,1st call of ranseq: k,lu=           0          -2          20
+ ranseq: taskid,seed_input=           0   122929298
+ ranseq: taskid,seed from stdin:           0   122929298
+fclose: lu=  20
+ taskid,lu,fopen1: filename=           0           2 chkptou.1
+ taskid,lu,fopen1: filename=           0          20 ranout.1
+ store:  exit icall=2
+ taskid,lu,fopen1: filename=           0         817 ranout
+fclose: lu= 817
+ main: before call outpen           0
+ enter outpen
+ taskid,lu,fopen1: filename=           0         800 outdata.grid
+outpen: batch size=4096        0 date & time is  11/ 2/2017   2:31:29
+ outpen: numtasks,ndirs,mwrite=        4096          64        4096
+ enter outpen_write_r
+ outpen: taskid,jwrite=         128           0
+ outpen: taskid,jwrite=         143          15
+ outpen: taskid,jwrite=         129           1
+ outpen: taskid,jwrite=         144          16
+ outpen: taskid,jwrite=         131           3
+ outpen: taskid,jwrite=         158          30
+ outpen: taskid,jwrite=         132           4
+ outpen: taskid,jwrite=         145          17
+ outpen: taskid,jwrite=         133           5
+ outpen: taskid,jwrite=         146          18
+ outpen: taskid,jwrite=         135           7
+ outpen: taskid,jwrite=         147          19
+ outpen: taskid,jwrite=         136           8
+ outpen: taskid,jwrite=         148          20
+ outpen: taskid,jwrite=         137           9
+ outpen: taskid,jwrite=         149          21
+ outpen: taskid,jwrite=         130           2
+ outpen: taskid,jwrite=         152          24
+ outpen: taskid,jwrite=         134           6
+ outpen: taskid,jwrite=         154          26
+ outpen: taskid,jwrite=         138          10
+ outpen: taskid,jwrite=         155          27
+ outpen: taskid,jwrite=         139          11
+ outpen: taskid,jwrite=         156          28
+ outpen: taskid,jwrite=         141          13
+ outpen: taskid,jwrite=         157          29
+ outpen: taskid,jwrite=         142          14
+ outpen: taskid,jwrite=         159          31
+ outpen: taskid,jwrite=         140          12
+ outpen: taskid,jwrite=         153          25
+ outpen: taskid,jwrite=         150          22
+ outpen: taskid,jwrite=         151          23
+outpen_write: before do 1      0 date & time is  11/ 2/2017   2:31:29
+outpen_write_r:  after do   2048 date & time is  11/ 2/2017   2:31:29
+outpen_write_r:  after do   1024 date & time is  11/ 2/2017   2:31:29
+outpen_write_r:  after do      0 date & time is  11/ 2/2017   2:31:29
+outpen_write:  after do 1      0 date & time is  11/ 2/2017   2:31:29
+outpen_write_r:  after do   3072 date & time is  11/ 2/2017   2:31:29
+outpen: batch size=4096        0 date & time is  11/ 2/2017   2:31:35
+  report from sub. outpen
+ velocity and scalar fields saved at step no.      45
+ enter chkstf, icall=           1
+ enter clreop,fn=log     
+ clreop: lu,fn=           7 log     
+  exit clreop,fn=log     
+ enter clreop,fn=run     
+ clreop: lu,fn=           8 run     
+  exit clreop,fn=run     
+ enter clreop,fn=eulstat
+ clreop: lu,fn=          15 eulstat
+  exit clreop,fn=eulstat
+ enter clreop,fn=rstensor
+ clreop: lu,fn=         996 rstensor
+  exit clreop,fn=rstensor
+ enter clreop,fn=corrmat
+ clreop: lu,fn=          30 corrmat
+  exit clreop,fn=corrmat
+ enter clreop,fn=vorstat
+ clreop: lu,fn=          35 vorstat
+  exit clreop,fn=vorstat
+ enter clreop,fn=dns_pdf_epsenst
+ clreop: lu,fn=         751 dns_pdf_epsenst
+  exit clreop,fn=dns_pdf_epsenst
+ enter clreop,fn=dns_max_epsenst
+ clreop: lu,fn=         752 dns_max_epsenst
+  exit clreop,fn=dns_max_epsenst
+Eulerian checkpointing: ends date & time is  11/ 2/2017   2:31:35
+            write_timings      0 date & time is  11/ 2/2017   2:31:35
+ enter write_timings
+ write_timings, string=USE_EVEN, kxcomm2   
+ write_timings, itask1,itask2=          63        4032
+ write_timings, ichkpt=           1
+          write_iotimings      1 date & time is  11/ 2/2017   2:31:35
+            write_timings      0 date & time is  11/ 2/2017   2:31:35
+          write_iotimings      1 date & time is  11/ 2/2017   2:31:35
+          write_iotimings      1 date & time is  11/ 2/2017   2:31:35
+istep=    46 taskid     0 date & time is  11/ 2/2017   2:31:35
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ dudx      46    6.5766E-02    3.3765E+00
+ dwdz      46   -6.5853E-02    3.3801E+00
+ istep,dt,time,cfl,velmax=    46 9.21148E-04 4.23527E-02 3.77000E+00 4.09272E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     46  40  5.415E+00  2.057E+02
+istep=    47 taskid     0 date & time is  11/ 2/2017   2:31:41
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    47 9.21174E-04 4.32739E-02 3.77000E+00 4.09260E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     47  41  4.874E+00  2.106E+02
+istep=    48 taskid     0 date & time is  11/ 2/2017   2:31:45
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    48 9.21201E-04 4.41951E-02 3.77000E+00 4.09248E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     48  42  4.918E+00  2.155E+02
+istep=    49 taskid     0 date & time is  11/ 2/2017   2:31:50
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    49 9.21227E-04 4.51163E-02 3.77000E+00 4.09237E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     49  43  4.611E+00  2.201E+02
+istep=    50 taskid     0 date & time is  11/ 2/2017   2:31:55
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    50 9.21254E-04 4.60376E-02 3.77000E+00 4.09225E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     50  44  5.353E+00  2.254E+02
+istep=    51 taskid     0 date & time is  11/ 2/2017   2:32: 0
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    51 9.21282E-04 4.69589E-02 3.77000E+00 4.09213E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     51  45  4.465E+00  2.299E+02
+istep=    52 taskid     0 date & time is  11/ 2/2017   2:32: 5
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    52 9.21310E-04 4.78802E-02 3.77000E+00 4.09200E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     52  46  5.023E+00  2.349E+02
+istep=    53 taskid     0 date & time is  11/ 2/2017   2:32:10
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    53 9.21338E-04 4.88015E-02 3.77000E+00 4.09188E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     53  47  4.568E+00  2.395E+02
+istep=    54 taskid     0 date & time is  11/ 2/2017   2:32:15
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    54 9.21366E-04 4.97229E-02 3.77000E+00 4.09175E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ Calling sptr, ioflag=           1
+ istep,iocount=          54           6
+ enter sptr, io,b11(m)=           1   1.00000000000000     
+  0.125184329184804       0.124837991128193       0.499697899369641     
+  0.124837991128193       0.125184329184804       0.499697899369641     
+  0.125185737329107       0.125185737329107       0.500044613909274     
+ grdiss,size,epslon=  6.299598278211742E-003   1.00000000000000     
+  6.299598278211742E-003
+  exit sptr
+ check_consym2: istep, difmax=          54 rk  0.190632767653960     
+jstep, ncpusteps_io=  54   6  4.986E+00  2.983E+01
+istep=    55 taskid     0 date & time is  11/ 2/2017   2:32:20
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ dudx      55    7.8855E-02    3.3772E+00
+ dwdz      55   -7.9006E-02    3.3824E+00
+ istep,dt,time,cfl,velmax=    55 9.21396E-04 5.06443E-02 3.77000E+00 4.09162E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+jstep, ncpusteps=     55  48  5.395E+00  2.449E+02
+istep=    56 taskid     0 date & time is  11/ 2/2017   2:32:25
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    56 9.21426E-04 5.15657E-02 3.77000E+00 4.09149E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     56  49  4.629E+00  2.495E+02
+istep=    57 taskid     0 date & time is  11/ 2/2017   2:32:30
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    57 9.21456E-04 5.24871E-02 3.77000E+00 4.09135E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     57  50  4.962E+00  2.545E+02
+istep=    58 taskid     0 date & time is  11/ 2/2017   2:32:35
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    58 9.21486E-04 5.34086E-02 3.77000E+00 4.09122E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     58  51  4.511E+00  2.590E+02
+istep=    59 taskid     0 date & time is  11/ 2/2017   2:32:39
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    59 9.21516E-04 5.43301E-02 3.77000E+00 4.09108E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+jstep, ncpusteps=     59  52  5.042E+00  2.640E+02
+istep=    60 taskid     0 date & time is  11/ 2/2017   2:32:44
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    60 9.21548E-04 5.52517E-02 3.77000E+00 4.09094E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     60  53  4.596E+00  2.686E+02
+istep=    61 taskid     0 date & time is  11/ 2/2017   2:32:49
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    61 9.21580E-04 5.61733E-02 3.77000E+00 4.09080E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     61  54  4.811E+00  2.735E+02
+istep=    62 taskid     0 date & time is  11/ 2/2017   2:32:54
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    62 9.21612E-04 5.70949E-02 3.77000E+00 4.09066E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+jstep, ncpusteps=     62  55  4.786E+00  2.782E+02
+istep=    63 taskid     0 date & time is  11/ 2/2017   2:32:58
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    63 9.21644E-04 5.80165E-02 3.77000E+00 4.09052E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+ Calling sptr, ioflag=           1
+ istep,iocount=          63           7
+ enter sptr, io,b11(m)=           1   1.00000000000000     
+  0.125270920380982       0.124799890682032       0.499669846007481     
+  0.124799890682032       0.125270920380982       0.499669846007481     
+  0.125273527730454       0.125273527730454       0.500141572674316     
+ grdiss,size,epslon=  6.300475838373397E-003   1.00000000000000     
+  6.300475838373397E-003
+  exit sptr
+ check_consym2: istep, difmax=          63 rk  0.191678251022365     
+jstep, ncpusteps_io=  63   7  4.824E+00  3.465E+01
+istep=    64 taskid     0 date & time is  11/ 2/2017   2:33: 3
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ dudx      64    9.1912E-02    3.3780E+00
+ dwdz      64   -9.2151E-02    3.3851E+00
+ istep,dt,time,cfl,velmax=    64 9.21677E-04 5.89382E-02 3.77000E+00 4.09037E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     64  56  5.693E+00  2.839E+02
+istep=    65 taskid     0 date & time is  11/ 2/2017   2:33: 9
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    65 9.21711E-04 5.98599E-02 3.77000E+00 4.09022E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     65  57  4.461E+00  2.884E+02
+istep=    66 taskid     0 date & time is  11/ 2/2017   2:33:13
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    66 9.21744E-04 6.07817E-02 3.77000E+00 4.09007E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     66  58  5.057E+00  2.934E+02
+istep=    67 taskid     0 date & time is  11/ 2/2017   2:33:19
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    67 9.21778E-04 6.17034E-02 3.77000E+00 4.08992E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     67  59  4.847E+00  2.983E+02
+istep=    68 taskid     0 date & time is  11/ 2/2017   2:33:23
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    68 9.21812E-04 6.26253E-02 3.77000E+00 4.08977E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+jstep, ncpusteps=     68  60  4.871E+00  3.032E+02
+istep=    69 taskid     0 date & time is  11/ 2/2017   2:33:28
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    69 9.21848E-04 6.35471E-02 3.77000E+00 4.08961E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     69  61  4.704E+00  3.079E+02
+istep=    70 taskid     0 date & time is  11/ 2/2017   2:33:33
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    70 9.21884E-04 6.44690E-02 3.77000E+00 4.08945E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     70  62  4.672E+00  3.125E+02
+istep=    71 taskid     0 date & time is  11/ 2/2017   2:33:38
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    71 9.21919E-04 6.53909E-02 3.77000E+00 4.08930E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+jstep, ncpusteps=     71  63  4.958E+00  3.175E+02
+istep=    72 taskid     0 date & time is  11/ 2/2017   2:33:43
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    72 9.21955E-04 6.63129E-02 3.77000E+00 4.08914E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+ Calling sptr, ioflag=           1
+ istep,iocount=          72           8
+ enter sptr, io,b11(m)=           1   1.00000000000000     
+  0.125373356379821       0.124758673983862       0.499648106002609     
+  0.124758673983863       0.125373356379821       0.499648106002609     
+  0.125377801862434       0.125377801862434       0.500263976446786     
+ grdiss,size,epslon=  6.301623588131870E-003   1.00000000000000     
+  6.301623588131869E-003
+  exit sptr
+ check_consym2: istep, difmax=          72 rk  0.189370772363511     
+jstep, ncpusteps_io=  72   8  4.605E+00  3.926E+01
+istep=    73 taskid     0 date & time is  11/ 2/2017   2:33:47
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ dudx      73    1.0493E-01    3.3789E+00
+ dwdz      73   -1.0529E-01    3.3881E+00
+ istep,dt,time,cfl,velmax=    73 9.21992E-04 6.72349E-02 3.77000E+00 4.08897E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     73  64  5.546E+00  3.230E+02
+istep=    74 taskid     0 date & time is  11/ 2/2017   2:33:53
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    74 9.22029E-04 6.81569E-02 3.77000E+00 4.08881E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     74  65  4.641E+00  3.277E+02
+istep=    75 taskid     0 date & time is  11/ 2/2017   2:33:57
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    75 9.22067E-04 6.90789E-02 3.77000E+00 4.08864E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+jstep, ncpusteps=     75  66  5.067E+00  3.328E+02
+istep=    76 taskid     0 date & time is  11/ 2/2017   2:34: 3
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    76 9.22104E-04 7.00011E-02 3.77000E+00 4.08848E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     76  67  4.757E+00  3.375E+02
+istep=    77 taskid     0 date & time is  11/ 2/2017   2:34: 7
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    77 9.22142E-04 7.09232E-02 3.77000E+00 4.08831E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     77  68  4.576E+00  3.421E+02
+istep=    78 taskid     0 date & time is  11/ 2/2017   2:34:12
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    78 9.22181E-04 7.18454E-02 3.77000E+00 4.08813E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     78  69  5.047E+00  3.471E+02
+istep=    79 taskid     0 date & time is  11/ 2/2017   2:34:17
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    79 9.22221E-04 7.27676E-02 3.77000E+00 4.08796E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     79  70  4.446E+00  3.516E+02
+istep=    80 taskid     0 date & time is  11/ 2/2017   2:34:21
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    80 9.22260E-04 7.36899E-02 3.77000E+00 4.08779E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+jstep, ncpusteps=     80  71  5.104E+00  3.567E+02
+istep=    81 taskid     0 date & time is  11/ 2/2017   2:34:27
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    81 9.22299E-04 7.46122E-02 3.77000E+00 4.08761E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+ Calling sptr, ioflag=           1
+ istep,iocount=          81           9
+ enter sptr, io,b11(m)=           1   1.00000000000000     
+  0.125491580125939       0.124714369848535       0.499632653423338     
+  0.124714369848535       0.125491580125939       0.499632653423339     
+  0.125498696649921       0.125498696649921       0.500411765088847     
+ grdiss,size,epslon=  6.303041822516077E-003   1.00000000000000     
+  6.303041822516077E-003
+  exit sptr
+ check_consym2: istep, difmax=          81 rk  0.189405079877473     
+jstep, ncpusteps_io=  81   9  4.658E+00  4.392E+01
+istep=    82 taskid     0 date & time is  11/ 2/2017   2:34:31
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ dudx      82    1.1790E-01    3.3800E+00
+ dwdz      82   -1.1841E-01    3.3916E+00
+ istep,dt,time,cfl,velmax=    82 9.22340E-04 7.55345E-02 3.77000E+00 4.08743E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     82  72  5.467E+00  3.621E+02
+istep=    83 taskid     0 date & time is  11/ 2/2017   2:34:37
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    83 9.22381E-04 7.64569E-02 3.77000E+00 4.08725E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     83  73  4.836E+00  3.670E+02
+istep=    84 taskid     0 date & time is  11/ 2/2017   2:34:42
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    84 9.22422E-04 7.73793E-02 3.77000E+00 4.08707E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     84  74  4.909E+00  3.719E+02
+istep=    85 taskid     0 date & time is  11/ 2/2017   2:34:47
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    85 9.22463E-04 7.83018E-02 3.77000E+00 4.08688E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     85  75  4.935E+00  3.768E+02
+istep=    86 taskid     0 date & time is  11/ 2/2017   2:34:51
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    86 9.22505E-04 7.92243E-02 3.77000E+00 4.08670E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     86  76  4.423E+00  3.813E+02
+istep=    87 taskid     0 date & time is  11/ 2/2017   2:34:56
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    87 9.22548E-04 8.01468E-02 3.77000E+00 4.08651E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     87  77  5.288E+00  3.865E+02
+istep=    88 taskid     0 date & time is  11/ 2/2017   2:35: 1
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    88 9.22591E-04 8.10694E-02 3.77000E+00 4.08632E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+jstep, ncpusteps=     88  78  4.438E+00  3.910E+02
+istep=    89 taskid     0 date & time is  11/ 2/2017   2:35: 6
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    89 9.22634E-04 8.19920E-02 3.77000E+00 4.08613E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ before itransform, vorflag= F
+ RK stage:            4 flagc= F
+jstep, ncpusteps=     89  79  5.034E+00  3.960E+02
+istep=    90 taskid     0 date & time is  11/ 2/2017   2:35:11
+ RK stage:            1 flagc= F
+ before itransform, vorflag= F
+ istep,dt,time,cfl,velmax=    90 9.22677E-04 8.29147E-02 3.77000E+00 4.08594E+03
+ RK stage:            2 flagc= F
+ before itransform, vorflag= F
+ before itransform, vorflag= F
+ RK stage:            3 flagc= F
+ RK stage:            4 flagc= F
+ before itransform, vorflag= F
+ Calling sptr, ioflag=           1
+ istep,iocount=          90          10
+ enter sptr, io,b11(m)=           1   1.00000000000000     
+  0.125625528961146       0.124667010707632       0.499623460421701     
+  0.124667010707632       0.125625528961146       0.499623460421701     
+  0.125636368826832       0.125636368826832       0.500584874019650     
+ grdiss,size,epslon=  6.304730913191964E-003   1.00000000000000     
+  6.304730913191964E-003
+  exit sptr
+ check_consym2: istep, difmax=          90 rk  0.189143973961005     
+jstep, ncpusteps_io=  90  10  4.788E+00  4.871E+01
+ Eulerian checkpointing begins
+Eulerian checkpointing: start date & time is  11/ 2/2017   2:35:16
+ velocities and scalars saved at t=  8.291471723364364E-002
+              enter store      0 date & time is  11/ 2/2017   2:35:16
+ store, icall,nrd=           2         108
+ store: enter icall=2
+ main: before call outpen           1
+ taskid,lu,fopen1: filename=           0           2 chkptou
+fclose: lu=   2
+ taskid,lu,fopen1: filename=           0          20 ranout
+fclose: lu=  20
+ taskid,lu,fopen1: filename=           0           2 chkptou.2
+ taskid,lu,fopen1: filename=           0          20 ranout.2
+ store:  exit icall=2
+ taskid,lu,fopen1: filename=           0         817 ranout
+fclose: lu= 817
+ main: before call outpen           0
+ enter outpen
+ taskid,lu,fopen1: filename=           0         800 outdata.grid
+outpen: batch size=4096        0 date & time is  11/ 2/2017   2:35:16
+ outpen: numtasks,ndirs,mwrite=        4096          64        4096
+ enter outpen_write_r
+ outpen: taskid,jwrite=         144          16
+ outpen: taskid,jwrite=         128           0
+ outpen: taskid,jwrite=         145          17
+ outpen: taskid,jwrite=         129           1
+ outpen: taskid,jwrite=         146          18
+ outpen: taskid,jwrite=         130           2
+ outpen: taskid,jwrite=         147          19
+ outpen: taskid,jwrite=         131           3
+ outpen: taskid,jwrite=         148          20
+ outpen: taskid,jwrite=         132           4
+ outpen: taskid,jwrite=         149          21
+ outpen: taskid,jwrite=         133           5
+ outpen: taskid,jwrite=         150          22
+ outpen: taskid,jwrite=         134           6
+ outpen: taskid,jwrite=         151          23
+ outpen: taskid,jwrite=         135           7
+ outpen: taskid,jwrite=         152          24
+ outpen: taskid,jwrite=         136           8
+ outpen: taskid,jwrite=         153          25
+ outpen: taskid,jwrite=         137           9
+ outpen: taskid,jwrite=         154          26
+ outpen: taskid,jwrite=         138          10
+ outpen: taskid,jwrite=         155          27
+ outpen: taskid,jwrite=         139          11
+ outpen: taskid,jwrite=         156          28
+ outpen: taskid,jwrite=         140          12
+ outpen: taskid,jwrite=         157          29
+ outpen: taskid,jwrite=         141          13
+ outpen: taskid,jwrite=         158          30
+ outpen: taskid,jwrite=         142          14
+ outpen: taskid,jwrite=         159          31
+ outpen: taskid,jwrite=         143          15
+outpen_write: before do 1      0 date & time is  11/ 2/2017   2:35:16
+outpen_write_r:  after do      0 date & time is  11/ 2/2017   2:35:16
+outpen_write:  after do 1      0 date & time is  11/ 2/2017   2:35:16
+outpen_write_r:  after do   3072 date & time is  11/ 2/2017   2:35:16
+outpen_write_r:  after do   2048 date & time is  11/ 2/2017   2:35:16
+outpen_write_r:  after do   1024 date & time is  11/ 2/2017   2:35:17
+outpen: batch size=4096        0 date & time is  11/ 2/2017   2:35:23
+  report from sub. outpen
+ velocity and scalar fields saved at step no.      90
+Eulerian checkpointing: ends date & time is  11/ 2/2017   2:35:23
+            write_timings      0 date & time is  11/ 2/2017   2:35:23
+ enter write_timings
+ write_timings, string=USE_EVEN, kxcomm2   
+ write_timings, itask1,itask2=          63        4032
+ write_timings, ichkpt=           2
+          write_iotimings      1 date & time is  11/ 2/2017   2:35:23
+            write_timings      0 date & time is  11/ 2/2017   2:35:23
+ DONE, taskid=  4095 date & time is  11/ 2/2017   2:35:23
+          write_iotimings      1 date & time is  11/ 2/2017   2:35:23
+          write_iotimings      1 date & time is  11/ 2/2017   2:35:23
+ taskid, cpu/proc used=           0   471.264823772013     
+ DONE, taskid=     0 date & time is  11/ 2/2017   2:35:23
+ 
+TACC: Shutdown complete. Exiting.
+            Mean  Min   Max
+Freq [GHz]  2.685 2.639 2.727
+Number of Nodes 86
+                 Mean         Min         Max
+Read [GB]        33461.40     32503.27    34174.46
+Write [GB]       24008.14     22840.03    24557.07
+MBW [GB/s]       120.26     116.31    123.10
+Page Hits %      0.23     0.22    0.23
+Page Empty %     0.47     0.47    0.48
+Page Conflict %  0.30     0.30    0.30
+Finished running DNS2d_p8.avx2.x

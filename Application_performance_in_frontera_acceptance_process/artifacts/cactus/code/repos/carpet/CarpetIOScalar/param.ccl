@@ -1,0 +1,80 @@
+# Parameter definitions for thorn CarpetIOScalar
+
+
+
+shares: IO
+
+USES STRING out_dir
+
+USES KEYWORD out_criterion
+USES CCTK_INT out_every
+USES CCTK_REAL out_dt
+
+USES BOOLEAN strict_io_parameter_check
+USES KEYWORD verbose
+USES KEYWORD out_fileinfo
+USES STRING out_group_separator
+
+
+
+private:
+
+
+
+BOOLEAN one_file_per_group "Write one file per group instead of per variable"
+{
+} "no"
+
+BOOLEAN all_reductions_in_one_file "Write all requested reductions in one file instead of per reduction"
+{
+} "no"
+
+
+
+INT out_precision "How many digits to output floating-point numbers with" STEERABLE = ALWAYS
+{
+  0:* :: "Number of precision digits"
+} 15
+
+
+
+CCTK_STRING outScalar_dir "Name of scalar output directory, overrides out_dir" STEERABLE = ALWAYS
+{
+  "^$" :: "Empty: use IO::out_dir"
+  ".+" :: "Not empty: directory name"
+} ""
+
+CCTK_STRING outScalar_vars "Variables to output in scalar form" STEERABLE = ALWAYS
+{
+  "" :: "A regex which matches everything"
+} ""
+
+CCTK_STRING outScalar_reductions "List of reductions to output in scalar form" STEERABLE = ALWAYS
+{
+  "" :: "A regex which matches everything"
+} "count minimum maximum sum average norm1 norm2 norm_inf icount iaverage inorm1 inorm2"
+
+
+
+KEYWORD outScalar_criterion "Criterion to select scalar output intervals, overrides out_every" STEERABLE = ALWAYS
+{
+  "never"     :: "Never output"
+  "iteration" :: "Output every so many iterations"
+  "divisor"   :: "Output if iteration mod divisor == 0."
+  "time"      :: "Output every that much coordinate time"
+} "iteration"
+
+CCTK_INT outScalar_every "How often to do scalar output, overrides IO::out_every" STEERABLE = ALWAYS
+{
+   1:* :: "Output every so many time steps"
+  -1:0 :: "No output"
+  -2   :: "Default to IO::out_every"
+} -2
+
+REAL outScalar_dt "How often to do scalar output, overrides out_dt" STEERABLE = ALWAYS
+{
+  (0:* :: "In intervals of that much coordinate time"
+   0   :: "As often as possible"
+  -1   :: "Disable output"
+  -2   :: "Default to IO::out_dt"
+} -2

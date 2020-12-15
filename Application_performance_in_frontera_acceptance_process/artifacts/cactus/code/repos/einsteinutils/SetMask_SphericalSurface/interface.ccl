@@ -1,0 +1,12 @@
+# Interface definition for thorn SetMask_SphericalSurface
+
+implements: SetMask_SphericalSurface
+
+inherits: HydroBase SphericalSurface
+
+USES INCLUDE: HydroBase.h
+
+# translate SphericalSurface name into ID
+CCTK_INT \
+FUNCTION sf_IdFromName (CCTK_INT IN id, CCTK_POINTER_TO_CONST IN name)
+USES FUNCTION sf_IdFromName

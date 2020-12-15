@@ -1,0 +1,29 @@
+--- nwchem-src/src/config/makefile.h	2015-11-09 10:40:32.000000000 -0600
++++ makefile.h.common512	2017-11-13 10:31:57.000000000 -0600
+@@ -1117,7 +1117,7 @@
+         endif
+         FOPTIONS += -fpp -g -no-save-temps
+         FDEBUG    = -O2 -g
+-        FOPTIMIZE = -O3 -xHost
++        FOPTIMIZE = -O3 -xCOMMON-AVX512
+         ifdef USE_OPENMP
+            FOPTIONS  += -openmp
+            LDOPTIONS += -openmp
+@@ -1828,7 +1828,7 @@
+         ifeq ($(_IFCV12),Y) 
+         FOPTIONS += -fimf-arch-consistency=true
+         endif
+-        FOPTIMIZE += -xHost
++        FOPTIMIZE += -xCOMMON-AVX512
+         FOPTIONS += -finline-limit=250
+        else
+         ifeq ($(_GOTSSE3),Y) 
+@@ -1878,7 +1878,7 @@
+       endif
+       ifeq ($(_CC),icc)
+ 	 ICCV15ORNEWER=$(shell icc -V  2>&1|egrep "Version "|head -n 1 | sed 's/.*Version \([0-9][0-9]\).*/\1/' | awk '{if ($$1 >= 15) {print "Y";exit}}')
+-         COPTIONS   +=   -xHOST -ftz
++         COPTIONS   +=   -xCOMMON-AVX512 -ftz
+          ifeq ($(ICCV15ORNEWER), Y)
+    	    COPTIONS   += -qopt-report-phase=vec  -qopt-report-file=stderr
+             ifdef USE_OPENMP

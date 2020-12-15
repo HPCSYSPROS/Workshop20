@@ -1,0 +1,25 @@
+#!/bin/csh
+
+if ( $#argv == 0 ) then
+  echo "Imports psfgen files from external source tree into NAMD tree."
+  echo "usage: $0 <psfgen tree>"
+  exit -1
+endif
+
+set dest=$0
+set dest=$dest:h
+if ( $dest == $0 ) set dest="."
+
+set base=$1
+
+echo Importing from $base to $dest
+
+foreach dir ( doc src )
+  foreach f ( $base/$dir/* )
+    if ( -f $f ) then
+      echo $f
+      \cp -f $f $dest/$dir
+    endif
+  end
+end
+

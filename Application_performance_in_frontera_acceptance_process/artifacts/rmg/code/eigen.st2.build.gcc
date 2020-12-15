@@ -1,0 +1,87 @@
+#!/bin/bash
+
+# W. Cyrus Proctor
+# 2017-11-13
+# Stampede2 Eigen build script
+
+ml reset
+ml gcc
+ml cmake
+ml fftw3
+ml petsc
+ml boost
+ml superlu
+
+set -x
+
+#export base=`pwd`
+
+export eigen=${base}/eigen
+export eigen_install=${eigen}/install/${TACC_FAMILY_COMPILER}
+
+export eigen_major=3
+export eigen_minor=3
+export eigen_patch=4
+export eigen_hash=5a0156e40feb
+export eigen_version=${eigen_major}.${eigen_minor}.${eigen_patch}
+
+export ncores=64
+
+export CC=gcc
+export CXX=g++
+export FC=gfortran
+
+export   CFLAGS="-O3 -flto -march=skylake-avx512 -mtune=skylake-avx512 -mavx512f -mavx512cd -mavx512bw -mavx512dq -mavx512vl -mavx512ifma -mavx512vbmi"
+export CXXFLAGS="-O3 -flto -march=skylake-avx512 -mtune=skylake-avx512 -mavx512f -mavx512cd -mavx512bw -mavx512dq -mavx512vl -mavx512ifma -mavx512vbmi"
+export  FCFLAGS="-O3 -flto -march=skylake-avx512 -mtune=skylake-avx512 -mavx512f -mavx512cd -mavx512bw -mavx512dq -mavx512vl -mavx512ifma -mavx512vbmi"
+export  LDFLAGS="-O3 -flto -march=skylake-avx512 -mtune=skylake-avx512 -mavx512f -mavx512cd -mavx512bw -mavx512dq -mavx512vl -mavx512ifma -mavx512vbmi"
+
+mkdir -p ${eigen}
+cd ${eigen}
+mkdir -p ${TACC_FAMILY_COMPILER}
+cd ${TACC_FAMILY_COMPILER}
+wget http://bitbucket.org/eigen/eigen/get/${eigen_version}.tar.bz2
+tar xvfj ${eigen_version}.tar.bz2
+mkdir -p build
+cd build
+
+cmake                                                          \
+-DCMAKE_INSTALL_PREFIX="${eigen_install}"                      \
+-DCMAKE_VERBOSE_MAKEFILE=ON                                    \
+-DCMAKE_CXX_COMPILER="${CXX}"                                  \
+-DCMAKE_C_COMPILER="${CC}"                                     \
+-DCMAKE_Fortran_COMPILER="${FC}"                               \
+-DCMAKE_CXX_FLAGS="${CXXFLAGS}"                                \
+-DCMAKE_C_FLAGS="${C_FLAGS}"                                   \
+-DCMAKE_Fortran_FLAGS="${FC_FLAGS}"                            \
+-DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}"                          \
+-DCMAKE_MODULE_LINKER_FLAGS="${LDFLAGS}"                       \
+-DCMAKE_SHARED_LINKER_FLAGS="${LDFLAGS}"                       \
+-DCMAKE_STATIC_LINKER_FLAGS="${LDFLAGS}"                       \
+-DMPFR_INCLUDES=/opt/apps/gcc/7.1.0/include                    \
+-DMPFR_LIBRARIES=/opt/apps/gcc/7.1.0/lib/libmpfr.so            \
+-DGMP_INCLUDES=/opt/apps/gcc/7.1.0/include                     \
+-DGMP_LIBRARIES=/opt/apps/gcc/7.1.0/lib/libgmp.so              \
+-DBoost_DIR="${TACC_BOOST_DIR}"                                \
+-DBoost_INCLUDE_DIR="${TACC_BOOST_INC}"                        \
+-DCHOLMOD_INCLUDES="${TACC_PETSC_DIR}"/"${PETSC_ARCH}"/include \
+-DCHOLMOD_LIBRARIES="${TACC_PETSC_LIB}"/libcolamd.a            \
+-DCHOLMOD_METIS_LIBRARY="${TACC_PETSC_LIB}"/libmetis.so        \
+-DAMD_LIBRARY="${TACC_PETSC_LIB}"/libamd.a                     \
+-DFFTW_LIB="${TACC_FFTW3_LIB}"/libfftw3.so                     \
+-DFFTW_INCLUDES="${TACC_FFTW3_INC}"                            \
+-DSUPERLU_INCLUDES="${TACC_SUPERLU_INC}"                       \
+-DSUPERLU_LIBRARIES="${TACC_SUPERLU_LIB}"/libsuperlu.so        \
+-DUMFPACK_INCLUDES="${TACC_PETSC_DIR}"/"${PETSC_ARCH}"/include \
+-DUMFPACK_LIBRARIES="${TACC_PETSC_LIB}"/libumfpack.a           \
+-DEIGEN_TEST_AVX=ON                                            \
+-DEIGEN_TEST_AVX512=ON                                         \
+-DEIGEN_TEST_CXX11=ON                                          \
+-DEIGEN_TEST_FMA=ON                                            \
+-DEIGEN_TEST_OPENMP=ON                                         \
+../eigen-eigen-"${eigen_hash}"
+
+make -j ${ncores}
+make -j ${ncores} install
+
+

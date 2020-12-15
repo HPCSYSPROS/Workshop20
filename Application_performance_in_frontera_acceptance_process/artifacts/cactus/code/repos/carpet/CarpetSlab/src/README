@@ -1,0 +1,5 @@
+mapping:        handle mappings
+Get:            new style interface, uses function aliasing
+slab:           internal routine that actually performs the slabbing
+
+GetHyperslab:   old style interface, uses the include header mechanism

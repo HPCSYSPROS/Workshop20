@@ -1,0 +1,36 @@
+NAMD_ARCH = CRAY-XE
+CHARMARCH = gemini_gni-crayxe-persistent-smp
+
+CHARMOPTS = -ld++-option -static-intel
+FLOATOPTS = -ip -no-vec
+
+CXX = CC -std=c++11 -DNOHOSTNAME -DNO_GETPWUID
+CXXOPTS = -O2 $(FLOATOPTS)
+CXXNOALIASOPTS = -O2 -fno-alias $(FLOATOPTS)
+
+CC = cc
+COPTS = -O2 $(FLOATOPTS)
+
+
+#
+# ensure that required modules are loaded
+#
+
+$(info $(NAMD_PLATFORM))
+
+loaded_modules := $(subst :, ,$(LOADEDMODULES))
+
+module := $(filter rca/%,$(loaded_modules))
+ifeq (,$(module))
+  $(error module rca is not loaded)
+else
+  $(info found module $(module))
+endif
+
+module := $(filter PrgEnv-intel/%,$(loaded_modules))
+ifeq (,$(module))
+  $(error module PrgEnv-intel is not loaded)
+else
+  $(info found module $(module))
+endif
+

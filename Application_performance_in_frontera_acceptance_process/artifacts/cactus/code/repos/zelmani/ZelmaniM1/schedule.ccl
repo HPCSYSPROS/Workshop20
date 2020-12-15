@@ -1,0 +1,536 @@
+# Schedule definitions for thorn ZelmaniM1
+
+STORAGE: opacs
+
+if(do_M1) {
+  STORAGE: xi[1]
+  STORAGE: enu[3]
+  STORAGE: fnu[3]
+  STORAGE: enuh[1]
+  STORAGE: fnuh[1]
+  STORAGE: fnumag[1]
+  STORAGE: heatcoolanalysis[3]
+  # TODO: allocate storage only when refluxing is used
+  if (do_m1_reflux) {
+    STORAGE: register_fine_h[1]
+    STORAGE: register_coarse_h[1]
+  }
+  STORAGE: ZelmaniM1_scalars
+  STORAGE: enupm[1], fnupm[1], velpm[1], velp[1], velm[1]
+  STORAGE: enurhs[1], fnurhs[1]
+  STORAGE: rad[1],tot_vol[1],Luminosity[1]
+
+  if (do_m1_nevolve) {
+    STORAGE: nnu[3],nnuh[1],nnupm[1],nnurhs[1]
+  }
+  
+  if (do_m1_pnu) {
+    STORAGE: pnu[3]
+  }
+
+  if (use_nuTmunu) {
+    STORAGE: stress_energy_scalar_nu[3]
+    STORAGE: stress_energy_vector_nu[3]
+    STORAGE: stress_energy_tensor_nu[3]
+  }
+}
+
+#################################################
+# Set up the initial radiation conditions
+#################################################
+if(do_M1) {
+
+  schedule zm1_RegisterVars IN MoL_Register 
+  {
+    LANG: C
+    OPTION: global
+  } "register variables"
+
+#  SCHEDULE zm1_Initialize AT CCTK_INITIAL BEFORE zm1_setup_tests
+  SCHEDULE zm1_Initialize AT CCTK_BASEGRID BEFORE zm1_setup_tests
+  {
+    LANG: C
+    SYNC: stress_energy_scalar_nu, stress_energy_vector_nu, stress_energy_tensor_nu
+  } "initialize everything to zero"
+  
+  if (set_equilibrium && do_opac) {
+    SCHEDULE zm1_setEquil AT POST_RECOVER_VARIABLES
+    {
+      LANG: C
+    } "Set radiation to equilibrium conditions"
+    SCHEDULE zm1_setEquil AT CCTK_POSTINITIAL
+    {
+      LANG: C
+    } "Set radiation to equilibrium conditions"
+
+    if (use_nuTmunu) {
+      schedule zm1_ComputeNuTmunu IN CCTK_POSTINITIAL AFTER zm1_setEquil BEFORE MoL_PostStep
+      {
+       SYNC: stress_energy_scalar_nu, stress_energy_vector_nu, stress_energy_tensor_nu
+       LANG: C
+      } "Compute neutrino contribution to stress energy"
+    }
+  }
+
+}
+
+#################################################
+# Do we want to do tests?  These will overwrite 
+# otherwise specified initial conditions
+#################################################
+
+if(do_M1_testing && do_M1) {
+
+  SCHEDULE zm1_setup_tests AT CCTK_INITIAL
+  {
+    LANG: C
+    SYNC: stress_energy_scalar_nu, stress_energy_vector_nu, stress_energy_tensor_nu
+  } "set up test problem(s)"
+  
+  SCHEDULE zm1_tests_opacity AT POST_RECOVER_VARIABLES
+  {
+    LANG: C
+  } "get test opacities"
+ 
+  SCHEDULE zm1_tests_opacity AT CCTK_EVOL AFTER MoL_Evolution
+  {
+    LANG: C
+  } "get test opacities"
+  
+  #SCHEDULE zm1_tests_opacity AT CCTK_POSTREGRID 
+  #{
+  #  LANG: C
+  #} "get test opacities"
+
+  #SCHEDULE zm1_tests_opacity AT CCTK_POSTRESTRICT 
+  #{
+  #  LANG: C
+  #} "get test opacities"
+
+}
+
+#################################################
+# Schedule the opacity calculations if required
+#################################################
+if(do_opac) {
+
+  SCHEDULE zm1_readtable AT CCTK_BASEGRID
+  {
+    LANG: C
+    OPTIONS: global
+  } "Read opacity table"
+
+  SCHEDULE zm1_getopacs AT POST_RECOVER_VARIABLES
+  {
+    LANG: C
+  } "get opacities"
+ 
+  SCHEDULE zm1_getopacs AT CCTK_EVOL AFTER MoL_Evolution
+  {
+    LANG: C
+  } "get opacities"
+
+} # do_opac
+
+if(do_gray) {
+  
+  SCHEDULE zm1_readtable AT CCTK_BASEGRID
+  {
+    LANG: C
+    OPTIONS: global
+  } "Read opacity table"
+
+  SCHEDULE zm1_getopacs_gray AT POST_RECOVER_VARIABLES
+  {
+    LANG: C
+  } "get gray opacities"
+
+  SCHEDULE zm1_getopacs_gray AT CCTK_EVOL AFTER MoL_Evolution
+  {
+    LANG: C
+  } "get gray opacities"
+  
+} # do_gray 
+
+#################################################
+# Schedule the radiation evolution
+#################################################
+if(do_M1) {
+  SCHEDULE GROUP ZelmaniM1Evol at CCTK_EVOL AFTER (zm1_getopacs,zm1_getopacs_gray)
+  {
+  } "Main ZelmaniM1Direct group"
+ 
+  if (do_M1_testing) {
+    SCHEDULE zm1_ZeroVelocityCurv IN ZelmaniM1Evol BEFORE zm1_StartRKLoop
+    {
+      LANG: C
+      OPTIONS: local
+    } "Zero the velocity and curvature for flat space tests"
+  }
+  	  
+  SCHEDULE zm1_StartRKLoop IN ZelmaniM1Evol BEFORE ZelmaniM1RK
+  {
+    LANG: C
+    OPTIONS: level
+  } "Set the RK loop counter"
+   
+  # loop over RK steps 
+  SCHEDULE GROUP ZelmaniM1RK in ZelmaniM1Evol WHILE ZelmaniM1::zm1_RKStep
+  {
+  } "Loop over two Runge-Kutta Steps"
+  
+    SCHEDULE zm1_ZeroRHS IN ZelmaniM1RK BEFORE ZelmaniM1RHS
+    {
+      LANG: C
+      OPTIONS: local
+    } "Zero the right hand side arrays for M1"
+  
+    SCHEDULE zm1_StartLoop IN ZelmaniM1RK BEFORE ZelmaniM1RHS
+    {
+      LANG: C
+      OPTIONS: level
+    } "Set the flux_direction variable"
+    
+    if (do_m1_DG && DG_limit) { 
+      SCHEDULE zm1_Limit AS zm1_LimitFULL IN ZelmaniM1RK BEFORE ZelmaniM1RHS IF ZelmaniM1::zm1_RKstep_full
+      {
+        SYNC: enu
+        SYNC: fnu
+        LANG: C
+      } "Limit for DG"
+       
+      SCHEDULE zm1_Limit AS zm1_LimitHALF IN ZelmaniM1RK BEFORE ZelmaniM1RHS IF ZelmaniM1::zm1_RKstep_half
+      {
+        SYNC: enuh
+        SYNC: fnuh
+        LANG: C
+      } "Limit for DG"
+    }
+      
+    # loop over flux directions
+    if (update_zm1_rhs) {
+      SCHEDULE GROUP ZelmaniM1RHS in ZelmaniM1RK WHILE ZelmaniM1::zm1_flux_direction
+      {
+      } "Main ZelmaniM1RHS group"
+  
+        SCHEDULE zm1_Reconstruct IN ZelmaniM1RHS
+        {
+          LANG: C
+          OPTIONS: local
+        } "Reconstruct to the cell interfaces"
+        
+	#if (do_m1_DG) {
+	#  SCHEDULE zm1_FluxesDG IN ZelmaniM1RHS AFTER zm1_Reconstruct
+        #  {
+        #    LANG: C
+        #    OPTIONS: local
+        #  } "Solve Riemann problem and compute flux differences"
+	#} else {	 
+          SCHEDULE zm1_RiemannHLLE IN ZelmaniM1RHS AFTER zm1_Reconstruct
+          {
+            LANG: C
+            OPTIONS: local
+            STORAGE: enuflux[1] fnuflux[1] nnuflux[do_m1_nevolve]
+          } "Solve Riemann problem and compute flux differences"
+        #} 
+
+        SCHEDULE zm1_AdvanceLoop IN ZelmaniM1RHS AFTER zm1_RiemannHLLE
+        {
+          LANG: C
+          OPTIONS: level
+        } "Decrement the flux_direction variable"
+    }
+
+    SCHEDULE zm1_CalcUpdate IN ZelmaniM1RK AFTER ZelmaniM1RHS
+    {
+      STORAGE: dtautmp 
+      LANG: C
+      OPTIONS: local
+    } "Compute update"
+    
+    if (do_m1_nevolve && do_m1_pnu) { 
+      SCHEDULE zm1_Boundaries AS zm1_BoundariesFull IN ZelmaniM1RK AFTER zm1_CalcUpdate IF ZelmaniM1::zm1_RKstep_full
+      {
+        SYNC: enu
+        SYNC: pnu
+        SYNC: nnu
+        SYNC: fnu
+        SYNC: heatcoolanalysis
+        LANG: C
+      } "select ZelmaniM1 boundary conditions 2"
+
+      SCHEDULE zm1_Boundaries AS zm1_BoundariesHalf IN ZelmaniM1RK AFTER zm1_CalcUpdate IF ZelmaniM1::zm1_RKstep_half
+      {
+        SYNC: enuh
+        SYNC: nnuh
+        SYNC: fnuh
+        LANG: C
+      } "select ZelmaniM1 boundary conditions 1"
+      
+      SCHEDULE zm1_Boundaries AT PostRegrid BEFORE MoL_PostStep
+      {
+        SYNC: enu
+        SYNC: fnu
+        SYNC: nnu
+        SYNC: pnu
+        SYNC: heatcoolanalysis
+        LANG: C
+      } "select ZelmaniM1 boundary conditions after regrid"
+
+      SCHEDULE zm1_Boundaries AT PostRestrict BEFORE MoL_PostStep
+      {
+        SYNC: enu
+        SYNC: fnu
+        SYNC: nnu
+        SYNC: pnu
+        SYNC: heatcoolanalysis
+        LANG: C
+      } "select ZelmaniM1 boundary conditions after restrict"
+    } else if (do_m1_nevolve) { 
+      SCHEDULE zm1_Boundaries AS zm1_BoundariesFull IN ZelmaniM1RK AFTER zm1_CalcUpdate IF ZelmaniM1::zm1_RKstep_full
+      {
+        SYNC: enu
+        SYNC: nnu
+        SYNC: fnu
+        SYNC: heatcoolanalysis
+        LANG: C
+      } "select ZelmaniM1 boundary conditions 2"
+
+      SCHEDULE zm1_Boundaries AS zm1_BoundariesHalf IN ZelmaniM1RK AFTER zm1_CalcUpdate IF ZelmaniM1::zm1_RKstep_half
+      {
+        SYNC: enuh
+        SYNC: nnuh
+        SYNC: fnuh
+        LANG: C
+      } "select ZelmaniM1 boundary conditions 1"
+      
+      SCHEDULE zm1_Boundaries AT PostRegrid BEFORE MoL_PostStep
+      {
+        SYNC: enu
+        SYNC: fnu
+        SYNC: nnu
+        SYNC: heatcoolanalysis
+        LANG: C
+      } "select ZelmaniM1 boundary conditions after regrid"
+
+      SCHEDULE zm1_Boundaries AT PostRestrict BEFORE MoL_PostStep
+      {
+        SYNC: enu
+        SYNC: fnu
+        SYNC: nnu
+        SYNC: heatcoolanalysis
+        LANG: C
+      } "select ZelmaniM1 boundary conditions after restrict"
+    } else if (do_m1_pnu) { 
+      SCHEDULE zm1_Boundaries AS zm1_BoundariesFull IN ZelmaniM1RK AFTER zm1_CalcUpdate IF ZelmaniM1::zm1_RKstep_full
+      {
+        SYNC: enu
+        SYNC: pnu
+        SYNC: fnu
+        SYNC: heatcoolanalysis
+        LANG: C
+      } "select ZelmaniM1 boundary conditions 2"
+
+      SCHEDULE zm1_Boundaries AS zm1_BoundariesHalf IN ZelmaniM1RK AFTER zm1_CalcUpdate IF ZelmaniM1::zm1_RKstep_half
+      {
+        SYNC: enuh
+        SYNC: fnuh
+        LANG: C
+      } "select ZelmaniM1 boundary conditions 1"
+    
+      SCHEDULE zm1_Boundaries AT PostRegrid BEFORE MoL_PostStep
+      {
+        SYNC: enu
+        SYNC: fnu
+        SYNC: pnu
+        SYNC: heatcoolanalysis
+        LANG: C
+      } "select ZelmaniM1 boundary conditions after regrid"
+
+      SCHEDULE zm1_Boundaries AT PostRestrict BEFORE MoL_PostStep
+      {
+        SYNC: enu
+        SYNC: fnu
+        SYNC: pnu
+        SYNC: heatcoolanalysis
+        LANG: C
+      } "select ZelmaniM1 boundary conditions after restrict"
+    } else {
+      SCHEDULE zm1_Boundaries AS zm1_BoundariesFull IN ZelmaniM1RK AFTER zm1_CalcUpdate IF ZelmaniM1::zm1_RKstep_full
+      {
+        SYNC: enu
+        SYNC: fnu
+        SYNC: heatcoolanalysis
+        LANG: C
+      } "select ZelmaniM1 boundary conditions 2"
+      
+
+      SCHEDULE zm1_Boundaries AS zm1_BoundariesHalf IN ZelmaniM1RK AFTER zm1_CalcUpdate IF ZelmaniM1::zm1_RKstep_half
+      {
+        SYNC: enuh
+        SYNC: fnuh
+        LANG: C
+      } "select ZelmaniM1 boundary conditions 1"
+  
+      SCHEDULE zm1_Boundaries AT PostRegrid BEFORE MoL_PostStep
+      {
+        SYNC: enu
+        SYNC: fnu
+        SYNC: heatcoolanalysis
+        LANG: C
+      } "select ZelmaniM1 boundary conditions after regrid"
+
+      SCHEDULE zm1_Boundaries AT PostRestrict BEFORE MoL_PostStep
+      {
+        SYNC: enu
+        SYNC: fnu
+        SYNC: heatcoolanalysis
+        LANG: C
+      } "select ZelmaniM1 boundary conditions after restrict"
+
+     }
+      
+
+#    SCHEDULE GROUP zm1_sync_fullstep IN ZelmaniM1RK AFTER zm1_Boundaries IF ZelmaniM1::zm1_RKstep_full
+#    {
+#      SYNC: enu
+#      SYNC: fnu
+#    } "select sync the full step radiation variables"
+   
+#    SCHEDULE GROUP zm1_sync_halfstep IN ZelmaniM1RK AFTER zm1_Boundaries IF ZelmaniM1::zm1_RKstep_half
+#    {
+#      SYNC: enuh
+#      SYNC: fnuh
+#    } "select sync the half step radiation variables"
+   
+    schedule group ApplyBCs AS ZelmaniM1_ApplyBCs IN ZelmaniM1RK AFTER (zm1_BoundariesFull,zm1_BoundariesHalf)
+    {
+    } "Apply boundary conditions"
+    
+    SCHEDULE zm1_AdvanceRKLoop IN ZelmaniM1RK AFTER zm1_CalcUpdate
+    {
+      LANG: C
+      OPTIONS: level
+    } "Decrement the RKStep variable"
+ 
+ 
+  
+  #################################################
+  # Schedule radiation back reaction on the medium 
+  # and on gravity
+  #################################################
+  if (do_m1_eps_backreact || do_m1_ye_backreact || do_m1_scon_backreact) {
+
+# This is the non-conservative update
+#    SCHEDULE zm1_UpdateHydroState IN ZelmaniM1Evol AFTER ZelmaniM1RK 
+#    {
+#      LANG: Fortran
+#      OPTIONS: local
+#    } "Do a Prim2Con and get new temperature"
+#    # must schedule boundaries after this
+#    schedule group HydroBase_Boundaries IN ZelmaniM1Evol AFTER zm1_UpdateHydroState
+#    {	
+#    } "Do the boundaries after radiation-matter coupling"
+
+    schedule group HydroBase_Boundaries IN ZelmaniM1Evol AFTER ZelmaniM1RK
+    {	
+    } "Do the boundaries after radiation-matter coupling"
+
+    SCHEDULE group HydroBase_Con2Prim IN ZelmaniM1Evol AFTER HydroBase_Boundaries
+    {
+    } "Do a Con2Prim to update temperature, eps and other primitive friends"
+
+  }
+  
+  # Include neutrino pressure gradients in hydro calculation
+  # Similar to ZelmaniLeak strategy
+  if (do_m1_pnu) {
+    schedule zm1_pnu IN MoL_PostRHS BEFORE CheapExcision IF GRHydro::execute_MoL_Step
+    {
+     LANG: C
+    } "Add neutrino pressure to the RHS"
+  }
+  
+  if (use_nuTmunu) { 
+    schedule zm1_CopyNuTmunu IN CCTK_EVOL BEFORE MoL_Evolution
+    {
+     LANG: C
+    } "Copy neutrino stress energy forward in time"
+
+    schedule zm1_ComputeNuTmunu IN ZelmaniM1Evol AFTER ZelmaniM1RK
+    {
+     SYNC: stress_energy_scalar_nu, stress_energy_vector_nu, stress_energy_tensor_nu
+     LANG: C
+    } "Compute neutrino contribution to stress energy"
+
+    schedule zm1_UpdateTmunu IN AddToTmunu
+    {
+     LANG: C
+    } "Add neutrino stress energy to Tmunu"
+  }
+
+  #################################################
+  # Schedule radially averaged luminosity output 
+  # Calculation
+  #################################################
+  SCHEDULE GROUP ZelmaniM1Lum at CCTK_EVOL AFTER ZelmaniM1Evol
+  {
+  } "Main ZelmaniM1Direct group"
+
+  SCHEDULE GROUP ZelmaniM1Lum at POST_RECOVER_VARIABLES
+  {
+  } "Main ZelmaniM1Direct group"
+ 
+  schedule zm1_luminosity_init IN ZelmaniM1Lum
+    {
+      LANG: C
+      OPTIONS: global-early
+    } "Initialise 1d arrays"
+
+  schedule zm1_luminosity_setup AT CCTK_BASEGRID
+    {
+      LANG: C
+      OPTIONS: global-early
+    } "Initialise 1d arrays"
+
+  schedule zm1_luminosity_init AT CCTK_BASEGRID AFTER zm1_luminosity_setup
+    {
+      LANG: C
+      OPTIONS: global-early
+    } "Initialise 1d arrays"
+
+  schedule zm1_luminosity_local in ZelmaniM1Lum AFTER zm1_luminosity_init
+    {
+      LANG: C
+      OPTIONS: global-early loop-local
+    } "Distribute data into 1d arrays"
+
+  schedule zm1_luminosity_combine in ZelmaniM1Lum AFTER zm1_luminosity_local
+    {
+      LANG: C
+      OPTIONS: global-early
+    } "Combine all process-local 1d arrays"
+
+  schedule zm1_luminosity_transform in ZelmaniM1Lum AFTER zm1_luminosity_combine
+    {
+      LANG: C
+      OPTIONS: global-early
+    } "Average luminosities"
+
+  schedule zm1_luminosity_output AT CCTK_ANALYSIS
+    {
+      LANG: C
+      OPTIONS: global-early
+    } "Output luminosities"
+
+  schedule zm1_UpdateEntropy AT CCTK_ANALYSIS
+   {
+     LANG: Fortran
+     OPTIONS: local
+     TRIGGERS: hydrobase::entropy
+   } "If we want entropy output, compute the entropy"
+
+} # do_m1
+
+
+

@@ -1,0 +1,38 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+echo "Checking:"
+pwd
+hostname
+date
+cat ${PBS_NODEFILE} > SIMFACTORY/NODES
+
+# Environment
+echo
+echo 'ulimit -Ha:'
+ulimit -Ha
+echo 'ulimit -Sa:'
+ulimit -Sa
+echo
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export OMP_NUM_THREADS=@NUM_THREADS@
+env | sort > SIMFACTORY/ENVIRONMENT
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+# Use sqsub -vd (without the --nompirun option) to find out which
+# options mpirun should receive
+#time /opt/sharcnet/openmpi/1.6.2/intel/bin/mpirun -np @NUM_PROCS@ --bind-to-core -cpus-per-proc @NUM_THREADS@ --bynode @EXECUTABLE@ -L 3 @PARFILE@
+#time /opt/sharcnet/openmpi/1.6.2/intel/bin/mpirun -np @NUM_PROCS@ --bynode --bysocket --bind-to-socket --bind-to-core @EXECUTABLE@ -L 3 @PARFILE@
+time /opt/sharcnet/openmpi/1.8.7/intel-15.0.3/std/bin/mpirun -np @NUM_PROCS@ -cpus-per-proc @NUM_THREADS@ @EXECUTABLE@ -L 3 @PARFILE@
+
+echo "Stopping:"
+date
+
+echo "Done."

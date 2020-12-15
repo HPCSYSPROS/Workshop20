@@ -1,0 +1,12 @@
+Cactus Code Thorn SystemTopology
+Author(s)    : Erik Schnetter <schnetter@gmail.com>
+Maintainer(s): Erik Schnetter <schnetter@gmail.com>
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Report the system topology (nodes, cores, etc.) as reported by MPI and
+hwloc.
+
+Set thread affinities.

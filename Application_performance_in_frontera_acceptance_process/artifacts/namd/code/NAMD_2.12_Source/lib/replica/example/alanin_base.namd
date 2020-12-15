@@ -1,0 +1,20 @@
+# shared simulation options for replica exchange
+
+timestep	1.0
+
+structure	alanin.psf
+coordinates	unfolded.pdb
+
+margin		10.0
+stepspercycle	100
+parameters	alanin.params
+exclude		scaled1-4
+1-4scaling	0.4
+switching 	on
+switchdist	7.0
+cutoff		8.0
+pairlistdist 	10.0
+
+langevin on
+langevinDamping 10.0
+

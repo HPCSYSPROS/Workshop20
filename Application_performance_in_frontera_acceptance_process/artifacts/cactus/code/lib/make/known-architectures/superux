@@ -1,0 +1,93 @@
+#! /bin/sh
+# /*@@
+#   @file    superux
+#   @date    Fri Mar 3 12:35:28
+#   @author  Tom Goodale
+#   @desc
+#            Known architecture stuff for the SX-5
+#   @enddesc
+#   @version $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/known-architectures/superux,v 1.18 2005-10-05 19:16:47 goodale Exp $
+# @@*/
+
+if test "$CCTK_CONFIG_STAGE" = 'preferred-compilers' ; then
+
+  # use the Cactus preprocessor for Fortran
+  if test -z "$FPP"; then
+    FPP='$(PERL) $(CCTK_HOME)/lib/sbin/cpp.pl'
+    echo Setting FPP to $FPP
+  fi
+
+  if test -z "$CPP"; then
+	if test -n "`echo $CC | grep sxcc`" ; then
+      CPP=$CC
+      echo Setting CPP to $CPP
+    fi
+  fi
+
+else
+
+  if test "x$cross_compiling" = 'xyes' ; then
+    : ${C_OPTIMISE_FLAGS='-C aopt -pvctl,noassoc'}
+  else
+    : ${C_OPTIMISE_FLAGS='-O2'}
+  fi
+  : ${CXX_OPTIMISE_FLAGS='-C hopt -pvctl,noassoc'}
+  : ${F77_OPTIMISE_FLAGS='-C hopt -Wf,"-pvctl fullmsg loopcnt=100000000 vwork=stack -L fmtlist mrgmsg transform source"'}
+  : ${F90_OPTIMISE_FLAGS='$(F77_OPTIMISE_FLAGS)'}
+
+  # switch off warnings by default, reactivate if WARN=yes was set
+  : ${F77FLAGS='-w'}
+  : ${F90FLAGS="$F77FLAGS"}
+  if test "$WARN" = 'xyes' ; then
+    : ${F77_WARN_FLAGS='-Nw'}
+    : ${F90_WARN_FLAGS='-Nw'}
+  fi
+  : ${CXX_WARN_FLAGS=''}
+
+  if test "$LD" = "$CXX" -o "$LD" = "$F90" ; then
+    : ${LDFLAGS='-f90lib'}
+  else
+    : ${LIBS='i90sx f90sxe v90sxe_sv i90sxe m90sxe u90sx m'}
+  fi
+
+  # dependencies are a bit awkward to generate on the SX-5
+  if test "x$cross_compiling" = 'xyes' ; then
+    : ${C_DEPEND='$(CPP) -M $(CPPFLAGS)'}
+    : ${CXX_DEPEND='$(C_DEPEND)'}
+  else
+    : ${C_DEPEND='$(CPP) -H$@ $(CPPFLAGS)'}
+    : ${CXX_DEPEND='$(C_DEPEND)'}
+    : ${F77_DEPEND='$(C_DEPEND)'}
+    : ${F_DEPEND='$(C_DEPEND)'}
+    : ${C_DEPEND_OUT='> /dev/null 2> $(basename $(@)).d; $(PERL) -ni -e "s,^,$(basename $(@)).o $(basename $(@)).d : ,; print if (! m/:.*:/) " $(basename $(@)).d'}
+    : ${CXX_DEPEND_OUT='$(C_DEPEND_OUT)'}
+    : ${F_DEPEND_OUT='$(C_DEPEND_OUT)'}
+    : ${F77_DEPEND_OUT='$(C_DEPEND_OUT)'}
+  fi
+
+  # MPI stuff
+  if test -n "$MPI" ; then
+    NATIVE_MPI_LIBS='mpi'
+  fi
+
+  # stuff for cross-compiling
+  if test "x$cross_compiling" = 'xyes' ; then
+    ENDIAN=big
+
+    SIZEOF_SHORT_INT=2
+    SIZEOF_INT=4
+    SIZEOF_LONG_INT=8
+    SIZEOF_LONG_LONG=8
+
+    SIZEOF_FLOAT=4
+    SIZEOF_DOUBLE=8
+    SIZEOF_LONG_DOUBLE=16
+
+    SIZEOF_POINTER=8
+
+    NULL_DEVICE='/dev/null'
+
+    AR=sxar
+    USE_RANLIB=no
+  fi
+fi

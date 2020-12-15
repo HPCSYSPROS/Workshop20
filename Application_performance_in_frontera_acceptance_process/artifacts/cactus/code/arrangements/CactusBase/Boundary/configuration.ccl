@@ -1,0 +1,11 @@
+# Configuration definition for thorn Boundary
+# $Header$
+
+# This will disappear once function aliasing has requires
+
+PROVIDES Boundary
+{
+  SCRIPT
+  LANG
+}
+

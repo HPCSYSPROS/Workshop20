@@ -1,0 +1,5 @@
+# Configuration definitions for thorn CarpetMask
+
+OPTIONAL LoopControl
+{
+}

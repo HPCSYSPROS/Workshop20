@@ -1,0 +1,9 @@
+module NamdCentLB {
+
+extern module CentralLB;
+
+group NamdCentLB : CentralLB {
+  entry void NamdCentLB(void);  
+};
+
+};

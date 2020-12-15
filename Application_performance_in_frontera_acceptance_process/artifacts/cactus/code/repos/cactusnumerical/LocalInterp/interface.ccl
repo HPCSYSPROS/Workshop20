@@ -1,0 +1,6 @@
+# Interface definition for thorn LocalInterp
+# $Header$
+
+implements: LocalInterp
+
+# this thorn doesn't define or use any Cactus grid variables

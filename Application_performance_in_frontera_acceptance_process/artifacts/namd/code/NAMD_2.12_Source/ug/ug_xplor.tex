@@ -1,0 +1,112 @@
+\section{Translation between \NAMD\ and X-PLOR configuration parameters}
+\label{section:xplorequiv}
+
+\NAMD\ was designed to provide many of the same molecular dynamics functions that
+X-PLOR provides.  As such, there are many similarities between the types of parameters
+that must be passed to both X-PLOR and \NAMD.  This section describes relations
+between similar \NAMD\ and X-PLOR parameters.  
+
+\begin{itemize}
+
+\item
+\XNCOMP{cutoff}{CTOFNB}
+{When full electrostatics are not in use within \NAMD, 
+these parameters have exactly the same meaning 
+--- the distance at which electrostatic 
+and van der Waals forces are truncated.  
+When full electrostatics are in use
+within \NAMD, the meaning is still very similar.  
+The van der Waals force is still truncated at the specified distance, 
+and the electrostatic force is still computed at every timestep 
+for interactions within the specified distance.  
+However, the \NAMD\ integration uses multiple time stepping to 
+compute electrostatic force interactions beyond this distance 
+every {\tt stepspercycle} timesteps.}
+
+\item
+\XNCOMP{vdwswitchdist}{CTONNB}
+{Distance at which the van der Waals switching function becomes active.}
+
+\item 
+\XNCOMP{pairlistdist}{CUTNb}
+{Distance within which interaction pairs will be included in pairlist.}
+
+\item
+\XNCOMP{1-4scaling}{E14Fac}{Scaling factor for 1-4 pair electrostatic interactions.}
+
+\item
+\XNCOMP{dielectric}{EPS}{Dielectric constant.}
+
+\item
+\XNCOMP{exclude}{NBXMod}
+{Both parameters specify which atom pairs 
+to exclude from non-bonded interactions.  
+The ability to ignore explicit exclusions is {\it not} present within \NAMD, 
+thus only positive values of {\tt NBXMod} have \NAMD\ equivalents.  
+These equivalences are
+\begin{itemize}
+\item
+{\tt NBXMod=1} is equivalent to {\tt exclude=none} 
+--- no atom pairs excluded, 
+\item
+{\tt NBXMod=2} is equivalent to {\tt exclude=1-2} 
+--- only 1-2 pairs excluded, 
+\item
+{\tt NBXMod=3} is equivalent to {\tt exclude=1-3} 
+--- 1-2 and 1-3 pairs excluded, 
+\item
+{\tt NBXMod=4} is equivalent to {\tt exclude=1-4} 
+--- 1-2, 1-3, and 1-4 pairs excluded, 
+\item
+{\tt NBXMod}=5 is equivalent to {\tt exclude=scaled1-4} 
+--- 1-2 and 1-3 pairs excluded, 1-4 pairs modified. 
+\end{itemize}}
+
+\item
+\XNCOMP{switching}{SHIFt, VSWItch, and TRUNcation}
+{Activating the \NAMD\ option {\tt switching} is equivalent 
+to using the X-PLOR options {\tt SHIFt} and {\tt VSWItch}.  
+Deactivating {\tt switching} is equivalent 
+to using the X-PLOR option {\tt TRUNcation}.}
+
+\item
+\XNCOMP{temperature}{FIRSttemp}
+{Initial temperature for the system.}
+
+\item
+\XNCOMP{rescaleFreq}{IEQFrq}
+{Number of timesteps between velocity rescaling.}
+
+\item
+\XNCOMP{rescaleTemp}{FINAltemp}
+{Temperature to which velocities are rescaled.}
+
+\item
+\XNCOMP{restartname}{SAVE}{Filename prefix for the restart files.}
+
+\item
+\XNCOMP{restartfreq}{ISVFrq}
+{Number of timesteps between the generation of restart files.}
+
+\item
+\XNCOMP{DCDfile}{TRAJectory}
+{Filename for the position trajectory file.} 
+
+\item
+\XNCOMP{DCDfreq}{NSAVC}
+{Number of timesteps between writing coordinates to the trajectory file.}
+
+\item
+\XNCOMP{velDCDfile}{VELOcity}
+{Filename for the velocity trajectory file.}
+
+\item
+\XNCOMP{velDCDfreq}{NSAVV}
+{Number of timesteps between writing velocities to the trajectory file.} 
+
+\item
+\XNCOMP{numsteps}{NSTEp}
+{Number of simulation timesteps to perform.}
+
+\end{itemize}
+

@@ -1,0 +1,13 @@
+#! /bin/sh
+# /*@@
+#   @file    darwin8.1.0
+#   @date    Mon 25 July 2005 
+#   @author  Thomas Radke
+#   @desc
+#            Known architecture stuff for MacOS X (Darwin) release 8.1.0
+#   @enddesc
+#   @version $Header$
+# @@*/
+
+. $srcdir/known-architectures/darwin
+

@@ -1,0 +1,56 @@
+# Interface definition for thorn Boundary
+# $Header$
+
+implements: boundary
+
+INCLUDES HEADER: Boundary.h in Boundary.h
+
+
+
+# Implementation of new boundary spec:
+
+CCTK_INT FUNCTION Boundary_RegisterPhysicalBC(CCTK_POINTER_TO_CONST IN GH, \
+  CCTK_INT IN CCTK_FPOINTER function_pointer(CCTK_POINTER_TO_CONST IN GH, \
+                                             CCTK_INT IN num_vars, \
+                                             CCTK_INT ARRAY IN var_indices, \
+                                             CCTK_INT ARRAY IN faces, \
+                                             CCTK_INT ARRAY IN boundary_widths, \
+                                             CCTK_INT ARRAY IN table_handles),\
+  CCTK_STRING IN bc_name)
+PROVIDES FUNCTION Boundary_RegisterPhysicalBC WITH \
+  Bdry_Boundary_RegisterPhysicalBC LANGUAGE C
+USES FUNCTION Boundary_RegisterPhysicalBC
+
+CCTK_INT FUNCTION Boundary_SelectVarForBC(CCTK_POINTER_TO_CONST IN GH, \
+  CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, \
+  CCTK_STRING IN var_name, CCTK_STRING IN bc_name)
+CCTK_INT FUNCTION Boundary_SelectVarForBCI(CCTK_POINTER_TO_CONST IN GH, \
+  CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, \
+  CCTK_INT IN var_index, CCTK_STRING IN bc_name)
+CCTK_INT FUNCTION Boundary_SelectGroupForBC(CCTK_POINTER_TO_CONST IN GH, \
+  CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, \
+  CCTK_STRING IN group_name, CCTK_STRING IN bc_name)
+CCTK_INT FUNCTION Boundary_SelectGroupForBCI(CCTK_POINTER_TO_CONST IN GH, \
+  CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, \
+  CCTK_INT IN group_index, CCTK_STRING IN bc_name)
+PROVIDES FUNCTION Boundary_SelectVarForBC WITH Bdry_Boundary_SelectVarForBC \
+  LANGUAGE C
+PROVIDES FUNCTION Boundary_SelectVarForBCI WITH \
+  Bdry_Boundary_SelectVarForBCI LANGUAGE C
+PROVIDES FUNCTION Boundary_SelectGroupForBC WITH \
+  Bdry_Boundary_SelectGroupForBC LANGUAGE C
+PROVIDES FUNCTION Boundary_SelectGroupForBCI WITH \
+  Bdry_Boundary_SelectGroupForBCI LANGUAGE C
+
+CCTK_INT FUNCTION Boundary_SelectedGVs(CCTK_POINTER_TO_CONST IN GH, \
+  CCTK_INT IN array_size, CCTK_INT ARRAY OUT var_indicies, \
+  CCTK_INT ARRAY OUT faces, CCTK_INT ARRAY OUT boundary_widths, \
+  CCTK_INT ARRAY OUT table_handles, CCTK_STRING IN bc_name)
+PROVIDES FUNCTION Boundary_SelectedGVs WITH Bdry_Boundary_SelectedGVs \
+  LANGUAGE C
+
+
+
+CCTK_INT FUNCTION \
+    SymmetryTableHandleForGrid (CCTK_POINTER_TO_CONST IN cctkGH)
+REQUIRES FUNCTION SymmetryTableHandleForGrid

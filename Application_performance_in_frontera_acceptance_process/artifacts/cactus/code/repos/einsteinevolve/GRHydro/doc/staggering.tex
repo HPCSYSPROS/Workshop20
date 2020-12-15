@@ -1,0 +1,31 @@
+\documentclass{article}
+\begin{document}
+In what follows, we assume second-order differencing.  Adapt as necessary.
+
+For staggered $A$-field evolution we know the values of the $A$ field at edges:
+\begin{equation}
+A_x(i,j+\frac{1}{2},k+\frac{1}{2});~A_y(i+\frac{1}{2},j,k+\frac{1}{2});~A_z(i+\frac{1}{2},j+\frac{1}{2},k)
+\end{equation}
+
+From these, we calculate directly the values of the $B$-fields at faces:
+\begin{equation}
+B_{face}^x(i+\frac{1}{2},j,k) =\frac{A_z(i+\frac{1}{2},j+\frac{1}{2},k)-A_z(i+\frac{1}{2},j-\frac{1}{2},k)}{\Delta y}-
+\frac{A_y(i+\frac{1}{2},j,k+\frac{1}{2})-A_z(i+\frac{1}{2},j,k-\frac{1}{2})}{\Delta z}
+\end{equation}
+and the values of the $B$-field at cell centers by averaging
+\begin{equation}
+B_{cent}^x(i,j,k)=\frac{B_{face}^x(i+\frac{1}{2},j,k)+B_{face}^x(i-\frac{1}{2},j,k)}{2}
+\end{equation}
+These can be calculated at the end of the timestep.
+
+To update the $A$-field, we calculate
+\begin{eqnarray}
+\partial_t A_x(i,j+\frac{1}{2},k+\frac{1}{2})& =& -E^x(i,j+\frac{1}{2},k+\frac{1}{2})\\
+&=&[v^y B^z-v^z B^y](i,j+\frac{1}{2},k+\frac{1}{2})^{LLF/HLL}
+\end{eqnarray}
+The values of $B$ need to be reconstructed an ``extra'' time, to the pairs of edges perpendicular to their direction.  The $v$-fields need to be reconstructed twice, once parallel to their direction and once perpendicular (but never doubly perpendicular).  We can minimize work and reuse our previous reconstructed, as suggested by Etienne et al. and originally Del Zanna et al. if we assume reconstruction happens in the perpendicular direction first for the velocities.  Note that to get the wavespeeds at the edges, all primitives need to be reconstructed twice.  To establish the notation in the code, one can try the following: for all primitives except the $B$-field, one reconstructs in the flux-direction, turns either in the right-handed direction (positive cycle through $x-y-z$) or the left-handed direction (cycle in the order $x-z-y$), and then reconstructs either in the plus or minus sense again.  Thus, we have the following,  for the example that {\tt flux\_direction}=1, the $y$-direction.\\
+
+{\tt rhop\_r\_m}: Reconstruct rho in the $+y$ direction, cycle to the right, and then move in the minus ($-z$) direction, resulting in $\rho(i,j+\frac{1}{2},k-\frac{1}{2})$.
+
+Note that since we require reconstruction, the source term for $\partial_t A_x$ is actually calcuated during {\tt FluxTerms}, and we zero out the contribution in {\tt GRHydro\_SourceAM.F90}.
+\end{document}

@@ -1,0 +1,110 @@
+#!/bin/bash
+
+# W. Cyrus Proctor
+# 2017-11-13
+# Stampede2 RMG build script
+
+
+ml reset
+ml gcc
+ml cmake
+ml boost
+ml fftw3
+ml mkl
+
+set -x
+
+#export base=`pwd`
+
+export rmg=${base}/rmg
+export rmg_install=${rmg}/install/${TACC_FAMILY_COMPILER}
+
+export ob=${base}/openbabel
+export ob_install=${ob}/install/${TACC_FAMILY_COMPILER}
+
+export plplot=${base}/plplot
+export plplot_install=${plplot}/install/${TACC_FAMILY_COMPILER}
+
+export rmg_major=2
+export rmg_minor=2 # Must be at least 2; read spp build instructions
+export rmg_patch=1
+export rmg_version=${rmg_major}.${rmg_minor}.${rmg_patch}
+export rmg_sht_version=${rmg_major}.${rmg_minor}
+
+export CTEST_OUTPUT_ON_FAILURE=1
+export ncores=48
+
+export CC=mpicc
+export CXX=mpicxx
+export FC=mpif90
+export MPICXX=mpicxx
+export MPICC=mpicc
+export MPIF90=mpif90
+export MPIEXEC=ibrun
+
+export   CFLAGS="-O3 -march=skylake-avx512 -mtune=skylake-avx512 -mavx512f -mavx512cd -mavx512bw -mavx512dq -mavx512vl -mavx512ifma -mavx512vbmi"
+export CXXFLAGS="-O3 -march=skylake-avx512 -mtune=skylake-avx512 -mavx512f -mavx512cd -mavx512bw -mavx512dq -mavx512vl -mavx512ifma -mavx512vbmi -std=c++03"
+export  FCFLAGS="-O3 -march=skylake-avx512 -mtune=skylake-avx512 -mavx512f -mavx512cd -mavx512bw -mavx512dq -mavx512vl -mavx512ifma -mavx512vbmi"
+export  LDFLAGS="-O3 -march=skylake-avx512 -mtune=skylake-avx512 -mavx512f -mavx512cd -mavx512bw -mavx512dq -mavx512vl -mavx512ifma -mavx512vbmi"
+
+mkdir -p ${rmg}
+cd ${rmg}
+mkdir -p ${TACC_FAMILY_COMPILER}
+cd ${TACC_FAMILY_COMPILER}
+wget https://downloads.sourceforge.net/project/rmgdft/Releases/${rmg_version}/rmg-release_${rmg_version}.tar.gz
+tar xvfz rmg-release_${rmg_version}.tar.gz
+mv rmg-release_${rmg_version} rmg-release_${rmg_version}.orig
+tar xvfz rmg-release_${rmg_version}.tar.gz
+
+export source=rmg-release_${rmg_version}
+sed -i "s:cmake_minimum_required (VERSION 2.8):cmake_minimum_required (VERSION 2.8)\ncmake_policy(SET CMP0046 OLD):g" ${source}/CMakeLists.txt
+sed -i 's:#set(MKLROOT $ENV{MKLROOT}):set(MKLROOT $ENV{MKLROOT}):g' ${source}/CMakeLists.txt
+sed -i 's:target_link_libraries (${rmg} -Wl,--start-group ${MAGMA_LIBRARIES} ${MKL_LIB64}/libmkl_scalapack_lp64.a ${MKL_LIB64}/libmkl_intel_lp64.a ${MKL_LIB64}/libmkl_core.a ${MKL_LIB64}/libmkl_gnu_thread.a ${MKL_LIB64}/libmkl_blacs_openmpi_lp64.a -Wl,--end-group):target_link_libraries (${rmg} ${MKL_LIB64}/libmkl_scalapack_lp64.a -Wl,--start-group ${MAGMA_LIBRARIES} ${MKL_LIB64}/libmkl_intel_lp64.a ${MKL_LIB64}/libmkl_intel_thread.a ${MKL_LIB64}/libmkl_core.a ${MKL_LIB64}/libmkl_blacs_intelmpi_lp64.a /opt/intel/compilers_and_libraries/linux/lib/intel64/libiomp5.a -Wl,--end-group -lpthread -lm -ldl):g' ${source}/CMakeLists.txt
+sed -i 's:target_link_libraries (${rmg} ${MKL_LIB64}/libmkl_scalapack_lp64.a -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a ${MKLROOT}/lib/intel64/libmkl_gnu_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a ${MKLROOT}/lib/intel64/libmkl_blacs_openmpi_lp64.a  -Wl,--end-group):target_link_libraries (${rmg} ${MKL_LIB64}/libmkl_scalapack_lp64.a -Wl,--start-group ${MAGMA_LIBRARIES} ${MKL_LIB64}/libmkl_intel_lp64.a ${MKL_LIB64}/libmkl_intel_thread.a ${MKL_LIB64}/libmkl_core.a ${MKL_LIB64}/libmkl_blacs_intelmpi_lp64.a /opt/intel/compilers_and_libraries/linux/lib/intel64/libiomp5.a -Wl,--end-group -lpthread -lm -ldl):g' ${source}/CMakeLists.txt
+sed -i "s:set (USE_SVN 0):set (USE_SVN 0)\n\nadd_definitions(-D_BSD_SOURCE=1):g" ${source}/CMakeLists.txt 
+sed -i 's:install(FILES RmgLib/libRmgLibShared.so RmgLib/libRmgLib.a:install(FILES ${PROJECT_BINARY_DIR}/RmgLib/libRmgLibShared.so ${PROJECT_BINARY_DIR}/RmgLib/libRmgLib.a:g' ${source}/CMakeLists.txt 
+sed -i "s:add_executable (poisson_pbc examples/Poisson/poisson_pbc.cpp):#add_executable (poisson_pbc examples/Poisson/poisson_pbc.cpp):g" ${source}/RmgLib/CMakeLists.txt 
+sed -i 's:target_link_libraries (poisson_pbc ${Boost_LIBRARIES} RmgLibShared):#target_link_libraries (poisson_pbc ${Boost_LIBRARIES} RmgLibShared):g' ${source}/RmgLib/CMakeLists.txt
+sed -i 's:target_link_libraries (poisson_pbc ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES} RmgLibShared):#target_link_libraries (poisson_pbc ${Boost_LIBRARIES} ${MPI_CXX_LIBRARIES} RmgLibShared):g' ${source}/RmgLib/CMakeLists.txt
+cat ${source}/CMakeLists.txt | grep "cmake_policy"
+cat ${source}/CMakeLists.txt | grep "^set(MKLROOT"
+cat ${source}/CMakeLists.txt | grep 'target_link_libraries (${rmg}'
+cat ${source}/CMakeLists.txt | grep "BSD"
+cat ${source}/CMakeLists.txt | grep "RmgLib/libRmgLibShared.so"
+cat ${source}/RmgLib/CMakeLists.txt | grep "add_executable"
+cat ${source}/RmgLib/CMakeLists.txt | grep "target_link_libraries"
+diff -Naur rmg-release_${rmg_version}.orig rmg-release_${rmg_version} > ${base}/patches/rmg.master.patch
+mkdir -p build
+cd build
+
+cmake                                                              \
+-DCMAKE_INSTALL_PREFIX=${rmg_install}                              \
+-DCMAKE_VERBOSE_MAKEFILE=ON                                        \
+-DCMAKE_EXPORT_COMPILE_COMMANDS=ON                                 \
+-DCMAKE_CXX_COMPILER="${CXX}"                                      \
+-DCMAKE_C_COMPILER="${CC}"                                         \
+-DCMAKE_CXX_FLAGS="${CXXFLAGS}"                                    \
+-DCMAKE_C_FLAGS="${C_FLAGS}"                                       \
+-DMPIEXEC="${MPIEXEC}"                                             \
+-DMPIEXEC_MAX_NUMPROCS=4                                           \
+-DMPI_CXX_COMPILER="${MPICXX}"                                     \
+-DMPI_C_COMPILER="${MPICC}"                                        \
+-DMPI_Fortran_COMPILER="${MPIF90}"                                 \
+-DMPI_CXX_COMPILE_FLAGS="${CXXFLAGS}"                              \
+-DMPI_C_COMPILE_FLAGS="${CFLAGS}"                                  \
+-DMPI_Fortran_COMPILE_FLAGS="${FCFLAGS}"                           \
+-DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}"                              \
+-DCMAKE_MODULE_LINKER_FLAGS="${LDFLAGS}"                           \
+-DCMAKE_SHARED_LINKER_FLAGS="${LDFLAGS}"                           \
+-DBoost_DIR="${TACC_BOOST_DIR}"                                    \
+-DFFTW_INCLUDES="${TACC_FFTW3_INC}"                                \
+-DFFTW_LIBRARIES="${TACC_FFTW3_LIB}/libfftw3_mpi.so;${TACC_FFTW3_LIB}/libfftw3.so" \
+-DOPENBABEL_INCLUDES=${ob_install}/include/openbabel-2.0/openbabel \
+-DOPENBABEL_LIBRARIES=${ob_install}/lib/libopenbabel.so            \
+-DPLplot_INCLUDE_DIR=${plplot_install}/include                     \
+-DPLplot_cxx_LIBRARY=${plplot_install}/lib/libplplotcxx.so         \
+-DPLplot_LIBRARY=${plplot_install}/lib/libplplot.so                \
+${rmg}/${TACC_FAMILY_COMPILER}/${source}
+
+make -j ${ncores} rmg-cpu
+make -j ${ncores} install

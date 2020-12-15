@@ -1,0 +1,9 @@
+module NamdNborLB {
+
+extern module NeighborLB;
+
+group NamdNborLB : NeighborLB {
+  entry void NamdNborLB(void);  
+};
+
+};

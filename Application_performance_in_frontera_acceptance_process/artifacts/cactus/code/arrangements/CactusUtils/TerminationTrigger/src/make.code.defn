@@ -1,0 +1,7 @@
+# Main make.code.defn file for thorn TerminationTrigger
+
+# Source files in this directory
+SRCS = walltime.c file.c
+
+# Subdirectories containing source files
+SUBDIRS = 

@@ -1,0 +1,35 @@
+# Parameter definitions for thorn ZelmaniAnalysis
+# $Header:$
+
+
+CCTK_INT number_of_spheres "Number of spheres to integrate in" STEERABLE=ALWAYS
+{
+ 0:* :: "0 or positive"
+} 0
+
+CCTK_REAL radii[100] "integraton radii" STEERABLE=ALWAYS
+{
+ 0:*    :: "anything > 0"
+ -1.0 :: "not set"
+} -1.0
+
+BOOLEAN do_enu_interior "compute and reduce the integrated neutrino energy density (if ZelmaniM1 is active)" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN do_omega_3D "Store 3D 3-timelevel GF with the angular velocity" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN do_entropy_update "Compute the entropy at CCTK_ANALYSIS" STEERABLE=ALWAYS
+{
+} "no"
+
+#BOOLEAN do_adm_full_hydro "Compute ADM integrals based on hydro and curv vars" STEERABLE=ALWAYS
+#{
+#} "no"
+
+BOOLEAN do_ic_analysis "Compute analysis quantities for inner core" STEERABLE=ALWAYS
+{
+} "no"
+

@@ -1,0 +1,46 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+. /etc/profile
+. /etc/profile.d/modules.sh
+
+module load vtune/xe_2011/xe_2011
+module load mpi/impi/impi4.0.3.008
+
+module li
+
+
+cd @RUNDIR@-active
+
+echo "Checking:"
+pwd
+hostname
+date
+cat ${MPI_NODEFILE} > SIMFACTORY/NODES
+
+echo "Environment:"
+export OMP_NUM_THREADS=@NUM_THREADS@
+env | sort > SIMFACTORY/ENVIRONMENT
+
+case @VTUNE_ANALYSIS@ in
+  LOCKS_AND_WAITS) vtune_opts="-collect locksandwaits -knob collect-spin-data=true -knob collect-signals=true -follow-child -mrte-mode=auto -target-duration-type=short -no-allow-multiple-runs -no-analyze-system -data-limit=1000 -slow-frames-threshold=40 -fast-frames-threshold=100 -result-dir @RUNDIR@/vtune-analysis" ;;
+  HOTSPOTS)  vtune_opts="-collect hotspots -follow-child -mrte-mode=auto -target-duration-type=short -no-allow-multiple-runs -no-analyze-system -data-limit=1000 -slow-frames-threshold=40 -fast-frames-threshold=100 -result-dir @RUNDIR@/vtune-analysis" ;;
+  CONCURRENCY) vtune_opts="-collect concurrency -knob collect-signals=true -follow-child -mrte-mode=auto -target-duration-type=short -no-allow-multiple-runs -no-analyze-system -data-limit=10000 -slow-frames-threshold=40 -fast-frames-threshold=100 -result-dir @RUNDIR@/vtune-analysis" ;;
+
+  *) vtune_opts="-collect hotspots -follow-child -mrte-mode=auto -target-duration-type=short -no-allow-multiple-runs -no-analyze-system -data-limit=1000 -slow-frames-threshold=40 -fast-frames-threshold=100 -result-dir @RUNDIR@/vtune-analysis" ;;
+  
+esac
+
+echo "vtune_opts: $vtune_opts"
+
+
+export CACTUS_STARTTIME=$(date +%s)
+time  amplxe-cl $vtune_opts -- mpirun -np @NUM_PROCS@ -ppn @(@PPN_USED@/@NUM_THREADS@)@ @EXECUTABLE@ -L 3 @PARFILE@
+
+echo "Stopping:"
+date
+
+echo "Done."

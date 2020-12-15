@@ -1,0 +1,113 @@
+module DataExchanger {
+
+  include "Pointer.h";
+
+  group DataExchanger
+  {
+    entry DataExchanger(void);
+    entry void recv_data(Pointer p);
+    entry void recv_eval_result(Pointer p);
+    entry void recv_ack();
+    entry void recv_red();
+    entry void recv_bcast();
+
+    entry void send(Pointer srcPointer, int srcSize, int dstPart, int dst) {
+      serial {
+        packSend(dst,dstPart,(char*)srcPointer.data,srcSize,recv_data_idx);
+      }
+      when recv_ack() serial { 
+        CpvAccess(breakScheduler) = 1;
+      }
+    };
+
+    entry void recv(Pointer recvPointer, int srcPart, int src) {
+      serial { loop = 1;}
+      while(loop) {
+        when recv_data(Pointer p) serial { 
+          DataMessage *dmsg = (DataMessage*)p.data;
+          if((srcPart < 0) || (dmsg->src == src && dmsg->srcPart == srcPart)) {
+            *((DataMessage**)recvPointer.data) = dmsg;
+            if ( ! dmsg->code ) packSend(dmsg->src,dmsg->srcPart,NULL,0,recv_ack_idx);
+            loop = 0;
+            CpvAccess(breakScheduler) = 1;
+          } else {
+            thisProxy[CkMyPe()].recv_data(p);
+          }
+        }
+      }
+    };
+
+    entry void sendRecv(Pointer srcPointer, int srcSize, int dstPart, int dst, Pointer recvPointer, int srcPart, int src) {
+      serial {
+        packSend(dst,dstPart,(char*)srcPointer.data,srcSize,recv_data_idx);
+        loop = 1;
+      }
+      while(loop) {
+        when recv_data(Pointer p) serial { 
+          DataMessage *dmsg = (DataMessage*)p.data;
+          if((srcPart < 0) || (dmsg->src == src && dmsg->srcPart == srcPart)) {
+            *((DataMessage**)recvPointer.data) = dmsg;
+            if ( ! dmsg->code ) packSend(dmsg->src,dmsg->srcPart,NULL,0,recv_ack_idx);
+            loop = 0;
+          }else {
+            thisProxy[CkMyPe()].recv_data(p);
+          }
+        }
+      }
+      when recv_ack() serial { 
+        CpvAccess(breakScheduler) = 1;
+      }
+    };
+
+    entry void eval(Pointer srcPointer, int srcSize, int dstPart, int dst, Pointer recvPointer) {
+      serial {
+        packSend(dst,dstPart,(char*)srcPointer.data,srcSize,recv_eval_command_idx);
+      }
+      when recv_eval_result(Pointer p) serial { 
+        DataMessage *dmsg = (DataMessage*)p.data;
+        *((DataMessage**)recvPointer.data) = dmsg;
+        CpvAccess(breakScheduler) = 1;
+      }
+    };
+
+    entry void recv_eval_command(Pointer p) {
+      serial {
+        DataMessage *dmsg = (DataMessage*)p.data;
+        const char *resultPtr = 0;
+        CpvAccess(inEval) = 1;
+        int code = Node::Object()->getScript()->eval(dmsg->data, &resultPtr);
+        CpvAccess(inEval) = 0;
+        int resultSize = strlen(resultPtr);
+        packSend(dmsg->src,dmsg->srcPart,resultPtr,resultSize,recv_eval_result_idx,code);
+      }
+    };
+
+    entry void barrier() {
+      for(recvred = 0; recvred < numChildren; recvred++) {
+        when recv_red() {}
+      }
+      if(parent != -1) {
+        serial { packSend(0,parent,NULL,0,recv_red_idx); }
+      } else {
+        serial {
+          for(sendbcast = 0; sendbcast < numChildren; sendbcast++) {
+            packSend(0,firstChild+sendbcast,NULL,0,recv_bcast_idx); 
+          }
+        }
+      }
+      if(parent != -1) {
+        when recv_bcast() {
+          serial {
+            for(sendbcast = 0; sendbcast < numChildren; sendbcast++) {
+              packSend(0,firstChild+sendbcast,NULL,0,recv_bcast_idx); 
+            }
+          }
+        }
+      }
+      serial { 
+        CpvAccess(breakScheduler) = 1;
+      }
+    };
+  };
+};
+

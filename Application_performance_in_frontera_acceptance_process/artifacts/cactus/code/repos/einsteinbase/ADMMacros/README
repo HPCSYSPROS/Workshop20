@@ -1,0 +1,9 @@
+Cactus Code Thorn ADMMacros
+Author(s)    : Tom Goodale
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+This thorn provides nothing but a load of macros for other thorns to use

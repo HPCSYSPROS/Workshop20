@@ -1,0 +1,216 @@
+#! /bin/sh
+# /*@@
+#   @file    MPICH
+#   @date    Wed Jul 21 13:27:07 1999
+#   @author  Tom Goodale
+#   @desc
+#            Configuration options for MPI=MPICH
+#   @enddesc
+#   @version $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/extras/MPI/MPICH,v 1.27 2007-08-08 12:04:13 tradke Exp $
+# @@*/
+
+
+echo '  MPICH selected'
+
+# MPICH is pretty configerable itself
+
+# Find the directory.
+if test -z "$MPICH_DIR" ; then
+  echo '  MPICH selected but no MPICH_DIR set. Checking some places...'
+  CCTK_Search MPICH_DIR "/usr /usr/local /usr/local/mpich /usr/local/packages/mpich /usr/local/apps/mpich /usr/lib/mpich /usr/local/lib/mpich $HOME" include/mpi_errno.h
+  if test -z "$MPICH_DIR" ; then
+    if test -n "$MPICH_ARCH" ; then
+      CCTK_Search MPICH_DIR "/usr/local/mpich/$MPICH_ARCH /usr/local/packages/mpich/$MPICH_ARCH /usr/local/apps/mpich/$MPICH_ARCH /usr/lib/mpich/$MPICH_ARCH /usr/local/lib/mpich/$MPICH_ARCH $HOME/$MPICH_ARCH" include/mpi_errno.h
+      if test -z "$MPICH_DIR" ; then
+        if test -n "$MPICH_DEVICE" ; then
+          CCTK_Search MPICH_DIR "/usr/local/mpich/$MPICH_ARCH/$MPICH_DEVICE /usr/local/packages/mpich/$MPICH_ARCH/$MPICH_DEVICE /usr/local/apps/mpich/$MPICH_ARCH/$MPICH_DEVICE /usr/lib/mpich/$MPICH_ARCH/$MPICH_DEVICE /usr/local/lib/mpich/$MPICH_ARCH/$MPICH_DEVICE $HOME/$MPICH_ARCH/$MPICH_DEVICE" include/mpi_errno.h
+          if test -z "$MPICH_DIR" ; then
+            CCTK_Search MPICH_DIR "/usr/local/mpich/$MPICH_DEVICE /usr/local/packages/mpich/$MPICH_DEVICE /usr/local/apps/mpich/$MPICH_DEVICE /usr/lib/mpich/$MPICH_DEVICE /usr/local/lib/mpich/$MPICH_DEVICE $HOME/$MPICH_DEVICE" include/mpi_errno.h
+          fi
+        fi
+      fi
+    else
+      CCTK_Search MPICH_DIR "/usr/local/mpich/$MPICH_DEVICE /usr/local/packages/mpich/$MPICH_DEVICE /usr/local/apps/mpich/$MPICH_DEVICE /usr/lib/mpich/$MPICH_DEVICE /usr/local/lib/mpich/$MPICH_DEVICE $HOME/$MPICH_DEVICE" include/mpi_errno.h
+
+    fi
+  fi
+  if test -z "$MPICH_DIR" ; then
+    echo '  Unable to locate the MPICH directory - please set MPICH_DIR'
+    exit 2
+  fi
+fi
+
+# Find the MPICH architecture
+
+if test -z "$MPICH_ARCH" ; then
+  # MPICH2 doesn't install tarch
+  if test ! -x "$MPICH_DIR/bin/mpich2version" ; then
+    if test -x "$MPICH_DIR/bin/tarch" ; then
+      MPICH_ARCH=`$MPICH_DIR/bin/tarch`
+      echo "  MPICH architecture is $MPICH_ARCH"
+    else
+      echo "  Cannot execute $MPICH_DIR/bin/tarch"
+      exit 2
+    fi
+  fi
+fi
+
+if test -x "$MPICH_DIR/bin/mpich2version" ; then
+  # see MPICH2 User's Guide, sect. 5.3: Special Issues for C++
+  CXXFLAGS="$CXXFLAGS -DMPICH_IGNORE_CXX_SEEK"
+  CPPFLAGS="$CPPFLAGS -DMPICH_IGNORE_CXX_SEEK"
+fi
+
+# Find the MPICH device - this isn't necessary for mpich-1.2.0
+
+if test -d "$MPICH_DIR/build/$MPICH_ARCH" ; then
+  if test -z "$MPICH_DEVICE" ; then
+    echo '  MPICH selected but no MPICH_DEVICE set. Checking for one...'
+    CCTK_Search MPICH_DEVICE 'ch_p4 ch_shmem globus ch_gm' lib $MPICH_DIR/build/$MPICH_ARCH/$MPICH_DEVICE
+    if test -z "$MPICH_DEVICE" ; then
+      echo '  Unable to determine the MPICH device - please set MPICH_DEVICE'
+      exit 2
+    fi
+    echo "  MPICH device is $MPICH_DEVICE"
+  fi
+#elif test -n "$MPICH_DEVICE" -a "$MPICH_DEVICE" != 'globus'; then
+#  found_device=`$MPICH_DIR/bin/tdevice`
+#  echo "  MPICH device is $found_device"
+#  if test "$MPICH_DEVICE" != "$found_device"; then
+#    echo "  Your setting of MPICH_DEVICE = '$MPICH_DEVICE' is inconsistent with the device found in MPICH_DIR = $MPICH_DIR/. Please fix !"
+#    exit 2
+#  fi
+fi
+
+# Work out MPICH version
+
+if test -d "$MPICH_DIR/build/$MPICH_ARCH" ; then
+  MPICH_LIB_DIR="$MPICH_DIR/build/$MPICH_ARCH/$MPICH_DEVICE/lib"
+  MPICH_INC_DIRS="$MPICH_DIR/include $MPICH_DIR/build/$MPICH_ARCH/$MPICH_DEVICE/include"
+else
+  # don't explicitely add standard include search paths
+    if test                                     \
+        "$MPICH_DIR" != '/' -a                  \
+        "$MPICH_DIR" != '/usr' -a               \
+        "$MPICH_DIR" != '/usr/local';           \
+        then
+    MPICH_LIB_DIR="$MPICH_DIR/lib"
+    MPICH_INC_DIRS="$MPICH_DIR/include"
+  fi
+fi
+
+# Select the device and any special options for it.
+
+case "$MPICH_DEVICE" in
+
+  globus)
+############################# Globus device ##################################
+# We use the globus-makefile-header command to obtain the include and
+# library paths and libs for Globus.
+    if test -z "$GLOBUS_LOCATION"; then
+      echo 'MPICH_DEVICE globus selected by GLOBUS_LOCATION not set'
+      exit 2
+    fi
+    if test ! -x "$GLOBUS_LOCATION/sbin/gpt-flavor-configuration" -o \
+              ! -x "$GLOBUS_LOCATION/bin/globus-makefile-header"; then
+      echo "Couldn't find globus setup programs in GLOBUS_LOCATION '$GLOBUS_LOCATION'"
+      exit 2
+    fi
+
+    # if GLOBUS_FLAVOR is not set, choose the first flavor found
+    if test -z "$GLOBUS_FLAVOR"; then
+      GLOBUS_FLAVOR=`$GLOBUS_LOCATION/sbin/gpt-flavor-configuration | grep ':$' | head -n 1 | sed 's/:$//g'`
+    fi
+
+    # query the makefile settings used to build a globus program
+    globus_query_cmd="$GLOBUS_LOCATION/bin/globus-makefile-header -flavor=$GLOBUS_FLAVOR globus_nexus globus_ftp_control globus_duroc_runtime"
+    eval "$globus_query_cmd &> /dev/null"
+    if test $? != 0; then
+      if test -n "$GLOBUS_FLAVOR"; then
+        echo "Invalid GLOBUS_FLAVOR '$GLOBUS_FLAVOR' specified"
+      else
+        echo 'No globus flavor found'
+      fi
+      exit 2
+    fi
+
+    # now figure out the individual flags...
+    GLOBUS_INC_DIRS=`$globus_query_cmd | grep GLOBUS_INCLUDES | sed 's/GLOBUS_INCLUDES =//' | sed 's/ -I/ /g'`
+    GLOBUS_LIB_DIRS=`$globus_query_cmd | grep GLOBUS_LDFLAGS  | sed 's/GLOBUS_LDFLAGS =//'  | sed 's/ -L/ /g'`
+    GLOBUS_LIBS=`    $globus_query_cmd | grep GLOBUS_PKG_LIBS | sed 's/GLOBUS_PKG_LIBS =//' | sed 's/ -l/ /g'`
+
+    MPICH_INC_DIRS="$MPICH_INC_DIRS $GLOBUS_INC_DIRS"
+    MPICH_DEVICE_LIB_DIR="$GLOBUS_LIB_DIRS"
+    MPICH_DEVICE_LIBS="$GLOBUS_LIBS"
+    ;;
+
+  ch_gm)
+############################# Myrinet device ##################################
+#
+    if test -z "$MYRINET_DIR" ; then
+      echo '  Myrinet device selected but no MYRINET_DIR set. Checking some places...'
+      CCTK_Search MYRINET_DIR '/usr /usr/gm /usr/local /usr/local/gm /usr/local/myrinet /usr/local/packages/myrinet /usr/local/apps/myrinet' lib/libgm.a
+      if test -z "$MYRINET_DIR" ; then
+        echo '  Unable to locate the Myrinet directory - please set MYRINET_DIR'
+        exit 2
+      fi
+    fi
+    MPICH_DEVICE_LIB_DIR="$MYRINET_DIR/lib"
+    MPICH_DEVICE_LIBS='gm'
+    ;;
+
+  *)
+############################# other devices ##################################
+    # if an MPICH config file exists, take device libs and libdirs from there
+    # otherwise leave them empty
+    mpichlib_conf_file="$MPICH_DIR/etc/mpichlib.conf"
+    if test -r "$mpichlib_conf_file" ; then
+      MPI_WITH_PMPI=`grep MPI_WITH_PMPI $mpichlib_conf_file | perl -ne 's/MPI_WITH_PMPI="(.+)"/\1/; print'`
+      base_lib_list=`grep BASE_LIB_LIST $mpichlib_conf_file | perl -ne 's/BASE_LIB_LIST="(.+)"/\1/; print'`
+      MPICH_DEVICE_LIB_DIR=`echo "$base_lib_list" | perl -nae '@libdirs = (); foreach $libdir (@F) { push (@libdirs, $libdir) if ($libdir =~ s/^-L(.+)/\1/) } print "@libdirs"'`
+      MPICH_DEVICE_LIBS=`echo "$base_lib_list" | perl -nae '@libs = (); foreach $lib (@F) { push (@libs, $lib) if ($lib =~ s/^-l(.+)/\1/) } print "@libs"'`
+    elif test -x "$MPICH_DIR/bin/mpich2version" -a -f "$MPICH_DIR/etc/mpicc.conf"; then
+      mpich2_conf_file="$MPICH_DIR/etc/mpicc.conf"
+
+      # for MPICH2: reverse the value of NEEDSPLIB into MPI_WITH_PMPI
+      MPI_WITH_PMPI=`grep NEEDSPLIB $mpich2_conf_file | perl -ne 's/NEEDSPLIB="(.+)"/\1/; print'`
+      if test "$MPI_WITH_PMPI" = 'no'; then
+        MPI_WITH_PMPI='yes'
+      elif test "$MPI_WITH_PMPI" = 'yes'; then
+        MPI_WITH_PMPI='no'
+      fi
+      base_lib_list=`grep MPI_OTHERLIBS $mpich2_conf_file | perl -ne 's/MPI_OTHERLIBS="(.+)"/\1/; print'`
+      MPICH_DEVICE_LIB_DIR=`echo "$base_lib_list" | perl -nae '@libdirs = (); foreach $libdir (@F) { push (@libdirs, $libdir) if ($libdir =~ s/^-L(.+)/\1/) } print "@libdirs"'`
+      MPICH_DEVICE_LIBS=`echo "$base_lib_list" | perl -nae '@libs = (); foreach $lib (@F) { push (@libs, $lib) if ($lib =~ s/^-l(.+)/\1/) } print "@libs"'`
+    else
+      MPICH_DEVICE_LIB_DIR=''
+      MPICH_DEVICE_LIBS=''
+    fi
+    ;;
+esac
+
+# Work out what the MPICH library is called
+if test "$MPICH_DEVICE" = 'globus'; then
+  MPICH_LIB='mpichg2'
+elif test -r "$MPICH_LIB_DIR/libmpi.a" ; then
+  MPICH_LIB='mpi'
+else
+  MPICH_LIB='mpich'
+  if test "$MPI_WITH_PMPI" = 'no'; then
+    MPICH_LIB="$MPICH_LIB pmpich"
+  fi
+fi
+
+# Set the MPI version name
+if test -x "$MPICH_DIR/bin/mpich2version" ; then
+  MPICH2_VERSION=`$MPICH_DIR/bin/mpich2version -v`
+  MPICH2_DEVICE=`$MPICH_DIR/bin/mpich2version -d`
+  MPI_VERSION="MPICH2 ${MPICH2_VERSION} (${MPICH2_DEVICE})"
+else
+  MPI_VERSION="MPICH_$MPICH_DEVICE"
+fi
+
+# Finally set the library lines.
+MPI_LIBS="$MPICH_LIB $MPICH_DEVICE_LIBS"
+MPI_LIB_DIRS="$MPICH_LIB_DIR $MPICH_DEVICE_LIB_DIR"
+MPI_INC_DIRS="$MPICH_INC_DIRS"

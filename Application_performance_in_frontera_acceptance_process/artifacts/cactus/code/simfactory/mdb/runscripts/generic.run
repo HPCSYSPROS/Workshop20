@@ -1,0 +1,26 @@
+#!/bin/sh
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+echo "Checking:"
+pwd
+hostname
+date
+
+echo "Environment:"
+export OMP_NUM_THREADS=@NUM_THREADS@
+#env | sort > SIMFACTORY/ENVIRONMENT
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+
+if [ @RUNDEBUG@ -eq 0 ]; then
+    @EXECUTABLE@ -L 3 @PARFILE@
+else
+    gdb --args @EXECUTABLE@ -L 3 @PARFILE@
+fi
+
+echo "Stopping:"
+date

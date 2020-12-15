@@ -1,0 +1,45 @@
+#! /bin/bash
+# Create all arrangement documentation (HTML)
+# (C) 2003-07-21 Erik Schnetter <schnetter@uni-tuebingen.de>
+# (C) 2010-04-21 Barry Wardell <barry.wardell@aei.mpg.de>
+# $Header: /cactusdevcvs/Cactus/lib/sbin/ArrangementDoc,v 1.7 2009/11/11 22:32:53 schnetter Exp $
+
+echo "Creating arrangement documentation (HTML)..."
+
+type -P htlatex &>/dev/null || { echo "htlatex not found.  Aborting." >&2; exit 1; }
+
+# Selected arrangement; process all arrangements if this is empty
+selection="$1"
+
+abspath=$PWD
+
+for arr in `cd arrangements; echo *`; do
+  if test -d arrangements/$arr; then
+    if test -z "$selection" || test "$arr" == "$selection"; then
+      if test -e arrangements/$arr/doc/documentation.tex; then
+        echo "  Processing arrangement $arr..."
+
+        mkdir -p doc/HTML/ArrangementDoc/$arr 2> /dev/null
+        (
+          cd doc/HTML/ArrangementDoc/$arr
+          rm -f documentation.tex documentation.html documentation.css documentation*.png
+          path=$abspath/arrangements/$arr/doc
+          < $path/documentation.tex sed -e 's+\(\\includegraphics.*\){ *\(.*\) *}+\1{'"$path"'/\2}+g' |
+          sed -e 's+\(\\input *\)\(.*\)+\1'"$path"'/\2+g' |
+          sed -e 's+\\usepackage{../../../doc/latex/cactus}+\\usepackage{../../../../doc/latex/cactus}+g' > documentation.tex
+
+          $abspath/lib/sbin/ConvertFigures $path
+
+          {
+            htlatex documentation   "" "" "" -interaction=nonstopmode > LATEX_MESSAGES 2>&1
+          } ||
+          echo "    ERROR: Could not create documentation (check for latex errors)"
+        )
+
+      fi                  # if arrangement has documentation
+    fi                      # if arrangement is enabled
+  fi
+done                            # for arrangements
+
+echo "  Created arrangement documentation (HTML) in doc/HTML/ArrangementDoc directory."
+echo "  Done."

@@ -1,0 +1,157 @@
++ module load intel/18.0.0
+++ /opt/apps/lmod/lmod/libexec/lmod bash load intel/18.0.0
++ eval 'CPATH="/opt/intel/compilers_and_libraries_2018.0.128/linux/daal/include:/opt/intel/compilers_and_libraries_2018.0.128/linux/tbb/include:/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl/include:/opt/intel/compilers_and_libraries_2018.0.128/linux/ipp/include";' export 'CPATH;' 'DAALROOT="/opt/intel/compilers_and_libraries_2018.0.128/linux/daal";' export 'DAALROOT;' 'ICC_BIN="/opt/intel/compilers_and_libraries_2018.0.128/linux/bin/intel64";' export 'ICC_BIN;' 'ICC_LIB="/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64";' export 'ICC_LIB;' 'IFC_BIN="/opt/intel/compilers_and_libraries_2018.0.128/linux/bin/intel64";' export 'IFC_BIN;' 'IFC_LIB="/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64";' export 'IFC_LIB;' 'INTEL_LICENSE_FILE="/home1/00434/eijkhout/intel/licenses:/opt/intel/licenses:/opt/intel/compilers_and_libraries_2018.0.128/linux/licenses";' export 'INTEL_LICENSE_FILE;' 'IPPROOT="/opt/intel/compilers_and_libraries_2018.0.128/linux/ipp";' export 'IPPROOT;' 'I_MPI_CC="icc";' export 'I_MPI_CC;' 'I_MPI_CXX="icpc";' export 'I_MPI_CXX;' 'I_MPI_F77="ifort";' export 'I_MPI_F77;' 'I_MPI_F90="ifort";' export 'I_MPI_F90;' 'I_MPI_FABRICS="shm:tmi";' export 'I_MPI_FABRICS;' 'I_MPI_FC="ifort";' export 'I_MPI_FC;' 'I_MPI_HYDRA_PMI_CONNECT="alltoall";' export 'I_MPI_HYDRA_PMI_CONNECT;' 'I_MPI_JOB_FAST_STARTUP="1";' export 'I_MPI_JOB_FAST_STARTUP;' 'I_MPI_ROOT="/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi";' export 'I_MPI_ROOT;' 'I_MPI_TMI_PROVIDER="psm2";' export 'I_MPI_TMI_PROVIDER;' 'LD_LIBRARY_PATH="/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi/intel64/lib:/opt/intel/debugger_2018/libipt/intel64/lib:/opt/intel/debugger_2018/iga/lib:/opt/intel/compilers_and_libraries_2018.0.128/linux/tbb/lib/intel64_lin/gcc4.4:/opt/intel/compilers_and_libraries_2018.0.128/linux/daal/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/tbb/lib/intel64/gcc4.7:/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/ipp/lib/intel64:/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64:/opt/apps/gcc/6.3.0/lib64:/opt/apps/gcc/6.3.0/lib";' export 'LD_LIBRARY_PATH;' 'LIBRARY_PATH="/opt/intel/compilers_and_libraries_2018.0.128/linux/tbb/lib/intel64_lin/gcc4.4:/opt/intel/compilers_and_libraries_2018.0.128/linux/daal/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/tbb/lib/intel64/gcc4.7:/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/ipp/lib/intel64";' export 'LIBRARY_PATH;' 'LMOD_FAMILY_COMPILER="intel";' export 'LMOD_FAMILY_COMPILER;' 'LMOD_FAMILY_COMPILER_VERSION="18.0.0";' export 'LMOD_FAMILY_COMPILER_VERSION;' 'LMOD_FAMILY_MPI="impi";' export 'LMOD_FAMILY_MPI;' 'LMOD_FAMILY_MPI_VERSION="18.0.0";' export 'LMOD_FAMILY_MPI_VERSION;' 'LOADEDMODULES="git/2.9.0:autotools/1.1:TACC:xalt/1.7.7:intel/18.0.0:impi/18.0.0";' export 'LOADEDMODULES;' 'MANPATH="/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi/man:/opt/intel/documentation_2018/en/man/common:/opt/intel/documentation_2018/en/debugger/gdb-igfx/man:/opt/intel/documentation_2018/en/debugger/gdb-ia/man:/usr/local/man:/usr/share/man:/usr/X11R6/man:/usr/kerberos/man:/usr/man:/opt/apps/git/2.9.0/share/man";' export 'MANPATH;' 'MKLROOT="/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl";' export 'MKLROOT;' 'MODULEPATH="/opt/apps/intel18/impi18_0/modulefiles:/opt/apps/intel18/modulefiles:/opt/apps/xsede/modulefiles:/opt/apps/modulefiles:/opt/modulefiles";' export 'MODULEPATH;' 'MPICH_HOME="/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi";' export 'MPICH_HOME;' 'NLSPATH="/opt/intel/debugger_2018/gdb/intel64/share/locale/%l_%t/%N:/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl/lib/intel64/locale/%l_%t/%N:/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64/locale/%l_%t/%N";' export 'NLSPATH;' 'PATH="/opt/apps/xalt/1.7.7/bin:/opt/apps/intel18/impi/18.0.0/bin:/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi/intel64/bin:/opt/intel/compilers_and_libraries_2018.0.128/linux/bin/intel64:/opt/apps/gcc/6.3.0/bin:/opt/apps/autotools/1.1/bin:/opt/apps/git/2.9.0/bin:/usr/lib64/qt-3.3/bin:/usr/local/bin:/bin:/usr/bin:.";' export 'PATH;' 'TACC_FAMILY_COMPILER="intel";' export 'TACC_FAMILY_COMPILER;' 'TACC_FAMILY_COMPILER_VERSION="18.0.0";' export 'TACC_FAMILY_COMPILER_VERSION;' 'TACC_FAMILY_MPI="impi";' export 'TACC_FAMILY_MPI;' 'TACC_FAMILY_MPI_VERSION="18.0.0";' export 'TACC_FAMILY_MPI_VERSION;' 'TACC_IMPI_BIN="/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi/intel64/bin";' export 'TACC_IMPI_BIN;' 'TACC_IMPI_DIR="/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi";' export 'TACC_IMPI_DIR;' 'TACC_IMPI_INC="/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi/intel64/include";' export 'TACC_IMPI_INC;' 'TACC_IMPI_LIB="/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi/intel64/lib";' export 'TACC_IMPI_LIB;' 'TACC_INTEL_BIN="/opt/intel/compilers_and_libraries_2018.0.128/linux/bin/intel64";' export 'TACC_INTEL_BIN;' 'TACC_INTEL_DIR="/opt/intel/compilers_and_libraries_2018.0.128/linux";' export 'TACC_INTEL_DIR;' 'TACC_INTEL_INC="/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/include/intel64";' export 'TACC_INTEL_INC;' 'TACC_INTEL_LIB="/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64";' export 'TACC_INTEL_LIB;' 'TACC_MKL_DIR="/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl";' export 'TACC_MKL_DIR;' 'TACC_MKL_INC="/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl/include";' export 'TACC_MKL_INC;' 'TACC_MKL_LIB="/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl/lib/intel64";' export 'TACC_MKL_LIB;' 'TACC_MPI_GETMODE="impi_hydra";' export 'TACC_MPI_GETMODE;' 'TACC_VEC_FLAGS="-xAVX2' '-axCORE-AVX512,MIC-AVX512";' export 'TACC_VEC_FLAGS;' 'TBBROOT="/opt/intel/compilers_and_libraries_2018.0.128/linux/tbb";' export 'TBBROOT;' '_LMFILES_="/opt/apps/modulefiles/git/2.9.0.lua:/opt/apps/modulefiles/autotools/1.1.lua:/opt/apps/modulefiles/TACC.lua:/opt/apps/modulefiles/xalt/1.7.7.lua:/opt/apps/modulefiles/intel/18.0.0.lua:/opt/apps/intel18/modulefiles/impi/18.0.0.lua";' export '_LMFILES_;' '_ModuleTable001_="X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXtbIk1QSSJdPSJpbXBpIixbImNvbXBpbGVyIl09ImludGVsIix9LG1UPXtUQUNDPXtbImZuIl09Ii9vcHQvYXBwcy9tb2R1bGVmaWxlcy9UQUNDLmx1YSIsWyJmdWxsTmFtZSJdPSJUQUNDIixbImxvYWRPcmRlciJdPTMscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0iVEFDQyIsfSxhdXRvdG9vbHM9e1siZm4iXT0iL29wdC9hcHBzL21vZHVsZWZpbGVzL2F1dG90b29scy8xLjEubHVhIixbImZ1bGxOYW1lIl09ImF1dG90b29scy8xLjEiLFsibG9hZE9y";' export '_ModuleTable001_;' '_ModuleTable002_="ZGVyIl09Mixwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0xLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJhdXRvdG9vbHMiLH0sZ2l0PXtbImZuIl09Ii9vcHQvYXBwcy9tb2R1bGVmaWxlcy9naXQvMi45LjAubHVhIixbImZ1bGxOYW1lIl09ImdpdC8yLjkuMCIsWyJsb2FkT3JkZXIiXT0xLHByb3BUPXt9LFsic3RhY2tEZXB0aCJdPTEsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09ImdpdCIsfSxpbXBpPXtbImZuIl09Ii9vcHQvYXBwcy9pbnRlbDE4L21vZHVsZWZpbGVzL2ltcGkvMTguMC4wLmx1YSIsWyJmdWxsTmFtZSJdPSJpbXBpLzE4LjAuMCIsWyJsb2FkT3JkZXIiXT02LHByb3BUPXt9LFsic3RhY2tEZXB0aCJdPTAsWyJzdGF0dXMiXT0iYWN0";' export '_ModuleTable002_;' '_ModuleTable003_="aXZlIixbInVzZXJOYW1lIl09ImltcGkiLH0saW50ZWw9e1siZm4iXT0iL29wdC9hcHBzL21vZHVsZWZpbGVzL2ludGVsLzE4LjAuMC5sdWEiLFsiZnVsbE5hbWUiXT0iaW50ZWwvMTguMC4wIixbImxvYWRPcmRlciJdPTUscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0iaW50ZWwvMTguMC4wIix9LHhhbHQ9e1siZm4iXT0iL29wdC9hcHBzL21vZHVsZWZpbGVzL3hhbHQvMS43LjcubHVhIixbImZ1bGxOYW1lIl09InhhbHQvMS43LjciLFsibG9hZE9yZGVyIl09NCxwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0wLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJ4YWx0Iix9LH0sbXBhdGhBPXsiL29wdC9hcHBz";' export '_ModuleTable003_;' '_ModuleTable004_="L2ludGVsMTgvaW1waTE4XzAvbW9kdWxlZmlsZXMiLCIvb3B0L2FwcHMvaW50ZWwxOC9tb2R1bGVmaWxlcyIsIi9vcHQvYXBwcy94c2VkZS9tb2R1bGVmaWxlcyIsIi9vcHQvYXBwcy9tb2R1bGVmaWxlcyIsIi9vcHQvbW9kdWxlZmlsZXMiLH0sWyJzeXN0ZW1CYXNlTVBBVEgiXT0iL29wdC9hcHBzL3hzZWRlL21vZHVsZWZpbGVzOi9vcHQvYXBwcy9tb2R1bGVmaWxlczovb3B0L21vZHVsZWZpbGVzIix9";' export '_ModuleTable004_;' '_ModuleTable_Sz_="4";' export '_ModuleTable_Sz_;'
+++ CPATH=/opt/intel/compilers_and_libraries_2018.0.128/linux/daal/include:/opt/intel/compilers_and_libraries_2018.0.128/linux/tbb/include:/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl/include:/opt/intel/compilers_and_libraries_2018.0.128/linux/ipp/include
+++ export CPATH
+++ DAALROOT=/opt/intel/compilers_and_libraries_2018.0.128/linux/daal
+++ export DAALROOT
+++ ICC_BIN=/opt/intel/compilers_and_libraries_2018.0.128/linux/bin/intel64
+++ export ICC_BIN
+++ ICC_LIB=/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64
+++ export ICC_LIB
+++ IFC_BIN=/opt/intel/compilers_and_libraries_2018.0.128/linux/bin/intel64
+++ export IFC_BIN
+++ IFC_LIB=/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64
+++ export IFC_LIB
+++ INTEL_LICENSE_FILE=/home1/00434/eijkhout/intel/licenses:/opt/intel/licenses:/opt/intel/compilers_and_libraries_2018.0.128/linux/licenses
+++ export INTEL_LICENSE_FILE
+++ IPPROOT=/opt/intel/compilers_and_libraries_2018.0.128/linux/ipp
+++ export IPPROOT
+++ I_MPI_CC=icc
+++ export I_MPI_CC
+++ I_MPI_CXX=icpc
+++ export I_MPI_CXX
+++ I_MPI_F77=ifort
+++ export I_MPI_F77
+++ I_MPI_F90=ifort
+++ export I_MPI_F90
+++ I_MPI_FABRICS=shm:tmi
+++ export I_MPI_FABRICS
+++ I_MPI_FC=ifort
+++ export I_MPI_FC
+++ I_MPI_HYDRA_PMI_CONNECT=alltoall
+++ export I_MPI_HYDRA_PMI_CONNECT
+++ I_MPI_JOB_FAST_STARTUP=1
+++ export I_MPI_JOB_FAST_STARTUP
+++ I_MPI_ROOT=/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi
+++ export I_MPI_ROOT
+++ I_MPI_TMI_PROVIDER=psm2
+++ export I_MPI_TMI_PROVIDER
+++ LD_LIBRARY_PATH=/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi/intel64/lib:/opt/intel/debugger_2018/libipt/intel64/lib:/opt/intel/debugger_2018/iga/lib:/opt/intel/compilers_and_libraries_2018.0.128/linux/tbb/lib/intel64_lin/gcc4.4:/opt/intel/compilers_and_libraries_2018.0.128/linux/daal/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/tbb/lib/intel64/gcc4.7:/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/ipp/lib/intel64:/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64:/opt/apps/gcc/6.3.0/lib64:/opt/apps/gcc/6.3.0/lib
+++ export LD_LIBRARY_PATH
+++ LIBRARY_PATH=/opt/intel/compilers_and_libraries_2018.0.128/linux/tbb/lib/intel64_lin/gcc4.4:/opt/intel/compilers_and_libraries_2018.0.128/linux/daal/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/tbb/lib/intel64/gcc4.7:/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/ipp/lib/intel64
+++ export LIBRARY_PATH
+++ LMOD_FAMILY_COMPILER=intel
+++ export LMOD_FAMILY_COMPILER
+++ LMOD_FAMILY_COMPILER_VERSION=18.0.0
+++ export LMOD_FAMILY_COMPILER_VERSION
+++ LMOD_FAMILY_MPI=impi
+++ export LMOD_FAMILY_MPI
+++ LMOD_FAMILY_MPI_VERSION=18.0.0
+++ export LMOD_FAMILY_MPI_VERSION
+++ LOADEDMODULES=git/2.9.0:autotools/1.1:TACC:xalt/1.7.7:intel/18.0.0:impi/18.0.0
+++ export LOADEDMODULES
+++ MANPATH=/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi/man:/opt/intel/documentation_2018/en/man/common:/opt/intel/documentation_2018/en/debugger/gdb-igfx/man:/opt/intel/documentation_2018/en/debugger/gdb-ia/man:/usr/local/man:/usr/share/man:/usr/X11R6/man:/usr/kerberos/man:/usr/man:/opt/apps/git/2.9.0/share/man
+++ export MANPATH
+++ MKLROOT=/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl
+++ export MKLROOT
+++ MODULEPATH=/opt/apps/intel18/impi18_0/modulefiles:/opt/apps/intel18/modulefiles:/opt/apps/xsede/modulefiles:/opt/apps/modulefiles:/opt/modulefiles
+++ export MODULEPATH
+++ MPICH_HOME=/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi
+++ export MPICH_HOME
+++ NLSPATH=/opt/intel/debugger_2018/gdb/intel64/share/locale/%l_%t/%N:/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl/lib/intel64/locale/%l_%t/%N:/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64/locale/%l_%t/%N
+++ export NLSPATH
+++ PATH=/opt/apps/xalt/1.7.7/bin:/opt/apps/intel18/impi/18.0.0/bin:/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi/intel64/bin:/opt/intel/compilers_and_libraries_2018.0.128/linux/bin/intel64:/opt/apps/gcc/6.3.0/bin:/opt/apps/autotools/1.1/bin:/opt/apps/git/2.9.0/bin:/usr/lib64/qt-3.3/bin:/usr/local/bin:/bin:/usr/bin:.
+++ export PATH
+++ TACC_FAMILY_COMPILER=intel
+++ export TACC_FAMILY_COMPILER
+++ TACC_FAMILY_COMPILER_VERSION=18.0.0
+++ export TACC_FAMILY_COMPILER_VERSION
+++ TACC_FAMILY_MPI=impi
+++ export TACC_FAMILY_MPI
+++ TACC_FAMILY_MPI_VERSION=18.0.0
+++ export TACC_FAMILY_MPI_VERSION
+++ TACC_IMPI_BIN=/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi/intel64/bin
+++ export TACC_IMPI_BIN
+++ TACC_IMPI_DIR=/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi
+++ export TACC_IMPI_DIR
+++ TACC_IMPI_INC=/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi/intel64/include
+++ export TACC_IMPI_INC
+++ TACC_IMPI_LIB=/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi/intel64/lib
+++ export TACC_IMPI_LIB
+++ TACC_INTEL_BIN=/opt/intel/compilers_and_libraries_2018.0.128/linux/bin/intel64
+++ export TACC_INTEL_BIN
+++ TACC_INTEL_DIR=/opt/intel/compilers_and_libraries_2018.0.128/linux
+++ export TACC_INTEL_DIR
+++ TACC_INTEL_INC=/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/include/intel64
+++ export TACC_INTEL_INC
+++ TACC_INTEL_LIB=/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64
+++ export TACC_INTEL_LIB
+++ TACC_MKL_DIR=/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl
+++ export TACC_MKL_DIR
+++ TACC_MKL_INC=/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl/include
+++ export TACC_MKL_INC
+++ TACC_MKL_LIB=/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl/lib/intel64
+++ export TACC_MKL_LIB
+++ TACC_MPI_GETMODE=impi_hydra
+++ export TACC_MPI_GETMODE
+++ TACC_VEC_FLAGS='-xAVX2 -axCORE-AVX512,MIC-AVX512'
+++ export TACC_VEC_FLAGS
+++ TBBROOT=/opt/intel/compilers_and_libraries_2018.0.128/linux/tbb
+++ export TBBROOT
+++ _LMFILES_=/opt/apps/modulefiles/git/2.9.0.lua:/opt/apps/modulefiles/autotools/1.1.lua:/opt/apps/modulefiles/TACC.lua:/opt/apps/modulefiles/xalt/1.7.7.lua:/opt/apps/modulefiles/intel/18.0.0.lua:/opt/apps/intel18/modulefiles/impi/18.0.0.lua
+++ export _LMFILES_
+++ _ModuleTable001_=X01vZHVsZVRhYmxlXz17WyJNVHZlcnNpb24iXT0zLFsiY19yZWJ1aWxkVGltZSJdPWZhbHNlLFsiY19zaG9ydFRpbWUiXT1mYWxzZSxkZXB0aFQ9e30sZmFtaWx5PXtbIk1QSSJdPSJpbXBpIixbImNvbXBpbGVyIl09ImludGVsIix9LG1UPXtUQUNDPXtbImZuIl09Ii9vcHQvYXBwcy9tb2R1bGVmaWxlcy9UQUNDLmx1YSIsWyJmdWxsTmFtZSJdPSJUQUNDIixbImxvYWRPcmRlciJdPTMscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0iVEFDQyIsfSxhdXRvdG9vbHM9e1siZm4iXT0iL29wdC9hcHBzL21vZHVsZWZpbGVzL2F1dG90b29scy8xLjEubHVhIixbImZ1bGxOYW1lIl09ImF1dG90b29scy8xLjEiLFsibG9hZE9y
+++ export _ModuleTable001_
+++ _ModuleTable002_=ZGVyIl09Mixwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0xLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJhdXRvdG9vbHMiLH0sZ2l0PXtbImZuIl09Ii9vcHQvYXBwcy9tb2R1bGVmaWxlcy9naXQvMi45LjAubHVhIixbImZ1bGxOYW1lIl09ImdpdC8yLjkuMCIsWyJsb2FkT3JkZXIiXT0xLHByb3BUPXt9LFsic3RhY2tEZXB0aCJdPTEsWyJzdGF0dXMiXT0iYWN0aXZlIixbInVzZXJOYW1lIl09ImdpdCIsfSxpbXBpPXtbImZuIl09Ii9vcHQvYXBwcy9pbnRlbDE4L21vZHVsZWZpbGVzL2ltcGkvMTguMC4wLmx1YSIsWyJmdWxsTmFtZSJdPSJpbXBpLzE4LjAuMCIsWyJsb2FkT3JkZXIiXT02LHByb3BUPXt9LFsic3RhY2tEZXB0aCJdPTAsWyJzdGF0dXMiXT0iYWN0
+++ export _ModuleTable002_
+++ _ModuleTable003_=aXZlIixbInVzZXJOYW1lIl09ImltcGkiLH0saW50ZWw9e1siZm4iXT0iL29wdC9hcHBzL21vZHVsZWZpbGVzL2ludGVsLzE4LjAuMC5sdWEiLFsiZnVsbE5hbWUiXT0iaW50ZWwvMTguMC4wIixbImxvYWRPcmRlciJdPTUscHJvcFQ9e30sWyJzdGFja0RlcHRoIl09MCxbInN0YXR1cyJdPSJhY3RpdmUiLFsidXNlck5hbWUiXT0iaW50ZWwvMTguMC4wIix9LHhhbHQ9e1siZm4iXT0iL29wdC9hcHBzL21vZHVsZWZpbGVzL3hhbHQvMS43LjcubHVhIixbImZ1bGxOYW1lIl09InhhbHQvMS43LjciLFsibG9hZE9yZGVyIl09NCxwcm9wVD17fSxbInN0YWNrRGVwdGgiXT0wLFsic3RhdHVzIl09ImFjdGl2ZSIsWyJ1c2VyTmFtZSJdPSJ4YWx0Iix9LH0sbXBhdGhBPXsiL29wdC9hcHBz
+++ export _ModuleTable003_
+++ _ModuleTable004_=L2ludGVsMTgvaW1waTE4XzAvbW9kdWxlZmlsZXMiLCIvb3B0L2FwcHMvaW50ZWwxOC9tb2R1bGVmaWxlcyIsIi9vcHQvYXBwcy94c2VkZS9tb2R1bGVmaWxlcyIsIi9vcHQvYXBwcy9tb2R1bGVmaWxlcyIsIi9vcHQvbW9kdWxlZmlsZXMiLH0sWyJzeXN0ZW1CYXNlTVBBVEgiXT0iL29wdC9hcHBzL3hzZWRlL21vZHVsZWZpbGVzOi9vcHQvYXBwcy9tb2R1bGVmaWxlczovb3B0L21vZHVsZWZpbGVzIix9
+++ export _ModuleTable004_
+++ _ModuleTable_Sz_=4
+++ export _ModuleTable_Sz_
++ '[' 0 = 0 ']'
+++ : -s sh
++ eval
++ export LD_LIBRARY_PATH=/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi/intel64/lib:/opt/intel/debugger_2018/libipt/intel64/lib:/opt/intel/debugger_2018/iga/lib:/opt/intel/compilers_and_libraries_2018.0.128/linux/tbb/lib/intel64_lin/gcc4.4:/opt/intel/compilers_and_libraries_2018.0.128/linux/daal/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/tbb/lib/intel64/gcc4.7:/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/ipp/lib/intel64:/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64:/opt/apps/gcc/6.3.0/lib64:/opt/apps/gcc/6.3.0/lib:/opt/apps/intel17/hdf5/1.8.16/x86_64/lib
++ LD_LIBRARY_PATH=/opt/intel/compilers_and_libraries_2018.0.128/linux/mpi/intel64/lib:/opt/intel/debugger_2018/libipt/intel64/lib:/opt/intel/debugger_2018/iga/lib:/opt/intel/compilers_and_libraries_2018.0.128/linux/tbb/lib/intel64_lin/gcc4.4:/opt/intel/compilers_and_libraries_2018.0.128/linux/daal/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/tbb/lib/intel64/gcc4.7:/opt/intel/compilers_and_libraries_2018.0.128/linux/mkl/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64_lin:/opt/intel/compilers_and_libraries_2018.0.128/linux/ipp/lib/intel64:/opt/intel/compilers_and_libraries_2018.0.128/linux/compiler/lib/intel64:/opt/apps/gcc/6.3.0/lib64:/opt/apps/gcc/6.3.0/lib:/opt/apps/intel17/hdf5/1.8.16/x86_64/lib
++ export N=1600
++ N=1600
++ export tpn=2
++ tpn=2
++ export n=3200
++ n=3200
++ export t=24
++ t=24
++ export OMP_NUM_THREADS=24
++ OMP_NUM_THREADS=24
++ export OMP_PROC_BIND=true
++ OMP_PROC_BIND=true
++ export FLOPCOUNT=0
++ FLOPCOUNT=0
++ '[' 0 -eq 1 ']'
++ export timingfile=timing-skx-1600-2.txt
++ timingfile=timing-skx-1600-2.txt
++ echo 'Job: 392465'
++ tee timing-skx-1600-2.txt
++ echo 'Run 1600 nodes, tnp=2, 24 way thread parallel'
++ tee -a timing-skx-1600-2.txt
++ echo Starting:
+++ date +%s
++ export CACTUS_STARTTIME=1509742619
++ CACTUS_STARTTIME=1509742619
++ echo 'start at 1509742619'
++ '[' 0 -eq 1 ']'
++ ibrun ./cactus_zelmani s15WH07_R0001.par
+WARNING level 1 from host c476-002.stampede2.tacc.utexas.edu process 0
+  while executing schedule bin (none), routine (no thorn)::(no routine)
+  in thorn Carpet, file /scratch/00434/eijkhout/frontier/christian/Zelmani/arrangements/Carpet/Carpet/src/SetupGH.cc:1684:
+  -> The domain for map 0 contains 2.77351e+09 grid points.  This number is larger than the maximum number that can be represented as an integer (2.14748e+09).  This can lead to strange problems in thorns which try to calculate the total number of grid points.
++ echo Stopping:
+++ date +%s
++ export CACTUS_STOPTIME=1509744558
++ CACTUS_STOPTIME=1509744558
++ echo 'start at 1509744558'
++ tee -a timing-skx-1600-2.txt
++ echo 'RunTime: 1939 s'

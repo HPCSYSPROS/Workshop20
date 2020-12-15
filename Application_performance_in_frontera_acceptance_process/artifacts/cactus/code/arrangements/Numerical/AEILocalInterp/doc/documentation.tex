@@ -1,0 +1,1799 @@
+% *======================================================================*
+%  Cactus Thorn template for ThornGuide documentation
+%  Author: Ian Kelley
+%  Date: Sun Jun 02, 2002
+%  $Header$                                                             
+%
+%  Thorn documentation in the latex file doc/documentation.tex 
+%  will be included in ThornGuides built with the Cactus make system.
+%  The scripts employed by the make system automatically include 
+%  pages about variables, parameters and scheduling parsed from the 
+%  relevent thorn CCL files.
+%  
+%  This template contains guidelines which help to assure that your     
+%  documentation will be correctly added to ThornGuides. More 
+%  information is available in the Cactus UsersGuide.
+%                                                    
+%  Guidelines:
+%   - Do not change anything before the line
+%       % START CACTUS THORNGUIDE",
+%     except for filling in the title, author, date etc. fields.
+%        - Each of these fields should only be on ONE line.
+%        - Author names should be sparated with a \\ or a comma
+%   - You can define your own macros, but they must appear after
+%     the START CACTUS THORNGUIDE line, and must not redefine standard 
+%     latex commands.
+%   - To avoid name clashes with other thorns, 'labels', 'citations', 
+%     'references', and 'image' names should conform to the following 
+%     convention:          
+%       ARRANGEMENT_THORN_LABEL
+%     For example, an image wave.eps in the arrangement CactusWave and 
+%     thorn WaveToyC should be renamed to CactusWave_WaveToyC_wave.eps
+%   - Graphics should only be included using the graphix package. 
+%     More specifically, with the "includegraphics" command. Do
+%     not specify any graphic file extensions in your .tex file. This 
+%     will allow us (later) to create a PDF version of the ThornGuide
+%     via pdflatex. |
+%   - References should be included with the latex "bibitem" command. 
+%   - Use \begin{abstract}...\end{abstract} instead of \abstract{...}
+%   - Do not use \appendix, instead include any appendices you need as 
+%     standard sections. 
+%   - For the benefit of our Perl scripts, and for future extensions, 
+%     please use simple latex.     
+%
+% *======================================================================* 
+% 
+% Example of including a graphic image:
+%    \begin{figure}[ht]
+% 	\begin{center}
+%    	   \includegraphics[width=6cm]{MyArrangement_MyThorn_MyFigure}
+% 	\end{center}
+% 	\caption{Illustration of this and that}
+% 	\label{MyArrangement_MyThorn_MyLabel}
+%    \end{figure}
+%
+% Example of using a label:
+%   \label{MyArrangement_MyThorn_MyLabel}
+%
+% Example of a citation:
+%    \cite{MyArrangement_MyThorn_Author99}
+%
+% Example of including a reference
+%   \bibitem{MyArrangement_MyThorn_Author99}
+%   {J. Author, {\em The Title of the Book, Journal, or periodical}, 1 (1999), 
+%   1--16. {\tt http://www.nowhere.com/}}
+%
+% *======================================================================* 
+
+% If you are using CVS use this line to give version information
+% $Header$
+
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% The author of the documentation
+\author{Jonathan Thornburg, incorporating code from Thomas Radke} 
+
+% The title of the document (not necessarily the name of the Thorn)
+\title{Thorn Guide for the {\bf AEILocalInterp} Thorn}
+
+% the date your document was last changed, if your document is in CVS, 
+% please us:
+%    \date{$ $Date$ $}
+\date{$ $Date$ $}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+% Add all definitions used in this documentation here 
+%   \def\mydef etc
+\setlength{\unitlength}{1mm}	% length unit for latex picture environment
+\def\csmash#1{\hbox to 0em{\hss{#1}\hss}}
+
+\def\defn#1{{\bf #1}}
+\def\thorn#1{{\bf #1}}
+\def\arrangement#1{{\bf #1}}
+
+\def\Cplusplus{\hbox{C\hspace{-.05em}\raisebox{.4ex}{\tiny\bf ++}}}
+\def\cf{cf.\hbox{}}
+\def\Ie{I.e.\hbox{}}
+\def\ie{i.e.\hbox{}}
+\def\eg{e.g.\hbox{}}
+
+% Add an abstract for this thorn's documentation
+\begin{abstract}
+This thorn provides the \verb|CCTK_InterpLocalUniform()| API for
+processor-local interpolation of N-dimensional data arrays.  The data
+arrays (in general there may be many of them) must be defined on a
+uniformly spaced grid.
+
+This thorn provides several variants of Lagrange and Hermite
+interpolation.  At present the Lagrange interpolation operators support
+orders~1 through~6 for 1-D interpolation, and~1 through~4 for 2-D
+and 3-D interpolation.  The Hermite interpolation operators support
+orders~2, 3, and~4 for 1-D interpolation, and~2 and~3 for 2-D
+and 3-D interpolation.
+
+This thorn supports a number of interpolation options, including
+parameter-table entries to control the handling of grid boundaries
+and out-of-range points, non-contiguous input arrays, taking
+derivatives as part of the interpolation, and querying the
+Jacobian of the interpolation operation.
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Introduction}
+
+This interpolator provides:
+\begin{itemize}
+\item	Lagrange polynomial interpolation of orders 1--6 for 1-D
+	interpolation and 1--4 for 2-D and 3-D interpolation.
+	This interpolator actually provides two slightly different
+	flavors of Lagrange interpolation, \defn{tensor product}
+	and \defn{maximum degree}, registered under the operator names
+	\begin{verbatim}
+   "Lagrange polynomial interpolation (tensor product)"
+   "Lagrange polynomial interpolation (maximum degree)"
+	\end{verbatim}
+	Section~\ref{AEIThorns/AEILocalInterp/sect-multi-dim-interp}
+	of this thorn guide explains the two variants in detail, but
+	for most purposes the tensor-product variant is
+	preferable.  For convenience this is also registered under
+	the operator name
+	\begin{verbatim}
+   "Lagrange polynomial interpolation"
+	\end{verbatim}
+	and this is probably the best interpolation operator for
+	general-purpose use.%%%
+\footnote{%%%
+	 For backwards compatability this interpolator
+	 is also registered under still another operator name,
+	 {\tt "generalized polynomial interpolation"}, but this
+	 is deprecated and will probably be removed at some point.
+	 }%%%
+\item	Hermite polynomial interpolation of orders 2-4 for 1-D
+	interpolation, and 2--3 for 2-D and 3-D interpolation,
+	registered under the operator name
+	\begin{verbatim}
+   "Hermite polynomial interpolation"
+	\end{verbatim}
+\end{itemize}
+The code allows arbitrarily-shaped interpolation molecules,
+but at the moment only hypercube-shaped molecules are implemented.
+It would be easy to add additional orders and/or dimensions if desired.
+
+This interpolator supports a number of options specified by a
+\defn{parameter table} (a Cactus key-value table, manipulated by the
+\verb|Util_Table*()| APIs).  Note that all the interpolator options
+described here apply only to the current interpolator call: there is
+no visible state kept inside the interpolator from one call to another.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{History}
+
+This interpolator was written by Jonathan Thornburg in winter 2001--2002.
+Between then and July~2003 it lived in the
+\thorn{LocalInterp} thorn in the \arrangement{CactusBase} arrangement,
+but in July 2003 it was moved to the (new)
+\thorn{AEILocalInterp} thorn in the \arrangement{AEIThorns} arrangement
+so it could stay GPL
+(Cactus policies forbid GPL code in the CactusBase arrangement).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Basic Terminology}
+\label{AEIThorns/AEILocalInterp/sect-basic-terminology}
+
+Within Cactus, each interpolator has a character-string name;
+this is mapped to a Cactus \defn{interpolator handle} by
+\verb|CCTK_InterpHandle()|.  For any given interpolator handle,
+there may be a separate interpolator defined for each of the
+interpolation APIs (both the processor-local ones provided by this
+thorn, and the global ones provided by driver-specific interpolator
+thorns such as \thorn{PUGHInterp}).
+
+Terminology for interpolation seems to differ a bit from one author
+to another.  Here we refer to the \defn{point-centered} interpolation
+of a set of \defn{input arrays} (defining data on a uniformly or
+nonuniformly spaced \defn{grid} of \defn{data points}) to a set of
+\defn{interpolation points} (specified by a corresponding set of
+\defn{interpolation coordinates}), with the results being stored
+in a corresponding set of \defn{output arrays}.  Alternatively,
+we may refer to \defn{cell-centered} interpolation, using a grid
+of \defn{data cells} and a set of \defn{interpolation cells}.
+(This latter terminology is common in hydrodynamics interpolators.)
+
+At present all the interpolators do polynomial interpolation, and
+allow the interpolation of multiple input arrays (to the same set of
+interpolation points) in a single interpolator call, using the basic
+algorithm:
+\begin{verbatim}
+for each interpolation point
+{
+choose an interpolation molecule position somewhere near the interpolation point
+
+        for each output array
+        {
+        compute an interpolating polynomial
+          which approximates the input data at the molecule points
+        output = polynomial(interpolation point)
+        }
+}
+\end{verbatim}
+In the future, we may add other interpolators where the choice of
+molecule is data-dependent (and thus may vary from one input array to
+the next), and/or where the entire input grid is used in each interpolation.
+
+We define the \defn{order} of the interpolation to be the order of
+the fitted polynomial.  That is, in our terminology linear interpolation
+is order~1, quadratic is order~2, cubic is order~3, etc.  An order~$n$
+interpolator thus has $O\big((\Delta x)^{n+1})\big)$ interpolation errors
+for generic smooth input data.
+Section~\ref{AEIThorns/AEILocalInterp/sect-multi-dim-interp} explains how the
+interpolating polynomial is defined for multi-dimensional interpolation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{The Non-Smoothness of Interpolation Errors}
+
+Because the interpolating polynomial generally changes if
+the interpolation point moves from one grid cell to another, unless
+something special is done the interpolating function isn't smooth,
+\ie{} its 1st~derivative is generically {\em discontinuous\/},
+with $O(\Delta x^n)$ jump discontinuities each time the interpolating
+polynomial changes.  Correspondingly, the interpolation error is
+generically a ``bump function'' which is zero at each grid point
+and rises to a local maximum in each grid cell.%%%
+\footnote{%%%
+	 For a further discussion of the non-smoothness of
+	 interpolation errors, see appendix~F of J. Thornburg,
+	 \textit{Physical Review D} \textbf{59(10)}, 104007.
+	 }%%%
+{}  This is the case, for example, for tensor-product Lagrange
+polynomial interpolation.%%%
+	 
+
+[For maximum-degree Lagrange polynomial interpolation, the
+interpolation error may not be zero at the grid points, and the
+interpolant itself may not be continuous there.  
+Section~\ref{AEIThorns/AEILocalInterp/sect-multi-dim-interp} explains this
+in detail.]
+
+This thorn also provides Hermite polynomial interpolation, which
+guarantees a smooth ($C^1$) interpolant and (for smooth input data)
+interpolation error.  Unfortunately, this comes at the cost of a
+larger molecule size than the same-order Lagrange interplator, and
+a much larger interpolation error if the interpolation molecules are
+off-centered.  (By default, the Hermite interpolator doesn't allow
+off-centered molecules, though this can be changed via the
+\verb|boundary_off_centering_tolerance[]| and
+\verb|excision_off_centering_tolerance[]| parameter-table entries.)
+
+For most purposes Lagrange polynomial interpolation is better;
+only use Hermite polynomial interpolation if you need a smooth
+interpolant.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{More Terminology}
+
+As described in the Function Reference section of the Cactus User's Guide,
+\verb|interp_coords|, \verb|input_arrays|, and \verb|output_arrays| are
+actually all pointers to arrays of \verb|void *| pointers, since we
+support a number of different Cactus data types.  Internally, the
+interpolator casts these \verb|void *| pointers to \verb|CCTK_REAL *|
+or whatever the correct Cactus data types are.  But when describing
+how the interpolator accesses the various arrays, for simplicity we
+usually gloss over this casting, \ie{} we pretend that \verb|interp_coords|,
+\verb|input_arrays|, and \verb|output_arrays| are pointers to arrays
+of \verb|CCTK_REAL *| pointers.  (This may become clearer once you
+read the next example.)
+
+We use \verb|pt|, \verb|in|, and \verb|out| as generic 0-origin integer
+subscripts into the arrays of interpolation points, input arrays, and
+output arrays respectively.  We use \verb|(i,j,k)| as a generic
+\verb|N_dims|-vector of integer subscripts into the input array
+\verb|input_arrays[in]|.  (Thus \defn{{\tt (i,j,k)} space} refers to
+the grid of data points.)  We usually only write array subscripting
+expressions for the 3-D case; the restrictions/generalizations to
+other dimensions should be obvious.
+
+For example, for 3-D interpolation, the (x,y,z) coordinates of a typical
+interpolation point are given by
+\begin{verbatim}
+x = interp_coords[0][pt]
+y = interp_coords[1][pt]
+z = interp_coords[2][pt]
+\end{verbatim}
+(Notice here that as described above, we've implicitly taken
+\verb|interp_coords| to have the C~type\\
+\verb|const CCTK_REAL* interp_coords[]|, glossing over the casting
+from its actual C~type of\\
+\verb|const void* interp_coords[]|.)
+
+We take \verb|axis| to be a 0-origin integer specifying a coordinate
+axis (dimension), \ie{} 0~for~$x$, 1~for~$y$, 2~for~$z$, \dots.
+We take \verb|ibndry| to be a 0-origin integer specifying the
+combination of a coordinate axis (dimension) and a minimum/maximum
+``end'' of the grid; these are enumerated in the order
+$x_{\min}$, $x_{\max}$, $y_{\min}$, $y_{\max}$, $z_{\min}$,
+$z_{\max}$, \dots.
+
+When describing Jacobians and domains of dependence, it's useful to
+introduce the notion of \defn{molecule position}, a nominal reference
+point for the interpolation molecule in \verb|(i,j,k)| coordinate
+space.  (For example, the molecule position might just be the \verb|(i,j,k)|
+coordinates of the molecule's center.)  We also introduce
+\defn{molecule coordinates} \verb|(mi,mj,jk)|, which are just
+\verb|(i,j,k)| coordinates relative to the molecule position.
+We use \verb|m| as a generic molecule coordinate.  Thus
+(in notation which should be obvious) a generic molecule operation
+can be written
+\begin{equation}
+\verb|output| = \sum_{\tt m} \verb|coeff[posn+m]| \times \verb|input[posn+m]|
+\end{equation}
+Note that there is no requirement that the output be semantically
+located at the position \verb|posn|!  (This may become clearer once
+you look at the example in
+section~\ref{AEIThorns/AEILocalInterp/sect-Jacobian/fixed-sized-hypercube}.)
+However, by convention we do assume that $\verb|m|=0$ is always a valid
+\verb|m| coordinate; this simplifies pointer arithmetic.
+
+When describing various entries in the parameter table in,
+we use \verb|const| qualifiers on table entries to indicate that the
+interpolator treats them as \verb|const| variables/arrays, \ie{} it
+promises not to change them.  In contrast, table entries which are
+not shown as \verb|const| are considered read-write by the interpolator;
+it typically uses them to return outputs back to the caller.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Interpolator Parameters}
+
+The \verb|CCTK_InterpLocalUniform()| interpolation API
+(described in detail in the ``Function Reference'' appendix of
+the Cactus Users' Guide) includes a \defn{parameter table}
+(a Cactus key-value table, manipulated by the \verb|Util_Table*()| APIs)
+whose table handle is passed to the interpolator.  This can be used
+to specify a number of options to the interpolator; it can also be
+used by the interpolator to return additional information back to
+the caller.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Interpolation Order}
+
+The only mandatory parameter for this interpolator is the interpolation
+order:
+\begin{verbatim}
+const CCTK_INT order;
+\end{verbatim}
+As noted in section~\ref{AEIThorns/AEILocalInterp/sect-basic-terminology},
+in our terminology linear interpolation is order~1, quadratic is
+order~2, cubic is order~3, etc.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Molecule Size and Centering}
+\label{AEIThorns/AEILocalInterp/sect-molecule-size+centering}
+
+If no grid boundaries or excised points are nearby, the interpolator
+centers the molecules around the interpolation point as much as possible.
+Table~\ref{AEIThorns/AEILocalInterp/tab-molecule-size+centering} gives the molecule
+size and details of the centering policy for each interpolation operator
+and order.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{table}
+
+\def\Linterval{\lower0.60ex\hbox{\hskip-0.20em$\big[$}}
+\def\Rinterval{\lower0.60ex\hbox{\hskip-0.25em$\big)$}}
+
+\def\TwoPointMolecule{%%%
+\raise0.5ex\hbox{%%%
+\begin{picture}(0,0)
+\put(-4,0){\circle*{1.5}}
+\put(-4,0){\Linterval}
+\put(4,0){\Rinterval}
+\put(4,0){\circle*{1.5}}
+\end{picture}%%%
+}}%%%
+
+\def\ThreePointMolecule{%%%
+\raise0.5ex\hbox{%%%
+\begin{picture}(0,0)
+\put(-8,0){\circle*{1.5}}
+\put(-4,0){\Linterval}
+\put(0,0){\circle*{1.5}}
+\put(4,0){\Rinterval}
+\put(8,0){\circle*{1.5}}
+\end{picture}%%%
+}}%%%
+
+\def\FourPointMolecule{%%%
+\raise0.5ex\hbox{%%%
+\begin{picture}(0,0)
+\put(-12,0){\circle*{1.5}}
+\put(-4,0){\circle*{1.5}}
+\put(-4,0){\Linterval}
+\put(4,0){\Rinterval}
+\put(4,0){\circle*{1.5}}
+\put(12,0){\circle*{1.5}}
+\end{picture}%%%
+}}%%%
+
+\def\FivePointMolecule{%%%
+\raise0.5ex\hbox{%%%
+\begin{picture}(0,0)
+\put(-16,0){\circle*{1.5}}
+\put(-8,0){\circle*{1.5}}
+\put(-4,0){\Linterval}
+\put(0,0){\circle*{1.5}}
+\put(4,0){\Rinterval}
+\put(8,0){\circle*{1.5}}
+\put(16,0){\circle*{1.5}}
+\end{picture}%%%
+}}%%%
+
+\def\SixPointMolecule{%%%
+\raise0.5ex\hbox{%%%
+\begin{picture}(0,0)
+\put(-20,0){\circle*{1.5}}
+\put(-12,0){\circle*{1.5}}
+\put(-4,0){\circle*{1.5}}
+\put(-4,0){\Linterval}
+\put(4,0){\Rinterval}
+\put(4,0){\circle*{1.5}}
+\put(12,0){\circle*{1.5}}
+\put(20,0){\circle*{1.5}}
+\end{picture}%%%
+}}%%%
+
+\def\SevenPointMolecule{%%%
+\raise0.5ex\hbox{%%%
+\begin{picture}(0,0)
+\put(-24,0){\circle*{1.5}}
+\put(-16,0){\circle*{1.5}}
+\put(-8,0){\circle*{1.5}}
+\put(-4,0){\Linterval}
+\put(0,0){\circle*{1.5}}
+\put(4,0){\Rinterval}
+\put(8,0){\circle*{1.5}}
+\put(16,0){\circle*{1.5}}
+\put(24,0){\circle*{1.5}}
+\end{picture}%%%
+}}%%%
+
+\renewcommand{\arraystretch}{1.5}
+\begin{flushleft}
+\begin{tabular}{@{}lcc@{\quad\hspace{25mm}}c@{\hspace{25mm}}}
+						&	& Molecule
+	&								\\[-1ex]
+Interpolation Operator				& Order	& Size
+	& \csmash{Molecule Centering Policy}				\\
+\hline %-------------------------------------------------------
+\verb|"Lagrange polynomial interpolation"|	& 1	& 2-point
+	& \TwoPointMolecule						\\
+\verb|"Lagrange polynomial interpolation"|	& 2	& 3-point
+	& \ThreePointMolecule						\\
+\verb|"Lagrange polynomial interpolation"|	& 3	& 4-point
+	& \FourPointMolecule						\\
+\verb|"Lagrange polynomial interpolation"|	& 4	& 5-point
+	& \FivePointMolecule						\\
+\verb|"Lagrange polynomial interpolation"|	& 5	& 6-point
+	& \SixPointMolecule						\\
+\verb|"Lagrange polynomial interpolation"|	& 6	& 7-point
+	& \SevenPointMolecule						\\
+\hline %-------------------------------------------------------
+\verb|"Hermite polynomial interpolation"|	& 2	& 4-point
+	& \FourPointMolecule						\\
+\verb|"Hermite polynomial interpolation"|	& 3	& 6-point
+	& \SixPointMolecule						\\
+\verb|"Hermite polynomial interpolation"|	& 4	& 6-point
+	& \SixPointMolecule						\\
+\hline %-------------------------------------------------------
+\end{tabular}
+\end{flushleft}
+\caption[Molecule Sizes]
+	{
+	This table gives the molecule size and centering for each
+	interpolation operator and order.  $\bullet$~shows the input
+	grid points, and $[ \quad )$~shows the interval of interpolation
+	points (relative to the grid) for which the interpolator
+	will use the molecule shown.
+	For example, with grid points at integer coordinates, if
+	the the interpolator is using 5-point molecules, it will
+	use a molecule containing the grid points $\{ -2, -1, 0, 1, 2 \}$
+	for all interpolation points in the range $[-0.5, 0.5)$.
+	}
+\label{AEIThorns/AEILocalInterp/tab-molecule-size+centering}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Handling of Grid Boundaries}
+\label{AEIThorns/AEILocalInterp/sect-grid-boundaries}
+
+If an interpolation point is too near a grid boundary and/or an
+excised region the interpolator can either off-center the interpolation
+molecule, or refuse to interpolate that point
+(returning a\\
+\verb|CCTK_INTERP_ERROR_POINT_OUTSIDE|\,%%%
+\footnote{%%%
+	 For backwards compatability the error code
+	 {\tt CCTK\_INTERP\_ERROR\_POINT\_X\_RANGE}
+	 is also defined; it's a synonym for
+	 {\tt CCTK\_INTERP\_ERROR\_POINT\_OUTSIDE}.
+	 }%%%
+{} or \verb|CCTK_INTERP_ERROR_POINT_EXCISED| error code, and possibly
+also printing a warning message).  This behavior is controlled by the
+(optional) parameter-table entries
+\begin{verbatim}
+const CCTK_INT N_boundary_points_to_omit[2*N_dims]
+const CCTK_REAL boundary_off_centering_tolerance[2*N_dims]
+const CCTK_REAL boundary_extrapolation_tolerance[2*N_dims]
+const CCTK_REAL excision_off_centering_tolerance[2*N_dims] # not implemented yet
+const CCTK_REAL excision_extrapolation_tolerance[2*N_dims] # not implemented yet
+\end{verbatim}
+The elements of these arrays are matched up with the grid boundaries
+in the order\\
+$[x_{\min}, x_{\max}, y_{\min}, y_{\max}, z_{\min}, z_{\max}, \dots]$.
+(For \verb|excision_*_tolerance[]| the minimum/maximum are interpreted
+as the corresponding coordinate decreasing/increasing when moving
+out of the active region of the grid into the excised region.)
+We use \verb|ibndry| as a generic 0-origin index into these arrays.
+
+%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Omitting Boundary Points}
+
+For any given grid boundary \verb|ibndry|, the interpolator doesn't use
+input data from the\\
+\verb|N_boundary_points_to_omit[ibndry]| grid points closest to the
+boundary.  In other words, these points are effectively omitted from
+the input grid.  For example:
+\begin{itemize}
+\item	Setting this parameter to an array of all 0s means the
+	interpolator may use data from all grid points.
+	This is the default if this parameter isn't specified.
+\item	Setting this parameter to an array of all 1s means the
+	interpolator may not use input data from the outermost
+	row/plane of grid points on any face.
+\end{itemize}
+
+More generally, this option may be useful for controlling the extent
+to which the interpolator uses input data from ghost and/or symmetry
+zones.
+
+%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Off-Centering Molecules near Grid Boundaries
+	       and/or Excision Regions}
+
+The (optional) parameter-table entries
+\begin{verbatim}
+const CCTK_REAL boundary_off_centering_tolerance[2*N_dims]
+const CCTK_REAL boundary_extrapolation_tolerance[2*N_dims]
+const CCTK_REAL excision_off_centering_tolerance[2*N_dims] # not implemented yet
+const CCTK_REAL excision_extrapolation_tolerance[2*N_dims] # not implemented yet
+\end{verbatim}
+control the local interpolator's willingness to off-center
+(change away from the default centering) its interpolation molecules
+near boundaries and excised points.
+
+To describe how these parameters work, it's useful to define two
+regions in the data coordinate space:
+\begin{description}
+\item[The \defn{valid-data region}]
+	is the entire grid minus any ommited-on-boundary
+	or excised points; to make this a region we take the
+	Lego-block bounding box of the non-excised grid points.
+\item[The \defn{default-centering region}]
+	is that region in interpolation-point space where the
+	interpolator can use the default molecule centering
+	(described in table~\ref{AEIThorns/AEILocalInterp/tab-molecule-size+centering}),
+	\ie{} where the default-centering molecules require data
+	only from the data-valid region.
+\end{description}
+Figure~\ref{AEIThorns/AEILocalInterp/fig-valid-data+default-centering} shows an
+example of these regions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{figure}
+
+% "X" to mark excised point
+\def\ExcisedPoint{%%%
+\begin{picture}(0,0)
+\put(-2,-2){\line(1,1){4}}
+\put(2,-2){\line(-1,1){4}}
+\end{picture}%%%
+}%%%
+
+\def\Linterval{\lower0.60ex\hbox{\hskip-0.20em$\big[$}}
+
+\def\xmin{\begin{picture}(0,0)\put(4,0){\vector(-1,0){4}}\end{picture}}
+\def\xmax{\begin{picture}(0,0)\put(-4,0){\vector(1,0){4}}\end{picture}}
+\def\ymin{\begin{picture}(0,0)\put(0,4){\vector(0,-1){4}}\end{picture}}
+\def\ymax{\begin{picture}(0,0)\put(0,-4){\vector(0,1){4}}\end{picture}}
+
+\begin{center}
+\begin{picture}(150,150)
+%%% grid
+\multiput(0,0)(10,0){16}{\multiput(0,0)(0,10){16}{\circle*{1.5}}}
+%%% excised points
+\multiput(70,60)(10,0){2}{\ExcisedPoint}
+\multiput(60,70)(10,0){4}{\ExcisedPoint}
+\multiput(60,80)(10,0){4}{\ExcisedPoint}
+\multiput(70,90)(10,0){2}{\ExcisedPoint}
+%%% outer-boundary valid-data region
+\multiput(0,0)(2,0){75}{\line(1,0){1}}
+\multiput(150,0)(0,2){75}{\line(0,1){1}}
+\multiput(150,150)(-2,0){75}{\line(-1,0){1}}
+\multiput(0,150)(0,-2){75}{\line(0,-1){1}}
+% ... and movement directions
+\put(75,10){\ymin}
+\put(140,75){\xmax}
+\put(75,140){\ymax}
+\put(10,75){\xmin}
+%%% outer-boundary default-centering regions...
+% ... for 3-point molecules
+\put(5,5){\line(1,0){140}}
+\put(145,5){\line(0,1){140}}
+\put(145,145){\line(-1,0){140}}
+\put(5,145){\line(0,-1){140}}
+% ... for 4-point molecules
+\put(10,10){\line(1,0){130}}
+\put(140,10){\line(0,1){130}}
+\put(140,140){\line(-1,0){130}}
+\put(10,140){\line(0,-1){130}}
+%%% excised-point valid-data region
+\multiput(60,60)(0,-2){5}{\line(0,-1){1}}
+\multiput(60,50)(2,0){15}{\line(1,0){1}}
+\multiput(90,50)(0,2){5}{\line(0,1){1}}
+\multiput(90,60)(2,0){5}{\line(1,0){1}}
+\multiput(100,60)(0,2){15}{\line(0,1){1}}
+\multiput(100,90)(-2,0){5}{\line(-1,0){1}}
+\multiput(90,90)(0,2){5}{\line(0,1){1}}
+\multiput(90,100)(-2,0){15}{\line(-1,0){1}}
+\multiput(60,100)(0,-2){5}{\line(0,-1){1}}
+\multiput(60,90)(-2,0){5}{\line(-1,0){1}}
+\multiput(50,90)(0,-2){15}{\line(0,-1){1}}
+\multiput(50,60)(2,0){5}{\line(1,0){1}}
+%%% excised-point default-centering regions...
+% ... for 3-point molecules
+\put(55,55){\line(0,-1){10}}
+\put(55,45){\line(1,0){40}}
+\put(95,45){\line(0,1){10}}
+\put(95,55){\line(1,0){10}}
+\put(105,55){\line(0,1){40}}
+\put(105,95){\line(-1,0){10}}
+\put(95,95){\line(0,1){10}}
+\put(95,105){\line(-1,0){40}}
+\put(55,105){\line(0,-1){10}}
+\put(55,95){\line(-1,0){10}}
+\put(45,95){\line(0,-1){40}}
+\put(45,55){\line(1,0){10}}
+% ... for 4-point molecules
+\put(50,50){\line(0,-1){10}}
+\put(50,40){\line(1,0){50}}
+\put(100,40){\line(0,1){10}}
+\put(100,50){\line(1,0){10}}
+\put(110,50){\line(0,1){50}}
+\put(110,100){\line(-1,0){10}}
+\put(100,100){\line(0,1){10}}
+\put(100,110){\line(-1,0){50}}
+\put(50,110){\line(0,-1){10}}
+\put(50,100){\line(-1,0){10}}
+\put(40,100){\line(0,-1){50}}
+\put(40,50){\line(1,0){10}}
+% ... and movement directions for 4-point molecules
+\put(50,45){\xmax}
+\put(75,40){\ymax}
+\put(100,45){\xmin}
+\put(105,50){\ymax}
+\put(110,75){\xmin}
+\put(105,100){\ymin}
+\put(100,105){\xmin}
+\put(75,110){\ymin}
+\put(50,105){\xmax}
+\put(45,100){\ymin}
+\put(40,75){\xmax}
+\put(45,50){\ymax}
+\end{picture}
+\end{center}
+
+\caption[Example of valid-data and default-centering regions]
+	{
+	This figure shows an example of the valid-data and
+	default-centering regions for a 2-D grid.
+	$\times$~marks the excised points, and the dashed lines
+	show the boundaries of the valid-data region.
+	The solid lines show the boundaries of the default-centering
+	regions for 3-point and 4-point molecules.  The arrows on the
+	default-centering region for 4-point molecules show which
+	elements of the \hbox{\tt boundary\_*\_tolerance[ibndry]}
+	and \hbox{\tt excision\_*\_tolerance[ibndry]} arrays apply
+	to each line segment of the region boundary:\\
+\centerline{%%%
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{c@{\qquad}r}
+$\raise0.50ex\hbox{\xmin \hskip4mm}$	& $x_{\min}$ ({\tt ibndry = 0})	\\
+$\raise0.50ex\hbox{\hskip4mm \xmax}$	& $x_{\max}$ ({\tt ibndry = 1})	\\
+$\lower1mm\hbox{\,\ymin\,}$		& $y_{\min}$ ({\tt ibndry = 2})	\\
+$\raise3mm\hbox{\,\ymax\,}$		& $y_{\max}$ ({\tt ibndry = 3})	%%%\\
+\end{tabular}%%%
+}
+	}
+\label{AEIThorns/AEILocalInterp/fig-valid-data+default-centering}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Near a boundary or excised regions, the interpolator will off-center
+its molecules (if and) only if the interpolation point is both
+\begin{itemize}
+\item	within ($\le$) \verb|*_off_centering_tolerance[ibndry]|
+	grid spacings of the default-centering region, {\bf and}
+\item	within ($\le$) \verb|*_extrapolation_tolerance[ibndry]|
+	grid spacings of the valid-data region.
+\end{itemize}
+where we use ``\verb|*|'' to denote \verb|boundary| or \verb|excision|
+as appropriate.
+
+There are four cases for these parameters:
+\begin{description}
+\item[\mathversion{bold}
+      $\text{\tt *\!\_off\_centering\_tolerance[ibdnry]} = 0.0$ and
+      $\text{\tt *\!\_extrapolation\_tolerance[ibndry]} = 0.0$:]\mbox{}\\
+	No off-centering is allowed: the interpolator reports an
+	error (\verb|CCTK_ERROR_INTERP_POINT_OUTSIDE| or
+	\verb|CCTK_ERROR_INTERP_POINT_EXCISED| return code
+	as appropriate) if any interpolation point is outside
+	the default-centering region.
+\item[\mathversion{bold}
+      $\text{\tt *\!\_off\_centering\_tolerance[ibdnry]} > 0.0$ and
+      $\text{\tt *\!\_extrapolation\_tolerance[ibndry]} = 0.0$:]\mbox{}\\
+	The interpolator allows interpolation points to be up to ($\le$)
+	\verb|*_off_centering_tolerance[ibndry]| grid spacings outside
+	the default-centering region in this direction.
+	If an interpolation point is beyond this limit in any
+	direction, then the interpolator reports an error.
+\item[\mathversion{bold}
+      $\text{\tt *\!\_off\_centering\_tolerance[ibdnry]} = \infty$%%%
+\footnotemark{}%%%
+{}    and
+      $\text{\tt *\!\_extrapolation\_tolerance[ibndry]} > 0.0$:]\mbox{}\\
+\footnotetext{%%%
+	     In practice $999.0$ is a conventional value here.
+	     The actual value doesn't matter so long as it's
+	     larger than any possible molecule radius.
+	     }%%%
+	The interpolator allows interpolation points to be up to ($\le$)
+	\verb|*_extrapolation_tolerance[ibndry]| grid spacings outside
+	the valid-data region in this direction.
+	If an interpolation point is beyond this limit in any
+	direction, then the interpolator reports an error.
+\item[\mathversion{bold}
+      $\text{\tt *\!\_off\_centering\_tolerance[ibdnry]} = 0.0$ and
+      $\text{\tt *\!\_extrapolation\_tolerance[ibndry]} > 0.0$:]\mbox{}\\
+	In practice the default-centering region is always a
+	(normally proper) subset of the valid-data region, so this
+	case is nonsensical: the positive value for
+	\verb|*_extrapolation_tolerance[ibndry]| has no effect
+	because of the $\verb|*_off_centering_tolerance[ibndry]| = 0.0$
+	setting.  The interpolator gives a warning for this case.
+\end{description}
+
+If any of these table entries aren't specified, the defaults are
+\begin{verbatim}
+boundary_off_centering_tolerance[ibndry] = 999.0   # effectively infinity
+boundary_extrapolation_tolerance[ibndry] = 1.0e-10
+\end{verbatim}
+In other words, the interpolation points may be anywhere within the
+valid-data region or up to $10^{-10}$ grid spacing outside it.  (The
+$10^{-10}$ ``fudge factor'' helps to avoid spurious errors in case
+floating-point roundoff moves an interpolation point which was supposed
+to be just on the boundary of the valid-data region, slightly outside it.)
+
+[In the near future these defaults may be changed:  For Lagrange
+polynomial interpolation the new defaults would be
+\begin{verbatim}
+boundary_off_centering_tolerance[ibndry] = 999.0   # effectively infinity
+boundary_extrapolation_tolerance[ibndry] = 1.0e-10
+\end{verbatim}
+while for Hermite polynomial interpolation they would be
+\begin{verbatim}
+boundary_off_centering_tolerance[ibndry] = 1.0e-10
+boundary_extrapolation_tolerance[ibndry] = 0.0
+\end{verbatim}
+This would leave Lagrange interpolation unchanged, while for Hermite
+interpolation the defaults would forbid any significant off-centering
+of the interpolation molecules.]
+
+%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Suppressing Warning Messages about Off-Centering}
+
+By default, \thorn{AEILocalInterp} prints a Cactus level~1 warning
+message for each interpolation point which causes it to return a
+\verb|CCTK_INTERP_ERROR_POINT_OUTSIDE| or
+\verb|CCTK_INTERP_ERROR_POINT_EXCISED| error code.  If the key
+\verb|suppress_warnings| is present in the parameter table
+(it may have any datatype and value), then these messages are
+not printed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Per-Point Status Reporting}
+
+By default, an interpolator just returns a single result, either
+0 for success or some (negative) error code.  If there are multiple
+interpolation points causing errors, an interpolator should return
+0 for success, or the error code for the first point in error
+(the one with the smallest \verb|pt|).
+
+However, sometimes you would like to know the status of the interpolation
+for {\em each\/} point.  The following (optional) parameter-table entries
+may be used to request this, and to query if the interpolator supports this:
+\begin{verbatim}
+/*
+ * To query whether the interpolator supports per-point status, set this
+ * to a NULL pointer.  To actually request per-point status, set this to
+ * a non-NULL pointer pointing to a buffer of  N_interp_points  CCTK_INTs
+ * into which the interpolator should store the per-point status.  The status
+ * for point  pt  is defined to be the result which CCTK_InterpLocalUnifom()
+ * would return if that were the only point being interpolated.
+ */
+CCTK_POINTER per_point_status;
+\end{verbatim}
+
+If the interpolator supports returning per-point status, and if the key
+\verb|per_point_status| is present in the parameter table, then the
+interpolator will set
+\begin{verbatim}
+CCTK_INT error_point_status;
+\end{verbatim}
+in the parameter table.  If $\verb|per_point_status| = \verb|NULL|$,
+the interpolator will set \verb|error_point_status| to~0.  Otherwise,
+the interpolator will set \verb|error_point_status| to the negative of
+the number of points for which the per-point status is non-zero.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Multi-Dimensional Interpolation}
+\label{AEIThorns/AEILocalInterp/sect-multi-dim-interp}
+
+In multiple dimensions, there are two plausible definitions for the
+generic interpolating polynomial of a given order (degree) $n$.  For
+convenience I'll describe these for the 2-D case, but the generalization
+to any number of dimensions should be obvious:
+
+\begin{itemize}
+\item	The generic ``\defn{tensor product}'' polynomial of degree $n$ is
+	\begin{equation}
+	f(x,y) = \sum_{{0 \le i \le n} \atop {0 \le j \le n}} a_{ij} x^i y^j
+			\label{AEIThorns/AEILocalInterp/eqn-polynomial-2d-TP}
+	\end{equation}
+\item	The generic ``\defn{maximum degree}'' polynomial of degree $n$ is
+	\begin{equation}
+	g(x,y) = \sum_{0 \le i+j \le n} a_{ij} x^i y^j
+			\label{AEIThorns/AEILocalInterp/eqn-polynomial-2d-MD}
+	\end{equation}
+\end{itemize}
+
+Because it has $(n+1)^2$ coefficients, the tensor-product polynomial $f$
+can (and does) pass through all the $(n+1)^2$ input data points in a
+square molecule of size $n+1$.  This implies that the interpolation
+error vanishes at the input grid points, and that the overall
+interpolating function is continuous (up to floating-point roundoff
+errors).  However, $f$ does have the slightly peculiar property of
+having terms up to $x^n y^n$ despite being of ``degree'' $n$.
+(For example, the ``linear'' interpolant for $n=1$ would have $xy$ terms,
+even though those are formally quadratic in the independent variables
+$x$ and $y$.)
+
+In contrast, the maximum-degree polynomial $g$ has only
+$\frac{1}{2} (n+1)(n+2)$ coefficients, so for generic input data
+(\ie{} input data which isn't actually sampled from a polynomial of
+the form~$(\ref{AEIThorns/AEILocalInterp/eqn-polynomial-2d-MD})$) $g$ can't pass
+through all the $(n+1)^2$ input data points in a square molecule of
+size $n+1$.  The interpolator actually does a least-squares fit of
+the polymomial $g$ to the input data in the molecule, so in general
+the molecule won't pass through {\em any\/} of the data points!
+Moreover, each time the interpolation point crosses a grid square
+(for odd~$n$) or the center lines of a grid square (for even~$n$),
+the set of points used in the molecule changes 
+(\cf{}~section~\ref{AEIThorns/AEILocalInterp/sect-molecule-size+centering}),
+so the interpolant generally has a jump discontinuity!
+For these reasons, the tensor-product
+choice~$(\ref{AEIThorns/AEILocalInterp/eqn-polynomial-2d-TP})$ is generally
+preferable.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Molecule Family}
+\label{AEIThorns/AEILocalInterp/sect-molecule-family}
+
+An interpolator may support different families/shapes of interpolation
+molecules.  Hypercube-shaped molecules are the simplest and most common
+case, but one could also imagine (say) octagon-shaped molecules in 2-D,
+or some generalization of this in higher numbers of dimensions.
+
+The (optional) parameter
+\begin{verbatim}
+/* set with Util_TableSetString() */
+const char molecule_family[];
+\end{verbatim}
+may be used to set or query the molecule family.
+
+If this key is present in the parameter table, the interpolator sets
+the molecule family/shape based on the value specified.
+If this key {\em isn't\/} present in the parameter table, then the
+interpolator sets it to the molecule family being used.
+
+At present only hypercubed-shaped molecules are implemented; these
+are specified by \verb|molecule_family| set to \verb|"cube"|.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Non-Contiguous Input Arrays}
+\label{AEIThorns/AEILocalInterp/sect-non-contiguous-inputs}
+
+Sometimes the input ``arrays'' used by the interpolator might not
+be contiguous in memory.  For example, we might want to do 2-D interpolation
+within a plane of a 3-D grid array, but the plane might or might not
+be contiguous in memory.  (Another example would be that the input
+arrays might be members of a compact group.)
+
+The following (optional) parameter-table entries specify non-contiguous
+input arrays:
+\begin{verbatim}
+const CCTK_INT input_array_offsets[N_input_arrays];
+
+/* the next 3 table entries are shared by all input arrays */
+const CCTK_INT input_array_strides       [N_dims];
+const CCTK_INT input_array_min_subscripts[N_dims];
+const CCTK_INT input_array_max_subscripts[N_dims];
+\end{verbatim}
+
+In general, the interpolator accesses the input using the generic
+subscripting expression
+\begin{verbatim}
+input_array[in][offset + i*stride_i + j*stride_j + k*stride_k]
+\end{verbatim}
+where
+\begin{verbatim}
+offset = input_array_offsets[in]
+(stride_i,stride_j,stride_k) = input_array_strides[]
+\end{verbatim}
+and where \verb|(i,j,k)| run from \verb|input_array_min_subscripts[]|
+to \verb|input_array_max_subscripts[]| inclusive
+(n.b.~this is an {\em inclusive\/} range, \ie{} 
+$\verb|min| \le \verb|(i,j,k)| \le \verb|max|$).
+
+The defaults are that each input array is contiguous in memory,
+\ie{} \verb|input_array_offsets[]| = 0,
+\verb|stride| determined from \verb|input_array_dims[]|
+              in the usual Fortran manner,
+\verb|input_array_min_subscripts[]| = all 0s, and
+\verb|input_array_max_subscripts[]| = \verb|input_array_dims[]|-1.
+If the stride and max subscript are both specified explicitly, then the
+explicit \verb|input_array_dims[]| argument to
+\verb|CCTK_InterpLocalUniform()| is ignored.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Derivatives}
+\label{AEIThorns/AEILocalInterp/sect-derivatives}
+
+If we view the input data as being samples of a smooth function,
+then instead of estimating values of that function at the interpolation
+points, the interpolator can instead or additionally estimate values
+of various derivatives of that function at the interpolation points.
+(We don't currently implement it, but one could also imagine
+interpolating more general molecule operations such as Laplacians.)
+
+The following (optional) parameter-table entries are used to specify
+this:
+\begin{verbatim}
+const CCTK_INT operand_indices[N_output_arrays];
+const CCTK_INT operation_codes[N_output_arrays];
+\end{verbatim}
+The semantics here are that
+\begin{verbatim}
+output_array[out] = op(input_array[operand_indices[out]])
+\end{verbatim}
+where \verb|op| is an operator specified by the \verb|operation_codes[out]|
+value as described below.
+
+Note that \verb|operand_indices[]| doesn't directly name the inputs,
+but rather gives their (0-origin) subscripts in the list of inputs.
+This allows for a more efficient implementation in the (common) case
+where some of the input arrays have many different operations applied
+to them.  (It's most efficient to group all operations on a given
+input array together in the \verb|operand_indices| and
+\verb|operation_codes| arrays, as in the example in
+section~\ref{AEIThorns/AEILocalInterp/sect-example-derivatives}.)
+
+Negative \verb|operation_codes[out]| values  are reserved for future
+use.  An \verb|operation_codes[out]| value which is $\ge 0$ is taken
+as a decimal integer encoding a coordinate partial derivative: each
+decimal digit means to take the coordinate partial derivative along
+that (1-origin) axis; the order of the digits in a number is ignored.
+Table~\ref{AEIThorns/AEILocalInterp/tab-derivative-codes} summarizes these resulting
+derivative codes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{table}
+\begin{center}
+\begin{tabular}{cl}
+\verb|operation_codes[out]|
+	& What it means							\\
+\hline %---------------------------------------------------------------
+0	& interpolate the input array itself (no derivative)		\\[1ex]
+1	& interpolate $\partial \big/ \partial x^1$ of the input array	\\
+2	& interpolate $\partial \big/ \partial x^2$ of the input array	\\
+3	& interpolate $\partial \big/ \partial x^3$ of the input array	\\[1ex]
+12 or 21& interpolate $\partial^2 \big/ \partial x^1 \partial x^2$
+	  of the input array						\\
+13 or 31& interpolate $\partial^2 \big/ \partial x^1 \partial x^3$
+	  of the input array						\\
+23 or 32& interpolate $\partial^2 \big/ \partial x^2 \partial x^3$
+	  of the input array						\\
+11	& interpolate $\partial^2 \big/ \partial (x^1)^2$ of the input array \\
+22	& interpolate $\partial^2 \big/ \partial (x^2)^2$ of the input array \\
+33	& interpolate $\partial^2 \big/ \partial (x^3)^2$ of the input array \\
+\hline %---------------------------------------------------------------
+\end{tabular}
+\end{center}
+\caption[Derivative Codes]
+	{
+	This table gives the codes in {\tt operation\_codes[out]}
+	for each possible 1st or 2nd~derivative in 3-D; for 1-D or
+	2-D codes referring to nonexistent coordinates are invalid.
+	}
+\label{AEIThorns/AEILocalInterp/tab-derivative-codes}
+\end{table}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At present we do {\em not\/} have any \verb|#define|s for the
+operation codes in the Cactus header files.  However, you can avoid
+most of the software-engineering problems of having ``magic numbers''
+for the operation codes, by using the macro
+\begin{verbatim}
+#define DERIV(op)   op
+\end{verbatim}
+to mark all such \verb|operation_codes[]| values in your code.
+There's an example of this in
+section~\ref{AEIThorns/AEILocalInterp/sect-example-derivatives}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Jacobian and Domain of Dependence}
+\label{AEIThorns/AEILocalInterp/sect-Jacobian}
+
+The Jacobian of the interpolator is defined as
+\begin{equation}
+\frac{\partial \hbox{\tt output\_array[out][pt]}}
+     {\partial \hbox{\tt input\_array[in][(i,j,k)]}}
+				\label{AEIThorns/AEILocalInterp/eqn-Jacobian}
+\end{equation}
+We may want to know the Jacobian itself, and/or ``just'' the set of
+\verb|(i,j,k)| for which this is nonzero (\ie{} the Jacobian's sparsity
+structure, or equivalently the domain of dependence of the output result,
+or equivalently the interpolation molecule size and shape) for a given
+\verb|out|, \verb|in|, and \verb|pt|.%%%
+\footnote{%%%
+	 For something like a spline interpolator the Jacobian
+	 is generally nonzero for all {\tt (i,j,k)}, but
+	 exponentially small for most of them; in this case
+	 the Jacobian-query API would probably specify a cutoff
+	 to return an approximate Jacobian with reasonable sparsity.
+	 }%%%
+
+The complexity of doing this depends (strongly!) on the structure
+of the Jacobian, and in particular on the answers to the following
+questions:
+\begin{itemize}
+\item	What molecule family is being used?
+\item	Does the interpolation molecule size and/or shape depend
+	on where the interpolation points are in the grid?%%%
+\footnote{%%%
+	 We can always make the interpolation molecules be
+	 the ``same size and shape'' by padding them with
+	 zero entries to bring them all up to the size of
+	 the largest molecule used anywhere in the grid,
+	 but this would be very inefficient if many molecules
+	 were padded in this way.
+	 }%%%
+\item	If this interpolator supports computing derivatives
+	as described in section~\ref{AEIThorns/AEILocalInterp/sect-derivatives},
+	does the interpolation molecule size and/or shape depend
+	on \verb|operation_codes[]|?
+\item	Does the interpolation molecule size and/or shape depend
+	on the actual floating-point values being interpolated?
+	(Examples of this might include ENO (essentially nonoscillatory)
+	and/or TVD (total-variation diminishing) interpolators for
+	hydrodynamics calculations.)
+\item	Do the actual floating-point values of the Jacobian depend
+	on the actual floating-point values being interpolated?
+	Equivalently, is the interpolation nonlinear?
+\end{itemize}
+
+Because the different cases differ so much in the amount of information
+required to describe the Jacobian, it's hard to define a single API
+which covers all cases without burdening the simpler cases with
+excessive complexity.  Instead, the interpolator defines a
+Jacobian-structure--query API to determine which case applies,
+together with (conceptually) several different APIs for the
+different cases.  (At the moment only a single case is implemented.)
+
+%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Determining the Jacobian's structure}
+\label{AEIThorns/AEILocalInterp/sect-Jacobian/structure}
+
+The following parameter-table entries may be used to query which
+of the different Jacobian-structure cases applies:
+
+The parameter \verb|molecule_family| may may be used to query what
+molecule family is being used.  This is described in detail in
+section~\ref{AEIThorns/AEILocalInterp/sect-molecule-family}.
+
+If the interpolation molecule size and/or shape vary with the
+interpolation coordinates, the interpolator sets the parameter
+\begin{verbatim}
+CCTK_INT MSS_is_fn_of_interp_coords;
+\end{verbatim}
+to 1.  Otherwise (\ie{} if the interpolation molecule size and shape
+are independent of the interpolation coordinates) it should set this
+parameter to 0.
+
+If the interpolator supports computing derivatives as described in
+section~\ref{AEIThorns/AEILocalInterp/sect-derivatives}, {\em and\/}
+if the interpolation molecule's size and/or shape varies with
+\verb|operation_codes[]|, the interpolator sets the parameter
+\begin{verbatim}
+CCTK_INT MSS_is_fn_of_which_operation;
+\end{verbatim}
+to 1.  Otherwise (\ie{} if the interpolator doesn't support computing
+derivatives, or if the interpolator does support computing derivatives
+but the interpolation molecule size and shape are independent of the
+\verb|operation_code[]| values), the interpolator sets this parameter
+to 0.  Note that this query tests whether the molecule size and/or shape
+depend on \verb|operation_codes[]| in general, independent of whether
+there are in fact any distinct values (or even any values at all) passed
+in \verb|operation_codes[]| in this particular interpolator call.  In
+other words, this is a query about the basic design of the interpolator,
+not about this particular call.
+
+If the interpolation molecule's size and/or shape varies with the
+actual floating-point values of the input arrays, the interpolator
+sets the parameter
+\begin{verbatim}
+CCTK_INT MSS_is_fn_of_input_array_values;
+\end{verbatim}
+to 1.  Otherwise (\ie{} if the interpolation molecule size and shape
+are independent of the input array values; this is a necessary, but
+not sufficient, condition for the interpolation to be linear), the
+interpolator sets this parameter to 0.
+
+If the actual floating-point values of the
+Jacobian~$(\ref{AEIThorns/AEILocalInterp/eqn-Jacobian})$
+(for a given \verb|out|, \verb|in|, and \verb|pt|) depend on the actual
+floating-point values of the input arrays (\ie{} if the interpolation
+is nonlinear), the interpolator sets the parameter
+\begin{verbatim}
+CCTK_INT Jacobian_is_fn_of_input_array_values;
+\end{verbatim}
+to 1.  Otherwise (\ie{} if the interpolation is linear) the interpolator
+sets this parameter to 0.
+
+The current implementation always sets
+\begin{verbatim}
+MSS_is_fn_of_interp_coords = 0
+MSS_is_fn_of_which_operation = 0
+MSS_is_fn_of_input_array_values = 0
+Jacobian_is_fn_of_input_array_values = 0
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%
+
+\subsubsection{Fixed-Size Hypercube-Shaped Molecules}
+\label{AEIThorns/AEILocalInterp/sect-Jacobian/fixed-sized-hypercube}
+
+The simplest case (and the only one for which we have defined an
+API at present) is when the molecules are hypercube-shaped and of
+(typically small) fixed size, independent of the interpolation
+coordinates and the actual floating-point values in the input arrays
+(though presumably depending on the interpolation order and on
+\verb|operation_code|).  In other words, this case applies if
+(and only if) the Jacobian structure information described in
+section~\ref{AEIThorns/AEILocalInterp/sect-Jacobian/structure}
+returns
+\begin{verbatim}
+MSS_is_fn_of_interp_coords = 0
+MSS_is_fn_of_which_operation = 0
+MSS_is_fn_of_input_array_values = 0
+Jacobian_is_fn_of_input_array_values = 0
+\end{verbatim}
+(These are precisely the values set by the current implementation.)
+In the rest of this section we describe the query API for this case.
+
+The following parameters may be used to query the molecule size:
+\begin{verbatim}
+CCTK_INT const molecule_min_m[N_dims];
+CCTK_INT const molecule_max_m[N_dims];
+\end{verbatim}
+The semantics of these are that if both of these keys are present
+(the values and datatypes don't matter), then the interpolator will
+(re)set the values to give the (inclusive) minimum and maximum
+\verb|m|~molecule coordinates.  (Note that either both of these
+keys should be present, or neither should be present.  This
+simplifies the logic in the interpolator slightly.)
+
+The following parameter may be used to query the molecule positions:
+\begin{verbatim}
+CCTK_INT* const molecule_positions[N_dims];
+\end{verbatim}
+The semantics of this is that the caller should set
+\verb|molecule_positions[]| to an array of \verb|N_dims| pointers to
+(caller-supplied) arrays of \verb|N_interp_points| \verb|CCTK_INT|s
+each.  If this key exists, then the interpolator will store the
+molecule positions in the pointed-to arrays.
+
+The following parameters may be used to query the
+Jacobian~$(\ref{AEIThorns/AEILocalInterp/eqn-Jacobian})$ itself:
+\begin{verbatim}
+CCTK_REAL* const Jacobian_pointer[N_output_arrays];
+const CCTK_INT   Jacobian_offset [N_output_arrays];   # optional, default=all 0
+
+/* the next 3 table entries are shared by all Jacobians */
+const CCTK_INT Jacobian_interp_point_stride;
+const CCTK_INT Jacobian_m_strides[N_dims];
+const CCTK_INT Jacobian_part_stride;                  # optional, default=1
+\end{verbatim}
+If \verb|Jacobian_pointer| is present in the table, then
+\verb|Jacobian_interp_point_stride| and \verb|Jacobian_m_strides|
+must also be present.  For each \verb|out| where
+\verb|Jacobian_pointer[out] != NULL|,%%%
+\footnote{%%%
+	 That is, setting {\tt Jacobian\_pointer[out] = NULL}
+	 supresses the Jacobian query.  If (as is often the
+	 case) the Jacobian is independent of {\tt out}, then
+	 it's a good idea to avoid unnecessary computations by
+	 supressing the queries in this manner for any remaining
+	 output arrays.
+	 }%%%
+{} the interpolator would then store the
+Jacobian~$(\ref{AEIThorns/AEILocalInterp/eqn-Jacobian})$ in
+\begin{verbatim}
+Jacobian_pointer[out][offset
+                      + pt*Jacobian_interp_point_stride
+                      + mi*stride_i + mj*stride_j + mk*stride_k
+                      + part*Jacobian_part_stride]
+\end{verbatim}
+where
+\begin{verbatim}
+offset = Jacobian_offset[out]
+(stride_i,stride_j,stride_k) = Jacobian_m_strides[]
+\end{verbatim}
+and where \verb|part| is 0 for real values and the real parts of complex
+values, and 1 for the imaginary parts of complex values.
+
+By appropriately setting the various stride parameters, this allows
+a fairly wide variety of possible storage layouts for the Jacobian.
+
+An example may help to clarify this:  Suppose we have a 1-D grid
+with 11~grid points, with integer subscripts~0 through~10 inclusive,
+and interpolation coordinates given by \verb|coord_origin = 0.0|
+and \verb|coord_delta = 0.1|.
+Suppose further that we're doing Lagrange polynomial interpolation,
+with \verb|order = 2| and hence
+(by table~\ref{AEIThorns/AEILocalInterp/tab-molecule-size+centering})
+using 3-point molecules.
+Finally, suppose that we query the Jacobian molecule positions for
+the \verb|N_interp_points=14| interpolation points 0.0, 0.04, 0.06,
+0.10, 0.14, 0.16, 0.20, 0.80, 0.84, 0.86, 0.90, 0.94, 0.96, 1.00.
+Then the queries might return
+\begin{verbatim}
+interp_molecule_min_m = -1
+interp_molecule_max_m = +1
+                                         /* interp_x      molecule     */
+interp_molecule_positions[0][ 0] =  1    /*   0.00     [0.0, 0.1, 0.2] */
+interp_molecule_positions[0][ 1] =  1    /*   0.04     [0.0, 0.1, 0.2] */
+interp_molecule_positions[0][ 2] =  1    /*   0.06     [0.0, 0.1, 0.2] */
+interp_molecule_positions[0][ 3] =  1    /*   0.10     [0.0, 0.1, 0.2] */
+interp_molecule_positions[0][ 4] =  1    /*   0.14     [0.0, 0.1, 0.2] */
+interp_molecule_positions[0][ 5] =  2    /*   0.16     [0.1, 0.2, 0.3] */
+interp_molecule_positions[0][ 6] =  2    /*   0.20     [0.1, 0.2, 0.3] */
+interp_molecule_positions[0][ 7] =  8    /*   0.80     [0.7, 0.8, 0.9] */
+interp_molecule_positions[0][ 8] =  8    /*   0.84     [0.7, 0.8, 0.9] */
+interp_molecule_positions[0][ 9] =  9    /*   0.86     [0.8, 0.9, 1.0] */
+interp_molecule_positions[0][10] =  9    /*   0.90     [0.8, 0.9, 1.0] */
+interp_molecule_positions[0][11] =  9    /*   0.94     [0.8, 0.9, 1.0] */
+interp_molecule_positions[0][12] =  9    /*   0.96     [0.8, 0.9, 1.0] */
+interp_molecule_positions[0][13] =  9    /*   1.00     [0.8, 0.9, 1.0] */
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Smoothing}
+
+The way the generalized polynomial interpolator is implemented it's
+easy to also do Savitzky-Golay smoothing.%%%
+\footnote{%%%
+	 See section~14.8 of Numerical Recipes
+	 (2nd edition) for a general discussion of
+	 Savitzky-Golay smoothing.
+	 }%%%
+{}  This is best described by way of an example:  Suppose we're doing
+1-D cubic interpolation, using
+(by table~\ref{AEIThorns/AEILocalInterp/tab-molecule-size+centering})
+4-point molecules.  In other words, at each interpolation point we
+use a cubic interpolation polynomial fitted to 4~surrounding data points.
+For Savitzky-Golay smoothing, we would instead {\em least-squares fit\/}
+a cubic polynomial to some {\em larger\/} number of surrounding data
+points.  This combines interpolation with smoothing, so there's less
+amplification of noise in the input data in the interpolation outputs.
+
+The optional input
+\begin{verbatim}
+const CCTK_INT smoothing;
+\end{verbatim}
+specifies how much (how many points) to enlarge the interpolation
+molecule for this.  The default is 0 (no smoothing).  1 would mean to
+enlarge the molecule by 1 point (\eg{} to use a 5-point molecule instead
+of the usual 4-point one for cubic interpolation).  2 would mean to
+enlarge by 2 points, (\eg{} to use a 6-point molecule for cubic
+interpolation).  Etc etc.
+
+Note that in $>1$~dimension, the maximum-degree Lagrange interpolation
+already uses more data points than the number of free parameters in
+the interpolating polynomials, \ie{} it already does some Savitzky-Golay
+smoothing.  For example, in 2-D a generic cubic polynomial
+$f(x,y) = \sum_{i+j \le 3} c_{ij} x^i y^j$ has 10 free parameters
+$c_{ij}$, which we least-squares fit to the 16 data points in the
+$4 \times 4$ molecule.
+
+Savitzky-Golay smoothing is basically free apart from the increase in
+the molecule size, e.g. a \verb|smoothing|=2 cubic interpolation has
+exactly the same cost as any other 6-point--molecule interpolation.
+
+The current implementation has all the framework for smoothing, but
+only the \verb|smoothing=0| case is implemented at the moment.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Debugging}
+
+Setting the optional parameter
+\begin{verbatim}
+const CCTK_INT debug;
+\end{verbatim}
+to a positive value turns on various debug printing inside the
+interpolator.  This is intended for debugging the interpolator itself;
+you need to look at the interpolator source code to interpret the output.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Logging}
+
+This thorn has a Boolean parameter \verb|log_interp_coords|.
+If this is set to \verb|true|, this thorn will write a detailed log
+file giving the grid information and interpolation coordinates for
+each interpolator call.  Each processor will write a separate log file,
+with the file name determined via
+\begin{verbatim}
+snprintf(buffer, length,
+         "AEILocalInterp.proc%d.log"
+         CCTK_MyProc(NULL))
+\end{verbatim}
+
+Each file begins with a header comment describing the file format in
+detail.  After the header comment, there is one line in the file for
+each call on \verb|CCTK_InterpLocalUniform()| which is handled by this thorn
+(with \verb|log_interp_coords| set to \verb|true|).
+
+Note that these log files are typically quite large, and writing them         
+may significantly slow the simulation -- you should probably only use
+this option for debugging purposes.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Supressing Interpolation}
+
+Sometimes you may want to call the interpolator, but not actually
+do any interpolation for some or all of the arrays:
+\begin{itemize}
+\item	you may be doing a query
+\item	you may be just checking values in the parameter table
+\item	you may want to interpolate varying subsets of some set
+	of arrays
+\item	you may have no interpolation points, yet still want to
+	do the interpolator call for other reasons
+\end{itemize}
+
+In such cases there are several possible ways you can supress some
+or all of the interpolations:
+\begin{description}
+\item[\mathversion{bold}
+      Set $\text{\tt N\_interp\_points} = 0$:]\mbox{}\\
+	This supresses all interpolation.  In this case
+	\verb|interp_coords| may also be \verb|NULL| if desired.
+\item[\mathversion{bold}
+      Set $\text{\tt N\_input\_arrays} = 0$ and
+      $\text{\tt N\_output\_arrays} = 0$:]\mbox{}\\
+	This suppresses all interpolation.  However, note that
+	some parameter-table entries like \verb|operand_indices|
+	and \verb|operation_codes| are specified as being arrays
+	whose size depends on \verb|N_output_arrays|, and it's an
+	error for these table entries to be present with the wrong
+	size (in this case, with any nonzero size).
+\item[\mathversion{bold}
+      Set $\text{\tt output\_arrays[out]} = \text{\tt NULL}$:]\mbox{}\\
+	This supresses the interpolation for this particular
+	output array.  This is probably the cleanest way of
+	selectively turning individual arrays on and off.
+	If $\verb|output_arrays[out]| = \verb|NULL|$ and
+	the input arrays aren't needed for any queries you're doing,
+	then it's useful to also set the corresponding
+	$\verb|input_arrays[in]| = \verb|NULL|$, to supress the
+	interpolator fetching data (which in this case will never be used)
+	from the input arrays.
+\end{description}
+
+Note that the combination
+$\verb|input_arrays[in]| = \verb|NULL|$ and
+$\verb|output_arrays[out]| \ne \verb|NULL|$ is an error: conceptually
+you're asking for an interpolation (the output array pointer is
+non-\verb|NULL|) but not supplying any input data (the input array
+pointer is \verb|NULL|).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Implementation}
+
+This interpolator's basic design is to use separate specialized code
+for each combination of
+\begin{verbatim}
+   (N_dims, molecule_family, order, smoothing)
+\end{verbatim}
+\ie{} in practice for each distinct choice of interpolation molecule.
+Maple is used to generate all the interpolation coefficients.
+The C preprocessor is then used to generate all the specialized code
+from a single master ``template'' file.  The template code uses
+\verb|#ifdef|s to handle lower dimensions with no extra overhead,
+\eg{} 1-D/2-D interpolation is basically just as efficient as in
+a purpose-built 1-D/2-D interpolator, with no extra overhead imposed
+by the interpolator also supporting higher-dimensional interpolation.
+
+The Maple code which generates the interpolation coefficients is quite
+general-purpose, and can handle an arbitrary dimensionality and molecule
+size/shape.  Generating new coefficients can be rather time-consuming,
+though, \eg{} the current coefficients for 3-D for orders~1-4
+take about 8~cpu minutes to generate using Maple~7 on a 1.7~GHz~P4.
+
+Note that when compiling the code in the directory
+\verb|src/GeneralizedPolynomial-Uniform| of this thorn, you may get
+compiler warnings about casts discarding \verb|const| qualifiers from
+pointers in (the \verb|#include|-ed file) \verb|template.c|.  Don't
+worry -- the code is actually ok.%%%
+\footnote{%%%
+	 The warnings are really a design bug in C's
+	 const-qualifier rules when pointers point to
+	 other pointers.  See question~11.10 in the
+	 (excellent!) {\tt comp.lang.c} online FAQ
+	 ({\tt http://www.eskimo.com/~scs/C-faq/top.html})
+	 for further discussion.  gcc~2.95.3 gives the
+	 spurious warnings, but gcc~3.2.1 doesn't, nor
+	 does the Intel C compiler in any version I've
+	 tried.  Also, \Cplusplus{} has fixed the problems
+	 in C's const-qualifier rules, so the same code
+	 compiled as \Cplusplus{} shouldn't give any
+	 warnings (and doesn't on the compilers I've tried).
+	 }%%%
+{}  You may also get compiler warnings about unused variables in
+this same file; again don't worry, the code is ok.
+
+See the \verb|README| file in the source code directory
+\verb|AEILocalInterp/src/| and in its subdirectories for further details
+on the implementation.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Examples}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{A Simple Example}
+
+Here's a simple example in C, of interpolating a \verb|CCTK_REAL| and a
+\verb|CCTK_COMPLEX| $10 \times 20$ 2-D array, at 5 interpolation points,
+using cubic interpolation.
+
+{\bf Note:}
+Since C allows arrays to be initialized only if the initializer
+values are compile-time constants, we have to declare the
+\verb|interp_coords[]|, \verb|input_arrays[]|, and \verb|output_arrays[]|
+arrays as non-\verb|const|, and set their values with ordinary
+(run-time) assignment statements.  In \Cplusplus, there's no
+restriction on initializer values, so we could declare the arrays
+\verb|const| and initialize them as part of their declarations.
+
+\begin{verbatim}
+#define N_DIMS   2
+#define N_INTERP_POINTS   5
+#define N_INPUT_ARRAYS    2
+#define N_OUTPUT_ARRAYS   2
+
+/* (x,y) coordinates of data grid points */
+#define X_ORIGIN   ...
+#define X_DELTA    ...
+#define Y_ORIGIN   ...
+#define Y_DELTA    ...
+const CCTK_REAL origin[N_DIMS] = { X_ORIGIN, Y_ORIGIN };
+const CCTK_REAL delta [N_DIMS] = { X_DELTA,  Y_DELTA  };
+
+/* (x,y) coordinates of interpolation points */
+const CCTK_REAL interp_x[N_INTERP_POINTS];
+const CCTK_REAL interp_y[N_INTERP_POINTS];
+const void* interp_coords[N_DIMS];              /* see note above */
+
+/* input arrays */
+/* ... note Cactus uses Fortran storage ordering, i.e. X is contiguous */
+#define NX   10
+#define NY   20
+const CCTK_REAL    input_real   [NY][NX];
+const CCTK_COMPLEX input_complex[NY][NX];
+const CCTK_INT input_array_dims[N_DIMS] = { NX, NY };
+const CCTK_INT input_array_type_codes[N_INPUT_ARRAYS]
+        = { CCTK_VARIABLE_REAL, CCTK_VARIABLE_COMPLEX };
+const void* input_arrays[N_INPUT_ARRAYS];       /* see note above */
+
+/* output arrays */
+CCTK_REAL    output_real   [N_INTERP_POINTS];
+CCTK_COMPLEX output_complex[N_INTERP_POINTS];
+const CCTK_INT output_array_type_codes[N_OUTPUT_ARRAYS]
+        = { CCTK_VARIABLE_REAL, CCTK_VARIABLE_COMPLEX };
+void* output_arrays[N_OUTPUT_ARRAYS];           /* see note above */
+
+int operator_handle, param_table_handle;
+operator_handle = CCTK_InterpHandle("my interpolation operator");
+if (operator_handle < 0)
+        CCTK_WARN(-1, "can't get interpolation handle!");
+param_table_handle = Util_TableCreateFromString("order=3");
+if (param_table_handle < 0)
+        CCTK_WARN(-1, "can't create parameter table!");
+
+/* initialize the rest of the parameter arrays */
+interp_coords[0] = (const void *) interp_x;
+interp_coords[1] = (const void *) interp_y;
+input_arrays [0] = (const void *) input_real;
+input_arrays [1] = (const void *) input_complex;
+output_arrays[0] = (      void *) output_real;
+output_arrays[1] = (      void *) output_complex;
+
+/* do the actual interpolation, and check for error returns */
+if (CCTK_InterpLocalUniform(N_DIMS,
+                            operator_handle, param_table_handle,
+                            origin, delta,
+                            N_INTERP_POINTS,
+                               CCTK_VARIABLE_REAL,
+                               interp_coords,
+                            N_INPUT_ARRAYS,
+                               input_array_dims,
+                               input_array_type_codes,
+                               input_arrays,
+                            N_OUTPUT_ARRAYS,
+                               output_array_type_codes,
+                               output_arrays) < 0)
+        CCTK_WARN(-1, "error return from interpolator!");
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{An Example of Interpolating Derivatives}
+\label{AEIThorns/AEILocalInterp/sect-example-derivatives}
+
+In this example we interpolate the 3-metric and its 1st~derivatives
+at a set of interpolation points on a 2-sphere.
+
+{\bf Note:}
+Since we're not using \Cplusplus, we again declare the pointer arrays
+non-\verb|const|, and ``initialize'' them with ordinary (run-time)
+assignment statements.  However, in this example, for greater clarity
+we place these assignment statements right after the declarations.
+Since C allows declarations only at the start of a \verb|{ }| block,
+not in the middle of a block, we nest the rest of the program in extra
+blocks (with the \verb|{ }| indented 2 spaces to distinguish them from
+``normal'' \verb|{ }| pairs) to allow for further declarations.  The
+reader will have to decide for herself whether this style is more or
+less ugly than separating the declarations and initializations of the
+pointer arrays.
+
+\begin{verbatim}
+#define N_DIMS        3
+
+/* interpolation points */
+#define N_INTERP_POINTS 1000
+const CCTK_REAL interp_x[N_INTERP_POINTS],
+                interp_y[N_INTERP_POINTS],
+                interp_z[N_INTERP_POINTS];
+const void* interp_coords[N_DIMS];              /* see note above */
+interp_coords[0] = (const void *) interp_x;
+interp_coords[1] = (const void *) interp_y;
+interp_coords[2] = (const void *) interp_z;
+
+/* dimensions of the data grid */
+#define NX   30
+#define NY   40
+#define NZ   50
+
+  {
+/* input arrays */
+/* n.b. we use Fortran storage order: X is contiguous, Z least so */
+#define N_INPUT_ARRAYS  6
+const CCTK_REAL gxx_3D[NZ][NY][NX], gxy_3D[NZ][NY][NX], gxz_3D[NZ][NY][NX],
+                                    gyy_3D[NZ][NY][NX], gyz_3D[NZ][NY][NX],
+                                                        gzz_3D[NZ][NY][NX];
+
+const CCTK_INT input_array_dims[N_DIMS] = {NX, NY, NZ};
+const CCTK_INT input_array_type_codes[N_INPUT_ARRAYS]
+        = { CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL,
+                                CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL,
+                                                    CCTK_VARIABLE_REAL };
+const void* input_arrays[N_INPUT_ARRAYS];       /* see note above */
+input_arrays[0] = (const void *) gxx_3D;
+input_arrays[1] = (const void *) gxy_3D;
+input_arrays[2] = (const void *) gxz_3D;
+input_arrays[3] = (const void *) gyy_3D;
+input_arrays[4] = (const void *) gyz_3D;
+input_arrays[5] = (const void *) gzz_3D;
+
+  {
+/* output arrays */
+/* (for best efficiency we group all operations on a given input together) */
+#define N_OUTPUT_ARRAYS 24
+CCTK_REAL
+   gxx[N_INTERP_POINTS],
+      dx_gxx[N_INTERP_POINTS], dy_gxx[N_INTERP_POINTS], dz_gxx[N_INTERP_POINTS],
+   gxy[N_INTERP_POINTS],
+      dx_gxy[N_INTERP_POINTS], dy_gxy[N_INTERP_POINTS], dz_gxy[N_INTERP_POINTS],
+   gxz[N_INTERP_POINTS],
+      dx_gxz[N_INTERP_POINTS], dy_gxz[N_INTERP_POINTS], dz_gxz[N_INTERP_POINTS],
+   gyy[N_INTERP_POINTS],
+      dx_gyy[N_INTERP_POINTS], dy_gyy[N_INTERP_POINTS], dz_gyy[N_INTERP_POINTS],
+   gyz[N_INTERP_POINTS],
+      dx_gyz[N_INTERP_POINTS], dy_gyz[N_INTERP_POINTS], dz_gyz[N_INTERP_POINTS],
+   gzz[N_INTERP_POINTS],
+      dx_gzz[N_INTERP_POINTS], dy_gzz[N_INTERP_POINTS], dz_gzz[N_INTERP_POINTS];
+const CCTK_INT output_array_type_codes[N_OUTPUT_ARRAYS]
+   = { CCTK_VARIABLE_REAL,
+          CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL,
+       CCTK_VARIABLE_REAL,
+          CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL,
+       CCTK_VARIABLE_REAL,
+          CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL,
+       CCTK_VARIABLE_REAL,
+          CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL,
+       CCTK_VARIABLE_REAL,
+          CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL,
+       CCTK_VARIABLE_REAL,
+          CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL, CCTK_VARIABLE_REAL };
+void* output_arrays[N_OUTPUT_ARRAYS];           /* see note above */
+output_arrays[ 0] = (void *)    gxx;
+output_arrays[ 1] = (void *) dx_gxx;
+output_arrays[ 2] = (void *) dy_gxx;
+output_arrays[ 3] = (void *) dz_gxx;
+output_arrays[ 4] = (void *)    gxy;
+output_arrays[ 5] = (void *) dx_gxy;
+output_arrays[ 6] = (void *) dy_gxy;
+output_arrays[ 7] = (void *) dz_gxy;
+output_arrays[ 8] = (void *)    gxz;
+output_arrays[ 9] = (void *) dx_gxz;
+output_arrays[10] = (void *) dy_gxz;
+output_arrays[11] = (void *) dz_gxz;
+output_arrays[12] = (void *)    gyy;
+output_arrays[13] = (void *) dx_gyy;
+output_arrays[14] = (void *) dy_gyy;
+output_arrays[15] = (void *) dz_gyy;
+output_arrays[16] = (void *)    gyz;
+output_arrays[17] = (void *) dx_gyz;
+output_arrays[18] = (void *) dy_gyz;
+output_arrays[19] = (void *) dz_gyz;
+output_arrays[20] = (void *)    gzz;
+output_arrays[21] = (void *) dx_gzz;
+output_arrays[22] = (void *) dy_gzz;
+output_arrays[23] = (void *) dz_gzz;
+
+  {
+/* integer codes to specify the derivatives */
+const CCTK_INT operand_indices[N_OUTPUT_ARRAYS]
+   = { 0, 0, 0, 0,
+       1, 1, 1, 1,
+       2, 2, 2, 2,
+       3, 3, 3, 3,
+       4, 4, 4, 4,
+       5, 5, 5, 5 };
+#define DERIV(x)   x
+const CCTK_INT operation_codes[N_OUTPUT_ARRAYS]
+   = { DERIV(0), DERIV(1), DERIV(2), DERIV(3),
+       DERIV(0), DERIV(1), DERIV(2), DERIV(3),
+       DERIV(0), DERIV(1), DERIV(2), DERIV(3),
+       DERIV(0), DERIV(1), DERIV(2), DERIV(3),
+       DERIV(0), DERIV(1), DERIV(2), DERIV(3),
+       DERIV(0), DERIV(1), DERIV(2), DERIV(3) };
+
+int operator_handle, param_table_handle;
+operator_handle = CCTK_InterpHandle("my interpolation operator");
+if (operator_handle < 0)
+        CCTK_WARN(-1, "can't get interpolation handle!");
+
+param_table_handle = Util_TableCreate(UTIL_TABLE_FLAGS_DEFAULT);
+if (param_table_handle < 0)
+        CCTK_WARN(-1, "can't create parameter table!");
+if (Util_TableSetInt(param_table_handle, 3, "order") < 0)
+        CCTK_WARN(-1, "can't set order in parameter table!");
+if (Util_TableSetIntArray(param_table_handle,
+                          N_OUTPUT_ARRAYS, operand_indices,
+                          "operand_indices") < 0)
+        CCTK_WARN(-1, "can't set operand_indices array in parameter table!");
+if (Util_TableSetIntArray(param_table_handle,
+                          N_OUTPUT_ARRAYS, operation_codes,
+                          "operation_codes") < 0)
+        CCTK_WARN(-1, "can't set operation_codes array in parameter table!");
+
+if (CCTK_InterpLocalUniform(N_DIMS,
+                            operator_handle, param_table_handle,
+                            origin, delta,
+                            N_INTERP_POINTS,
+                               CCTK_VARIABLE_REAL,
+                               interp_coords,
+                            N_INPUT_ARRAYS,
+                               input_array_dims,
+                               input_array_type_codes,
+                               input_arrays,
+                            N_OUTPUT_ARRAYS,
+                               output_array_type_codes,
+                               output_arrays) < 0)
+        CCTK_WARN(-1, "error return from interpolator!");
+  }
+  }
+  }
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Acknowledgments}
+
+Thanks to Thomas Radke for our ongoing collaboration on Cactus
+interpolation,
+to Ian Hawke and Erik Schnetter for helpful comments on the documentation,
+to Tom Goodale and Thomas Radke for many useful design discussions,
+to Erik Schnetter for bug reports,
+and to all the Cactus crew for a great infrastructure!
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

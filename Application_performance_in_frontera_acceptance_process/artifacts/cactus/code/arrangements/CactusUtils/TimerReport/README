@@ -1,0 +1,11 @@
+Cactus Code Thorn TimerReport
+Author(s)    : Cactus team
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Simplistic additional timer information.  This thorn provides timer
+details to screen at different iterations and before checkpoints
+depending on parameter settings.

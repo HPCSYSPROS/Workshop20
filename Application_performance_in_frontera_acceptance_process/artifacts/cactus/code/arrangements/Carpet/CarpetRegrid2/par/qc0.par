@@ -1,0 +1,459 @@
+Cactus::cctk_run_title = "QC-0"
+
+Cactus::cctk_full_warnings         = yes
+Cactus::highlight_warning_messages = no
+Cactus::cctk_timer_output          = full
+
+#Cactus::cctk_itlast     = 131072
+#Cactus::terminate       = immediately
+#Cactus::terminate       = time
+#Cactus::cctk_final_time = 1.0
+Cactus::terminate       = never
+#Cactus::terminate       = runtime
+#Cactus::max_runtime     = 2592 # 48 h * 60 min/h * 90%
+
+
+
+ActiveThorns = "DGEMM"
+
+ActiveThorns = "Formaline"
+
+ActiveThorns = "LocalInterp AEILocalInterp"
+
+ActiveThorns = "Slab"
+
+ActiveThorns = "TGRtensor"
+
+
+
+ActiveThorns = "SphericalSurface"
+
+SphericalSurface::nsurfaces = 3
+SphericalSurface::maxntheta = 39
+SphericalSurface::maxnphi   = 76
+
+SphericalSurface::ntheta      [0] = 39
+SphericalSurface::nphi        [0] = 76
+SphericalSurface::nghoststheta[0] = 2
+SphericalSurface::nghostsphi  [0] = 2
+
+SphericalSurface::ntheta      [1] = 39
+SphericalSurface::nphi        [1] = 76
+SphericalSurface::nghoststheta[1] = 2
+SphericalSurface::nghostsphi  [1] = 2
+
+SphericalSurface::ntheta      [2] = 39
+SphericalSurface::nphi        [2] = 76
+SphericalSurface::nghoststheta[2] = 2
+SphericalSurface::nghostsphi  [2] = 2
+
+
+
+ActiveThorns = "IOUtil"
+
+IO::out_dir = $parfile
+
+
+
+ActiveThorns = "Carpet CarpetLib CarpetInterp CarpetReduce CarpetSlab"
+
+Carpet::verbose = yes
+
+Carpet::domain_from_coordbase = yes
+Carpet::max_refinement_levels = 20
+
+driver::ghost_size              = 2
+Carpet::use_outer_buffer_zones  = yes
+Carpet::num_integrator_substeps = 3
+
+Carpet::prolongation_order_space = 3
+Carpet::prolongation_order_time  = 2
+
+Carpet::enable_all_storage     = no
+Carpet::regrid_during_recovery = no
+
+#Carpet::convergence_level = 0
+Carpet::convergence_level = 2
+
+Carpet::init_3_timelevels = yes
+
+CarpetLib::fast_recomposing = yes
+
+
+
+ActiveThorns = "NaNChecker"
+
+NaNChecker::check_every = 131072
+NaNChecker::check_vars = "
+        ADMBase::gxx
+"
+
+
+
+ActiveThorns = "Boundary CartGrid3D CoordBase ReflectionSymmetry RotatingSymmetry180 SymBase"
+
+CoordBase::domainsize = minmax
+
+CoordBase::xmin =   0.0
+CoordBase::ymin = -96.0
+CoordBase::zmin =   0.0
+CoordBase::xmax =  96.0
+CoordBase::ymax =  96.0
+CoordBase::zmax =  96.0
+CoordBase::dx   =   1.6
+CoordBase::dy   =   1.6
+CoordBase::dz   =   1.6
+
+CoordBase::boundary_size_x_lower     = 2
+CoordBase::boundary_size_z_lower     = 2
+CoordBase::boundary_shiftout_x_lower = 1
+CoordBase::boundary_shiftout_z_lower = 1
+
+CartGrid3D::type = coordbase
+
+ReflectionSymmetry::reflection_z   = yes
+ReflectionSymmetry::avoid_origin_z = no
+
+
+
+ActiveThorns = "CarpetRegrid2 CarpetTracker"
+
+CarpetRegrid2::regrid_every = 131072
+
+CarpetRegrid2::num_centres = 2
+
+CarpetRegrid2::num_levels_1 = 6
+CarpetRegrid2::position_x_1 =  1.16
+CarpetRegrid2::position_y_1 =  0.0
+CarpetRegrid2::position_z_1 =  0.0
+CarpetRegrid2::radius_1[ 1] = 48.0
+CarpetRegrid2::radius_1[ 2] = 24.0
+CarpetRegrid2::radius_1[ 3] = 12.0
+CarpetRegrid2::radius_1[ 4] =  6.0
+CarpetRegrid2::radius_1[ 5] =  3.0
+
+CarpetRegrid2::num_levels_2 = 6
+CarpetRegrid2::position_x_2 = -1.16
+CarpetRegrid2::position_y_2 =  0.0
+CarpetRegrid2::position_z_2 =  0.0
+CarpetRegrid2::radius_2[ 1] = 48.0
+CarpetRegrid2::radius_2[ 2] = 24.0
+CarpetRegrid2::radius_2[ 3] = 12.0
+CarpetRegrid2::radius_2[ 4] =  6.0
+CarpetRegrid2::radius_2[ 5] =  3.0
+
+
+
+ActiveThorns = "ADMBase ADMCoupling ADMMacros CoordGauge SpaceMask StaticConformal TmunuBase"
+
+ADMMacros::spatial_order = 4
+
+
+
+ActiveThorns = "TwoPunctures"
+
+ADMBase::metric_type = "physical"
+
+ADMBase::initial_data  = "twopunctures"
+ADMBase::initial_lapse = "twopunctures-averaged"
+ADMBase::initial_shift = "zero"
+
+TwoPunctures::par_b          =  1.16
+TwoPunctures::par_m_plus     =  0.45
+TwoPunctures::par_m_minus    =  0.45
+TwoPunctures::par_P_plus [1] =  0.333
+TwoPunctures::par_P_minus[1] = -0.333
+
+TwoPunctures::grid_setup_method = "evaluation"
+
+TwoPunctures::TP_epsilon = 1e-4
+
+TwoPunctures::verbose = yes
+
+
+
+ActiveThorns = "Time"
+
+Time::dtfac = 0.25
+
+
+
+ActiveThorns = "MoL"
+
+MoL::ODE_Method = RK3
+
+
+
+ActiveThorns = "BSSN_MoL"
+
+ADMBase::evolution_method = ADM_BSSN
+
+ADM_BSSN::timelevels   = 3
+ADM_BSSN::stencil_size = 2
+ADM_BSSN::advection    = center4
+ADM_BSSN::bound        = newrad
+
+ADMBase::lapse_evolution_method = 1+log
+ADM_BSSN::lapsesource           = modified
+ADM_BSSN::harmonic_f            = 2.0
+ADM_BSSN::lapse_advection_coeff = 1.0
+ADM_BSSN::force_lapse_positive  = yes
+
+ADMBase::shift_evolution_method        = gamma0
+ADM_BSSN::ShiftGammaCoeff              = 0.75
+ADM_BSSN::BetaDriver                   = 4.0
+ADM_BSSN::gamma_driver_advection_coeff = 1.0
+
+
+
+ActiveThorns = "Dissipation"
+
+# order=5 requires 3 ghost zones
+#Dissipation::order = 5
+Dissipation::order = 3
+Dissipation::vars = "
+        ADM_BSSN::ADM_BSSN_phi
+        ADM_BSSN::ADM_BSSN_metric
+        ADM_BSSN::ADM_BSSN_curv
+        ADM_BSSN::ADM_BSSN_K
+        ADM_BSSN::ADM_BSSN_gamma
+        ADMBase::lapse
+        ADMBase::shift
+"
+
+
+
+ActiveThorns = "ADMConstraints"
+
+
+
+ActiveThorns = "AHFinderDirect"
+
+AHFinderDirect::find_every   = 131072
+AHFinderDirect::move_origins = yes
+
+AHFinderDirect::geometry_interpolator_name = "Lagrange polynomial interpolation"
+AHFinderDirect::geometry_interpolator_pars = "order=4"
+AHFinderDirect::surface_interpolator_name  = "Lagrange polynomial interpolation"
+AHFinderDirect::surface_interpolator_pars  = "order=4"
+
+AHFinderDirect::N_horizons = 3
+
+AHFinderDirect::origin_x                                 [1] =  1.16
+AHFinderDirect::initial_guess__coord_sphere__x_center    [1] =  1.16
+AHFinderDirect::initial_guess__coord_sphere__radius      [1] =  0.25
+AHFinderDirect::which_surface_to_store_info              [1] = 0
+AHFinderDirect::reset_horizon_after_not_finding          [1] = no
+
+AHFinderDirect::origin_x                                 [2] = -1.16
+AHFinderDirect::initial_guess__coord_sphere__x_center    [2] = -1.16
+AHFinderDirect::initial_guess__coord_sphere__radius      [2] =  0.25
+AHFinderDirect::which_surface_to_store_info              [2] = 1
+AHFinderDirect::set_mask_for_individual_horizon          [2] = no
+AHFinderDirect::reset_horizon_after_not_finding          [2] = no
+
+AHFinderDirect::origin_x                                 [3] = 0
+AHFinderDirect::initial_guess__coord_sphere__x_center    [3] = 0
+AHFinderDirect::initial_guess__coord_sphere__radius      [3] = 2.0
+AHFinderDirect::which_surface_to_store_info              [3] = 2
+AHFinderDirect::set_mask_for_individual_horizon          [3] = no
+
+
+
+ActiveThorns = "IsolatedHorizon"
+
+IsolatedHorizon::verbose              = yes
+IsolatedHorizon::interpolator         = "Lagrange polynomial interpolation"
+IsolatedHorizon::interpolator_options = "order=4"
+
+IsolatedHorizon::num_horizons = 3
+IsolatedHorizon::surface_index[0] = 0
+IsolatedHorizon::surface_index[1] = 1
+IsolatedHorizon::surface_index[2] = 2
+
+
+
+ActiveThorns = "ProperDistance ProperTime"
+
+ProperDistance::number_geodesics      = 512
+ProperDistance::direction             = "x"
+ProperDistance::plane                 = "xy"
+ProperDistance::opening_angle         = 180.0
+ProperDistance::step_size             =   0.01
+ProperDistance::horizon_number        = 1
+ProperDistance::interpolation_order   = 3
+ProperDistance::integration_method    = "rk4"
+ProperDistance::eps                   = 0.00001
+ProperDistance::max_proper_distance   = 15
+ProperDistance::calc_every            = 131072
+ProperDistance::use_second_horizon    = yes
+ProperDistance::second_horizon_number = 2
+
+
+
+ActiveThorns = "WaveExtract"
+
+WaveExtract::out_every               = 25
+WaveExtract::maximum_detector_number = 6
+WaveExtract::switch_output_format    = 100
+WaveExtract::rsch2_computation       = "average Schwarzschild metric"
+WaveExtract::l_mode                  = 4
+WaveExtract::m_mode                  = 4
+WaveExtract::detector_radius[0]      = 20
+WaveExtract::detector_radius[1]      = 30
+WaveExtract::detector_radius[2]      = 40
+WaveExtract::detector_radius[3]      = 50
+WaveExtract::detector_radius[4]      = 60
+WaveExtract::detector_radius[5]      = 70
+
+
+
+ActiveThorns = "Weyl"
+
+Weyl::num_locations = 6
+
+Weyl::radius[0] = 20
+Weyl::radius[1] = 30
+Weyl::radius[2] = 40
+Weyl::radius[3] = 50
+Weyl::radius[4] = 60
+Weyl::radius[5] = 70
+
+
+
+ActiveThorns = "CarpetIOBasic"
+
+IOBasic::outInfo_every      = 131072
+IOBasic::outInfo_reductions = "norm2"
+IOBasic::outInfo_vars       = "
+        ADMConstraints::ham
+        IsolatedHorizon::ih_spin[0]
+        IsolatedHorizon::ih_radius[0]
+"
+
+
+
+ActiveThorns = "CarpetIOScalar"
+
+IOScalar::outScalar_every = 131072
+IOScalar::outScalar_vars  = "
+        ADMBase::metric
+        ADMBase::curv
+        ADMBase::lapse
+        ADMBase::shift
+        ADMConstraints::hamiltonian
+        ADMConstraints::momentum
+        SphericalSurface::sf_radius
+        IsolatedHorizon::ih_shapes
+        IsolatedHorizon::ih_coordinates
+        IsolatedHorizon::ih_tetrad_l
+        IsolatedHorizon::ih_tetrad_n
+        IsolatedHorizon::ih_tetrad_m
+        IsolatedHorizon::ih_newman_penrose
+        IsolatedHorizon::ih_weyl_scalars
+        IsolatedHorizon::ih_twometric
+        IsolatedHorizon::ih_killing_vector
+        IsolatedHorizon::ih_killed_twometric
+        IsolatedHorizon::ih_invariant_coordinates
+        IsolatedHorizon::ih_multipole_moments
+        IsolatedHorizon::ih_3determinant
+        Weyl::ricci_scalars
+        Weyl::weyl_scalars
+        Weyl::weyl_invariants
+        Weyl::weyl_scalars_multipoles
+"
+
+
+
+ActiveThorns = "CarpetIOASCII"
+
+IOASCII::out0D_every = 131072
+IOASCII::out0D_vars  = "
+        ADMBase::metric
+        ADMBase::curv
+        ADMBase::lapse
+        ADMBase::shift
+        ADMConstraints::hamiltonian
+        ADMConstraints::momentum
+        SphericalSurface::sf_valid
+        SphericalSurface::sf_info
+        SphericalSurface::sf_radius
+        SphericalSurface::sf_origin
+        SphericalSurface::sf_coordinate_descriptors
+        IsolatedHorizon::ih_state
+        IsolatedHorizon::ih_grid_int
+        IsolatedHorizon::ih_grid_real
+        IsolatedHorizon::ih_shapes
+        IsolatedHorizon::ih_coordinates
+        IsolatedHorizon::ih_tetrad_l
+        IsolatedHorizon::ih_tetrad_n
+        IsolatedHorizon::ih_tetrad_m
+        IsolatedHorizon::ih_newman_penrose
+        IsolatedHorizon::ih_weyl_scalars
+        IsolatedHorizon::ih_twometric
+        IsolatedHorizon::ih_killing_vector
+        IsolatedHorizon::ih_killed_twometric
+        IsolatedHorizon::ih_scalars
+        IsolatedHorizon::ih_invariant_coordinates
+        IsolatedHorizon::ih_multipole_moments
+        IsolatedHorizon::ih_3determinant
+        Weyl::ricci_scalars
+        Weyl::weyl_scalars
+        Weyl::weyl_invariants
+        Weyl::weyl_scalars_multipoles
+"
+
+IOASCII::out1D_every = 131072
+IOASCII::out1D_vars  = "
+        ADMBase::metric
+        ADMBase::curv
+        ADMBase::lapse
+        ADMBase::shift
+        ADMConstraints::hamiltonian
+        ADMConstraints::momentum
+        SphericalSurface::sf_radius
+        IsolatedHorizon::ih_weyl_scalars
+        IsolatedHorizon::ih_killing_vector
+        IsolatedHorizon::ih_killed_twometric
+        IsolatedHorizon::ih_3determinant
+        Weyl::ricci_scalars
+        Weyl::weyl_scalars
+        Weyl::weyl_invariants
+        Weyl::weyl_scalars_multipoles
+"
+
+IOASCII::out2D_every = 131072
+IOASCII::out2D_vars  = "
+        SphericalSurface::sf_radius
+"
+
+
+
+Activethorns = "CarpetIOHDF5"
+
+IOHDF5::out_every = 131072
+IOHDF5::out_vars  = "
+        ADMBase::metric
+        ADMBase::curv
+        ADMBase::lapse
+        ADMBase::shift
+        ADMConstraints::hamiltonian
+        ADMConstraints::momentum
+"
+
+IOHDF5::checkpoint          = yes
+IO::checkpoint_dir          = $parfile
+IO::checkpoint_ID           = yes
+IO::checkpoint_every        = 524288
+IO::checkpoint_on_terminate = yes
+
+IO::recover     = "autoprobe"
+IO::recover_dir = $parfile
+
+IOHDF5::use_grid_structure_from_checkpoint = yes
+
+
+
+ActiveThorns = "TimerReport"
+
+TimerReport::out_every = 131072

@@ -1,0 +1,39 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+module list
+
+echo "Checking:"
+pwd
+hostname
+date
+
+echo "Environment:"
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export GMON_OUT_PREFIX=gmon.out
+export OMP_NUM_THREADS=@NUM_THREADS@
+export I_MPI_FABRICS=shm:ofa
+export I_MPI_MIC=1
+export I_MPI_OFA_ADAPTER_NAME=mlx4_0
+env | sort > SIMFACTORY/ENVIRONMENT
+echo ${SLURM_NODELIST} > NODES
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+## Run on host only:
+#time /opt/apps/intel13/impi/4.1.0.024/intel64/bin/mpirun -machinefile NODES -np @NUM_PROCS@ @EXECUTABLE@ -L 3 @PARFILE@
+# Run on device only:
+time /opt/apps/intel13/impi/4.1.0.024/intel64/bin/mpiexec.hydra -host mic0 -np @NUM_PROCS@ $(echo '@EXECUTABLE@' | sed -e 's+^.*cactus_sim-hybrid+/work/00507/eschnett/Cbeta/exe/cactus_sim-hybrid-mic+') -L 3 @PARFILE@
+## Hybrid, run on both host and device:
+#time /opt/apps/intel13/impi/4.1.0.024/intel64/bin/mpiexec.hydra -machinefile NODES -np @NUM_PROCS@ @EXECUTABLE@ -L 3 @PARFILE@ : -host mic0 -np @(@NUM_PROCS@ * 61 / 16)@ $(echo '@EXECUTABLE@' | sed -e 's+cactus_sim-hybrid+/work/00507/eschnett/Cbeta/exe/cactus_sim-hybrid-mic+') -L 3 @PARFILE@
+
+echo "Stopping:"
+date
+
+echo "Done."

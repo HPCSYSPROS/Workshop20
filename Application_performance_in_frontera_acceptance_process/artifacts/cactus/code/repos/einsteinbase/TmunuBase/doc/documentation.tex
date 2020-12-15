@@ -1,0 +1,167 @@
+%  Thorn documentation in the latex file doc/documentation.tex
+%  will be included in ThornGuides built with the Cactus make system.
+%  The scripts employed by the make system automatically include
+%  pages about variables, parameters and scheduling parsed from the
+%  relevant thorn CCL files.
+
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+\author{Erik Schnetter \textless schnetter@cct.lsu.edu\textgreater}
+
+\title{TmunuBase}
+
+\date{2008-04-07}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+\begin{abstract}
+  Provide grid functions for the stress-energy tensor $T_{\mu\nu}$,
+  and schedule when these grid functions are calculated.  This allows
+  different thorns to cooperate without explicitly depending on each
+  other.  This thorn is compatible with the \texttt{CalcTmumu.inc}
+  interface, in the sense that thorns using this interface will work
+  correctly with TmunuBase.  Thorn TmunuBase is for the stress-energy
+  tensor what thorn ADMBase is for the metric tensor.
+\end{abstract}
+
+\section{Introduction}
+
+Thorn \texttt{TmunuBase} provides core infrastructure for thorns
+implementing some kind of energy or matter in general relativity, for
+example general relativistic hydrodynamics formulations.  It provides
+the basic variables, i.e., the stress-energy tensor $T_{\mu\nu}$, in
+addition to a set of parameters to regulate their use.  These
+variables are used to communicate between (possibly multiple) thorns
+contributing to the stress-energy content of the spacetime, and thorns
+needing to evaluate the stress-energy tensor such as spacetime
+evolution methods.  It also provides schedule groups to manage when
+$T_{\mu\nu}$ is calculated and when it is ready for access.
+
+\section{Using TmunuBase}
+
+\subsection{Variables}
+
+TmunuBase weakly assumes (but does not require) that the spacetime is
+described in terms of a $3+1$ decomposition.  The variables provided
+by \texttt{TmunuBase} are:
+\begin{itemize}
+\item The ``scalar'' part of $T_{\mu\nu}$, its time-time component:
+  \texttt{eTtt}
+\item The ``vector'' part of $T_{\mu\nu}$, its time-space components:
+  \texttt{eTtx}, \texttt{eTty}, \texttt{eTtz}
+\item The ``tensor'' part of $T_{\mu\nu}$, its space-space components:
+  \texttt{eTxx}, \texttt{eTxy}, \texttt{eTxz}, \texttt{eTyy},
+  \texttt{eTyz}, \texttt{eTzz}
+\end{itemize}
+These components have the prefix \texttt{e} to avoid naming conflicts
+with existing variables.  Many thorns dealing with matter already use
+variable names such as \texttt{Ttt}.
+
+These variables have up to three time levels.
+
+\subsection{Parameters}
+
+By default, the TmunuBase variables have no storage, and TmunuBase is
+inactive.  This makes it possible to add a matter interface to
+existing vacuum spacetime methods without changing their behaviour.
+
+Several parameters choose how TmunuBase behaves at run time:
+\begin{itemize}
+\item The parameter \texttt{stress\_energy\_storage} activates storage
+  for $T_{\mu\nu}$ and enables the schedule groups which calculate it.
+\item The parameter \texttt{stress\_energy\_at\_RHS} moves calculating
+  the $T_{\mu\nu}$ from the \texttt{evol} bin into the
+  \texttt{MoL\_PostStep} group.  This increases the order of accuracy
+  of the spacetime--matter coupling, but is only possible when thorn
+  MoL is used.\footnote{This was one of the main reason why thorn MoL
+    was instroduced.}  Generally, this parameter should be set when
+  MoL is used.
+\item The parameter \texttt{timelevels} chooses the number of time
+  levels for $T_{\mu\nu}$.  The default is a single time level, which
+  is sufficient for unigrid simulation.  Mesh refinement simulation
+  may require several time levels if mesh refinement boundaries
+  require correct values.
+\item The parameter \texttt{prolongation\_type} defines the
+  prolongation operator for mesh refinement boundaries.  The default
+  is Lagrange interpolation.
+\end{itemize}
+
+The grid scalar \texttt{stress\_energy\_state} describes whether the
+$T_{\mu\nu}$ variables have storage.
+
+\section{Programming with TmunuBase}
+
+\subsection{Contributing to $T_{\mu\nu}$}
+
+There may be multiple thorns contributing to $T_{\mu\nu}$.  Therefore,
+thorn TmunuBase initialises $T_{\mu\nu}$ to zero, and each thorn has
+to add to the existing values in $T_{\mu\nu}$.  The corresponding
+routine should be scheduled in the bin \texttt{AddToTmunu}.
+\emph{Note:} Do not schedule anything in the schedule bin
+\texttt{SetTmunu}.
+
+\subsection{Reading from $T_{\mu\nu}$}
+
+Since the values of $T_{\mu\nu}$ change at each time step, or -- if a
+thorn like \texttt{MoL} is used -- at each substep, $T_{\mu\nu}$ needs
+to be recalculated frequently.  This happens either in the schedule
+bin \texttt{evol} or in the schedule group \texttt{MoL\_PostStep}.
+$T_{\mu\nu}$ may only be accessed after it has been calculated, e.g.\
+\texttt{IN MoL\_PostStep AFTER SetTmunu}.  $T_{\mu\nu}$ can be freely
+accessed at other times, e.g.\ in \texttt{MoL\_CalcRHS} or at
+\texttt{poststep} or \texttt{analyisis}.
+
+\section{Compatibility to ADMCoupling}
+
+Cactus provides another interface for contributing to the
+stress-energy tensor, called \texttt{CalcTmunu}.  This alternative
+interface (which is described in thorn \texttt{ADMCoupling}) requires
+writing routines in fixed-format Fortran 77 and inserting lines of
+code into a file \texttt{CalcTmunu.inc}.  We suggest to use exactly
+one of these two interface and not to mix them.
+
+Thorn TmunuBase takes contributions from the \texttt{CalcTmunu}
+interface automatically into account as well.  It also collects the
+values which are added to its $T_{\mu\nu}$ and provides these to other
+thorns which use the \texttt{CalcTmunu.inc} interface.  That is, thorn
+TmunuBase is fully backwards compatible.
+
+\subsection{Comparison to ADMCoupling}
+
+The \texttt{CalcTmunu} interface and this thorn TmunuBase make
+different space/performance tradeoffs.  \texttt{CalcTmunu} does not
+store any components of the stress-energy tensor, which saves memory
+and is also more efficient if its components can be quickly calculated
+from other variables (presumably the state vector of a hydrodynamics
+thorn).
+
+TmunuBase requires explicit storage for $T_{\mu\nu}$.  This is
+necessary if $T_{\mu\nu}$ needs to be interpolated e.g.\ for dynamical
+horizon calculations.  Compared to the overall number of grid function
+in a typical simulation the number of additional variables is
+tolerable (typical numbers are 10 additional variables with 200
+existing variables).  With the exception of the parts ensuring
+compatibility to \texttt{CalcTmunu}, TmunuBase is also a much simpler
+and more flexible mechanism.
+
+\subsection{Acknowledgements}
+
+We thank I. Hawke for designing and implementing thorn MoL, without
+which a generic high-order coupling between spacetime and
+hydrodynamics methods would not be possible.
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

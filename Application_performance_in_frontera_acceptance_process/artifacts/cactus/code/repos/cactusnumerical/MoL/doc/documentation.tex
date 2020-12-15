@@ -1,0 +1,1660 @@
+% *======================================================================*
+%  Cactus Thorn template for ThornGuide documentation
+%  Author: Ian Kelley
+%  Date: Sun Jun 02, 2002
+%  $Header$                                                             
+%
+%  Thorn documentation in the latex file doc/documentation.tex 
+%  will be included in ThornGuides built with the Cactus make system.
+%  The scripts employed by the make system automatically include 
+%  pages about variables, parameters and scheduling parsed from the 
+%  relevent thorn CCL files.
+%  
+%  This template contains guidelines which help to assure that your     
+%  documentation will be correctly added to ThornGuides. More 
+%  information is available in the Cactus UsersGuide.
+%                                                    
+%  Guidelines:
+%   - Do not change anything before the line
+%       % START CACTUS THORNGUIDE",
+%     except for filling in the title, author, date etc. fields.
+%        - Each of these fields should only be on ONE line.
+%        - Author names should be sparated with a \\ or a comma
+%   - You can define your own macros, but they must appear after
+%     the START CACTUS THORNGUIDE line, and must not redefine standard 
+%     latex commands.
+%   - To avoid name clashes with other thorns, 'labels', 'citations', 
+%     'references', and 'image' names should conform to the following 
+%     convention:          
+%       ARRANGEMENT_THORN_LABEL
+%     For example, an image wave.eps in the arrangement CactusWave and 
+%     thorn WaveToyC should be renamed to CactusWave_WaveToyC_wave.eps
+%   - Graphics should only be included using the graphix package. 
+%     More specifically, with the "includegraphics" command. Do
+%     not specify any graphic file extensions in your .tex file. This 
+%     will allow us (later) to create a PDF version of the ThornGuide
+%     via pdflatex. |
+%   - References should be included with the latex "bibitem" command. 
+%   - Use \begin{abstract}...\end{abstract} instead of \abstract{...}
+%   - Do not use \appendix, instead include any appendices you need as 
+%     standard sections. 
+%   - For the benefit of our Perl scripts, and for future extensions, 
+%     please use simple latex.     
+%
+% *======================================================================* 
+% 
+% Example of including a graphic image:
+%    \begin{figure}[ht]
+%       \begin{center}
+%          \includegraphics[width=6cm]{MyArrangement_MyThorn_MyFigure}
+%       \end{center}
+%       \caption{Illustration of this and that}
+%       \label{MyArrangement_MyThorn_MyLabel}
+%    \end{figure}
+%
+% Example of using a label:
+%   \label{MyArrangement_MyThorn_MyLabel}
+%
+% Example of a citation:
+%    \cite{MyArrangement_MyThorn_Author99}
+%
+% Example of including a reference
+%   \bibitem{MyArrangement_MyThorn_Author99}
+%   {J. Author, {\em The Title of the Book, Journal, or periodical}, 1 (1999), 
+%   1--16. {\tt http://www.nowhere.com/}}
+%
+% *======================================================================* 
+
+% If you are using CVS use this line to give version information
+% $Header$
+
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+% The author of the documentation
+\author{Ian Hawke} 
+
+% The title of the document (not necessarily the name of the Thorn)
+\title{Method of Lines}
+
+% the date your document was last changed, if your document is in CVS, 
+% please use:
+\date{$ $Date$ $}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+% Add all definitions used in this documentation here 
+%   \def\mydef etc
+
+% Add an abstract for this thorn's documentation
+\begin{abstract}
+  The Method of Lines is a way of separating the time integration from
+  the rest of an evolution scheme. This thorn is intended to take care
+  of all the bookwork and provide some basic time integration methods,
+  allowing for easy coupling of different thorns.
+\end{abstract}
+
+% The following sections are suggestive only.
+% Remove them or add your own.
+
+% \section{Introduction}
+
+% \section{Physical System}
+
+% \section{Numerical Implementation}
+
+% \section{Using This Thorn}
+
+% \subsection{Obtaining This Thorn}
+
+% \subsection{Basic Usage}
+
+% \subsection{Special Behaviour}
+
+% \subsection{Interaction With Other Thorns}
+
+% \subsection{Examples}
+
+% \subsection{Support and Feedback}
+
+% \section{History}
+
+% \subsection{Thorn Source Code}
+
+% \subsection{Thorn Documentation}
+
+% \subsection{Acknowledgements}
+
+\section{Purpose}
+\label{CactusBase_MoL_sec:purpose}
+
+The Method of Lines (MoL) converts a (system of) partial differential
+equation(s) into an ordinary differential equation containing some
+spatial differential operator. As an example, consider writing the
+hyperbolic system of PDE's
+\begin{equation}
+  \label{CactusBase_MoL_eq:mol1}
+  \partial_t {\bf q} + {\bf A}^i({\bf q}) \partial_i {\bf B}({\bf q})
+  = {\bf s}({\bf q})
+\end{equation}
+in the alternative form
+\begin{equation}
+  \label{CactusBase_MoL_eq:mol2}
+  \partial_t {\bf q} = {\bf L}({\bf q}),
+\end{equation}
+which (assuming a given discretization of space) is an ODE.
+
+Given this separation of the time and space discretizations, well
+known stable ODE integrators such as Runge-Kutta can be used to do the
+time integration. This is more modular (allowing for simple extensions
+to higher order methods), more stable (as instabilities can now only
+arise from the spatial discretization or the equations themselves) and
+also avoids the problems of retaining high orders of convergence when
+coupling different physical models.
+
+MoL can be used for hyperbolic, parabolic and even elliptic problems
+(although I definitely don't recommend the latter). As it currently
+stands it is set up for systems of equations in the first order type
+form of equation~(\ref{CactusBase_MoL_eq:mol2}). If you want to implement a
+multilevel scheme such as leapfrog it is not obvious to me that MoL is
+the thing to use. However if you have lots of thorns that you want to
+interact, for example ADM\_BSSN and a hydro code plus maybe EM or a
+scalar field, and they can easily be written in this sort of form,
+then you probably want to use MoL.
+
+This thorn is meant to provide a simple interface that will implement
+the MoL inside Cactus as transparently as possible. It will initially
+implement only the optimal Runge-Kutta time integrators (which are TVD
+up to RK3, so suitable for hydro) up to fourth order and iterated
+Crank Nicholson. All of the interaction with the MoL thorn should
+occur directly through the scheduler. For example, all synchronization
+steps should now be possible at the schedule level. This is essential
+for interacting cleanly with different drivers, especially to make
+Mesh Refinement work.
+
+For more information on the Method of Lines the most comprehensive
+references are the works of Jonathan
+Thornburg~\cite{CactusBase_MoL_Thornburg93,CactusBase_MoL_Thornburg99}
+- see especially section 7.3 of the thesis. From the CFD viewpoint the
+review of ENO methods by Shu,~\cite{CactusBase_MoL_Shu99}, has some
+information. For relativistic fluids the paper of Neilsen and
+Choptuik~\cite{CactusBase_MoL_Neilsen00} is also quite good.
+
+\section{How to use}
+\label{CactusBase_MoL_sec:use}
+
+
+\subsection{Thorn users}
+\label{CactusBase_MoL_sec:useruse}
+
+For those who used the old version of MoL, this version is
+unfortunately slightly more effort to use. That is, for most methods
+you'll now have to set 4 parameters instead of just one. 
+
+If you already have a thorn that uses the method of lines, then there
+are four main parameters that are relevant to change the integration
+method. The keyword {\tt MoL\_ODE\_Method} chooses between the
+different methods. Currently supported are {\tt RK2}, {\tt RK3}, {\tt
+  ICN}, {\tt ICN-Avg} and {\tt Generic}. These are second order
+Runge-Kutta, third order Runge-Kutta, Iterative Crank Nicholson,
+Iterative Crank Nicholson with averaging, and the generic Shu-Osher
+type Runge-Kutta methods. To switch between the different types of
+generic methods there is also the keyword {\tt Generic\_Type} which is
+currently restricted to {\tt RK} for the standard TVD Runge-Kutta
+methods (first to fourth order) and {\tt ICN} for the implementation
+of the Iterative Crank Nicholson method in generic form.
+
+Full descriptions of the currently implemented methods are given in
+section~\ref{CactusBase_MoL_sec:methods}. 
+
+The parameter {\tt MoL\_Intermediate\_Steps} controls the number of
+intermediate steps for the ODE solver. For the generic Runge-Kutta
+solvers it controls the order of accuracy of the method.  For the {\tt
+  ICN} methods this parameter controls the number of iterations taken,
+which {\bf does not check for stability}. This parameter defaults to
+3.
+
+The parameter {\tt MoL\_Num\_Scratch\_Levels} controls the amount of
+scratch space used. If this is insufficient for the method selected
+there will be an error at parameter checking time. This parameter
+defaults to 0, as no scratch space is required for the efficient ICN
+and Runge-Kutta 2 and 3 solvers. For the generic solvers this must be
+at least {\tt MoL\_Intermediate\_Steps - 1}.
+
+Another parameter is {\tt MoL\_Memory\_Always\_On} which switches on
+memory for the scratch space always if true and only during evolution
+if false. This defaults to true for speed reasons; the memory gains
+are likely to be limited unless you're doing something very memory
+intensive at initialization or analysis.
+
+There is also a parameter {\tt MoL\_NaN\_Check} that will check your
+RHS grid functions for NaNs using the {\tt NaNChecker} thorn from
+CactusUtils. This will make certain that you find the exact grid
+function computing the first NaN; of course, this may not be the real
+source of your problem.
+
+The parameter {\tt disable\_prolongation} only does anything if you
+are using mesh refinement, and in particular {\tt Carpet}. With mesh
+refinement it may be necessary to disable prolongation in intermediate
+steps of MoL. This occurs when evolving systems containing second
+spatial derivatives. This is done by default in MoL. If your system is
+purely first order in space and time you may wish to set this to {\tt "no"}.
+
+Ideally, initial data thorns should always set initial data at all time
+levels.  However, sometimes initial data thorns fail to do this.  In
+this case you can do one of three things:
+\begin{itemize}
+\item	Fix the initial data thorn.  This is the best solution.
+\item	If you're using Carpet, it has some facilities to take
+	forward/backward time steps to initialize multiple time
+	levels.  See the Carpet parameters
+	\verb|init_each_timelevel| and
+	\verb|init_3_timelevels| for details.
+\item	Finally, if you set (the MoL parameter) \verb|initial_data_is_crap|,
+	MoL will copy the current time level of all variables it
+	knows about (more precisely, using the terminology of
+	section~\ref{CactusBase_MoL_sec:writeruse}, all evolved,
+	save-and-restore, and constrained variables which have
+	multiple time levels) to all the past time levels.
+	\textbf{Note that this copies the \underline{same} data
+	to each past time level; this will be wrong if your
+	spacetime is time-dependent!}
+
+	If enabled, the copy happens in the \verb|CCTK_POSTINITIAL|
+	schedule bin.  By default this happens \emph{before}
+	the \verb|MoL_PostStep| schedule group; the parameter
+	\verb|copy_ID_after_MoL_PostStep| can be used to change
+	this to \emph{after} \verb|MoL_PostStep|.
+\end{itemize}
+
+
+\subsection{Thorn writers}
+\label{CactusBase_MoL_sec:writeruse}
+
+To port an existing thorn using the method of lines, or to write a new
+thorn using it, should hopefully be relatively simple. As an example,
+within the MoL arrangement is WaveMoL which duplicates the WaveToy
+thorn given by CactusWave in a form suitable for use by MoL. In this
+section, ``the thorn'' will mean the user thorn doing the physics.
+
+We start with some terminology. Grid functions are split into four
+cateogories.
+\begin{enumerate}
+\item The first are those that are evolved using a MoL form. That is,
+  a right hand side is calculated and the variable updated using
+  it. These we call {\it evolved} variables.
+\item The second category are those variables that are set by a thorn
+  at every intermediate step of the evolution, usually to respect the
+  constraints. Examples of these include the primitive variables in a
+  hydrodynamics code. Another example would be the gauge variables if
+  these were set by constraints at every intermediate step (which is
+  slightly artificial; the usual example would be the use of maximal
+  slicing, which is only applied once every $N$ complete steps). These
+  are known as {\it constrained} variables.
+\item The third category are those variables that a thorn depends on
+  but does not set or evolve. An example would include the metric
+  terms considered from a thorn evolving matter. Due to the way that
+  MoL deals with these, they are known as {\it Save and Restore}
+  variables.
+\item The final category are those variables that do not interact with
+  MoL. These would include temporary variables for analysis or setting
+  up the initial data. These can safely be ignored.
+\end{enumerate}
+As a generic rule of thumb, variables for which you have a time
+evolution equation are {\it evolved} (obviously), variables which your
+thorn sets but does not evolve are {\it constrained}, and any other
+variables which your thorn reads during evolution is a {\it Save and
+  Restore} variable.
+
+MoL needs to know every GF that falls in one of the first three
+groups. If a GF is evolved by one thorn but is a constrained variable
+in another (for example, the metric in full GR Hydro) then each thorn
+should register the function as they see it. For example, the hydro
+thorn will register the metric as a Save and Restore variable and the
+spacetime thorn will register the metric as an evolved variable. The
+different variable categories are given the priority evolved,
+constrained, Save and Restore. So if a variable is registered as
+belonging in two different categories, it is always considered by MoL
+to belong to the category with the highest priority.
+
+MoL needs to know the total number of GFs in each category \textit{at
+  parameter time}. To do this, your thorn needs to use some
+accumulator parameters from MoL. As an example, here are the
+paramaters from WaveMoL:
+\begin{verbatim}
+shares: MethodOfLines
+
+USES CCTK_INT MoL_Num_Evolved_Vars
+USES CCTK_INT MoL_Num_Constrained_Vars
+USES CCTK_INT MoL_Num_SaveAndRestore_Vars
+
+restricted:
+
+CCTK_INT WaveMoL_MaxNumEvolvedVars \
+    "The maximum number of evolved variables used by WaveMoL" \
+    ACCUMULATOR-BASE=MethodofLines::MoL_Num_Evolved_Vars
+{
+  5:5           :: "Just 5: phi and the four derivatives"
+} 5
+
+CCTK_INT WaveMoL_MaxNumConstrainedVars \
+    "The maximum number of constrained variables used by WaveMoL" \
+    ACCUMULATOR-BASE=MethodofLines::MoL_Num_Constrained_Vars
+{
+  0:1           :: "A small range, depending on testing or not"
+} 1
+
+CCTK_INT WaveMoL_MaxNumSandRVars \
+    "The maximum number of save and restore variables used by WaveMoL" \
+    ACCUMULATOR-BASE=MethodofLines::MoL_Num_SaveAndRestore_Vars
+{
+  0:1           :: "A small range, depending on testing or not"
+} 1
+\end{verbatim}
+This should give the \textit{maximum} number of variables that your
+thorn will register.
+
+Every thorn should register every grid function that it uses even if
+you expect it to be registered again by a different thorn. For
+example, a hydro thorn would register the metric variables as Save and
+Restore, whilst the spacetime evolution thorn would register them as
+evolved (in ADM) or constrained (in ADM\_BSSN), both of which have
+precedence. To register your GFs with MoL schedule a routine in the
+bin {\tt MoL\_Register} which just contains the relevant function
+calls.  For an evolved variable the GF corresponding to the update
+term (${\bf L}({\bf q})$ in equation~(\ref{CactusBase_MoL_eq:mol2}))
+should be registered at the same time. The appropriate functions are
+given in section~\ref{CactusBase_MoL_sec:molfns}.
+
+These functions are provided using function aliasing. For details on
+using function aliasing, see sections B10.5 and F2.2.3 of the
+UsersGuide. For the case of real GFs, you simply add the following
+lines to your \texttt{interface.ccl}:
+\begin{verbatim}
+##########################################
+### PROTOTYPES - DELETE AS APPLICABLE! ###
+##########################################
+
+CCTK_INT FUNCTION MoLRegisterEvolved(CCTK_INT EvolvedIndex, CCTK_INT RHSIndex)
+CCTK_INT FUNCTION MoLRegisterEvolvedSlow(CCTK_INT EvolvedIndex, CCTK_INT RHSIndex)
+CCTK_INT FUNCTION MoLRegisterConstrained(CCTK_INT ConstrainedIndex)
+CCTK_INT FUNCTION MoLRegisterSaveAndRestore(CCTK_INT SandRIndex)
+CCTK_INT FUNCTION MoLRegisterEvolvedGroup(CCTK_INT EvolvedIndex, \
+                                          CCTK_INT RHSIndex)
+CCTK_INT FUNCTION MoLRegisterConstrainedGroup(CCTK_INT ConstrainedIndex)
+CCTK_INT FUNCTION MoLRegisterSaveAndRestoreGroup(CCTK_INT SandRIndex)
+CCTK_INT FUNCTION MoLChangeToEvolved(CCTK_INT EvolvedIndex, CCTK_INT RHSIndex)
+CCTK_INT FUNCTION MoLChangeToEvolvedSlow(CCTK_INT EvolvedIndex, CCTK_INT RHSIndex)
+CCTK_INT FUNCTION MoLChangeToConstrained(CCTK_INT ConstrainedIndex)
+CCTK_INT FUNCTION MoLChangeToSaveAndRestore(CCTK_INT SandRIndex)
+CCTK_INT FUNCTION MoLChangeToNone(CCTK_INT RemoveIndex)
+
+#############################################
+### USE STATEMENT - DELETE AS APPLICABLE! ###
+#############################################
+
+USES FUNCTION MoLRegisterEvolved
+USES FUNCTION MoLRegisterEvolvedSlow
+USES FUNCTION MoLRegisterConstrained
+USES FUNCTION MoLRegisterSaveAndRestore
+USES FUNCTION MoLRegisterEvolvedGroup
+USES FUNCTION MoLRegisterConstrainedGroup
+USES FUNCTION MoLRegisterSaveAndRestoreGroup
+USES FUNCTION MoLChangeToEvolved
+USES FUNCTION MoLChangeToConstrained
+USES FUNCTION MoLChangeToSaveAndRestore
+USES FUNCTION MoLChangeToNone
+\end{verbatim}
+
+Note that the list of parameters not complete; see the section on
+parameters for the use of arrays. However, the
+list of functions is, and is expanded on in
+section~\ref{CactusBase_MoL_sec:molfns}.  MoL will check whether a
+group or variable is a GF or an array and whether it is real.
+
+Having done that, one routine (or group of routines) which we'll here
+call {\tt Thorn\_CalcRHS} must be defined. This does all the finite
+differencing that you'd usually do, applied to ${\bf q}$, and finds
+the right hand sides which are stored in ${\bf L}$. This routine
+should be scheduled in {\tt MoL\_CalcRHS}. The precise order that
+these are scheduled should not matter, because no updating of any of
+the user thorns ${\bf q}$ will be done until after all the RHSs are
+calculated. {\bf Important note:} all the finite differencing must be
+applied to the most recent time level ${\bf q}$ and not to the
+previous time level ${\bf q}_p$ as you would normally do. Don't worry
+about setting up the data before the calculation, as MoL will do that
+automatically.
+
+Finally, if you have some things that have to be done after each
+update to an intermediate level, these should be scheduled in {\tt
+  MoL\_PostStep}. Examples of things that need to go here include the
+recalculation of primitive variables for hydro codes, the application
+of boundary conditions\footnote{It is possible to alter the
+  calculation of {\bf L} so that boundary conditions are automatically
+  updated and do not need setting. This is slightly tricksy. For an
+  example of how this would work see the new radiative boundary
+  condition in ADM\_BSSN. For more on this see section 7.3.4
+  of~\cite{CactusBase_MoL_Thornburg93}.}, the solution of elliptic
+equations (although this would be a very expensive place to solve
+them, some sets of equations might require the updating of some
+variables by constraints in this fashion). When applying boundary
+conditions the cleanest thing to do is to write a routine applying the
+symmetries to the appropriate GFs and, when calling it from the
+scheduler, adding the {\tt SYNC} statement to the appropriate groups.
+An example is given by the routine {\tt WaveToyMoL\_Boundaries} in
+thorn WaveMoL.
+
+Points to note. The thorn routine {\tt Thorn\_CalcRHS} does not need
+to know and in fact should definitely not know where precisely in the
+MoL step it is. It just needs to know that it is receiving {\it some}
+intermediate data stored in the GFs ${\bf q}$ and that it should
+return the RHS ${\bf L}({\bf q})$. All the book-keeping to ensure that
+it is passed the correct intermediate state at that the GFs contain
+the correct data at the end of the MoL step will be dealt with by the
+MoL thorn and the flesh.
+
+When using a multirate scheme the thorn routine {\tt Thorn\_CalcRHS} must
+check the MoL grid scalars {\tt MoL::MoL\_SlowStep} and {\tt
+MoL::MoL\_SlowPostStep} which MoL sets to true (non-zero) if it is time for
+the slow sector to compute its RHS or to apply its poststep routine. {\tt
+MoL::MoL\_SlowPostStep} is always true outside of the RHS loop, eg. in {\tt
+CCTK\_POST\_RESTRICT}.
+
+\subsection{Evolution method writers}
+\label{CactusBase_MoL_sec:evol-meth-writ}
+
+If you want to try adding a new evolution method to MoL the simplest
+way is to use the generic table option to specify it completely in the
+parameter file - no coding is required at all.
+
+All the generic methods evolve the equation
+\begin{equation}
+  \label{CactusBase_MoL_eq:mol3}
+  \partial_t {\bf q} = {\bf L}({\bf q})
+\end{equation}
+using the following algorithm for an $N$-step method:
+\begin{eqnarray}
+  \label{CactusBase_MoL_eq:genrk1-scheme}
+  {\bf q}^{(0)} & = & {\bf q}^n, \nonumber \\
+  {\bf q}^{(i)} & = & \sum_{k=0}^{i-1} \left( \alpha_{ik} {\bf
+  q}^{(k)} \right) + \Delta t \beta_{i-1} {\bf L} ( {\bf q}^{(i-1)} ),
+  \qquad i = 1, \dots, N, \\
+  {\bf q}^{n+1} & = & {\bf q}^{(N)}. \nonumber
+\end{eqnarray}
+This method is completely specified by $N$ ({\tt
+  GenericIntermediateSteps}) and the $\alpha$ ({\tt
+  GenericAlphaCoeffs}) and $\beta$ ({\tt GenericBetaCoeffs})
+arrays. The names in parentheses give the keys in a table that MoL
+will use. This table is created from the string parameter {\tt
+  Generic\_Method\_Descriptor}. 
+
+As an example, the standard TVD RK2 method that is implemented both in
+optimized and generic form is written as
+\begin{eqnarray}
+  \label{CactusBase_MoL_eq:rk2-scheme}
+  {\bf q}^{(1)} & = & {\bf q}^n + \Delta t {\bf L} ({\bf q}^n), \\
+  {\bf q}^{n+1} & = & \frac{1}{2} \left( {\bf q}^n + {\bf q}^{(1)} +
+  \Delta t {\bf L} ({\bf q}^{(1)}) \right). 
+\end{eqnarray}
+To implement this using the generic table options, use
+\begin{verbatim}
+methodoflines::MoL_Intermediate_Steps = 2
+methodoflines::MoL_Num_Scratch_Levels = 1
+methodoflines::Generic_Method_Descriptor = \
+           "GenericIntermediateSteps = 2 \
+            GenericAlphaCoeffs = { 1.0 0.0 0.5 0.5 } \
+            GenericBetaCoeffs = { 1.0 0.5 }"
+\end{verbatim}
+The number of steps specified in the table must be the same as {\tt
+  MoL\_Intermediate\_Steps}, and the number of scratch levels should
+be at least {\tt MoL\_Intermediate\_Steps - 1}.
+
+The generic methods are somewhat inefficient for use in production
+runs, so it is frequently better to write an optimized version once
+you are happy with the method. To do this you should
+\begin{itemize}
+\item write your code into a new file, called from the scheduler under
+  the alias {\tt MoL\_Add},
+\item make certain that at each intermediate step the correct values
+  of {\tt cctk\_time} and {\tt cctk\_delta\_time} are set in {\tt
+    SetTime.c} for mesh refinement, boundary conditions and so on,
+\item make certain that you check for the number of intermediate steps
+  in {\tt ParamCheck.c}.
+\end{itemize}
+
+\section{Example}
+\label{CactusBase_MoL_sec:example}
+
+As a fairly extended example of how to use MoL I'll outline how
+ADM\_BSSN works in this context. The actual implementation of this is
+given in the thorn {\tt AEIThorns/BSSN\_MoL}.
+
+As normal the required variables are defined in the {\tt
+  interface.ccl} file, together with the associated source terms. For
+example, the conformal factor and source are defined by
+
+\begin{verbatim}
+real ADM_BSSN_phi type=GF timelevels=2
+{
+  ADM_BS_phi
+} "ADM_BSSN_phi"
+
+real ADM_BSSN_sources type=GF
+{
+...,
+  adm_bs_sphi,
+...
+}
+\end{verbatim}
+Also in this file we write the function aliasing prototypes.
+
+Once the sources are defined the registration with MoL is required,
+for which the essential file is {\tt MoLRegister.c}. In the ADM\_BSSN
+system the standard metric coefficients $g_{ij}$ are not evolved, and
+neither are the standard extrinsic curvature components $K_{ij}$.
+However these are used by ADM\_BSSN in a number of places, and are
+calculated from evolved quantities at the appropriate points.  In the
+MoL terminology these variables are {\it constrained}. As the
+appropriate storage is defined in thorn ADMBase, the actual calls have
+the form
+
+\begin{verbatim}
+ ierr += MoLRegisterConstrained(CCTK_VarIndex("ADMBase::kxx"));
+\end{verbatim}
+
+\noindent The actual evolved variables include things such as the
+conformal factor. This, and the appropriate source term, is defined in
+thorn ADM\_BSSN, and so the call has the form
+
+\begin{verbatim} 
+ ierr += MoLRegisterEvolved(CCTK_VarIndex("adm_bssn::ADM_BS_phi"),
+                            CCTK_VarIndex("adm_bssn::adm_bs_sphi")); 
+\end{verbatim}
+
+
+As well as the evolved variables, and those constrained variables such
+as the metric, there are the gauge variables. Precisely what status
+these have depends on how they are set. If harmonic or 1+log slicing
+is used then the lapse is evolved:
+
+\begin{verbatim}
+ ierr += MoLRegisterEvolved(CCTK_VarIndex("ADMBase::alp"),
+                            CCTK_VarIndex("adm_bssn::adm_bs_salp")); 
+\end{verbatim}
+
+\noindent A matter density $\rho$ might not require such a high order scheme
+and can be evolved using a multi-rate scheme
+
+\begin{verbatim}
+ ierr += MoLRegisterEvolvedSlow(CCTK_VarIndex("GRHydro::dens"),
+                                CCTK_VarIndex("GRHydro::dendsrhs")); 
+\end{verbatim}
+
+\noindent If maximal or static slicing is used then the lapse is a
+constrained variable\footnote{Note that this is actually a bit of a
+  hack. The rational for {\it Save and Restore} variables was to deal
+  with maximal slicing. However it turned out that I hadn't thought it
+  through correctly and that the treatment for constrained variables
+  was required.}:
+
+\begin{verbatim}
+ ierr += MoLRegisterConstrained(CCTK_VarIndex("ADMBase::alp"));
+\end{verbatim}
+
+\noindent Finally, if none of the above apply we assume that the lapse
+is evolved in some unknown fashion, and so it must be registered as a
+Save and Restore variable:
+
+\begin{verbatim}
+ ierr += MoLRegisterSaveAndRestore(CCTK_VarIndex("ADMBase::alp"));
+\end{verbatim}
+
+However, it is perfectly possible that we may wish to change how we
+deal with the gauge during the evolution. This is dealt with in the
+file {\tt PreLoop.F}. If the slicing changes then the appropriate
+routine is called. For example, if we want to use 1+log evolution then
+we call 
+
+\begin{verbatim}
+ call CCTK_VarIndex(lapseindex,"ADMBase::alp")
+ call CCTK_VarIndex(lapserhsindex,"adm_bssn::adm_bs_salp")
+ ierr = ierr + MoLChangeToEvolved(lapseindex, lapserhsindex)
+\end{verbatim}
+
+\noindent It is not required to tell MoL what the lapse is changing
+{\it from}, or indeed if it is changing at all; MoL will work this out
+for itself.
+
+Finally there are the routines that we wish to apply after every
+intermediate step. These are {\tt ADM\_BSSN\_removetrA} which enforces
+various constraints (such as the tracefree conformal extrinsic
+curvature remaining trace free), {\tt ADM\_BSSN\_Boundaries} which
+applies symmetry boundary conditions as well as various others (such
+as some of the radiative boundary conditions). Note all the calls to
+{\tt SYNC} at this point. We also convert from the updated BSSN
+variables back to the standard ADM variables in {\tt
+  ADM\_BSSN\_StandardVariables}, and also update the time derivative
+of the lapse in {\tt ADM\_BSSN\_LapseChange}.
+
+\section{Time evolution methods provided by MoL}
+\label{CactusBase_MoL_sec:methods}
+
+The default method is Iterative Crank-Nicholson. There are many ways
+of implementing this. The standard {\tt "ICN"} and {\tt
+  "Generic"}/{\tt"ICN"} methods both implement the following, assuming
+an $N$ iteration method:
+\begin{eqnarray}
+  \label{CactusBase_MoL_eq:icn}
+  {\bf q}^{(0)} & = & {\bf q}^{n}, \\
+  {\bf q}^{(i)} & = & {\bf q}^{(0)} + \frac{\Delta t}{2} {\bf L}({\bf
+    q}^{(i-1)}), \quad i = 1,\dots,N-1, \\
+  {\bf q}^{(N)} & = & {\bf q}^{(N-1)} + \Delta t {\bf L}({\bf
+    q}^{(N-1)}), \\
+  {\bf q}^{n+1} & = & {\bf q}^{(N)}
+\end{eqnarray}
+
+The ``averaging'' ICN method {\tt "ICN-avg"} instead calculates
+intermediate steps before averaging:
+\begin{eqnarray}
+  \label{CactusBase_MoL_eq:icn-avg}
+  {\bf q}^{(0)} & = & {\bf q}^{n}, \\
+  \tilde{{\bf q}}^{(i)} & = & \frac{1}{2}\left( {\bf q}^{(i)} + {\bf
+      q}^{n} \right), \quad i = 0,\dots,N-1 \\
+  {\bf q}^{(i)} & = & {\bf q}^{(0)} +  \Delta t {\bf L}(\tilde{{\bf
+      q}}^{(N-1)}), \\
+  {\bf q}^{n+1} & = & {\bf q}^{(N)}
+\end{eqnarray}
+
+The Runge-Kutta methods are those typically used in hydrodynamics by,
+e.g., Shu and others --- see~\cite{CactusBase_MoL_Shu99} for
+example. Explicitly the first order method is the Euler method:
+\begin{eqnarray}
+  \label{CactusBase_MoL_eq:rk1}
+  {\bf q}^{(0)} & = & {\bf q}^{n}, \\
+  {\bf q}^{(1)} & = & {\bf q}^{(0)} +  \Delta t {\bf L}(\tilde{{\bf
+      q}}^{(0)}), \\
+  {\bf q}^{n+1} & = & {\bf q}^{(1)}.
+\end{eqnarray}
+The second order method is:
+\begin{eqnarray}
+  \label{CactusBase_MoL_eq:rk2}
+  {\bf q}^{(0)} & = & {\bf q}^{n}, \\
+  {\bf q}^{(1)} & = & {\bf q}^{(0)} + \Delta t {\bf L} ({\bf q}^{(0)}), \\
+  {\bf q}^{(2)} & = & \frac{1}{2} \left( {\bf q}^{(0)} + {\bf q}^{(1)}
+    + \Delta t {\bf L} ({\bf q}^{(1)}) \right), \\
+  {\bf q}^{n+1} & = & {\bf q}^{(2)}.
+\end{eqnarray}
+The third order method is:
+\begin{eqnarray}
+  \label{CactusBase_MoL_eq:rk3}
+  {\bf q}^{(0)} & = & {\bf q}^{n}, \\
+  {\bf q}^{(1)} & = & {\bf q}^{(0)} + \Delta t {\bf L} ({\bf q}^{(0)}), \\
+  {\bf q}^{(2)} & = & \frac{1}{4} \left( 3 {\bf q}^{(0)} + {\bf q}^{(1)} +
+    \Delta t {\bf L} ({\bf q}^{(1)}) \right), \\
+  {\bf q}^{(3)} & = & \frac{1}{3} \left( {\bf q}^{(0)} + 2 {\bf
+      q}^{(2)} + 2 \Delta t {\bf L} ({\bf q}^{(2)}) \right), \\
+  {\bf q}^{n+1} & = & {\bf q}^{(3)}.
+\end{eqnarray}
+The fourth order method, which is not strictly TVD, is:
+\begin{eqnarray}
+  \label{CactusBase_MoL_eq:rk4}
+  {\bf q}^{(0)} & = & {\bf q}^{n}, \\
+  {\bf q}^{(1)} & = & {\bf q}^{(0)} + \frac{1}{2} \Delta t {\bf L}
+  ({\bf q}^{(0)}), \\ 
+  {\bf q}^{(2)} & = & {\bf q}^{(0)} + \frac{1}{2} \Delta t {\bf L}
+  ({\bf q}^{(1)}), \\ 
+  {\bf q}^{(3)} & = & {\bf q}^{(0)} + \Delta t {\bf L} ({\bf
+    q}^{(2)}), \\  
+  {\bf q}^{(4)} & = & \frac{1}{6} \left( - 2 {\bf q}^{(0)} + 2 {\bf
+      q}^{(1)} + 4 {\bf q}^{(2)} + 2 {\bf q}^{(3)} + \Delta t{\bf L}
+    ({\bf q}^{(3)}) \right), \\
+  {\bf q}^{n+1} & = & {\bf q}^{(4)}.
+\end{eqnarray}
+
+\subsection{Multirate methods}
+\label{CactusBase_MoL_sec:multiratemol}
+% text originally by Christian Reisswig for the GRHydroMP paper
+A scheme for coupling different parts of a system of equations
+\begin{eqnarray}
+\partial_t \mathbf{g} &=& \mathbf{F}(\mathbf{g},\mathbf{q}) \label{eq:CactusBase_MoL_intmetric}, \\
+\partial_t \mathbf{q} &=& \mathbf{G}(\mathbf{g},\mathbf{q}) \label{eq:CactusBase_MoL_intmatter},
+\end{eqnarray}
+representing eg. spacetime and matter variables, respectively, with different RK integrators is 
+given by \emph{multirate} RK schemes (e.g.~\cite{CactusBase_MoL_schlegel:09, CactusBase_MoL_constantinescu:07}).
+Here, we pursuit the simple Ansatz of performing one RK2 intermediate RHS evaluation for two RK4 intermediate RHS evaluations.
+That is, the additional RK4 intermediate RHS evaluations simple use the results from the last intermediate RK2 step.
+
+To be more explicit, given the equation
+\begin{equation}
+\partial_t y = f(t,y)\,,
+\end{equation}
+where $f$ corresponds to the RHS possibly including spatial derivatives,
+we write a generic RK scheme according to
+\begin{eqnarray}
+y_{n+1} &=& y_n + \Delta t \sum_{i=1}^s b_i\, k_i\,, \\
+k_i &=& f(t_n + c_i \Delta t\,, y_n + \Delta t \sum_{j=1}^s a_{ij} k_j)\,.
+\end{eqnarray}
+The coefficients $b_i$, $c_i$, and $a_{ij}$ can be written in the standard Butcher
+notation.
+
+In our multirate scheme, we use two different sets of coefficients. 
+One set of coefficients determines the RK4 scheme used for integrating the spacetime variables \eqref{eq:CactusBase_MoL_intmetric}, the other set determines the RK2 scheme for the
+hydro variables \eqref{eq:CactusBase_MoL_intmatter}. The coefficients for the RK2 scheme are arranged such that RHS evaluations coincide with
+RK4 RHS evaluations.
+We list the corresponding multirate Butcher tableau in Table~\ref{tab:CactusBase_MoL_Multirate_butcher}.
+
+\begin{table}[th]
+\caption{Butcher tableau for an explicit multirate RK4/RK2 scheme. The right table (separated by the double vertical line) shows
+the coefficients $b_i$ (bottom line), $c_i$ (first vertical column), and $a_{ij}$ for the classical RK4 scheme.
+The left table shows the corresponding RK2 coefficients evaluated at timesteps that coincide with RK4 timesteps.}
+\label{tab:CactusBase_MoL_Multirate_butcher}
+\begin{tabular}{l|llll||l|llll}
+0 &     &   &   &          &   0   & & \\ 
+0 & 0   &   &   &          &   1/2 & 1/2\\
+0 & 0   & 0 &   &          &   1/2 & 0   & 1/2 &     & \\
+1 & 1   & 0 & 0 &          &   1   & 0   & 0   & 1/2 & \\
+\hline
+ & 1/2 & 0 & 0 & 1/2 &     & 1/3 & 1/6 & 1/6 & 1/3\\
+\end{tabular}
+\end{table}
+
+
+\section{Functions provided by MoL}
+\label{CactusBase_MoL_sec:molfns}
+
+All the functions listed below return error codes in theory. However
+at this current point in time they always return 0 (success). Any
+failure to register or change a GF is assumed fatal and MoL will
+issue a level 0 warning stopping the code. This may change in future,
+in which case negative return values will indicate errors.
+
+These are all \textit{aliased} functions. You can get the functions
+directly through header files, but this feature may be phased
+out. Using function aliasing is the recommended method.
+
+\begin{FunctionDescription}{MoLRegisterEvolved}
+  \label{CactusBase_MoL_MoLRegisterEvolved}
+  
+  Tells MoL that the given GF is in the evolved category with the
+  associated update GF.
+
+  \begin{SynopsisSection}
+    \begin{Synopsis}{C}
+\begin{verbatim}
+CCTK_INT ierr = MoLRegisterEvolved(CCTK_INT EvolvedIndex, 
+                                   CCTK_INT RHSIndex)
+CCTK_INT ierr = MoLRegisterEvolvedSlow(CCTK_INT EvolvedIndex, 
+                                       CCTK_INT RHSIndex)
+\end{verbatim}
+    \end{Synopsis}
+    \begin{Synopsis}{Fortran}
+\begin{verbatim}
+CCTK_INT ierr = MoLRegisterEvolved(CCTK_INT EvolvedIndex,
+                                   CCTK_INT RHSIndex)
+CCTK_INT ierr = MoLRegisterEvolvedSlow(CCTK_INT EvolvedIndex,
+                                       CCTK_INT RHSIndex)
+\end{verbatim}
+    \end{Synopsis}
+  \end{SynopsisSection}
+
+  \begin{ResultSection}
+    \begin{ResultNote}
+      Currently if there is an error, MoL will issue a level 0
+      warning. No sensible return codes exist.
+    \end{ResultNote}
+    \begin{Result}{\rm 0}
+      success
+    \end{Result}
+  \end{ResultSection}
+
+  \begin{ParameterSection}
+    \begin{Parameter}{EvolvedIndex}
+      Index of the GF to be evolved.
+    \end{Parameter}
+    \begin{Parameter}{RHSIndex}
+      Index of the associated update GF.
+    \end{Parameter}
+  \end{ParameterSection}
+
+  \begin{Discussion}
+    Should be called in a function scheduled in {\tt MoL\_Register}. Use the
+    {\tt Slow} variant to register the slow sector of a multirate scheme.
+  \end{Discussion}
+
+  \begin{SeeAlsoSection}
+    \begin{SeeAlso}{CCTK\_VarIndex()}
+      Get the variable index.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLRegisterSaveAndRestore()}
+      Register Save and Restore variables.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLRegisterConstrained()}
+      Register constrained variables.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLChangeToEvolved()}
+      Change a variable at runtime to be evolved.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLChangeToEvolvedSlow()}
+      Change a variable at runtime to be evolved in the slow sector.
+    \end{SeeAlso}
+  \end{SeeAlsoSection}
+
+  \begin{ExampleSection}
+    \begin{Example}{C}
+\begin{verbatim}
+ierr = MoLRegisterEvolved(CCTK_VarIndex("wavetoymol::phi"),
+                          CCTK_VarIndex("wavetoymol::phirhs"));
+\end{verbatim}
+    \end{Example}
+    \begin{Example}{Fortran}
+\begin{verbatim}
+call CCTK_VarIndex(EvolvedIndex, "wavetoymol::phi")
+call CCTK_VarIndex(RHSIndex, "wavetoymol::phirhs")
+ierr = MoLRegisterEvolved(EvolvedIndex, RHSIndex)
+\end{verbatim}
+    \end{Example}
+  \end{ExampleSection}
+
+\end{FunctionDescription}
+
+
+
+\begin{FunctionDescription}{MoLRegisterConstrained}
+  \label{CactusBase_MoL_MoLRegisterConstrained}
+  
+  Tells MoL that the given GF is in the constrained category.
+
+  \begin{SynopsisSection}
+    \begin{Synopsis}{C}
+\begin{verbatim}
+CCTK_INT ierr = MoLRegisterConstrained(CCTK_INT ConstrainedIndex)
+\end{verbatim}
+    \end{Synopsis}
+    \begin{Synopsis}{Fortran}
+\begin{verbatim}
+CCTK_INT ierr = MoLRegisterConstrained(CCTK_INT ConstrainedIndex)
+\end{verbatim}
+    \end{Synopsis}
+  \end{SynopsisSection}
+
+  \begin{ResultSection}
+    \begin{ResultNote}
+      Currently if there is an error, MoL will issue a level 0
+      warning. No sensible return codes exist.
+    \end{ResultNote}
+    \begin{Result}{\rm 0}
+      success
+    \end{Result}
+  \end{ResultSection}
+
+  \begin{ParameterSection}
+    \begin{Parameter}{ConstrainedIndex}
+      Index of the constrained GF.
+    \end{Parameter}
+  \end{ParameterSection}
+
+  \begin{Discussion}
+    Should be called in a function scheduled in {\tt MoL\_Register}.
+  \end{Discussion}
+
+  \begin{SeeAlsoSection}
+    \begin{SeeAlso}{CCTK\_VarIndex()}
+      Get the variable index.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLRegisterEvolved()}
+      Register evolved variables.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLRegisterSaveAndRestore()}
+      Register Save and Restore variables.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLChangeToConstrained()}
+      Change a variable at runtime to be constrained.
+    \end{SeeAlso}
+  \end{SeeAlsoSection}
+
+  \begin{ExampleSection}
+    \begin{Example}{C}
+\begin{verbatim}
+ierr = MoLRegisterConstrained(CCTK_VarIndex("ADMBase::alp"));
+\end{verbatim}
+    \end{Example}
+    \begin{Example}{Fortran}
+\begin{verbatim}
+call CCTK_VarIndex(ConstrainedIndex, "ADMBase::alp")
+ierr = MoLRegisterConstrained(ConstrainedIndex)
+\end{verbatim}
+    \end{Example}
+  \end{ExampleSection}
+
+\end{FunctionDescription}
+
+
+
+\begin{FunctionDescription}{MoLRegisterSaveAndRestore}
+  \label{CactusBase_MoL_MoLRegisterSaveAndRestore}
+  
+  Tells MoL that the given GF is in the Save and Restore category.
+
+  \begin{SynopsisSection}
+    \begin{Synopsis}{C}
+\begin{verbatim}
+CCTK_INT ierr = MoLRegisterSaveAndRestore(CCTK_INT SandRIndex)
+\end{verbatim}
+    \end{Synopsis}
+    \begin{Synopsis}{Fortran}
+\begin{verbatim}
+CCTK_INT ierr = MoLRegisterSaveAndRestore(CCTK_INT SandRIndex)
+\end{verbatim}
+    \end{Synopsis}
+  \end{SynopsisSection}
+
+  \begin{ResultSection}
+    \begin{ResultNote}
+      Currently if there is an error, MoL will issue a level 0
+      warning. No sensible return codes exist.
+    \end{ResultNote}
+    \begin{Result}{\rm 0}
+      success
+    \end{Result}
+  \end{ResultSection}
+
+  \begin{ParameterSection}
+    \begin{Parameter}{SandRIndex}
+      Index of the Save and Restore GF.
+    \end{Parameter}
+  \end{ParameterSection}
+
+  \begin{Discussion}
+    Should be called in a function scheduled in {\tt MoL\_Register}.
+  \end{Discussion}
+
+  \begin{SeeAlsoSection}
+    \begin{SeeAlso}{CCTK\_VarIndex()}
+      Get the variable index.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLRegisterEvolved()}
+      Register evolved variables.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLRegisterConstrained()}
+      Register constrained variables.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLChangeToSaveAndRestore()}
+      Change a variable at runtime to be Save and Restore.
+    \end{SeeAlso}
+  \end{SeeAlsoSection}
+
+  \begin{ExampleSection}
+    \begin{Example}{C}
+\begin{verbatim}
+ierr = MoLRegisterSaveAndRestore(CCTK_VarIndex("ADMBase::alp"));
+\end{verbatim}
+    \end{Example}
+    \begin{Example}{Fortran}
+\begin{verbatim}
+call CCTK_VarIndex(SandRIndex, "ADMBase::alp")
+ierr = MoLRegisterSaveAndRestore(SandRIndex)
+\end{verbatim}
+    \end{Example}
+  \end{ExampleSection}
+
+\end{FunctionDescription}
+
+
+
+\begin{FunctionDescription}{MoLRegisterEvolvedGroup}
+  \label{CactusBase_MoL_MoLRegisterEvolvedGroup}
+  
+  Tells MoL that the given group is in the evolved category with the
+  associated update group.
+
+  \begin{SynopsisSection}
+    \begin{Synopsis}{C}
+\begin{verbatim}
+CCTK_INT ierr = MoLRegisterEvolvedGroup(CCTK_INT EvolvedIndex, 
+                                        CCTK_INT RHSIndex)
+CCTK_INT ierr = MoLRegisterEvolvedGroupSlow(CCTK_INT EvolvedIndex, 
+                                            CCTK_INT RHSIndex)
+\end{verbatim}
+    \end{Synopsis}
+    \begin{Synopsis}{Fortran}
+\begin{verbatim}
+CCTK_INT ierr = MoLRegisterEvolvedGroup(CCTK_INT EvolvedIndex, 
+                                        CCTK_INT RHSIndex)
+CCTK_INT ierr = MoLRegisterEvolvedGroupSlow(CCTK_INT EvolvedIndex, 
+                                            CCTK_INT RHSIndex)
+\end{verbatim}
+    \end{Synopsis}
+  \end{SynopsisSection}
+
+  \begin{ResultSection}
+    \begin{ResultNote}
+      Currently if there is an error, MoL will issue a level 0
+      warning. No sensible return codes exist.
+    \end{ResultNote}
+    \begin{Result}{\rm 0}
+      success
+    \end{Result}
+  \end{ResultSection}
+
+  \begin{ParameterSection}
+    \begin{Parameter}{EvolvedIndex}
+      Index of the group to be evolved.
+    \end{Parameter}
+    \begin{Parameter}{RHSIndex}
+      Index of the associated update group.
+    \end{Parameter}
+  \end{ParameterSection}
+
+  \begin{Discussion}
+    Should be called in a function scheduled in {\tt MoL\_Register}. Use the
+    {\tt Slow} variant to register the slow sector of a multirate scheme.
+  \end{Discussion}
+
+  \begin{SeeAlsoSection}
+    \begin{SeeAlso}{CCTK\_GroupIndex()}
+      Get the group index.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLRegisterSaveAndRestoreGroup()}
+      Register Save and Restore variables.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLRegisterConstrainedGroup()}
+      Register constrained variables.
+    \end{SeeAlso}
+  \end{SeeAlsoSection}
+
+  \begin{ExampleSection}
+    \begin{Example}{C}
+\begin{verbatim}
+ierr = MoLRegisterEvolvedGroup(CCTK_GroupIndex("wavetoymol::scalarevolvemol"),
+                               CCTK_GroupIndex("wavetoymol::scalarevolvemolrhs"));
+\end{verbatim}
+    \end{Example}
+    \begin{Example}{Fortran}
+\begin{verbatim}
+call CCTK_GroupIndex(EvolvedIndex, "wavetoymol::scalarevolvemol")
+call CCTK_GroupIndex(RHSIndex, "wavetoymol::scalarevolvemolrhs")
+ierr = MoLRegisterEvolvedGroup(EvolvedIndex, RHSIndex)
+\end{verbatim}
+    \end{Example}
+  \end{ExampleSection}
+
+\end{FunctionDescription}
+
+
+
+\begin{FunctionDescription}{MoLRegisterConstrainedGroup}
+  \label{CactusBase_MoL_MoLRegisterConstrainedGroup}
+  
+  Tells MoL that the given group is in the constrained category.
+
+  \begin{SynopsisSection}
+    \begin{Synopsis}{C}
+\begin{verbatim}
+CCTK_INT ierr = MoLRegisterConstrainedGroup(CCTK_INT ConstrainedIndex)
+\end{verbatim}
+    \end{Synopsis}
+    \begin{Synopsis}{Fortran}
+\begin{verbatim}
+CCTK_INT ierr = MoLRegisterConstrainedGroup(CCTK_INT ConstrainedIndex)
+\end{verbatim}
+    \end{Synopsis}
+  \end{SynopsisSection}
+
+  \begin{ResultSection}
+    \begin{ResultNote}
+      Currently if there is an error, MoL will issue a level 0
+      warning. No sensible return codes exist.
+    \end{ResultNote}
+    \begin{Result}{\rm 0}
+      success
+    \end{Result}
+  \end{ResultSection}
+
+  \begin{ParameterSection}
+    \begin{Parameter}{ConstrainedIndex}
+      Index of the constrained group.
+    \end{Parameter}
+  \end{ParameterSection}
+
+  \begin{Discussion}
+    Should be called in a function scheduled in {\tt MoL\_Register}.
+  \end{Discussion}
+
+  \begin{SeeAlsoSection}
+    \begin{SeeAlso}{CCTK\_GroupIndex()}
+      Get the group index.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLRegisterEvolvedGroup()}
+      Register evolved variables.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLRegisterSaveAndRestoreGroup()}
+      Register Save and Restore variables.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLChangeToConstrained()}
+      Change a variable at runtime to be constrained.
+    \end{SeeAlso}
+  \end{SeeAlsoSection}
+
+  \begin{ExampleSection}
+    \begin{Example}{C}
+\begin{verbatim}
+ierr = MoLRegisterConstrainedGroup(CCTK_GroupIndex("ADMBase::lapse"));
+\end{verbatim}
+    \end{Example}
+    \begin{Example}{Fortran}
+\begin{verbatim}
+call CCTK_GroupIndex(ConstrainedIndex, "ADMBase::lapse")
+ierr = MoLRegisterConstrainedGroup(ConstrainedIndex)
+\end{verbatim}
+    \end{Example}
+  \end{ExampleSection}
+
+\end{FunctionDescription}
+
+
+
+\begin{FunctionDescription}{MoLRegisterSaveAndRestoreGroup}
+  \label{CactusBase_MoL_MoLRegisterSaveAndRestoreGroup}
+  
+  Tells MoL that the given group is in the Save and Restore category.
+
+  \begin{SynopsisSection}
+    \begin{Synopsis}{C}
+\begin{verbatim}
+CCTK_INT ierr = MoLRegisterSaveAndRestoreGroup(CCTK_INT SandRIndex)
+\end{verbatim}
+    \end{Synopsis}
+    \begin{Synopsis}{Fortran}
+\begin{verbatim}
+CCTK_INT ierr = MoLRegisterSaveAndRestoreGroup(CCTK_INT SandRIndex)
+\end{verbatim}
+    \end{Synopsis}
+  \end{SynopsisSection}
+
+  \begin{ResultSection}
+    \begin{ResultNote}
+      Currently if there is an error, MoL will issue a level 0
+      warning. No sensible return codes exist.
+    \end{ResultNote}
+    \begin{Result}{\rm 0}
+      success
+    \end{Result}
+  \end{ResultSection}
+
+  \begin{ParameterSection}
+    \begin{Parameter}{SandRIndex}
+      Index of the save and restore group.
+    \end{Parameter}
+  \end{ParameterSection}
+
+  \begin{Discussion}
+    Should be called in a function scheduled in {\tt MoL\_Register}.
+  \end{Discussion}
+
+  \begin{SeeAlsoSection}
+    \begin{SeeAlso}{CCTK\_GroupIndex()}
+      Get the group index.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLRegisterEvolvedGroup()}
+      Register evolved variables.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLRegisterConstrainedGroup()}
+      Register constrained variables.
+    \end{SeeAlso}
+  \end{SeeAlsoSection}
+
+  \begin{ExampleSection}
+    \begin{Example}{C}
+\begin{verbatim}
+ierr = MoLRegisterSaveAndRestoreGroup(CCTK_GroupIndex("ADMBase::shift"));
+\end{verbatim}
+    \end{Example}
+    \begin{Example}{Fortran}
+\begin{verbatim}
+call CCTK_GroupIndex(SandRIndex, "ADMBase::shift")
+ierr = MoLRegisterSaveAndRestoreGroup(SandRIndex)
+\end{verbatim}
+    \end{Example}
+  \end{ExampleSection}
+
+\end{FunctionDescription}
+
+
+
+\begin{FunctionDescription}{MoLChangeToEvolved}
+  \label{CactusBase_MoL_MoLChangeToEvolved}
+
+  Sets a GF to belong to the evolved category, with the associated
+  update GF. Not used for the initial setting.
+
+  \begin{SynopsisSection}
+    \begin{Synopsis}{C}
+\begin{verbatim}
+CCTK_INT ierr = MoLChangeToEvolved(CCTK_INT EvolvedIndex, 
+                                   CCTK_INT RHSIndex)
+CCTK_INT ierr = MoLChangeToEvolvedSlow(CCTK_INT EvolvedIndex, 
+                                       CCTK_INT RHSIndex)
+\end{verbatim}
+    \end{Synopsis}
+    \begin{Synopsis}{Fortran}
+\begin{verbatim}
+CCTK_INT ierr = MoLChangeToEvolvedSlow(CCTK_INT EvolvedIndex, 
+                                       CCTK_INT RHSIndex)
+\end{verbatim}
+    \end{Synopsis}
+  \end{SynopsisSection}
+
+  \begin{ResultSection}
+    \begin{ResultNote}
+      Currently if there is an error, MoL will issue a level 0
+      warning. No sensible return codes exist.
+    \end{ResultNote}
+    \begin{Result}{\rm 0}
+      success
+    \end{Result}
+  \end{ResultSection}
+
+  \begin{ParameterSection}
+    \begin{Parameter}{EvolvedIndex}
+      Index of the evolved GF.
+    \end{Parameter}
+    \begin{Parameter}{RHSIndex}
+      Index of the associated update GF.
+    \end{Parameter}
+  \end{ParameterSection}
+
+  \begin{Discussion}
+    Should be called in a function scheduled in {\tt MoL\_PreStep}.
+    Note that this function was designed to allow mixed slicings for
+    thorn ADMBase. This set of functions is largely untested and
+    should be used with great care.
+  \end{Discussion}
+
+  \begin{SeeAlsoSection}
+    \begin{SeeAlso}{CCTK\_VarIndex()}
+      Get the variable index.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLRegisterEvolved()}
+      Register evolved variables.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLChangeToSaveAndRestore()}
+      Change a variable at runtime to be Save and Restore.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLChangeToConstrained()}
+      Change a variable at runtime to be constrained.
+    \end{SeeAlso}
+  \end{SeeAlsoSection}
+
+  \begin{ExampleSection}
+    \begin{Example}{C}
+\begin{verbatim}
+ierr = MoLChangeToEvolved(CCTK_VarIndex("ADMBase::alp"),
+                          CCTK_VarIndex("adm_bssn::adm_bs_salp"));
+\end{verbatim}
+    \end{Example}
+    \begin{Example}{Fortran}
+\begin{verbatim}
+call CCTK_VarIndex(EvolvedIndex, "ADMBase::alp")
+call CCTK_VarIndex(RHSIndex,"adm_bssn::adm_bs_salp")
+ierr = MoLChangeToEvolved(EvolvedIndex, RHSIndex)
+\end{verbatim}
+    \end{Example}
+  \end{ExampleSection}
+
+\end{FunctionDescription}
+
+
+
+\begin{FunctionDescription}{MoLChangeToConstrained}
+  \label{CactusBase_MoL_MoLChangeToConstrained}
+  
+  Sets a GF to belong to the constrained category. Not used for the
+  initial setting.
+
+  \begin{SynopsisSection}
+    \begin{Synopsis}{C}
+\begin{verbatim}
+CCTK_INT ierr = MoLChangeToConstrained(CCTK_INT EvolvedIndex)
+\end{verbatim}
+    \end{Synopsis}
+    \begin{Synopsis}{Fortran}
+\begin{verbatim}
+CCTK_INT ierr = MoLChangeToConstrained(CCTK_INT EvolvedIndex)
+\end{verbatim}
+    \end{Synopsis}
+  \end{SynopsisSection}
+
+  \begin{ResultSection}
+    \begin{ResultNote}
+      Currently if there is an error, MoL will issue a level 0
+      warning. No sensible return codes exist.
+    \end{ResultNote}
+    \begin{Result}{\rm 0}
+      success
+    \end{Result}
+  \end{ResultSection}
+
+  \begin{ParameterSection}
+    \begin{Parameter}{ConstrainedIndex}
+      Index of the constrained GF.
+    \end{Parameter}
+  \end{ParameterSection}
+
+  \begin{Discussion}
+    Should be called in a function scheduled in {\tt MoL\_PreStep}.
+    Note that this function was designed to allow mixed slicings for
+    thorn ADMBase. This set of functions is largely untested and
+    should be used with great care.
+  \end{Discussion}
+
+  \begin{SeeAlsoSection}
+    \begin{SeeAlso}{CCTK\_VarIndex()}
+      Get the variable index.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLRegisterConstrained()}
+      Register constrained variables.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLChangeToSaveAndRestore()}
+      Change a variable at runtime to be Save and Restore.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLChangeToEvolved()}
+      Change a variable at runtime to be evolved.
+    \end{SeeAlso}
+  \end{SeeAlsoSection}
+
+  \begin{ExampleSection}
+    \begin{Example}{C}
+\begin{verbatim}
+ierr = MoLChangeToConstrained(CCTK_VarIndex("ADMBase::alp"));
+\end{verbatim}
+    \end{Example}
+    \begin{Example}{Fortran}
+\begin{verbatim}
+call CCTK_VarIndex(EvolvedIndex, "ADMBase::alp")
+ierr = MoLChangeToConstrained(EvolvedIndex)
+\end{verbatim}
+    \end{Example}
+  \end{ExampleSection}
+
+\end{FunctionDescription}
+
+
+
+\begin{FunctionDescription}{MoLChangeToSaveAndRestore}
+  \label{CactusBase_MoL_MoLChangeToSaveAndRestore}
+  
+  Sets a GF to belong to the Save and Restore category. Not used for the
+  initial setting.
+
+  \begin{SynopsisSection}
+    \begin{Synopsis}{C}
+\begin{verbatim}
+CCTK_INT ierr = MoLChangeToSaveAndRestore(CCTK_INT SandRIndex)      
+\end{verbatim}
+    \end{Synopsis}
+    \begin{Synopsis}{Fortran}
+\begin{verbatim}
+CCTK_INT ierr = MoLChangeToSaveAndRestore(CCTK_INT SandRIndex)    
+\end{verbatim}
+    \end{Synopsis}
+  \end{SynopsisSection}
+
+  \begin{ResultSection}
+    \begin{ResultNote}
+      Currently if there is an error, MoL will issue a level 0
+      warning. No sensible return codes exist.
+    \end{ResultNote}
+    \begin{Result}{\rm 0}
+      success
+    \end{Result}
+  \end{ResultSection}
+
+  \begin{ParameterSection}
+    \begin{Parameter}{SandRIndex}
+      Index of the Save and Restore GF.
+    \end{Parameter}
+  \end{ParameterSection}
+
+  \begin{Discussion}
+    Should be called in a function scheduled in {\tt MoL\_PreStep}.
+    Note that this function was designed to allow mixed slicings for
+    thorn ADMBase. This set of functions is largely untested and
+    should be used with great care.
+  \end{Discussion}
+
+  \begin{SeeAlsoSection}
+    \begin{SeeAlso}{CCTK\_VarIndex()}
+      Get the variable index.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLRegisterSaveAndRestore()}
+      Register Save and Restore variables.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLChangeToEvolved()}
+      Change a variable at runtime to be evolved.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLChangeToConstrained()}
+      Change a variable at runtime to be constrained.
+    \end{SeeAlso}
+  \end{SeeAlsoSection}
+
+  \begin{ExampleSection}
+    \begin{Example}{C}
+\begin{verbatim}
+ierr = MoLChangeToSaveAndRestore(CCTK_VarIndex("ADMBase::alp"));
+\end{verbatim}
+    \end{Example}
+    \begin{Example}{Fortran}
+\begin{verbatim}
+call CCTK_VarIndex(SandRIndex, "ADMBase::alp")
+ierr = MoLChangeToSaveAndRestore(SandRIndex)
+\end{verbatim}
+    \end{Example}
+  \end{ExampleSection}
+
+\end{FunctionDescription}
+
+
+
+\begin{FunctionDescription}{MoLChangeToNone}
+  \label{CactusBase_MoL_MoLChangeToNone}
+  
+  Sets a GF to belong to the ``unknown'' category. Not used for the
+  initial setting.
+
+  \begin{SynopsisSection}
+    \begin{Synopsis}{C}
+\begin{verbatim}
+CCTK_INT ierr = MoLChangeToNone(CCTK_INT RemoveIndex)
+\end{verbatim}
+    \end{Synopsis}
+    \begin{Synopsis}{Fortran}
+\begin{verbatim}
+CCTK_INT ierr = MoLChangeToNone(CCTK_INT RemoveIndex)
+\end{verbatim}
+    \end{Synopsis}
+  \end{SynopsisSection}
+
+  \begin{ResultSection}
+    \begin{ResultNote}
+      Currently if there is an error, MoL will issue a level 0
+      warning. No sensible return codes exist.
+    \end{ResultNote}
+    \begin{Result}{\rm 0}
+      success
+    \end{Result}
+  \end{ResultSection}
+
+  \begin{ParameterSection}
+    \begin{Parameter}{RemoveIndex}
+      Index of the ``unknown'' GF.
+    \end{Parameter}
+  \end{ParameterSection}
+
+  \begin{Discussion}
+    Should be called in a function scheduled in {\tt MoL\_PreStep}.
+    Note that this function was designed to allow mixed slicings for
+    thorn ADMBase. This set of functions is largely untested and
+    should be used with great care.
+  \end{Discussion}
+
+  \begin{SeeAlsoSection}
+    \begin{SeeAlso}{CCTK\_VarIndex()}
+      Get the variable index.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLChangeToEvolved()}
+      Change a variable at runtime to be evolved.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLChangeToSaveAndRestore()}
+      Change a variable at runtime to be Save and Restore.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLChangeToConstrained()}
+      Change a variable at runtime to be constrained.
+    \end{SeeAlso}
+  \end{SeeAlsoSection}
+
+  \begin{ExampleSection}
+    \begin{Example}{C}
+\begin{verbatim}
+ierr = MoLChangeToNone(CCTK_VarIndex("ADMBase::alp"));
+\end{verbatim}
+    \end{Example}
+    \begin{Example}{Fortran}
+\begin{verbatim}
+call CCTK_VarIndex(RemoveIndex, "ADMBase::alp")
+ierr = MoLChangeToNone(RemoveIndex)
+\end{verbatim}
+    \end{Example}
+  \end{ExampleSection}
+
+\end{FunctionDescription}
+
+
+
+\begin{FunctionDescription}{MoLQueryEvolvedRHS}
+  \label{CactusBase_MoL_MoLQueryEvolvedRHS}
+  
+  Queries  MoL for the index of the update variable for given GF in the
+  evolved category.
+
+  \begin{SynopsisSection}
+    \begin{Synopsis}{C}
+\begin{verbatim}
+CCTK_INT RHSindex = MoLQueryEvolvedRHS(CCTK_INT EvolvedIndex)
+\end{verbatim}
+    \end{Synopsis}
+    \begin{Synopsis}{Fortran}
+\begin{verbatim}
+CCTK_INT RHSindex = MoLQueryEvolvedRHS(CCTK_INT EvolvedIndex)
+\end{verbatim}
+    \end{Synopsis}
+  \end{SynopsisSection}
+
+  \begin{ResultSection}
+    \begin{ResultNote}
+        If the grid function passed does not exists, MoL will issue a level 0
+        warning. If the grid function is not of an evolved type (fast or slow
+        sector) $-1$ will be returned. Otherwise the variable
+        index of the update GF is returned.
+    \end{ResultNote}
+    \begin{Result}{$> 0$}
+      variable index of update GF
+    \end{Result}
+  \end{ResultSection}
+
+  \begin{ParameterSection}
+    \begin{Parameter}{EvolvedIndex}
+      Index of the GF whose update GF is to be returned.
+    \end{Parameter}
+  \end{ParameterSection}
+
+  \begin{Discussion}
+    Both slow and fast evolved variables can be queried.
+  \end{Discussion}
+
+  \begin{SeeAlsoSection}
+    \begin{SeeAlso}{CCTK\_VarIndex()}
+      Get the variable index.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLRegisterEvolved()}
+      Register evolved variables.
+    \end{SeeAlso}
+    \begin{SeeAlso}{MoLChangeToEvolvedSlow()}
+      Change a variable at runtime to be evolved in the slow sector.
+    \end{SeeAlso}
+  \end{SeeAlsoSection}
+
+  \begin{ExampleSection}
+    \begin{Example}{C}
+\begin{verbatim}
+rhsindex = MoLQueryEvolvedRHS(CCTK_VarIndex("wavetoymol::phi"));
+\end{verbatim}
+    \end{Example}
+    \begin{Example}{Fortran}
+\begin{verbatim}
+call CCTK_VarIndex(EvolvedIndex, "wavetoymol::phi")
+rhsindex = MoLQueryEvolvedRHS(EvolvedIndex)
+\end{verbatim}
+    \end{Example}
+  \end{ExampleSection}
+
+\end{FunctionDescription}
+
+
+
+\begin{thebibliography}{9}
+
+\bibitem{CactusBase_MoL_Thornburg93}
+J. Thornburg.
+\newblock {N}umerical {R}elativity in {B}lack {H}ole {S}pacetimes. 
+\newblock Unpublished thesis, University of British Columbia.
+\newblock 1993.
+\newblock Available from \mbox{\tt
+  http://www.aei.mpg.de/\~{}jthorn/phd/html/phd.html}. 
+
+\bibitem{CactusBase_MoL_Thornburg99}
+J. Thornburg.
+\newblock A {3+1} {C}omputational {S}cheme for {D}ynamic {S}pherically
+{S}ymmetric {B}lack {H}ole {S}pacetimes -- {II}: {T}ime {E}volution.
+\newblock Preprint {\tt gr-qc/9906022}, submitted to {\em Phys. Rev.}
+{\bf D}. 
+
+\bibitem{CactusBase_MoL_Shu99}
+C. Shu.
+\newblock {H}igh {O}rder {ENO} and {WENO} {S}chemes for
+{C}omputational {F}luid {D}ynamics.
+\newblock In T.~J. Barth and H. Deconinck, editors {\em High-Order
+  Methods for Computational Physics}. Springer, 1999.
+\newblock A related online version can be found under {\em Essentially
+  {N}on-{O}scillatory and {W}eighted {E}ssentially {N}on-{O}scillatory
+  {S}chemes for {H}yperbolic {C}onservation {L}aws} at {\tt
+  http://www.icase.edu/library/reports/rdp/97/97-65RDP.tex.refer.html}. 
+
+\bibitem{CactusBase_MoL_Neilsen00}
+D.~W. Neilsen and M.~W. Choptuik.
+\newblock Ultrarelativistic fluid dynamics.
+\newblock {\em Class. Quantum Grav.}, {\bf 17}:\penalty0 733--759, 2000.
+
+\bibitem{CactusBase_MoL_schlegel:09}
+M. Schlegel, O. Knoth, M. Arnold, and R. Wolke
+\newblock {\em Journal of Computational and Applied Mathematics}, {\bf 226}, 345, 2009.
+
+\bibitem{CactusBase_MoL_constantinescu:07}
+E. Constantinescu and A. Sandu
+\newblock {\em SIAM J. Sci.\ Comput.}, {\bf 33}, 239, 2007.
+
+\end{thebibliography}
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

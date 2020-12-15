@@ -1,0 +1,56 @@
+/* SSE accelerated compiles with gcc before gcc-3.3.x are expected not
+   to work.
+ 
+   SSE accelerated compiles with gcc-3.3.x and gcc-3.4.x are expected to
+   work with a patched compiler.  Contact KJB for more information.
+ 
+   Versions of gcc-4.0.x should be avoided in general.
+ 
+   Versions of gcc-4.1.x are thought be to good out-of-the-box with
+   SSE acceleratin BUT have issues with aliasing analysis.  Aliasing
+   optimization have been disabled for the time being.
+ 
+   To set the compilers/linkers used by mpicc/mpiCC, set the environment
+   variables MPICH_CC, MPICH_CLINKER, MPICH_CCC and MPICH_CCLINKER accordingly.
+ 
+   Due to MPI idiocy out of our control -Wno-long-long is set in
+   the brutality to avoid MPI headers breaking the compile. */
+ 
+/* File extension to use for libraries and executables */
+#define EXTENSION bw_intel
+ 
+/* Machine specific libraries and include directories */
+
+//LIBRARIES    += $(shell mpicc --showme:link)
+//INCLUDE_DIRS += $(shell mpicc --showme:compile)
+//LIBRARY_DIRS +=
+ 
+/* Leave undefined if you don't want V4 acceleration */
+#define V4_ACCELERATION
+ 
+/* Which Programs to use on this machine? */
+CC     = mpicc
+CXX    = mpicxx
+LD     = mpicc
+AR     = ar clq
+RANLIB = ranlib
+RM     = rm -f
+ 
+/* What compile flags should be used? */
+CBRUTALITY   = -O3 -xMIC-AVX512
+CXXBRUTALITY = -O3 -xMIC-AVX512
+OPTIMIZATION = -O3 -xMIC-AVX512 -ffast-math -fno-unsafe-math-optimizations -fno-strict-aliasing -fomit-frame-pointer
+ 
+CFLAGS   = ${CBRUTALITY}   ${OPTIMIZATION} 
+CXXFLAGS = ${CXXBRUTALITY} ${OPTIMIZATION}
+LDFLAGS  = ${CXXFLAGS}                     
+ARFLAGS  =
+ 
+#ifdef V4_ACCELERATION
+CXXFLAGS += -DUSE_V4_SSE
+#endif
+ 
+/* Openmpi silliness */
+CCFLAGS  += $(shell mpicc --showme:compile)
+CXXFLAGS += $(shell mpicc --showme:compile) -DOMPI_SKIP_MPICXX
+ 

@@ -1,0 +1,65 @@
+# Parameter definitions for thorn TimerReport
+# $Header$
+
+private:
+
+# These parameters control output frequency based on iteration. Output still
+# happens before the run terminates and, if enabled, before checkpoints.
+INT out_every "How often to output timer report to screen" STEERABLE=ALWAYS
+{
+  0   :: "No periodic output (default)"
+  1:* :: "Every so many iterations"
+} 0
+
+INT out_at "Output timer information at a given iteration" STEERABLE=ALWAYS
+{
+  -1   :: "Do not output at specific iteration (default)"
+  0:*  :: "At this iteration"
+} -1
+
+STRING out_filename "File name for timer reports" STEERABLE=ALWAYS
+{
+  "^$"   :: "empty filename: print to stdout"
+  "^.+$" :: "otherwise: print to that file"
+} ""
+
+BOOLEAN before_checkpoint "Before a checkpoint" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN next "On next iteration" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN output_schedule_timers "Output the schedule timers in a formatted tabular format" STEERABLE=ALWAYS
+{
+} "yes"
+
+BOOLEAN output_all_timers "Output one file per processor containing all the Cactus timers" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN output_all_timers_together "Output three files (formats .txt, .csv, and .tsv), containing information about all the Cactus timers (average, minimum, and maximum over all processors)" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN output_all_timers_readable "Output one file containing information about all the Cactus timers (average, minimum, and maximum over all processors), in a format that is readable by humans" STEERABLE=ALWAYS
+{
+} "no"
+
+STRING all_timers_clock "Which clock to use for the all timers output" STEERABLE=ALWAYS
+{
+  ".*"   :: "any clock name allowed"
+} "gettimeofday"
+
+INT n_top_timers "How many timers to include in the top timer report" STEERABLE=ALWAYS
+{
+  0   :: "Do not print the report"
+  1:* :: "Any number of timers"
+} 0
+
+shares: IO
+
+USES STRING out_dir
+
+USES INT checkpoint_every

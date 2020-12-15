@@ -1,0 +1,184 @@
+module CudaPmeSolver {
+	extern module PmeSolver;
+
+#ifdef NAMD_CUDA
+	message CudaPmeXYZInitMsg;
+	message CudaPmeXYInitMsg;
+	message CudaPmeXInitMsg;
+
+	message InitDeviceMsg;
+	message InitDeviceMsg2;
+
+	message DeviceDataMsg;
+
+	array[1D] CudaPmePencilXYZ : PmePencilXYZ {
+		entry CudaPmePencilXYZ();
+		entry void initialize(CudaPmeXYZInitMsg *msg);
+		entry void initializeDevice(InitDeviceMsg *msg);
+	};
+
+	class CProxy_CudaPmePencilZ;
+	array[3D] CudaPmePencilXY : PmePencilXY {
+		entry CudaPmePencilXY();
+		entry void initialize(CudaPmeXYInitMsg *msg);
+		entry void initializeDevice(InitDeviceMsg *msg);
+		entry void getDeviceBufferZ(int x, bool sameDevice, CProxy_CudaPmePencilZ proxy);
+		entry void getDeviceBuffer(int x, bool sameDevice, CProxy_CudaPmePencilZ proxy) {
+			serial {
+				numGetDeviceBuffer++;
+				getDeviceBufferZ(x, sameDevice, proxy);
+			}
+		};
+		entry void recvDeviceBuffer(DeviceDataMsg *msg);
+		entry void recvDeviceBuffers() {
+			overlap {
+	  		for (imsg=0;imsg < numDeviceBuffers;++imsg) {
+					when recvDeviceBuffer(DeviceDataMsg *msg) serial {
+						deviceBuffers[msg->i].data = msg->data;
+						deviceBuffers[msg->i].event = msg->event;
+						delete msg;
+					}
+				}
+				for (imsgZ=0;imsgZ < numGetDeviceBuffer;imsgZ++) {
+					when getDeviceBufferZ(int x, bool sameDevice, CProxy_CudaPmePencilZ proxy) serial {
+						proxy(x,0,0).recvDeviceBuffer(new DeviceDataMsg(thisIndex.z, event, getData(x, sameDevice)));
+					}
+				}
+			}
+			serial { setDeviceBuffers(); }
+		};
+	};
+
+	class CProxy_CudaPmePencilY;
+	array[3D] CudaPmePencilX : PmePencilX {
+		entry CudaPmePencilX();
+		entry void initialize(CudaPmeXInitMsg *msg);
+		entry void initializeDevice(InitDeviceMsg *msg);
+		entry void getDeviceBuffer2(int x, bool sameDevice, CProxy_CudaPmePencilY proxy);
+		entry void getDeviceBuffer(int x, bool sameDevice, CProxy_CudaPmePencilY proxy) {
+			serial {
+				numGetDeviceBuffer++;
+				getDeviceBuffer2(x, sameDevice, proxy);
+			}
+		};
+		entry void recvDeviceBuffer(DeviceDataMsg *msg);
+		entry void recvDeviceBuffers() {
+			overlap {
+	  		for (imsgY=0;imsgY < numDeviceBuffers;++imsgY) {
+					when recvDeviceBuffer(DeviceDataMsg *msg) serial {
+						deviceBuffers[msg->i].data = msg->data;
+						deviceBuffers[msg->i].event = msg->event;
+						delete msg;
+					}
+				}
+				for (imsg=0;imsg < numGetDeviceBuffer;imsg++) {
+					when getDeviceBuffer2(int x, bool sameDevice, CProxy_CudaPmePencilY proxy) serial {
+						proxy(x,0,thisIndex.z).recvDeviceBufferX(new DeviceDataMsg(thisIndex.y, event, getData(x, sameDevice)));
+					}
+				}
+			}
+			serial { setDeviceBuffers(); }
+		};
+	};
+
+	array[3D] CudaPmePencilY : PmePencilY {
+		entry CudaPmePencilY();
+		entry void initialize(CudaPmeXInitMsg *msg);
+		entry void initializeDevice(InitDeviceMsg2 *msg);
+		entry void getDeviceBuffer2(int y, bool sameDevice, CProxy_CudaPmePencilX proxy);
+		entry void getDeviceBuffer(int y, bool sameDevice, CProxy_CudaPmePencilX proxy) {
+			serial {
+				numGetDeviceBufferX++;
+				getDeviceBuffer2(y, sameDevice, proxy);
+			}
+		};
+		entry void getDeviceBuffer22(int y, bool sameDevice, CProxy_CudaPmePencilZ proxy);
+		entry void getDeviceBuffer(int y, bool sameDevice, CProxy_CudaPmePencilZ proxy) {
+			serial {
+				numGetDeviceBufferZ++;
+				getDeviceBuffer22(y, sameDevice, proxy);
+			}
+		};
+		entry void recvDeviceBufferZ(DeviceDataMsg *msg);
+		entry void recvDeviceBufferX(DeviceDataMsg *msg);
+		entry void recvDeviceBuffers() {
+			overlap {
+	  		for (imsgZ=0;imsgZ < numDeviceBuffersZ;++imsgZ) {
+					when recvDeviceBufferZ(DeviceDataMsg *msg) serial {
+						deviceBuffersZ[msg->i].data = msg->data;
+						deviceBuffersZ[msg->i].event = msg->event;
+						delete msg;
+					}
+				}
+	  		for (imsgX=0;imsgX < numDeviceBuffersX;++imsgX) {
+					when recvDeviceBufferX(DeviceDataMsg *msg) serial {
+						deviceBuffersX[msg->i].data = msg->data;
+						deviceBuffersX[msg->i].event = msg->event;
+						delete msg;
+					}
+				}
+				for (imsgXX=0;imsgXX < numGetDeviceBufferX;imsgXX++) {
+					when getDeviceBuffer2(int y, bool sameDevice, CProxy_CudaPmePencilX proxy) serial {
+						proxy(0,y,thisIndex.z).recvDeviceBuffer(new DeviceDataMsg(thisIndex.x, event, getDataForX(y, sameDevice)));
+					}
+				}
+				for (imsgZZ=0;imsgZZ < numGetDeviceBufferZ;imsgZZ++) {
+					when getDeviceBuffer22(int y, bool sameDevice, CProxy_CudaPmePencilZ proxy) serial {
+						proxy(thisIndex.x,y,0).recvDeviceBuffer(new DeviceDataMsg(thisIndex.z, event, getDataForZ(y, sameDevice)));
+					}
+				}
+			}
+			serial { setDeviceBuffers(); }
+		};
+	};
+
+	array[3D] CudaPmePencilZ : PmePencilZ {
+		entry CudaPmePencilZ();
+		entry void initialize(CudaPmeXInitMsg *msg);
+		entry void initialize(CudaPmeXYInitMsg *msg);
+		entry void initializeDevice(InitDeviceMsg2 *msg);
+
+		entry void getDeviceBufferXY(int z, bool sameDevice, CProxy_CudaPmePencilXY proxy);
+		entry void getDeviceBuffer(int z, bool sameDevice, CProxy_CudaPmePencilXY proxy) {
+			serial {
+				numGetDeviceBufferXY++;
+				getDeviceBufferXY(z, sameDevice, proxy);
+			}			
+		};
+
+		entry void getDeviceBufferY(int z, bool sameDevice, CProxy_CudaPmePencilY proxy);
+		entry void getDeviceBuffer(int z, bool sameDevice, CProxy_CudaPmePencilY proxy) {
+			serial {
+				numGetDeviceBufferY++;
+				getDeviceBufferY(z, sameDevice, proxy);
+			}			
+		};
+		entry void recvDeviceBuffer(DeviceDataMsg *msg);
+		entry void recvDeviceBuffers() {
+			overlap {
+	  		for (imsgY=0;imsgY < numDeviceBuffers;++imsgY) {
+					when recvDeviceBuffer(DeviceDataMsg *msg) serial {
+						deviceBuffers[msg->i].data = msg->data;
+						deviceBuffers[msg->i].event = msg->event;
+						delete msg;
+					}
+				}
+				for (imsg=0;imsg < numGetDeviceBufferY;imsg++) {
+					when getDeviceBufferY(int z, bool sameDevice, CProxy_CudaPmePencilY proxy) serial {
+						proxy(thisIndex.x,0,z).recvDeviceBufferZ(new DeviceDataMsg(thisIndex.y, event, getData(z, sameDevice)));
+					}
+				}
+				for (imsg=0;imsg < numGetDeviceBufferXY;imsg++) {
+					when getDeviceBufferXY(int z, bool sameDevice, CProxy_CudaPmePencilXY proxy) serial {
+						proxy(0,0,z).recvDeviceBuffer(new DeviceDataMsg(thisIndex.x, event, getData(z, sameDevice)));
+					}
+				}
+			}
+			serial { setDeviceBuffers(); }
+		};
+
+
+	};
+#endif // NAMD_CUDA
+
+};

@@ -1,0 +1,13 @@
+#! /bin/sh
+#  /*@@
+#    @file      aix5.1.0.0
+#    @date      Feb 2002
+#    @author    Gerd Lanfermann
+#    @desc 
+#   
+#    @enddesc
+#    @version $Header$
+#  @@*/
+
+. $srcdir/known-architectures/aix
+

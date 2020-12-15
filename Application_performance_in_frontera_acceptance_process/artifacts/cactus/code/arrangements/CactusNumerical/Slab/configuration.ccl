@@ -1,0 +1,9 @@
+# Configuration definition for thorn Slab
+
+PROVIDES Slab
+{
+}
+
+OPTIONAL LoopControl MPI
+{
+}

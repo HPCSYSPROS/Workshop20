@@ -1,0 +1,2893 @@
+#!/usr/bin/env perl
+
+=begin comment
+
+File:           GetComponents
+Author:         Eric Seidel
+Version:        1.0.0
+Email:          eric@eseidel.org
+Description:    This program automates the procedure of checking out components
+                from multiple sources and mechanisms. For more info see the
+                Pod Documentation with ./GetComponents -m
+
+                                LICENSE
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+=end comment
+
+=cut
+
+use strict;
+use warnings;
+
+#use diagnostics;
+use Data::Dumper;
+use Getopt::Long;
+use Pod::Usage;
+use File::stat;
+use Cwd;
+use Term::ANSIColor qw(:constants);
+use POSIX qw(strftime);
+
+# import optional threading modules
+my $PARALLEL;
+my %semaphores;
+my $QUEUE;
+eval {
+    require threads;
+    require threads::shared;
+    require Thread::Queue;
+    require Thread::Semaphore;
+};
+unless ($@) {
+    import threads;
+    import threads::shared;
+    import Thread::Queue;
+    import Thread::Semaphore;
+
+    #$PARALLEL = 1;
+    $QUEUE = Thread::Queue->new();
+}
+
+my $combined_components = "# This file was automatically generated "
+  . "using the GetComponents script.\n\n";
+my %components_to_checkout;
+my %components_to_update;
+my @all_components;
+my $checkout_size : shared = 0;
+my $update_size : shared   = 0;
+my @components_error : shared;
+my @warnings : shared;
+my %svn_servers : shared;
+my $ROOT               = '';
+my $VERBOSE            = 0;
+my $DEBUG              = 0;
+my $HELP               = 0;
+my $MAN                = 0;
+my $EXPERIMENTAL       = 0;
+my $ANONYMOUS_CHECKOUT = 1;
+my $DO_UPDATES         = 0;
+my $STATUS             = 0;
+my $DIFF               = 0;
+my $SHALLOW_CLONE      = 0;
+my $DATE;
+my @CRL_LISTS;
+my @ORIG_LISTS;
+my %DEFINITIONS;
+my $cvs         = 'cvs';
+my $svn         = 'svn';
+my $git         = 'git';
+my $darcs       = 'darcs';
+my $wget        = 'wget';
+my $hg          = 'hg';
+my $curl        = 'curl';
+my $ln          = "ln -nsf";
+my $cvs_found   = 0;
+my $svn_found   = 0;
+my $git_found   = 0;
+my $darcs_found = 0;
+my $wget_found  = 0;
+my $curl_found  = 0;
+my $hg_found    = 0;
+my %updated_git_repos : shared;
+my %updated_darcs_repos : shared;
+my %updated_hg_repos : shared;
+my %verified_git_repos;
+my %verified_darcs_repos;
+my %verified_hg_repos;
+my %checkout_types = (
+    'cvs'   => \&handle_cvs,
+    'svn'   => \&handle_svn,
+    'git'   => \&handle_git,
+    'darcs' => \&handle_darcs,
+    'http'  => \&handle_wget,
+    'https' => \&handle_wget,
+    'ftp'   => \&handle_wget,
+    'hg'    => \&handle_hg
+);
+my $crl_dir = ".crl";
+
+if ( defined( $ENV{HOME} ) ) {
+    $crl_dir = "$ENV{HOME}/.crl";
+}
+else {
+    print "Home directory is not set. CRL files will be stored in .crl\n";
+}
+if ( !-e "$crl_dir" ) {
+    run_command("mkdir $crl_dir");
+}
+
+####################### MAIN PROGRAM #####################################
+
+# parse options and print usage if syntax error
+GetOptions(
+    'verbose'              => \$VERBOSE,
+    'help|?'               => \$HELP,
+    'man'                  => \$MAN,
+    'debug'                => \$DEBUG,
+    'anonymous!'           => \$ANONYMOUS_CHECKOUT,
+    'update'               => \$DO_UPDATES,
+    'root=s'               => \$ROOT,
+    'date=s'               => \$DATE,
+    'experimental'         => \$EXPERIMENTAL,
+    'status'               => \$STATUS,
+    'diff'                 => \$DIFF,
+    'parallel'             => \$PARALLEL,
+    'shallow!'             => \$SHALLOW_CLONE,
+    'reset-authentication' => sub { system("rm $crl_dir/users") }
+) or pod2usage(2);
+pod2usage(1) if $HELP;
+pod2usage( -verbose => 2 ) if $MAN;
+
+find_tools();
+
+&process_args();
+
+# grab the directory the script was called from, we will need this later
+my $orig_dir = cwd();
+if ( $ROOT ne '' ) { $DEFINITIONS{ROOT} = $ROOT }
+
+parse_list();
+print_list() if $DEBUG;
+get_status() if $STATUS;
+get_diff()   if $DIFF;
+process_users();
+prompt_for_update();
+verify_urls() if $DO_UPDATES;
+
+# start timer here, we don't care about authentication time
+my $start_time = time;
+
+foreach my $key ( sort {length($a)<=>length($b)} ( keys %components_to_checkout ) ) {
+    checkout( sort {length($a->{NAME}||$a->{CHECKOUT})<=>length($b->{NAME}||$b->{CHECKOUT})}
+                   @{ $components_to_checkout{$key} } );
+}
+if ($DO_UPDATES) {
+    foreach my $key ( sort {length($a)<=>length($b)} ( keys %components_to_update ) ) {
+        update( sort {length($a->{NAME}||$a->{CHECKOUT})<=>length($b->{NAME}||$b->{CHECKOUT})}
+                     @{ $components_to_update{$key} } );
+    }
+}
+
+write_componentlist_target();
+
+print_summary();
+exit( @components_error > 0 );
+
+##########################################################################
+
+sub process_args() {
+    unless ( @ARGV || ( -e ".crl/component_list.crl" ) ) {
+        pod2usage( "\n$0: No files given.\nSpecify --man "
+              . "for an explanation of how to use this script.\n\n" );
+    }
+
+    if ( @ARGV == 0 ) {
+        my $list = ".crl/component_list.crl";
+        push @ORIG_LISTS, $list;
+        push @CRL_LISTS, $list;
+        # set $ROOT so it isn't overwritten by definition in file
+        $ROOT = '.';
+    }
+    else {
+        foreach my $ARG (@ARGV) {
+
+            # save original list for log message
+            push @ORIG_LISTS, $ARG;
+            if ( $ARG =~ m!^https?://! ) {
+                download_list($ARG);
+                $ARG =~ s!.*/!!;
+            }
+            push @CRL_LISTS, $ARG;
+        }
+    }
+}
+
+sub download_list {
+    my $url  = shift;
+    my $file = $url;
+    $file =~ s!.*/!!;
+    if ($curl_found) {
+        system("$curl --silent '$url' -o $file") == 0 and return;
+    }
+    system("$wget --quiet '$url' -O $file") == 0 and return;
+    DIE("Couldn't download $url correctly.");
+}
+
+sub find_tools {
+    if ( system("which $cvs >/dev/null 2>&1") == 0 ) { $cvs_found = 1 }
+    if ( system("which $svn >/dev/null 2>&1") == 0 ) { $svn_found = 1 }
+    if ( system("which $git >/dev/null 2>&1") == 0 ) { $git_found = 1 }
+    if ( system("which $curl >/dev/null 2>&1") == 0 ) {
+        $curl_found = 1;
+        $curl .= " -f";
+    }
+    elsif ( system("which $wget >/dev/null 2>&1") == 0 )  { $wget_found  = 1 }
+    if    ( system("which $darcs >/dev/null 2>&1") == 0 ) { $darcs_found = 1 }
+    if    ( system("which $hg >/dev/null 2>&1") == 0 )    { $hg_found    = 1 }
+    if    ($cvs_found) {
+
+        # Use compression to speed up slow links, and to avoid
+        # transmission errors with CCT's CVS server
+        $cvs = "$cvs -z9";
+    }
+}
+
+sub download_include {
+    my $url = shift;
+    print("Using include $url\n");
+    if ( $url !~ /^https?:\/\// ) {
+        DIE("Don't know how to retrieve include url $url");
+    }
+    if ( -e "$crl_dir/include_tmp" ) {
+        unlink("$crl_dir/include_tmp");
+    }
+    if ((   !$curl_found
+         or (run_command("$curl '$url' -o $crl_dir/include_tmp"))[0])
+        and (run_command("$wget '$url' -O $crl_dir/include_tmp"))[0] )
+    {
+        DIE("Couldn't download include url $url correctly\n");
+    }
+    if ( !-e "$crl_dir/include_tmp" ) {
+        DIE("Couldn't download include url $url correctly\n");
+    }
+    open( my $INCL, "$crl_dir/include_tmp" )
+      or DIE("Couldn't open include url file from $url\n");
+    my @lines = <$INCL>;
+    unshift( @lines, "\n" );
+    close($INCL);
+    return @lines;
+}
+
+sub parse_list {
+    my $file = '';
+    foreach my $LIST (@CRL_LISTS) {
+        open( my $COMPONENT_LIST, $LIST ) or DIE("Could not open $LIST");
+
+        # check for CRL Header
+        while (<$COMPONENT_LIST>) {
+            next if m/^#|^\s*$/;
+            if (m/^!CRL_VERSION .*_experimental/) {
+                $EXPERIMENTAL = 1;
+                print "Using experimental features, be careful!\n";
+            }
+            if (m/^!CRL_VERSION/) {
+
+                # save Header
+                $combined_components .= $_;
+                $_ = '';
+                last;
+            }
+            if (m/\w/) {
+                $|++;
+                print "$LIST is not a CRL file.\n";
+                print "Do you want to continue? yes no [no]: ";
+                my $answer = <STDIN>;
+                chomp $answer;
+                $|--;
+                exit unless $answer =~ /^y/;
+                last;
+            }
+        }
+
+        # now that we know we have an CRL file, we slurp it
+        my @lines = <$COMPONENT_LIST>;
+        close($COMPONENT_LIST);
+
+        # convert CRNL and CR to newline (for lists generated by windows and macs)
+        map s/(\r\n|\r)/\n/gm, @lines;
+
+        # handle includes
+        my $i = -1;
+        foreach my $line (@lines) {
+            $i++;
+            if ( $line =~ /^[^#]*!INCLUDE *= *(.*)$/ ) {
+                splice( @lines, $i, 1, &download_include($1) );
+            }
+        }
+
+        # grab definitions
+        my $line_nr = 0;
+        foreach my $line (@lines) {
+            $line_nr++;
+            if ( $line =~ /^!DEFINE\s*([^\s]+)\s*=\s*(.+)/ ) {
+                my ( $def, $value ) = ( $1, $2 );
+
+                # don't set ROOT if already given on the command line
+                next if $def eq 'ROOT' && $ROOT ne '';
+
+                # resolve compound definitions
+                $value =~ s/\$(\w+)/$DEFINITIONS{$1}/;
+
+                # check for repeated definitions
+                if ( defined( $DEFINITIONS{$def} )
+                    and $DEFINITIONS{$def} ne $value )
+                {
+                    if ($EXPERIMENTAL) {
+                        WARN("Repeated definition of $def on line $line_nr, ignored");
+                    }
+                    else {
+                        print ">$DEFINITIONS{$def}< >$value<\n";
+                        DIE("Repeated definition of $def on line $line_nr");
+                    }
+                }
+                else {
+                    $DEFINITIONS{$def} = $value;
+                }
+            }
+        }
+        $file .= "\n\n# Component list: $LIST\n\n";
+        $file .= join( "", @lines );
+    }
+    my $orig_file = $file;
+
+    # remove comments
+    $file =~ s/^\s*#.*$//gm;
+    $file =~ s/\n\n/\n/g;
+    $file =~ s/#.*$//gm;
+
+    # replace long-form directives with short-form directives
+    $file =~ s/!ANONYMOUS_USER/!ANON_USER/gm;
+    $file =~ s/!ANONYMOUS_PASS/!ANON_PASS/gm;
+    $file =~ s/!ANONYMOUS_PASSWORD/!ANON_PASS/gm;
+    $file =~ s/!LOCAL_PATH/!LOC_PATH/gm;
+    $file =~ s/!REPOSITORY_PATH/!REPO_PATH/gm;
+    $file =~ s/!REPOSITORY_BRANCH/!REPO_BRANCH/gm;
+    $file =~ s/!AUTHORIZATION_URL/!AUTH_URL/gm;
+
+    # replace definitions, except if escaped
+    $file =~ s/(?<!\\)\$(\w+)/
+                        exists $DEFINITIONS{$1} ? $DEFINITIONS{$1} : '$'.$1
+                        /egm;
+    if ($file =~ /(?<!\\)\$([A-Za-z]\w*)/) {
+        # make sure that escaped definitions are environment variables
+        for my $match ($+) {
+            #print "$match\n";
+            unless (grep $_ eq $match,  keys %ENV) {
+                DIE("No definition for $match found in input file or ENV.");
+            }
+        }
+        # now replace escaped defs with env variables
+        $file =~ s/(?<!\\)\$([A-Za-z]\w*)/$ENV{$1}/g;
+    }
+    # if $ROOT is undefined, it will be set to the current directory
+    if   ( defined( $DEFINITIONS{ROOT} ) ) { $ROOT = $DEFINITIONS{ROOT} }
+    else                                   { $ROOT = $orig_dir }
+    DIE("Target directory '$ROOT' exists and is not a directory") if (-e $ROOT and not -d $ROOT);
+
+    my @sections = split( /^!TARGET\s*=\s*/m, $file );
+    shift(@sections);
+    foreach my $section (@sections) {
+
+        # if there is only one section there will be an empty section
+        # which must be skipped
+        if ( $section =~ /^$/ ) { next }
+
+        $section = "!TARGET = $section";
+        my @pairs = split( /^\s*!([^\s=]+)\s*=\s*/m, $section );
+        shift(@pairs);
+
+        for my $pairs (@pairs) {
+            $pairs =~ s/\s+$//;
+        }
+
+        my %rec;
+
+        # turn off warnings for this statement, we do our own checking
+        { no warnings 'all'; %rec = @pairs; }
+
+        # skip ignored thorns
+        if ( $rec{"TYPE"} =~ /ignore/ ) {
+            next;
+        }
+
+        if ( !defined( $rec{"CHECKOUT"} ) ) {
+            WARN("Nothing will be checked out from $rec{URL}\n");
+            next;
+        }
+        chomp %rec;
+
+        # make sure the user has all the required tools
+        if ( !defined( $rec{"TYPE"} ) ) {
+            print "Something is missing in the following section:\n";
+            print Dumper %rec;
+            die();
+        }
+        $|++;
+        if ( ( $rec{"TYPE"} eq "cvs" ) && ( !$cvs_found ) ) {
+            print "You have requested a cvs checkout, "
+              . "but the system was unable to find cvs.\n";
+            print "Please enter the path to cvs: ";
+            $cvs = <STDIN>;
+            chomp $cvs;
+
+            # verify that we actually have cvs now...
+            my $ret = system "$cvs --version >/dev/null 2>&1";
+            if ($ret) {
+                DIE("$cvs does not appear to be a working copy of cvs!");
+            }
+            else { $cvs_found = 1 }
+        }
+        if ( ( $rec{"TYPE"} eq "svn" ) && ( !$svn_found ) ) {
+            print "You have requested a subversion checkout, "
+              . "but the system was unable to find subversion.\n";
+            print "Please enter the path to subversion: ";
+            $svn = <STDIN>;
+            chomp $svn;
+
+            # verify that we actually have svn now...
+            my $ret = system "$svn --version >/dev/null 2>&1";
+            if ($ret) {
+                DIE("$svn does not appear to be a working copy of svn!");
+            }
+            else { $svn_found = 1 }
+        }
+        if ( ( $rec{"TYPE"} eq "git" ) && ( !$git_found ) ) {
+            print "You have requested a git checkout, "
+              . "but the system was unable to find git.\n";
+            print "Please enter the path to git: ";
+            $git = <STDIN>;
+            chomp $git;
+
+            # verify that we actually have git now...
+            my $ret = system "$git --version >/dev/null 2>&1";
+            if ($ret) {
+                DIE("$git does not appear to be a working copy of git!");
+            }
+            else { $git_found = 1 }
+        }
+        if ( ( $rec{"TYPE"} eq ( "http" or "https" ) )
+            && !( $wget_found || $curl_found ) )
+        {
+            print "You have requested an $rec{TYPE} checkout, "
+              . "but the system was unable to find curl or wget.\n";
+            print "Please enter the path to curl or wget: ";
+            my $path = <STDIN>;
+            chomp $path;
+            if ( $path =~ /curl/ ) {
+                $curl = $path;
+
+                # verify that we actually have curl now...
+                my $ret = system "$curl --version >/dev/null 2>&1";
+                if ($ret) {
+                    DIE("$curl does not appear to be a working copy of curl!");
+                }
+                else { $curl_found = 1 }
+            }
+            else {
+                $wget = $path;
+
+                # verify that we actually have wget now...
+                my $ret = system "$wget --version >/dev/null 2>&1";
+                if ($ret) {
+                    DIE("$wget does not appear to be a working copy of wget!");
+                }
+                else { $wget_found = 1 }
+            }
+        }
+        if ( ( $rec{"TYPE"} eq "darcs" ) && ( !$darcs_found ) ) {
+            print "You have requested a darcs checkout, "
+              . "but the system was unable to find darcs.\n";
+            print "Please enter the path to darcs: ";
+            $darcs = <STDIN>;
+            chomp $darcs;
+
+            # verify that we actually have darcs now...
+            my $ret = system "$darcs --version >/dev/null 2>&1";
+            if ($ret) {
+                DIE("$darcs does not appear to be a working copy of darcs!");
+            }
+            else { $darcs_found = 1 }
+        }
+        if ( ( $rec{"TYPE"} eq "hg" ) && ( !$hg_found ) ) {
+            print "You have requested an hg checkout, "
+              . "but the system was unable to find hg.\n";
+            print "Please enter the path to hg: ";
+            $hg = <STDIN>;
+            chomp $hg;
+
+            # verify that we actually have hg now...
+            my $ret = system "$hg --version >/dev/null 2>&1";
+            if ($ret) {
+                DIE("$hg does not appear to be a working copy of hg!");
+            }
+            else { $hg_found = 1 }
+        }
+        $|--;
+        # check for svn SSL problems
+        if ( $rec{"TYPE"} eq "svn" && defined $rec{"AUTH_URL"} ) {
+            my $base = $rec{"AUTH_URL"};
+            $base =~ s/(https\:\/\/[\w\.]+)\/(.*)$/$1/i;
+            unless ( defined $svn_servers{$base} ) {
+                my $ret = `$svn --non-interactive info $rec{AUTH_URL} 2>&1`;
+                if ( $ret =~ /Server certificate verification failed/ ) {
+                    $svn_servers{$base} = 0;
+                }
+                else {
+                    $svn_servers{$base} = 1;
+                }
+            }
+        }
+
+        # save target in original form to check existence.
+        my $target = $rec{"TARGET"};
+
+        # If AUTH_URL is not defined, use URL instead
+        if ( defined( $rec{"URL"} ) and !defined( $rec{"AUTH_URL"} ) ) {
+            $rec{"AUTH_URL"} = $rec{"URL"};
+        }
+
+        # save url in original form for parsing $1/$2
+        $rec{"URL_ORIG"}      = $rec{"URL"};
+        $rec{"AUTH_URL_ORIG"} = $rec{"AUTH_URL"};
+
+        # we are splitting each group of components into individuals
+        # to check for existence. they will now be passed individually to
+        # the checkout/update subroutines. this will take up more memory,
+        # but it should make it easier if the user decides to add another
+        # component from the same repository later
+        my @checkouts = split( /\s+/m, $rec{"CHECKOUT"} );
+        foreach my $checkout (@checkouts) {
+
+            # parse url variables
+            my ( $dir1, $dir2 );
+            if ( $checkout =~ m!/! ) {
+                ( $dir1, $dir2 ) = $checkout =~ m!(.+)/(.+)!;
+            }
+            else {
+                $dir1 = $checkout;
+            }
+            if ( defined( $rec{URL} ) ) {
+                $rec{URL} = $rec{"URL_ORIG"};
+                $rec{URL} =~ s!\$1!$dir1!;
+                $rec{URL} =~ s!\$2!$dir2!;
+            }
+            if ( defined( $rec{AUTH_URL} ) ) {
+                $rec{AUTH_URL} = $rec{"AUTH_URL_ORIG"};
+                $rec{AUTH_URL} =~ s!\$1!$dir1!;
+                $rec{AUTH_URL} =~ s!\$2!$dir2!;
+            }  
+
+            # parse name of git repo
+            if ( $rec{"TYPE"} eq "git" ) {
+                my $git_repo;
+                # check for custom repo name
+                if (defined($rec{NAME})) {
+                    $git_repo = $rec{NAME};
+                } else {
+                    $git_repo = $rec{"URL"};
+                    $git_repo =~ s/\.git$//;
+                    $git_repo =~ s/^.*[:\/]//;
+                }
+                $rec{"GIT_REPO"} = $git_repo;
+                $rec{"GIT_REPO"} =~ s!\$1!$dir1!;
+                $rec{"GIT_REPO"} =~ s!\$2!$dir2!;
+                
+                # add the repo to %updated_git_repos and set it to 0
+                # we will use this to track which repos have already been cloned
+                # or updated
+                if (not exists $updated_git_repos{$git_repo}) {
+                    $updated_git_repos{$git_repo} = 0;
+                }
+                if ($PARALLEL and not exists $semaphores{$git_repo}) {
+                    $semaphores{$git_repo} = Thread::Semaphore->new();
+                }
+            }
+    
+            # parse name of darcs repo
+            if ( $rec{"TYPE"} eq "darcs" ) {
+                my $darcs_repo;
+                # check for custom repo name
+                if (defined($rec{NAME})) {
+                    $darcs_repo = $rec{NAME};
+                } else {
+                    $darcs_repo = $rec{"URL"};
+                    $darcs_repo =~ s/_darcs$//;
+                    $darcs_repo =~ s/^.*[:\/]//;
+                }
+                $rec{"DARCS_REPO"} = $darcs_repo;
+                $rec{"DARCS_REPO"} =~ s!\$1!$dir1!;
+                $rec{"DARCS_REPO"} =~ s!\$2!$dir2!;
+                
+                # add the repo to %updated_darcs_repos and set it to 0
+                # we will use this to track which repos have already been cloned
+                # or updated
+                if (not exists $updated_darcs_repos{$darcs_repo}) {
+                    $updated_darcs_repos{$darcs_repo} = 0;
+                }
+                if ($PARALLEL and not exists $semaphores{$darcs_repo}) {
+                    $semaphores{$darcs_repo} = Thread::Semaphore->new();
+                }
+            }
+    
+            # parse name of mercurial repo
+            if ( $rec{"TYPE"} eq "hg" ) {
+                my $hg_repo;
+                # check for custom repo name
+                if (defined($rec{NAME})) {
+                    $hg_repo = $rec{NAME};
+                } else {
+                    $hg_repo = $rec{"URL"};
+                    $hg_repo =~ s/\.hg$//;
+                    $hg_repo =~ s/\/$//g;
+                    $hg_repo =~ s/^.*[:\/]//;
+                }
+                $rec{"HG_REPO"} = $hg_repo;
+                $rec{"HG_REPO"} =~ s!\$1!$dir1!;
+                $rec{"HG_REPO"} =~ s!\$2!$dir2!;
+                
+                # add the repo to %updated_hg_repos and set it to 0
+                # we will use this to track which repos have already been cloned
+                # or updated
+                if (not exists $updated_hg_repos{$hg_repo}) {
+                    $updated_hg_repos{$hg_repo} = 0;
+                }
+                if ($PARALLEL and not exists $semaphores{$hg_repo}) {
+                    $semaphores{$hg_repo} = Thread::Semaphore->new();
+                }
+            }
+
+            $rec{"CHECKOUT"} = $checkout;
+            my %component : shared = %rec;
+            my $name = $rec{"NAME"};
+            my $dir = defined($name) ? $name : $checkout;
+
+            # skip ignored thorns
+            if ( $component{"TYPE"} eq 'ignore' ) {
+                next;
+            }
+
+            # check for CVS directory
+            elsif ( -e "$target/$dir/CVS" ) {
+                push @{ $components_to_update{$target} }, \%component;
+            }
+
+            # or for .svn directory
+            elsif ( -e "$target/$dir/.svn" ) {
+                push @{ $components_to_update{$target} }, \%component;
+            }
+
+            # slightly different approach for git
+            elsif ( $component{"TYPE"} eq "git" && -e "$target/$checkout" ) {
+                push @{ $components_to_update{$target} }, \%component;
+            }
+
+            # and for darcs
+            elsif ( $component{"TYPE"} eq "darcs" && -e "$target/$checkout" ) {
+                push @{ $components_to_update{$target} }, \%component;
+            }
+
+            # and for hg
+            elsif ( $component{"TYPE"} eq "hg" && -e "$target/$checkout" ) {
+                push @{ $components_to_update{$target} }, \%component;
+            }
+            elsif ( $component{"TYPE"} eq "http" && -e "$target/$dir" ) {
+                push @{ $components_to_update{$target} }, \%component;
+            }
+            elsif ( $component{"TYPE"} eq "https" && -e "$target/$dir" ) {
+                push @{ $components_to_update{$target} }, \%component;
+            }
+            elsif ( $component{"TYPE"} eq "ftp" && -e "$target/$dir" ) {
+                push @{ $components_to_update{$target} }, \%component;
+            }
+            else {
+                push @{ $components_to_checkout{$target} }, \%component;
+            }
+            push @all_components, \%component;
+        }
+    }
+    $combined_components .= $orig_file;
+}
+
+sub print_list {
+    my $num_checkouts = 0;
+    my $num_updates   = 0;
+    foreach my $group ( values %components_to_checkout ) {
+        foreach my $component ( @{$group} ) {
+            $num_checkouts++;
+        }
+    }
+    foreach my $group ( values %components_to_update ) {
+        foreach my $component ( @{$group} ) {
+            $num_updates++;
+        }
+    }
+    $|++;
+    print $num_checkouts. " components will be checked out.\n";
+    print $num_updates. " components will be updated.\n";
+    $|--;
+    foreach my $group ( values %components_to_checkout ) {
+        foreach my $component ( @{$group} ) {
+            print "A    $component->{TARGET}/$component->{CHECKOUT}";
+            print "/$component->{NAME}" if defined $component->{NAME};
+            print "\n";
+        }
+    }
+    foreach my $group ( values %components_to_update ) {
+        foreach my $component ( @{$group} ) {
+            print "U    $component->{TARGET}/$component->{CHECKOUT}";
+            print "/$component->{NAME}" if defined $component->{NAME};
+            print "\n";
+        }
+    }
+}
+
+sub get_status {
+    foreach my $component (@all_components) {
+        $checkout_types{ $component->{TYPE} }->( 'status', %{$component} );
+    }
+    $|++;
+    print "Would you like a diff for these files? yes [no] ";
+    my $answer = <STDIN>;
+    if ( $answer =~ /y/ ) { get_diff() }
+    exit 0;
+}
+
+sub get_diff {
+    # first reset all updated_xxx_repos hashes
+    # they are also used by get_status
+    foreach my $key (keys %updated_git_repos) {
+        $updated_git_repos{$key} = 0;
+    }
+    foreach my $key (keys %updated_darcs_repos) {
+        $updated_darcs_repos{$key} = 0;
+    }
+    foreach my $key (keys %updated_hg_repos) {
+        $updated_hg_repos{$key} = 0;
+    }
+    foreach my $component (@all_components) {
+        $checkout_types{ $component->{TYPE} }->( 'diff', %{$component} );
+    }
+    exit 0;
+}
+
+sub verify_urls {
+    foreach my $group ( values %components_to_update ) {
+        foreach my $component ( @{$group} ) {
+            my $ret =
+              $checkout_types{ $component->{TYPE} }
+              ->( 'verify_url', %{$component} );
+            if ( !$ret ) {
+                DIE(    "The URL for $component->{CHECKOUT} has changed, "
+                      . "please perform a clean checkout." );
+            }
+        }
+    }
+}
+
+sub write_componentlist_target {
+    chdir($orig_dir);
+
+    # find directory to put file into
+    my $fn = $ROOT;
+    if ( defined( $DEFINITIONS{"COMPONENTLIST_TARGET"} ) ) {
+        # this means the user specified a location for the list
+        $fn = $DEFINITIONS{"COMPONENTLIST_TARGET"};
+        run_command("mkdir -p '$fn'");
+
+        # find file name
+        my $short_name = $CRL_LISTS[0];
+        $short_name =~ s/.*\///g;
+        $fn .= "/$short_name";
+
+        # write file
+        open( ALL, ">$fn" ) or die("Could not write file $fn");
+        print ALL $combined_components;
+        close(ALL);
+    }
+
+    # we'll also store it in the default location
+    $fn = "$ROOT/.crl/component_list.crl";
+    # perl can't create dirs for a file
+    unless (-e "$ROOT/.crl") {
+        mkdir "$ROOT/.crl";
+    }
+    # write file
+    open( ALL, ">$fn" ) or die("Could not write file $fn");
+    print ALL $combined_components;
+    close(ALL);
+}
+
+sub process_users {
+    my $user = $ENV{USER};
+    my $last = $user;
+    foreach my $component (@all_components) {
+
+        # accessing the component hash looks weird here, but what we are doing
+        # is using the hash reference stored in @components directly.
+        # we can't convert the reference back to a hash because that would
+        # create a new hash not in the array...
+
+        # if $ANONYMOUS_CHECKOUT is set we override any stored users
+        if ($ANONYMOUS_CHECKOUT) {
+            delete $component->{AUTH_URL};
+            next;
+        }
+
+        # if AUTH_URL is defined we want to find the username:
+        if (
+            defined( $component->{AUTH_URL} )
+            and (  $component->{TYPE} eq 'cvs'
+                or $component->{TYPE} eq 'svn'
+                or $component->{TYPE} eq 'darcs'
+                or $component->{TYPE} eq 'git'
+                or $component->{TYPE} eq 'hg' )
+          )
+        {
+
+            # first we check the users file for a match
+            my $saved_user = find_user( $component->{AUTH_URL_ORIG} );
+
+            # if no match is found, we prompt the user for a username
+            # and attempt to login
+            if ( !defined $saved_user ) {
+                if ( $component->{AUTH_URL} =~ /([^\/]+)@/ ) {
+                    $user = $1;
+                }
+                $|++;
+                print "No user found for $component->{AUTH_URL_ORIG}\n";
+                print "Please enter your username ('-' for anonymous access) "
+                  . "[$user]: ";
+                my $answer = <STDIN>;
+                chomp $answer;
+                $|--;
+
+                # we want to save that the user wants to use anonymous access
+                if ( $answer =~ /^-$/ ) {
+                    save_user( 'N/A', $component->{AUTH_URL_ORIG} );
+                    delete $component->{AUTH_URL_ORIG};
+                    delete $component->{AUTH_URL};
+                    next;
+                }
+                elsif ( $answer =~ /^$/ ) {
+                    $component->{USER} = $user;
+                    $checkout_types{ $component->{TYPE} }
+                      ->( 'authenticate', %{$component} );
+                }
+                else {
+                    $component->{USER} = $answer;
+                    $last = $answer;
+                    $checkout_types{ $component->{TYPE} }
+                      ->( 'authenticate', %{$component} );
+                }
+
+                # reset user to the last entry
+                $user = $last;
+            }
+
+            # check for specified anonymous access
+            elsif ( $saved_user eq 'N/A' ) {
+                delete $component->{AUTH_URL_ORIG};
+                delete $component->{AUTH_URL};
+                next;
+            }
+
+            # if a match is found, the user has previously logged in and
+            # we can continue
+            else {
+                $component->{USER} = $saved_user;
+                next;
+            }
+        }
+    }
+}
+
+sub save_user {
+    my ( $user, $url ) = @_;
+    open( my $USERS, ">> $crl_dir/users" )
+      or DIE("Could not open $crl_dir/users because of: $!");
+    print {$USERS} "$user $url\n";
+    close $USERS;
+}
+
+sub find_user {
+    my $url = shift;
+    if ( !-e "$crl_dir/users" ) { return }
+    open( my $USERS, "$crl_dir/users" )
+      or DIE("Could not open $crl_dir/users.");
+    while ( my $line = <$USERS> ) {
+        chomp $line;
+        my ( $saved_user, $saved_url ) = split( ' ', $line );
+        return $saved_user if index( $url, $saved_url ) == 0;
+    }
+    return undef;
+}
+
+sub prompt_for_update {
+
+    # if updates have been specified from the cmd line there's no need
+    # to bother the user
+    return if $DO_UPDATES == 1;
+
+    # if there are no components to update there's no reason to ask..
+    return unless scalar( values %components_to_update );
+    $|++;
+    print "Do you want to update all existing components? yes, no [no] : ";
+    my $answer = <STDIN>;
+    chomp $answer;
+    $|--;
+    $DO_UPDATES = 1 if ( $answer =~ /^y/ );
+}
+
+sub checkout {
+    my @components : shared = @_;
+    if ($PARALLEL and scalar(@components) > 1) {
+        # checkout first component in serial, because this is likely to be a
+        # component containing other components, and parallel checkouts here
+        # might run into problems just because of that.
+        # This happens for instance with svn version 1.7 through 1.8
+        process_component( $components[0]->{TYPE}, 'checkout', %{$components[0]} );
+        no warnings 'threads';
+        $QUEUE->enqueue(@components[1..$#components]);
+        my $thr1 = threads->create( \&worker, 'checkout' );
+        my $thr2 = threads->create( \&worker, 'checkout' );
+        my $thr3 = threads->create( \&worker, 'checkout' );
+        my $thr4 = threads->create( \&worker, 'checkout' );
+        foreach my $thr ( threads->list() ) {
+            $thr->join();
+        }
+    }
+    else {
+        foreach my $component (@components) {
+            process_component( $component->{TYPE}, 'checkout', %{$component} );
+        }
+    }
+}
+
+sub update {
+    my @components : shared = @_;
+    if ($PARALLEL) {
+        # update first component in serial, because this is likely to be a
+        # component containing other components, and parallel updates here
+        # might run into problems just because of that.
+        # This happens for instance with svn version 1.7 through 1.8
+        process_component( $components[0]->{TYPE}, 'update', %{$components[0]} );
+        no warnings 'threads';
+        $QUEUE->enqueue(@components[1..$#components]);
+        my $thr1 = threads->create( \&worker, 'update' );
+        my $thr2 = threads->create( \&worker, 'update' );
+        my $thr3 = threads->create( \&worker, 'update' );
+        my $thr4 = threads->create( \&worker, 'update' );
+        foreach my $thr ( threads->list() ) {
+            $thr->join();
+        }
+    }
+    else {
+        foreach my $component (@components) {
+            process_component( $component->{TYPE}, 'update', %{$component} );
+        }
+    }
+}
+
+sub worker {
+    my $method = shift;
+    while ( my $component = $QUEUE->dequeue_nb() ) {
+        process_component( $component->{TYPE}, $method, %{$component} );
+    }
+}
+
+sub process_component {
+    my ( $type, $method, %component ) = @_;
+    if ( !exists( $checkout_types{$type} ) ) {
+        DIE("Unrecognized checkout type: $type");
+    }
+    chdir($orig_dir);
+    my $err = $checkout_types{$type}->( $method, %component );
+
+    # increment the checkout or update counter
+    unless ($err) {
+        $checkout_size++ if $method eq 'checkout';
+        $update_size++   if $method eq 'update';
+    }
+}
+
+sub handle_cvs {
+    my ( $method, %component ) = @_;
+    my $checkout = $component{CHECKOUT};
+    my $user;
+    my $pass;
+    my $url;
+    my $target = $component{TARGET};
+    my $name   = $component{NAME};
+    my $cmd    = '';
+    my $branch =
+      defined( $component{REPO_BRANCH} ) ? '-r ' . $component{REPO_BRANCH} : '';
+    my $date = defined $DATE ? '-D ' . $DATE : '';
+
+    if ( defined( $component{AUTH_URL} ) ) {
+        $url  = $component{AUTH_URL};
+        $user = $component{USER};
+
+        # this looks ugly... but we're not guaranteed that $component{USER}
+        # will exist... i.e. for updates we don't define the username
+        if ( $url =~ /:pserver:/ ) {
+            $url =~ s/:pserver:/:pserver:$user\@/ if defined $user;
+        }
+        else {
+            $url = "$user\@$url" if defined $user;
+        }
+    }
+    elsif ( defined( $component{ANON_USER} ) && defined( $component{ANON_PASS} ) ) {
+        $url  = $component{URL};
+        $user = $component{ANON_USER};
+        $pass = $component{ANON_PASS};
+        if ( $url =~ /:pserver:/ ) {
+            $url =~ s/:pserver:/:pserver:$user:$pass\@/;
+        }
+        else {
+            $url = "$user:$pass\@$url";
+        }
+    }
+    # This handles cvs repositories which use external means to authenticate,
+    # especially SSH
+    else {
+        $url  = $component{URL};
+    }
+
+    if ( $method eq 'checkout' ) {
+
+        run_command("mkdir -p $target");
+        if ( defined($name) ) {
+            die if $checkout =~ m{/};
+
+            # cvs cannot check out into the current directory.  cvs
+            # also has problems checking out into subdirectory if the
+            # current directory contains a "CVS" entry.  we therefore
+            # check out into a new "tmp" subdirectory, and then move
+            # the content of "tmp" into the current directory, and
+            # then delete "tmp" again.
+            my $tmpdir = ".GetComponents-tmp-$$";
+            $cmd = "{ "
+              . "rm -rf $target/$tmpdir && "
+              . "(cd $target && "
+              . "$cvs -q -d $url checkout -d $tmpdir $branch $date $checkout) && "
+              . "mv $target/$tmpdir $target/$name; " . "}";
+        }
+        else {
+            $cmd = "cd $target && $cvs -q -d $url checkout $date $branch $checkout";
+        }
+
+        print_checkout_info( $checkout, $url, $target, $name );
+        my ( $err, $out ) = run_command($cmd);
+        if ( $err != 0 || $out =~ /^cvs:/gmi ) {
+            my $log = "Could not check out module $checkout\n";
+            #$out =~ s'^(?!\S*:\s).*$''gmi;
+            $log .= $out;
+            WARN($log);
+            push( @components_error, $checkout );
+        }
+        return $err;
+    }
+
+    elsif ( $method eq 'update' ) {
+
+        my $dir = defined($name) ? $name : $checkout;
+        $cmd = "cd $target/$dir && $cvs -q update -dP $date $branch";
+
+        print_update_info( $checkout, $url, $target, $name );
+        my ( $err, $out ) = run_command($cmd);
+        if ( $err != 0 || $out =~ /^cvs:/gmi ) {
+            my $log = "Could not update module $checkout\n";
+            #$out =~ s'^(?!\S*:\s).*$''gmi;
+            $log .= $out;
+            WARN($log);
+            push( @components_error, $checkout );
+        }
+        return $err;
+    }
+
+    elsif ( $method eq 'status' ) {
+
+        my $dir = defined($name) ? $name : $checkout;
+        $cmd = "cd $target/$dir && $cvs -n -q update -dP $branch";
+
+        my ( $err, $out ) = run_command($cmd);
+        $out = filter_status_output($out);
+        if ( $out !~ /^$/ ) {
+            print "In $target/$dir:\n";
+            print "$out\n";
+        }
+    }
+
+    elsif ( $method eq 'diff' ) {
+
+        my $dir = defined($name) ? $name : $checkout;
+        $cmd = "$cvs -q -d $url diff -u $target/$dir";
+
+        my ( $err, $out ) = run_command($cmd);
+        print $out;
+    }
+
+    elsif ( $method eq 'authenticate' ) {
+
+        $cmd = "$cvs -q -n -d $url checkout $checkout > /dev/null 2>&1";
+        my ( $err, $out ) = run_command($cmd);
+        if ( $err != 0 ) {
+
+            $cmd = "$cvs -q -d $url login";
+            run_command($cmd);
+        }
+
+        # store repository name and username
+        # remove username from url first
+        $url =~ s/$user\@//;
+        save_user( $user, $url );
+    }
+
+    elsif ( $method eq 'verify_url' ) {
+        my $dir = defined($name) ? $name : $checkout;
+        $url =~ s/:pserver://;
+        my $same_url;
+
+        open( my $rootfile, "$target/$dir/CVS/Root" )
+          or DIE("Could not open $target/$dir/CVS/Root");
+        while (<$rootfile>) {
+            if (/$url/) {
+                $same_url = 1;
+            }
+        }
+        close $rootfile;
+        return $same_url;
+    }
+
+    else { DIE("Unrecognized checkout method: $method") }
+}
+
+sub handle_svn {
+    my ( $method, %component ) = @_;
+    my $checkout = $component{"CHECKOUT"};
+    my $target   = $component{"TARGET"};
+    my $name     = $component{"NAME"};
+    my $cmd      = '';
+    my $user =
+      defined( $component{USER} ) ? " --username $component{USER}" : '';
+    my $err  = 0;
+    my $out  = '';
+    my $date = defined $DATE ? " -r {$DATE}" : '';
+
+    my $bad_cert = 0;
+    my $url      = $component{"URL"};
+    if ( defined( $component{"AUTH_URL"} ) ) {
+        $url = $component{"AUTH_URL"};
+        my $base = $url;
+        $base =~ s!(https://[\w\.]+)/(.*)$!$1!i;
+        unless ( $svn_servers{$base} ) {
+            $bad_cert = 1;
+        }
+    }
+
+    # This should be removed as soon as those repos are moved
+    my $cert_hack = '';
+    if ( $url =~ /https:\/\/svn\.cct\.lsu\.edu/ ) {
+      $cert_hack = " --trust-server-cert ";
+    }
+
+    if ( $method eq 'checkout' ) {
+
+        run_command("mkdir -p $target");
+        my $dir = defined($name) ? $name : $checkout;
+        $cmd = "cd $target && $svn checkout --non-interactive $cert_hack $user$date $url $dir";
+
+        print_checkout_info( $checkout, $url, $target, $name );
+
+        # let svn print to stderr to facilitate dealing with
+        # server certificate issues
+        ( $err, $out ) = run_command( $cmd, $VERBOSE, $bad_cert );
+        # Check for relocated repositories
+        if ($out =~ /^svn: Repository moved permanently to '(.*)'; please relocate$/) {
+            my $new_location = $1;
+            $cmd = "cd $target && $svn checkout --non-interactive $cert_hack $user$date $new_location $dir";
+            ( $err, $out ) = run_command( $cmd, $VERBOSE, $bad_cert );
+        }
+        if ( $err || $out =~ /^svn/gmi ) {
+            my $log = "Could not checkout module $checkout\n";
+            $out =~ s/^(?!svn).*$//gmi;
+            $out =~ s/\n+/\n/g;
+            $log .= $out;
+            WARN($log);
+            push( @components_error, $checkout );
+        }
+        return $err;
+    }
+
+    elsif ( $method eq 'update' ) {
+
+        my $dir = defined($name) ? $name : $checkout;
+        $cmd = "cd $target/$dir && $svn update --non-interactive $cert_hack $date";
+
+        print_update_info( $checkout, $url, $target, $name );
+        ( $err, $out ) = run_command( $cmd, $VERBOSE, $bad_cert );
+        # Check for relocated repositories
+        if ($out =~ /^svn: Repository moved permanently to '(.*)'; please relocate$/) {
+            my $new_location = $1;
+            $cmd = "cd $target/$dir && $svn info --non-interactive $cert_hack";
+            ( $err, $out ) = run_command( $cmd, $VERBOSE, $bad_cert );
+            $out =~ /^URL: (.*)$/m;
+            my $old_location = $1;
+            if (!defined($old_location)) {
+                WARN("Could not determine old location of module $checkout while ".
+                     "trying relocation");
+                push( @components_error, $checkout );
+            } else {
+                $cmd = "cd $target/$dir && $svn --non-interactive $cert_hack switch --relocate $old_location $new_location";
+                ( $err, $out ) = run_command( $cmd, $VERBOSE, $bad_cert );
+                if ( $err || $out =~ /^svn/gmi ) {
+                    WARN("Could not relocate module $checkout");
+                    push( @components_error, $checkout );
+                }
+            }
+        }
+        if ( $err || $out =~ /^svn/gmi ) {
+            my $log = "Could not update module $checkout\n";
+            $out =~ s/^(?!svn).*$//gmi;
+            $out =~ s/\n+/\n/g;
+            $log .= $out;
+            WARN($log);
+            push( @components_error, $checkout );
+        }
+        elsif ($out =~ /^[CE]\s+/gm && $out =~ /conflicts/gm) {
+            my $log = "Module $checkout has conflicts, don't forget to resolve\n";
+            $out =~ s/^(?![CE]).*$//gmi;
+            $out =~ s/\n+/\n/g;
+            $log .= $out;
+            WARN($log);
+            push( @components_error, $checkout . ": conflict during update" );
+            $err = 1;
+        }
+        else {
+            $cmd = "cd $target/$dir && $svn status --non-interactive $cert_hack ";
+            ( $err, $out ) = run_command( $cmd, $VERBOSE, $bad_cert );
+            if ($out =~ /^[CE]\s+/gm) {
+                my $log = "Module $checkout has conflicts, don't forget to resolve\n";
+                $out =~ s/^(?![CE]).*$//gmi;
+                $out =~ s/\n+/\n/g;
+                $log .= $out;
+                WARN($log);
+                push( @components_error, $checkout . ": pre-existing conflicts" );
+                $err = 1;
+            }
+        }
+
+        return $err;
+    }
+
+    elsif ( $method eq 'status' ) {
+
+        my $dir = defined($name) ? $name : $checkout;
+        $cmd = "$svn status $target/$dir";
+        my ($err, $out ) = run_command($cmd);
+        $out = filter_status_output($out);
+        if ( $out !~ /^$/ ) {
+            print "In $target/$dir:\n";
+            print "$out\n";
+        }
+    }
+
+    elsif ( $method eq 'diff' ) {
+
+        my $dir = defined($name) ? $name : $checkout;
+        $cmd = "$svn diff $target/$dir";
+
+        my ($err, $out ) = run_command($cmd);
+        print $out;
+    }
+
+    elsif ( $method eq 'authenticate' ) {
+
+        $cmd = "$svn info --non-interactive $user $url";
+        $err = run_command($cmd);
+
+        # store username and repo
+        save_user( $component{USER},
+            defined( $component{"AUTH_URL_ORIG"} )
+            ? $component{"AUTH_URL_ORIG"}
+            : $component{"URL_ORIG"} );
+    }
+
+    elsif ( $method eq 'verify_url' ) {
+        my $dir = defined($name) ? $name : $checkout;
+        my $cmd = "$svn info --non-interactive --xml $target/$dir";
+
+        my $same_url;
+        my $new_url = $url;
+        $url =~ s!https?://!!;
+        my ( $err, $out ) = run_command($cmd);
+        $out =~ m!<url>(.*)</url>!;
+        my $old_url = $1;
+        unless ($old_url =~ /$url/) {
+            # URL's don't match. try `svn switch`
+            ( $err, $out ) = run_command("$svn --non-interactive $cert_hack switch $new_url $target/$dir");
+            if ($err) {
+                # repo might have moved. try `svn switch --relocate`
+                ( $err, $out ) = run_command("$svn --non-interactive $cert_hack switch --relocate $old_url $new_url $target/$dir");
+                if ($out =~ /^svn: Repository moved permanently to '(.*)'; please relocate$/) {
+                    my $new_location = $1;
+                    if ($new_location eq $old_url) { $err = 0; }
+                }
+            }
+            # exit code 0 means no error, but 0 is boolean false...
+            return !$err;
+        }
+        return 1;
+    }
+    
+    else { DIE("Unrecognized checkout method: $method") }
+}
+
+sub handle_git {
+    my ( $method, %component ) = @_;
+    my $target  = $component{"TARGET"};
+    my $name    = $component{"NAME"};
+    my $url     = $component{"URL"};
+    if ( defined( $component{"AUTH_URL"} ) ) {
+        $url     = $component{"AUTH_URL"};
+    }
+    my $shallow;
+    if    ( $SHALLOW_CLONE == 1 ) { $shallow = ' --depth 1' }
+    elsif ( $SHALLOW_CLONE == 0 ) { $shallow = '' }
+    my $checkout      = $component{"CHECKOUT"};
+    my $repo_path     = $component{"REPO_PATH"};
+    my $git_repo      = $component{"GIT_REPO"};
+    my $cmd           = '';
+    my $git_repos_dir = '';
+    my @branches = defined $component{REPO_BRANCH} ? 
+                    split ", ", $component{REPO_BRANCH} : ();
+    my $branch;
+    my $tag;
+    my $repo_loc = "$orig_dir/$ROOT/repos/$git_repo";
+    
+    if ( $method eq 'checkout' ) {
+
+        if ($PARALLEL) {
+            $semaphores{$git_repo}->down();
+        }
+        print_checkout_info( $checkout, $url, $target, $name );
+
+        run_command("mkdir -p $orig_dir/$ROOT/repos");
+
+        # first check to see if previous attempt at clone failed
+        if ( $updated_git_repos{$git_repo} == -1 ) {
+            return -1;
+        }
+
+        # clone the git repo
+        elsif ( !-e $repo_loc ) {
+            $cmd = "$git clone$shallow $url $repo_loc";
+            my ( $err, $out ) = run_command($cmd);
+            if ($err) {
+                my $log = "Could not checkout module $checkout\n";
+                $out =~ s/^(?!fatal).*$//gmi;
+                $out =~ s/\n+/\n/g;
+                $log .= $out;
+                WARN($log);
+                push( @components_error, $checkout );
+                return $err;
+            }
+            
+            # determine if we need a branch or tag checkout
+            if ( defined $component{"REPO_BRANCH"} ) {
+                @branches = split(/, /, $component{"REPO_BRANCH"});
+                my $real_branches = `cd $repo_loc && $git tag -l`;
+                for $branch (@branches) {
+                    # determine if $branch is actually a tag
+                    if ( $real_branches =~ /^$branch/m ) {
+                        $tag = $branch;
+                        $branch = undef;
+                    }
+            
+                    if ( defined $branch ) {
+                        $cmd = "cd $repo_loc && "
+                          . "$git checkout --track -b $branch origin/$branch";
+                        if ( $branch eq 'master' ) {
+                            # fix for master branch
+                            $cmd = "cd $repo_loc && $git checkout master";
+                        }
+                        my ( $err, $out ) = run_command($cmd);
+                        if ($err) {
+                            my $new;
+                            if ( -e "$repo_loc.branch.failed" ) {
+                                my @times = glob "$repo_loc.branch.failed*";
+                                $new = "$repo_loc.branch.failed."
+                                        . scalar @times;
+                            } else {
+                                $new = "$repo_loc.branch.failed"
+                            }
+                            run_command("mv $repo_loc $new");
+                            $updated_git_repos{$git_repo} = -1;
+                            my $log =
+                                "Could not checkout $checkout, "
+                              . "unable to switch to branch $branch. "
+                              . "Any existing symlinks to $checkout will be "
+                              . "broken";
+                            WARN($log);
+                            push( @components_error,
+                                $checkout . ": symlinks may be broken" );
+                            return $err;
+                        }
+                    } elsif ( defined $tag ) {
+                        $cmd = "cd $repo_loc && $git checkout -b $tag origin/$tag";
+                        my ( $err, $out ) = run_command($cmd);
+                        if ($err) {
+                            my $new;
+                            if ( -e "$repo_loc.branch.failed" ) {
+                                my @times = glob "$repo_loc.branch.failed*";
+                                $new = "$repo_loc.branch.failed."
+                                        . scalar @times;
+                            } else {
+                                $new = "$repo_loc.branch.failed"
+                            }
+                            run_command("mv $repo_loc $new");
+                            $updated_git_repos{$git_repo} = -1;
+                            my $log =
+                                "Could not checkout $checkout, "
+                              . "unable to switch to tag $branch. "
+                              . "Any existing symlinks to $checkout will be "
+                              . "broken";
+                            WARN($log);
+                            push( @components_error,
+                                $checkout . ": symlinks may be broken" );
+                            return $err;
+                        }
+                    }
+                }
+            }
+            $updated_git_repos{$git_repo} = 1;
+        }
+
+        # if git repo has already been cloned, we will pull the latest version
+        elsif ( $updated_git_repos{$git_repo} == 0 ) {
+            git_stash_update_repo( $git_repo, $repo_loc, $checkout, @branches );
+        }
+
+        my ( $checkout_dir, $checkout_item ) = split( /\//, $checkout );
+        unless ( $checkout =~ m!/! ) {
+
+            # if $checkout does not contain a '/', the item to be checked
+            # out will be placed in $checkout_dir instead of $checkout_item,
+            # breaking the relative path for the symlink
+            $checkout_dir  = '';
+            $checkout_item = $checkout;
+        }
+
+        my $target_dir = "$orig_dir/$target/$checkout_dir";
+        # $target could be absolute path already...
+        if ($target =~ m!^/!) {
+            $target_dir = "$target/$checkout_dir"
+        }
+        run_command("mkdir -p $target_dir");
+
+        # get relative path from target directory to directory containing the
+        # repositories
+        $git_repos_dir = File::Spec->abs2rel( "$orig_dir/$ROOT/repos",
+            "$target_dir" );
+
+        # now we create a symlink from the repo to the appropriate target
+        if ( defined($repo_path) ) {
+            if ( $repo_path =~ /\$1|\$2/ ) {
+
+                my ( $dir1, $dir2 ) = $checkout =~ m!(.*)/(.*)!;
+                $repo_path =~ s!\$1!$dir1!;
+                $repo_path =~ s!\$2!$dir2!;
+
+                $cmd = "cd $target_dir && "
+                  . "$ln $git_repos_dir/$git_repo/$repo_path $checkout_item";
+                if ( $orig_dir eq $ROOT ) { $cmd =~ s!$orig_dir/!! }
+            }
+            else {
+                $cmd =
+                    "cd $target_dir && "
+                  . "$ln $git_repos_dir/$git_repo/$repo_path/$checkout "
+                  . "$checkout_item";
+                if ( $orig_dir eq $ROOT ) { $cmd =~ s!$orig_dir/!! }
+            }
+
+            #return if (-e "$checkout_item");
+            my ( $err, $out ) = run_command($cmd);
+            if ($err) {
+                push( @components_error, $checkout . ": symlink error." );
+            }
+            if ($PARALLEL) {
+                $semaphores{$git_repo}->up();
+            }
+            return $err;
+        }
+        elsif ( $checkout eq '.' ) {
+
+            # checkout entire repo
+            $cmd = "cd $target_dir && $ln $git_repos_dir/$git_repo $name";
+            if ( $orig_dir eq $ROOT ) { $cmd =~ s!$orig_dir/!! }
+            return if ( -e "$target_dir/$name" );
+            my ( $err, $out ) = run_command($cmd);
+            if ($err) {
+                push( @components_error, $checkout . ": symlink error." );
+            }
+            if ($PARALLEL) {
+                $semaphores{$git_repo}->up();
+            }
+            return $err;
+        }
+        else {
+            $cmd = "cd $target_dir && "
+              . "$ln $git_repos_dir/$git_repo/$checkout $checkout_item";
+            if ( $orig_dir eq $ROOT ) { $cmd =~ s!$orig_dir/!! }
+            return if ( -e "$target_dir/$checkout_item" );
+            my ( $err, $out ) = run_command($cmd);
+            if ($err) {
+                push( @components_error, $checkout . ": symlink error." );
+            }
+            if ($PARALLEL) {
+                $semaphores{$git_repo}->up();
+            }
+            return $err;
+        }
+    }
+
+    elsif ( $method eq 'update' ) {
+
+        if ( $updated_git_repos{$git_repo} == -1 ) {
+            return -1;
+        }
+        elsif ( $updated_git_repos{$git_repo} == 0 ) {
+            if ($PARALLEL) {
+                $semaphores{$git_repo}->down();
+            }
+
+            if (  !-e "$orig_dir/$ROOT/repos/$git_repo"
+                && -e "$orig_dir/$ROOT/git-repos/$git_repo" )
+            {
+                run_command("mkdir -p $orig_dir/$ROOT/repos");
+                run_command( "cd $orig_dir/$ROOT/repos && "
+                      . "$ln ../git-repos/$git_repo $git_repo" );
+            }
+            print_update_info( $checkout, $url, $target, $name );
+            
+            my $err = git_stash_update_repo( $git_repo, $repo_loc, $checkout,
+                                             @branches);
+            
+            if ($PARALLEL) {
+                $semaphores{$git_repo}->up();
+            }
+            return $err;
+        }
+
+        # if git repo has already been updated print update info anyway
+        # to suggest that we didn't miss a module
+        else {
+            print_update_info( $checkout, $url, $target, $name );
+            return 0; 
+        }
+    }
+
+    elsif ( $method eq 'status' ) {
+
+        # only need to run status once per repo
+        return if $updated_git_repos{$git_repo};
+        
+        my ( $err, $out ) = run_command("cd $repo_loc && $git status -s");
+        $out = filter_status_output($out);
+        if ( $out !~ /^$/ ) {
+            print "In $ROOT/repos/$git_repo:\n";
+            print "$out\n";
+        }
+        $updated_git_repos{$git_repo} = 1;
+    }
+
+    elsif ( $method eq 'diff' ) {
+
+        # only need to run diff once per repo
+        return if $updated_git_repos{$git_repo};
+        
+        $cmd = "cd $repo_loc && $git diff --exit-code";
+        my ( $err, $out ) = run_command($cmd);
+        if ( $out !~ /^$/ ) {
+            # help a bit with differentiating between diffs
+            print
+              "================================================================\n";
+            $out =~ s!^--- a/!--- a/$ROOT/repos/$git_repo/!gm;
+            $out =~ s!^\+\+\+ b/!\+\+\+ b/$ROOT/repos/$git_repo/!gm;
+            print $out;
+        }
+
+        # reuse this hash, we won't be updating anything this run..
+        $updated_git_repos{$git_repo} = 1;
+    }
+
+    elsif ( $method eq 'authenticate' ) {
+
+        # do something, nothing for now...
+        # git authenticates through ssh, so no storing usernames and stuff yet
+        my $user = $component{USER};
+        save_user( $user, $component{AUTH_URL_ORIG} );
+    }
+
+    elsif ( $method eq 'verify_url' ) {
+
+        # only need to run once per repo
+        return 1 if $verified_git_repos{$git_repo};
+        
+        my $cmd = "cd $repo_loc && git config --get remote.origin.url";
+        my ( $err, $out ) = run_command($cmd);
+        chomp($out);
+        $verified_git_repos{$git_repo} = 1;
+        if (! ( $out =~ /$url/ )) {
+            WARN("git::verify_url: URLs do not match. Stored URL: <$url>, current URL: <$out>");
+        }
+        return ( $out =~ /$url/ );
+    }
+    else { DIE("Unrecognized checkout method: $method") }
+}
+
+sub git_stash_update_repo {
+    my ( $git_repo, $repo_loc, $checkout, @branches ) = @_;
+    
+    # stash local changes, if necessary
+    my ( $err, $out ) = run_command("cd $repo_loc && $git stash save GetComponents-tmp");
+    if ($err) {
+        push( @components_error, $checkout );
+        my $logmsg = "Could not update $git_repo. Could not stash local changes. Error message was '$out'.";
+        WARN($logmsg);
+        $updated_git_repos{$git_repo} = -1;
+        return $err;
+    }
+
+    my $ret = git_update_repo($git_repo, $repo_loc, $checkout, @branches);
+
+    # pop stash if necessary
+    ( $err, $out ) = run_command("cd $repo_loc && if $git stash list | grep -q GetComponents-tmp; then $git stash pop \$($git stash list | grep GetComponents-tmp | sed -e 's/:.*//'); fi");
+    if ($err) {
+        push( @components_error, $checkout );
+        my $logmsg = "Could not update $git_repo. Could not pop stashed changes. Error message was '$out'.";
+        WARN($logmsg);
+        $updated_git_repos{$git_repo} = -1;
+        return $err;
+    }
+    return $ret;
+}
+
+sub git_update_repo {
+    my ( $git_repo, $repo_loc, $checkout, @branches ) = @_;
+
+    # update remote origin to make sure we can see all remote branches
+    my ( $err, $out ) = run_command("cd $repo_loc && $git remote update origin");
+    if ($err) {
+        push( @components_error, $checkout );
+        my $logmsg = "Could not update $git_repo. "
+          . "Could not update remote 'origin'.";
+        WARN($logmsg);
+        $updated_git_repos{$git_repo} = -1;
+        return $err;
+    }
+    
+    # what branch/tag are we on?
+    ( $err, $out ) = run_command("cd $repo_loc && $git branch");
+    $out =~ /^\*\s*(.*)/m;
+    my $current_branch = $1;
+    if ($current_branch =~ /no branch/) {
+        # figure out which tag we're on....
+        my $commit = `cd $repo_loc && $git rev-parse HEAD`;
+        $current_branch = `cd $repo_loc && $git tag --contains $commit`;
+    }
+    
+    # now loop through specified branches, and append 'master'
+    push @branches, 'master';
+    for my $branch (@branches) {
+        # three possibilities: 
+        # 1. branch exists locally, needs update
+        # 2. branch exists remotely, needs local tracking branch
+        # 3. branch is actually tag, do nothing
+
+        if ( `cd $repo_loc && $git branch` =~ /$branch/m ) {
+            # case 1
+            # checkout branch and pull --rebase
+            ( $err, $out ) = run_command(
+                            "cd $repo_loc && " .
+                            "if [ xrefs/heads/$branch != x`$git symbolic-ref -q HEAD` ] ; then " .
+                            "  $git checkout $branch ; " .
+                            "fi && " .
+                            "$git pull --rebase origin $branch");
+            if ($err) {
+                push( @components_error, $checkout );
+                my $logmsg = "Could not update $git_repo. "
+                  . "Could not update branch $branch.";
+                WARN($logmsg);
+                $updated_git_repos{$git_repo} = -1;
+                return $err;
+            }
+        } elsif ( `cd $repo_loc && $git branch -r` =~ /$branch/m ) {
+            # dealing with a remote tracking branch
+            ( $err, $out ) = run_command(
+                        "cd $repo_loc && " .
+                        "$git checkout --track -b $branch origin/$branch");
+            if ($err) {
+                push( @components_error, $checkout );
+                my $logmsg = "Could not update $git_repo. "
+                  . "Could not create local branch for $branch.";
+                WARN($logmsg);
+                $updated_git_repos{$git_repo} = -1;
+                return $err;
+            }
+        } # no need for else statement, do nothing for tags
+    }
+    
+    # now checkout original branch if required
+    ( $err, $out ) = run_command(
+                "cd $repo_loc && " .
+                "if [ xrefs/heads/$current_branch != x`$git symbolic-ref -q HEAD` ] ; then " .
+                "  $git checkout $current_branch ; " .
+                "fi");
+    if ($err) {
+        push( @components_error, $checkout );
+        my $logmsg = "Could not update $git_repo. "
+          . "Could not checkout original branch.";
+        WARN($logmsg);
+        $updated_git_repos{$git_repo} = -1;
+        return $err;
+    }
+    
+    
+    # # determine if we have a branch or tag checkout
+    # if ( @branches ) {
+    #     $branch = pop @branches;
+    #     # determine if $branch is actually a tag
+    #     if ( `cd $repo_loc && $git tag -l` =~ /^$branch/m ) {
+    #         $tag = $branch;
+    #         $branch = undef;
+    #     }
+    # }
+    # 
+    # 
+    # # `git pull --rebase` will fail in detached HEAD state
+    # # i.e. if we have checked out a tag
+    # unless (defined($tag)) {
+    #     ( $err, $out ) = run_command("cd $repo_loc && $git pull --rebase");
+    #     if ($err) {
+    #         push( @components_error, $checkout );
+    #         my $logmsg = "Could not update $git_repo. "
+    #           . "Could not pull in remote changes.";
+    #         WARN($logmsg);
+    #         $updated_git_repos{$git_repo} = -1;
+    #         return $err;
+    #     }
+    # } else {
+    #     ( $err, $out ) = run_command("cd $repo_loc && $git fetch");
+    #     if ($err) {
+    #         push( @components_error, $checkout );
+    #         my $logmsg = "Could not update $git_repo. "
+    #           . "Could not fetch remote changes.";
+    #         WARN($logmsg);
+    #         $updated_git_repos{$git_repo} = -1;
+    #         return $err;
+    #     }
+    #     ( $err, $out ) = run_command("cd $repo_loc && $git checkout $tag");
+    #     if ($err) {
+    #         push( @components_error, $checkout );
+    #         my $logmsg = "Could not update $git_repo. "
+    #           . "Could not checkout specified tag.";
+    #         WARN($logmsg);
+    #         $updated_git_repos{$git_repo} = -1;
+    #         return $err;
+    #     }
+    # }
+    # 
+    # if ($stash) {
+    #     # pop stashed changes
+    #     ( $err, $out ) = run_command("cd $repo_loc && $git stash pop");
+    # 
+    #     # `git stash pop` returns 1 if there is no stash
+    #     if ($err) {
+    #         push( @components_error, $checkout );
+    #         my $logmsg = "Could not update $git_repo. "
+    #           . "Could not pop stashed changes.";
+    #         WARN($logmsg);
+    #         $updated_git_repos{$git_repo} = -1;
+    #         return $err;
+    #     }
+    # }
+    $updated_git_repos{$git_repo} = 1
+      unless $updated_git_repos{$git_repo} == -1;
+    
+    return $err;
+}
+
+sub handle_curl {
+    my ( $method, %component ) = @_;
+    my $target   = $component{"TARGET"};
+    my $name     = $component{"NAME"};
+    my $url      = $component{"URL"};
+    my $user     = ' ';
+    my $pass     = ' ';
+    my $checkout = $component{"CHECKOUT"};
+    my $cmd      = '';
+    if ( defined( $component{"USER"} ) ) {
+        $user = "--user $component{USER}:$component{PASS}";
+    }
+
+    if ( $method eq 'checkout' ) {
+
+        run_command("mkdir -p $target");
+
+        if ( defined($name) ) {
+            die if $checkout =~ m{/};
+
+            # wget cannot check out into a specific directory.  we
+            # therefore check out in a new "tmp" subdirectory, and
+            # then rename, and then delete "tmp" again.
+            my $tmpdir = "$target/.GetComponents-tmp-$$";
+            $cmd = "{ "
+              . "rm -rf $tmpdir && "
+              . "mkdir $tmpdir && "
+              . "(cd $tmpdir && $curl -O $user $url/$checkout) && "
+              . "mv $tmpdir/$checkout $target/$name &&"
+              . "rmdir $tmpdir; " . "}";
+        }
+        else {
+            $cmd = "cd $target && $curl -O $user $url/$checkout";
+        }
+        print_checkout_info( $checkout, $url, $target, $name );
+        my ( $err, $out ) = run_command($cmd);
+        if ($err) {
+            push( @components_error, $checkout );
+        }
+        return $err;
+    }
+
+    elsif ( $method eq 'update' ) {
+
+        if ( defined($name) ) {
+            die if $checkout =~ m{/};
+
+            # wget cannot check out into a specific directory.  we
+            # therefore check out in a new "tmp" subdirectory, and
+            # then rename, and then delete "tmp" again.
+            my $tmpdir = "$target/.GetComponents-tmp-$$";
+            $cmd = "{ "
+              . "rm -rf $tmpdir && "
+              . "mkdir $tmpdir && "
+              . "mv $name $tmpdir/$checkout && "
+              . "(cd $tmpdir && $curl -O $user $url/$checkout) && "
+              . "mv $tmpdir/$checkout $target/$name &&"
+              . "rmdir $tmpdir; " . "}";
+        }
+        else {
+            $cmd = "cd $target && $curl -O $user $url/$checkout";
+        }
+
+        # add modification timestamp to old version
+        my $timestamp = strftime "%M.%d.%Y",
+          localtime( stat("$target/$checkout")->mtime );
+        my $temp = "$timestamp.$checkout";
+        run_command("mv $target/$checkout $target/$temp");
+        print_update_info( $checkout, $url, $target, $name );
+        my ( $err, $out ) = run_command($cmd);
+        push( @components_error, $checkout ) if $err;
+
+        # compare new version, if equivalent delete old
+        ( $err, $out ) = run_command("diff $target/$checkout $target/$temp");
+        run_command("rm -r $target/$temp") unless $err;
+    }
+
+    elsif ( $method eq 'status' ) {
+        warn "Status method not available for type: $component{TYPE}\n";
+        return;
+    }
+
+    elsif ( $method eq 'diff' ) {
+        warn "Diff method not available for type: $component{TYPE}\n";
+        return;
+    }
+
+    elsif ( $method eq 'verify_url' ) {
+
+        # nothing to do for http/ftp
+        return 1;
+    }
+
+    else { DIE("Unrecognized checkout method: $method") }
+}
+
+sub handle_darcs {
+    my ( $method, %component ) = @_;
+    my $target  = $component{"TARGET"};
+    my $name    = $component{"NAME"};
+    my $url     = $component{"URL"};
+    if ( defined( $component{"AUTH_URL"} ) ) {
+        $url     = $component{"AUTH_URL"};
+    }
+    my $shallow;
+    if    ( $SHALLOW_CLONE == 1 ) { $shallow = ' --lazy' }
+    elsif ( $SHALLOW_CLONE == 0 ) { $shallow = '' }
+    my $checkout        = $component{"CHECKOUT"};
+    my $repo_path       = $component{"REPO_PATH"};
+    my $darcs_repo      = $component{"DARCS_REPO"};
+    my $cmd             = '';
+    my $darcs_repos_dir = '';
+    my $tag = defined( $component{REPO_BRANCH} ) ? 
+                " -t $component{REPO_BRANCH}" : '';
+
+    my $repo_loc = "$orig_dir/$ROOT/repos/$darcs_repo";
+
+    if ( $method eq 'checkout' ) {
+
+        if ($PARALLEL) {
+            $semaphores{$darcs_repo}->down();
+        }
+
+        run_command("mkdir -p $orig_dir/$ROOT/repos");
+
+        # first check to see if previous attempt at clone failed
+        if ( $updated_darcs_repos{$darcs_repo} == -1 ) {
+            return -1;
+        }
+
+        # clone the darcs repo
+        elsif ( !-e $repo_loc ) {
+            $cmd = "$darcs get$shallow$tag $url $repo_loc";
+            print_checkout_info( $checkout, $url, $target, $name );
+            my ( $err, $out ) = run_command($cmd);
+            if ($err) {
+                my $log = "Could not checkout module $checkout\n";
+                $out =~ s/^(?!darcs).*$//gmi;
+                $out =~ s/\n+/\n/g;
+                $log .= $out;
+                WARN($log);
+                push( @components_error, $checkout );
+                return $err;
+            }
+            $updated_darcs_repos{$darcs_repo} = 1;
+        }
+
+        # if darcs repo has already been cloned, we will pull the latest
+        # version
+        elsif ( $updated_darcs_repos{$darcs_repo} == 0 ) {
+
+            print_checkout_info( $checkout, $url, $target, $name );
+            my ( $err, $out ) = run_command("$darcs pull$tag --repodir=$repo_loc");
+            if ($err) {
+                my $log = "Could not checkout module $checkout\n";
+                $out =~ s/^(?!darcs).*$//gmi;
+                $out =~ s/\n+/\n/g;
+                $log .= $out;
+                WARN($log);
+                push( @components_error, $checkout );
+                return $err;
+            }
+            $updated_darcs_repos{$darcs_repo} = 1;
+        }
+
+        # if darcs repo has already been updated, we will print checkout info
+        # anyway to suggest that we didn't miss a module
+        else { print_checkout_info( $checkout, $url, $target, $name ) }
+
+        my ( $checkout_dir, $checkout_item ) = split( /\//, $checkout );
+        unless ( $checkout =~ m!/! ) {
+
+            # if $checkout does not contain a '/', the item to be checked
+            # out will be placed in $checkout_dir instead of $checkout_item,
+            # breaking the relative path for the symlink
+            $checkout_dir  = '';
+            $checkout_item = $checkout;
+        }
+
+        my $target_dir = "$orig_dir/$target/$checkout_dir";
+        # $target could be absolute path
+        if ($target =~ m!^/!) {
+            $target_dir = "$target/$checkout_dir"
+        }
+        run_command("mkdir -p $target_dir");
+
+        # get relative path from target directory to directory containing the
+        # repositories
+        $darcs_repos_dir = File::Spec->abs2rel( "$orig_dir/$ROOT/repos",
+            "$target_dir" );
+
+        # now we create a symlink from the repo to the appropriate target
+        if ( defined($repo_path) ) {
+            if ( $repo_path =~ /\$1|\$2/ ) {
+
+                my ( $dir1, $dir2 ) = $checkout =~ m!(.*)/(.*)!;
+                $repo_path =~ s!\$1!$dir1!;
+                $repo_path =~ s!\$2!$dir2!;
+
+                $cmd = "cd $target_dir && "
+                  . "$ln $darcs_repos_dir/$darcs_repo/$repo_path $checkout_item";
+                if ( $orig_dir eq $ROOT ) { $cmd =~ s!$orig_dir/!! }
+            }
+            else {
+                $cmd =
+                    "cd $target_dir && "
+                  . "$ln $darcs_repos_dir/$darcs_repo/$repo_path/$checkout "
+                  . "$checkout_item";
+                if ( $orig_dir eq $ROOT ) { $cmd =~ s!$orig_dir/!! }
+            }
+
+            my ( $err, $out ) = run_command($cmd);
+            if ($err) {
+                push( @components_error, $checkout . ": symlink error." );
+            }
+
+            if ($PARALLEL) {
+                $semaphores{$darcs_repo}->up();
+            }
+            return $err;
+        }
+        elsif ( $checkout eq '.' ) {
+
+            # checkout entire repo
+            $cmd =
+              "cd $target_dir && " . "$ln $darcs_repos_dir/$darcs_repo $name";
+            if ( $orig_dir eq $ROOT ) { $cmd =~ s!$orig_dir/!! }
+            return if ( -e "$target_dir/$name" );
+            my ( $err, $out ) = run_command($cmd);
+            if ($err) {
+                push( @components_error, $checkout . ": symlink error." );
+            }
+            if ($PARALLEL) {
+                $semaphores{$darcs_repo}->up();
+            }
+
+            return $err;
+        }
+        else {
+            $cmd = "cd $target_dir && "
+              . "$ln $darcs_repos_dir/$darcs_repo/$checkout $checkout_item";
+            if ( $orig_dir eq $ROOT ) { $cmd =~ s!$orig_dir/!! }
+            return if ( -e "$target_dir/$checkout_item" );
+            my ( $err, $out ) = run_command($cmd);
+            if ($err) {
+                push( @components_error, $checkout . ": symlink error." );
+            }
+
+            if ($PARALLEL) {
+                $semaphores{$darcs_repo}->up();
+            }
+            return $err;
+        }
+    }
+
+    elsif ( $method eq 'update' ) {
+        if ( $updated_darcs_repos{$darcs_repo} == 0 ) {
+            if ($PARALLEL) {
+                $semaphores{$darcs_repo}->down();
+            }
+            if (  !-e "$orig_dir/$ROOT/repos/$darcs_repo"
+                && -e "$orig_dir/$ROOT/darcs-repos/$darcs_repo" )
+            {
+                run_command("mkdir -p $orig_dir/$ROOT/repos");
+                run_command( "cd $orig_dir/$ROOT/repos && "
+                      . "$ln ../darcs-repos/$darcs_repo $darcs_repo" );
+            }
+
+            print_update_info( $checkout, $url, $target, $name );
+            my ( $err, $out ) = run_command("$darcs pull$tag --repodir=$repo_loc");
+            if ($err) {
+                my $log = "Could not update module $checkout\n";
+                $out =~ s/^(?!darcs).*$//gmi;
+                $out =~ s/\n+/\n/g;
+                $log .= $out;
+                WARN($log);
+                push( @components_error, $checkout );
+            }
+            $updated_darcs_repos{$darcs_repo} = 1;
+
+            if ($PARALLEL) {
+                $semaphores{$darcs_repo}->up();
+            }
+            return $err;
+        }
+
+        # if darcs repo has already been updated print update info anyway
+        # to suggest that we didn't miss a module
+        else { print_update_info( $checkout, $url, $target, $name ); return 0; }
+    }
+
+    elsif ( $method eq 'status' ) {
+
+        return if $updated_darcs_repos{$darcs_repo};
+        my $cmd = "cd $repo_loc && $darcs whatsnew";
+        my ( $err, $out ) = run_command($cmd);
+        $out = filter_status_output($out);
+        if ( $out !~ /^$/ ) {
+            print "In $ROOT/repos/$darcs_repo:\n";
+            print "$out\n";
+        }
+        $updated_darcs_repos{$darcs_repo} = 1;
+    }
+
+    elsif ( $method eq 'diff' ) {
+
+        return if $updated_darcs_repos{$darcs_repo};
+        $cmd = "cd $repo_loc && $darcs diff -u";
+        my ( $err, $out ) = run_command($cmd);
+        $out =~ s!^--- a/!--- a/$ROOT/repos/$darcs_repo/!gm;
+        $out =~ s!^\+\+\+ b/!\+\+\+ b/$ROOT/repos/$darcs_repo/!gm;
+        print $out;
+        $updated_darcs_repos{$darcs_repo} = 1;
+    }
+
+    elsif ( $method eq 'verify_url' ) {
+
+        # only need to run once per repo
+        return 1 if $verified_darcs_repos{$darcs_repo};
+
+        my $cmd = "cd $repo_loc && $darcs show repo --no-files";
+        my ( $err, $out ) = run_command($cmd);
+        $verified_darcs_repos{$darcs_repo} = 1;
+        return ( $out =~ /Default Remote: $url/ );
+    }
+
+    elsif ( $method eq 'authenticate' ) {
+
+        # do something, nothing for now...
+        # darcs authenticates through ssh, so no storing usernames and stuff
+        # yet
+        my $user = $component{USER};
+        save_user( $user, $url );
+    }
+
+    else { DIE("Unrecognized checkout method: $method") }
+}
+
+sub handle_wget {
+    my ( $method, %component ) = @_;
+    my $target   = $component{"TARGET"};
+    my $name     = $component{"NAME"};
+    my $url      = $component{"URL"};
+    my $user     = ' ';
+    my $pass     = ' ';
+    my $checkout = $component{"CHECKOUT"};
+    my $cmd      = '';
+    if ( defined( $component{"USER"} ) ) {
+        $user = "--user=" . $component{"USER"};
+        $pass = "--password=" . $component{"PASS"};
+    }
+
+    if ( $method eq 'checkout' ) {
+
+        run_command("mkdir -p $target");
+
+        if ( defined($name) ) {
+            die if $checkout =~ m{/};
+
+            # wget cannot check out into a specific directory.  we
+            # therefore check out in a new "tmp" subdirectory, and
+            # then rename, and then delete "tmp" again.
+            my $tmpdir = "$target/.GetComponents-tmp-$$";
+            $cmd = "{ "
+              . "rm -rf $tmpdir && "
+              . "mkdir $tmpdir && "
+              . "(cd $tmpdir && $wget $user $pass $url/$checkout) && "
+              . "mv $tmpdir/$checkout $target/$name &&"
+              . "rmdir $tmpdir; " . "}";
+        }
+        else {
+            $cmd = "cd $target && $wget $user $pass $url/$checkout";
+        }
+        print_checkout_info( $checkout, $url, $target, $name );
+        my ( $err, $out ) = run_command($cmd);
+        push( @components_error, $checkout ) if $err;
+    }
+
+    elsif ( $method eq 'update' ) {
+
+        if ( defined($name) ) {
+            die if $checkout =~ m{/};
+
+            # wget cannot check out into a specific directory.  we
+            # therefore check out in a new "tmp" subdirectory, and
+            # then rename, and then delete "tmp" again.
+            my $tmpdir = "$target/.GetComponents-tmp-$$";
+            $cmd = "{ "
+              . "rm -rf $tmpdir && "
+              . "mkdir $tmpdir && "
+              . "mv $name $tmpdir/$checkout && "
+              . "(cd $tmpdir && $wget $user $pass $url/$checkout) && "
+              . "mv $tmpdir/$checkout $target/$name &&"
+              . "rmdir $tmpdir; " . "}";
+        }
+        else {
+            $cmd = "cd $target && $wget $user $pass $url/$checkout";
+        }
+
+        # add modification timestamp to old version
+        my $timestamp = strftime "%M.%d.%Y",
+          localtime( stat("$target/$checkout")->mtime );
+        my $temp = "$timestamp.$checkout";
+        run_command("mv $target/$checkout $target/$temp");
+        print_update_info( $checkout, $url, $target, $name );
+        my ( $err, $out ) = run_command($cmd);
+        push( @components_error, $checkout ) if $err;
+
+        # compare new version, if equivalent delete old
+        ( $err, $out ) = run_command("diff $target/$checkout $target/$temp");
+        run_command("rm -r $target/$temp") unless $err;
+    }
+
+    elsif ( $method eq 'status' ) {
+        warn "Status method not available for type: $component{TYPE}\n";
+        return;
+    }
+
+    elsif ( $method eq 'diff' ) {
+        warn "Diff method not available for type: $component{TYPE}\n";
+        return;
+    }
+
+    elsif ( $method eq 'verify_url' ) {
+
+        # nothing to do for http/ftp
+        return 1;
+    }
+
+    else { DIE("Unrecognized checkout method: $method") }
+}
+
+sub handle_hg {
+    my ( $method, %component ) = @_;
+    my $target       = $component{"TARGET"};
+    my $name         = $component{"NAME"};
+    my $url          = $component{"URL"};
+    if ( defined( $component{"AUTH_URL"} ) ) {
+        $url     = $component{"AUTH_URL"};
+    }
+    my $checkout     = $component{"CHECKOUT"};
+    my $repo_path    = $component{"REPO_PATH"};
+    my $hg_repo      = $component{"HG_REPO"};
+    my $cmd          = '';
+    my $hg_repos_dir = '';
+    my $branch =
+      defined( $component{REPO_BRANCH} ) ? $component{REPO_BRANCH} : undef;
+    my $date = defined $DATE ? '-d ' . $DATE : undef;
+
+    my $repo_loc = "$orig_dir/$ROOT/repos/$hg_repo";
+
+    if ( $method eq 'checkout' ) {
+        if ($PARALLEL) {
+            $semaphores{$hg_repo}->down();
+        }
+
+        run_command("mkdir -p $orig_dir/$ROOT/repos");
+
+        # first check to see if previous attempt at clone failed
+        if ( $updated_hg_repos{$hg_repo} == -1 ) {
+            return -1;
+        }
+
+        # clone the hg repo
+        if ( !-e $repo_loc ) {
+
+            $cmd = "$hg clone $url $repo_loc";
+            print_checkout_info( $checkout, $url, $target, $name );
+            my ( $err, $out ) = run_command($cmd);
+            if ($err) {
+                my $log = "Could not checkout module $checkout\n";
+                $out =~ s/^(?!abort).*$//gmi;
+                $out =~ s/\n+/\n/g;
+                $log .= $out;
+                WARN($log);
+                push( @components_error, $checkout );
+                return $err;
+            }
+            if ( defined($branch) ) {
+
+                my ( $err, $out ) =
+                  run_command("hg --repository $repo_loc checkout $branch");
+                if ($err) {
+                    my $new;
+                    if ( -e "$repo_loc.branch.failed" ) {
+                        my @times = glob "$repo_loc.branch.failed*";
+                        $new = "$repo_loc.branch.failed."
+                                . scalar @times;
+                    } else {
+                        $new = "$repo_loc.branch.failed"
+                    }
+                    run_command("mv $repo_loc $new");
+                    $updated_hg_repos{$hg_repo} = -1;
+                    my $log =
+                        "Could not checkout $checkout, "
+                      . "unable to switch to branch $branch. "
+                      . "Any existing symlinks to $checkout will be broken.";
+                    WARN($log);
+                    push( @components_error,
+                        $checkout . ": symlinks may be broken" );
+                    return $err;
+                }
+            }
+            if ( defined $date ) {
+
+                #chdir("$hg_repo");
+                my ( $err, $out ) = run_command(
+                    "hg --repository $repo_loc checkout --date $date");
+                if ($err) {
+                    my $new;
+                    if ( -e "$repo_loc.date.failed" ) {
+                        my @times = glob "$repo_loc.date.failed*";
+                        $new = "$repo_loc.date.failed."
+                                . scalar @times;
+                    } else {
+                        $new = "$repo_loc.date.failed"
+                    }
+                    run_command("mv $repo_loc $new");
+                    $updated_hg_repos{$hg_repo} = -1;
+                    my $log =
+                        "Could not checkout $checkout, "
+                      . "unable to checkout from date $date. "
+                      . "Any existing symlinks to $checkout will be broken.";
+                    WARN($log);
+                    push( @components_error,
+                        $checkout . ": symlinks may be broken" );
+                    return $err;
+                }
+            }
+            $updated_hg_repos{$hg_repo} = 1;
+        }
+
+        # if mercurial repo has already been cloned, we will pull the latest
+        # version
+        elsif ( $updated_hg_repos{$hg_repo} == 0 ) {
+
+            print_checkout_info( $checkout, $url, $target, $name );
+            my ( $err, $out ) = run_command("$hg --repository $repo_loc pull");
+            if ($err) {
+                my $log = "Could not checkout module $checkout\n";
+                $out =~ s/^(?!abort).*$//gmi;
+                $out =~ s/\n+/\n/g;
+                $log .= $out;
+                WARN($log);
+                push( @components_error, $checkout );
+                return $err;
+            }
+            $updated_hg_repos{$hg_repo} = 1;
+        }
+
+        # if mercurial repo has already been updated, we will print checkout
+        # info anyway to suggest that we didn't miss a module
+        else { print_checkout_info( $checkout, $url, $target, $name ) }
+
+        my ( $checkout_dir, $checkout_item ) = split( /\//, $checkout );
+        unless ( $checkout =~ m!/! ) {
+
+            # if $checkout does not contain a '/', the item to be checked
+            # out will be placed in $checkout_dir instead of $checkout_item,
+            # breaking the relative path for the symlink
+            $checkout_dir  = '';
+            $checkout_item = $checkout;
+        }
+
+        my $target_dir = "$orig_dir/$target/$checkout_dir";
+        # $target could be absolute path
+        if ($target =~ m!^/!) {
+            $target_dir = "$target/$checkout_dir"
+        }
+        run_command("mkdir -p $target_dir");
+
+        # get relative path from target directory to directory containing the
+        # repositories
+        $hg_repos_dir = File::Spec->abs2rel( "$orig_dir/$ROOT/repos",
+            "$target_dir" );
+
+        # now we create a symlink from the repo to the appropriate target
+        if ( defined($repo_path) ) {
+            if ( $repo_path =~ /\$1|\$2/ ) {
+
+                my ( $dir1, $dir2 ) = $checkout =~ m!(.*)/(.*)!;
+                $repo_path =~ s!\$1!$dir1!;
+                $repo_path =~ s!\$2!$dir2!;
+
+                $cmd = "cd $target_dir && "
+                  . "$ln $hg_repos_dir/$hg_repo/$repo_path $checkout_item";
+                if ( $orig_dir eq $ROOT ) { $cmd =~ s!$orig_dir/!! }
+            }
+            else {
+                $cmd =
+                    "cd $target_dir && "
+                  . "$ln $hg_repos_dir/$hg_repo/$repo_path/$checkout "
+                  . "$checkout_item";
+                if ( $orig_dir eq $ROOT ) { $cmd =~ s!$orig_dir/!! }
+            }
+
+            my ( $err, $out ) = run_command($cmd);
+            if ($err) {
+                push( @components_error, $checkout . ": symlink error." );
+            }
+
+            if ($PARALLEL) {
+                $semaphores{$hg_repo}->up();
+            }
+            return $err;
+        }
+        elsif ( $checkout eq '.' ) {
+
+            # checkout entire repo
+            $cmd = "cd $target_dir && " . "$ln $hg_repos_dir/$hg_repo $name";
+            if ( $orig_dir eq $ROOT ) { $cmd =~ s!$orig_dir/!! }
+            my ($err, $out) = (0, "");
+            if ( not -e "$target_dir/$name" ) {
+                ( $err, $out ) = run_command($cmd);
+                if ($err) {
+                    push( @components_error, $checkout . ": symlink error." );
+                }
+            }
+            if ($PARALLEL) {
+                $semaphores{$hg_repo}->up();
+            }
+            return $err;
+        }
+        else {
+            $cmd = "cd $target_dir && "
+              . "$ln $hg_repos_dir/$hg_repo/$checkout $checkout_item";
+            if ( $orig_dir eq $ROOT ) { $cmd =~ s!$orig_dir/!! }
+            my ($err, $out) = (0, "");
+            if ( not -e "$target_dir/$checkout_item" ) {
+                ( $err, $out ) = run_command($cmd);
+                if ($err) {
+                    push( @components_error, $checkout . ": symlink error." );
+                }
+            }
+            if ($PARALLEL) {
+                $semaphores{$hg_repo}->up();
+            }
+            return $err;
+        }
+    }
+
+    elsif ( $method eq 'update' ) {
+        if ( $updated_hg_repos{$hg_repo} == 0 ) {
+            if ($PARALLEL) {
+                $semaphores{$hg_repo}->down();
+            }
+            if (  !-e "$orig_dir/$ROOT/repos/$hg_repo"
+                && -e "$orig_dir/$ROOT/hg-repos/$hg_repo" )
+            {
+                run_command("mkdir -p $orig_dir/$ROOT/repos");
+                run_command( "cd $orig_dir/$ROOT/repos && "
+                      . "$ln ../hg-repos/$hg_repo $hg_repo" );
+            }
+
+            print_update_info( $checkout, $url, $target, $name );
+            my ( $err, $out ) =
+              run_command("$hg --repository $repo_loc pull --update");
+            if ($err) {
+                my $log = "Could not update module $checkout\n";
+                $out =~ s/^(?!abort).*$//gmi;
+                $out =~ s/\n+/\n/g;
+                $log .= $out;
+                WARN($log);
+                push( @components_error, $checkout );
+            }
+            $updated_hg_repos{$hg_repo} = 1;
+
+            if ($PARALLEL) {
+                $semaphores{$hg_repo}->up();
+            }
+            return $err;
+        }
+
+        # if hg repo has already been updated print update info anyway
+        # to suggest that we didn't miss a module
+        else { print_update_info( $checkout, $url, $target, $name ); return 0; }
+    }
+
+    elsif ( $method eq 'status' ) {
+        
+        return if $updated_hg_repos{$hg_repo};
+        my $cmd = "cd $repo_loc && $hg status";
+        my ( $err, $out ) = run_command($cmd);
+        $out = filter_status_output($out);
+        if ( $out !~ /^$/ ) {
+            print "In $ROOT/repos/$hg_repo:\n";
+            print "$out\n";
+        }
+        $updated_hg_repos{$hg_repo} = 1;
+    }
+
+    elsif ( $method eq 'diff' ) {
+
+        # only need to run diff once per repo
+        return if $updated_hg_repos{$hg_repo};
+
+        $cmd = "cd $repo_loc && $hg diff";
+        my ( $err, $out ) = run_command($cmd);
+        if ( $out !~ /^$/ ) {
+            # help a bit with differentiating between diffs
+            print
+              "================================================================\n";
+            $out =~ s!^--- a/!--- a/$ROOT/repos/$hg_repo/!gm;
+            $out =~ s!^\+\+\+ b/!\+\+\+ b/$ROOT/repos/$hg_repo/!gm;
+            print $out;
+        }
+        # reuse this hash, we won't be updating anything this run..
+        $updated_hg_repos{$hg_repo} = 1;
+    }
+
+    elsif ( $method eq 'authenticate' ) {
+
+        # do something, nothing for now...
+        # hg authenticates through ssh, so no storing usernames and stuff yet
+        my $user = $component{USER};
+        save_user( $user, $component{AUTH_URL_ORIG} );
+    }
+
+    elsif ( $method eq 'verify_url' ) {
+
+        # only need to run once per repo
+        return 1 if $verified_hg_repos{$hg_repo};
+
+        my $cmd = "cd $repo_loc && $hg showconfig paths.default";
+        my ( $err, $out ) = run_command($cmd);
+        $verified_hg_repos{$hg_repo} = 1;
+        # match against either anonymous or authenticated URL, assuming
+        # both point to actually the same repository
+        return ( $out =~ /$component{"URL"}/ or
+                 (defined $component{"AUTH_URL"} and
+                  $out =~ /$component{"AUTH_URL"}/) );
+    }
+
+    else { DIE("Unrecognized checkout method: $method") }
+}
+
+sub run_command {
+
+    # run a command through the shell and return the exit code and output.
+    # can optionally override the global verbose setting and elect to let
+    # the command print to stderr (this is useful in some cases, i.e. svn
+    # will print to stderr and block if the SSL certificate is not trusted)
+    my $command          = shift;
+    my $VERBOSE_OVERRIDE = shift;
+    my $show_err         = shift;
+    my $verbose = defined $VERBOSE_OVERRIDE ? $VERBOSE_OVERRIDE : $VERBOSE;
+    my $err = $show_err ? '' : '2>&1';
+    if ( $command =~ /^$/ ) { return }
+    if ($verbose) {
+
+        if ( $command =~ /^cd (.*) \&\& (.*)$/ ) {
+            my ( $cmd, $loc ) = ( $2, $1 );
+            print BOLD, "Executing: ", RESET, "$cmd\n",
+                  BOLD, "       In: ", RESET, "$loc\n";
+        }
+        else { print BOLD, "Executing: ", RESET, "$command\n" }
+    }
+    my $out = "";
+    if (not $DEBUG) { $out = `$command $err`; }
+    my $ret = $?;
+    print $out if $verbose;
+    return ( $ret, $out );
+}
+
+sub info {
+    my $text = shift;
+    if ($VERBOSE) { print $text}
+}
+
+sub print_checkout_info {
+    return if $DEBUG;
+
+    my ( $checkout, $url, $target, $name ) = @_;
+    my $msg =
+        "-----------------------------------------------------------------\n"
+      . "  Checking out module: $checkout\n"
+      . "      from repository: $url\n"
+      . "                 into: $target\n";
+    if ( defined($name) ) {
+        $msg .= "                   as: $name\n";
+    }
+    print $msg;
+}
+
+sub print_update_info {
+    return if $DEBUG;
+
+    my ( $checkout, $url, $target, $name ) = @_;
+    my $msg =
+        "-----------------------------------------------------------------\n"
+      . "  Updating module: $checkout\n"
+      . "  from repository: $url\n"
+      . "       located in: $target\n";
+    if ( defined($name) ) {
+        $msg .= "            under: $name\n";
+    }
+    print $msg;
+}
+
+sub print_summary {
+    return if $DEBUG;
+
+    print "-----------------------------------------------------------------\n";
+    if ( @components_error == 0 ) {
+        print "  $checkout_size components checked out successfully.\n";
+        print "  $update_size components updated successfully.\n\n";
+        my $logmsg = "Updated from thornlist(s): ";
+        $logmsg .= join( ' , ', @ORIG_LISTS );
+
+        &LOG($logmsg);
+    }
+    else {
+        print "  $checkout_size components checked out.\n";
+        print "  $update_size components updated.\n\n";
+        foreach my $error (@components_error) {
+            print "  Unable to process $error\n";
+        }
+        print "\n";
+        my $logmsg = @components_error
+          . " errors occurred during update from thornlist(s): ";
+        $logmsg .= join( ' , ', @ORIG_LISTS );
+        &LOG($logmsg);
+        print "Summary of Warnings:\n\n";
+        foreach my $warning (@warnings) {
+            print "$warning\n";
+        }
+    }
+
+    my $elapsed_time = time - $start_time;
+    my $min          = int( $elapsed_time / 60 );
+    my $sec          = $elapsed_time % 60;
+    print "  Time Elapsed: $min minutes, $sec seconds\n\n";
+}
+
+sub filter_status_output {
+    my $output = shift;
+    my @lines = split /\n/, $output;
+    foreach my $line (@lines) {
+        if ($line =~ /^\Q?\E\s+(.*)$/) {
+            my $path = $1;
+            if ($path eq "$ROOT/repos") {
+                $line = '';
+                next;
+            }
+            foreach my $c (@all_components) {
+                my $dir = defined($c->{NAME}) ? $c->{NAME} : $c->{CHECKOUT};
+                my $checkout = "$c->{TARGET}/$dir";
+                if ($checkout =~ /$path/) {
+                    $line = '';
+                    last;
+                }
+            }
+        }
+    }
+    $output = join "\n", @lines;
+    $output =~ s/^\s*//gm;
+    chomp $output;
+    return $output;
+}
+sub LOG {
+    return if $DEBUG;
+
+    my $log = shift;
+    if ( $log =~ /^$/ ) { return }
+
+    # move the file at 100KB, so it doesn't get too Long
+    if ( -e "$crl_dir/crl.log" ) {
+        if ( stat("$crl_dir/crl.log")->size > 100000 ) {
+            run_command("mv $crl_dir/crl.log $crl_dir/crl.log.old");
+        }
+    }
+    open( my $logfile, '>>', "$crl_dir/crl.log" ) or die $!;
+    my $timestamp = strftime "%b %e %H:%M:%S %Y", localtime;
+    print {$logfile} "$timestamp:\t$log\n";
+    close $logfile or die $!;
+}
+
+sub WARN {
+    my $warning = shift;
+    LOG($warning);
+    push( @warnings, $warning );
+    warn( "\n", BOLD, RED, "Warning: ", RESET, "$warning\n\n" );
+}
+
+sub DIE {
+    my $error = shift;
+    LOG($error);
+    die( "\n", BOLD, RED, "Error: ", RESET, "$error\n\n" );
+}
+
+__END__
+
+=head1 NAME
+GetComponents
+
+=head1 SYNOPSIS
+
+GetComponents [options] [file|URL]
+
+Options:
+
+    --help          brief help message
+
+    --man           full documentation
+
+    --verbose       print all system commands as they are executed
+
+    --debug         print all commands to be executed and exit
+
+    --parallel      checkout/update components in parallel
+
+    --anonymous     use anonymous checkout for all components
+
+    --update        process all updates
+
+    --status        run status commands for each component
+
+    --diff          run diff commands for each component
+
+    --root          override root directory
+
+    --date          checkout from a specific date
+
+    --[no]shallow   force shallow clones for git repositories
+
+    --reset-authentication
+                    delete authentication files
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<--help>
+
+Print a brief help message and exit.
+
+=item B<--man>
+
+Print the full man page and exit.
+
+=item B<--verbose>
+
+Print all system commands as they are executed by script, as well as output
+from the commands.
+
+=item B<--debug>
+
+Print a list of components that will be checked out or updated, along with the
+total number of components in the list.
+
+=item B<--parallel>
+
+Run checkout and update commands in parallel. Requires perl to be compiled with
+support for threads. 4 threads are used so as not to overload the network, this
+may become configurable in the future.
+
+=item B<--anonymous>
+
+Override any stored login credentials and use anonymous checkouts for all 
+components.
+
+=item B<--update>
+
+Override the update prompt and process all updates.
+
+=item B<--status>
+
+Provide a list of files that differ from the repository versions.
+
+=item B<--diff>
+
+Run a diff on the entire source tree. Be careful with this as it could run for
+a long time and produce a large output.
+
+=item B<--root>
+
+Override the root directory in the component list.
+This allows checking out into an arbitrary directory.
+
+=item B<--date>
+
+Checkout components from a specific date. Currently only supported for cvs, 
+svn, and mercurial.
+
+=item B<--[no]shallow>
+
+Force GetComponents to add '--depth 1' to all 'git clone' commands. This will 
+reduce the size of all git repositories by ignoring the repository history. 
+Equivalent options are used for darcs.
+
+=item B<--reset-authentication>
+
+Delete any CRL authentication files before processing the component list.
+
+=back
+
+=head1 DESCRIPTION
+
+B<This program> will parse the given input file(s), and checkout/update the 
+requested components using cvs, svn, git, darcs, hg, http, https, and ftp. It 
+requires an argument specifying the file that will contain the information 
+required to checkout the components. Multiple files may be passed together. A 
+component list may also be specified as the URL where the list is located, in 
+which case GetComponents will download the component list, and then proceed as
+usual.
+
+This file must have the following syntax:
+
+0. The first (non-comment) line must be '!CRL_VERSION = 1.0'
+
+1. It will be split up in to multiple sections, with each section 
+corresponding to a repository. The order of the sections is irrelevant.
+
+2. Each section will contain multiple directives beginning with a !.
+Required directives are: !TARGET, !TYPE, !URL, and !CHECKOUT.
+Optional directives are: !ANONYMOUS_USER, !ANONYMOUS_PASSWORD,
+!LOCAL_PATH, !REPOSITORY_PATH, and !AUTHORIZATION_URL. The shortened
+directives !ANON_USER, !ANON_PASS, !LOC_PATH, !REPO_PATH, and
+!AUTH_URL are also recognized.
+
+3. !TARGET MUST be the first directive for each section. It will specify the 
+directory, in which the components for the current repository will be placed.
+!TARGET may contain predefined constants i.e. $ROOT, which could represent the
+root directory for all of the components.
+
+4. !TYPE specifies the tool used to checkout the components. Currently, cvs, 
+svn, git, http, https, ftp, and hg (mercurial) are supported.
+
+5. !URL specifies the location of the repository for anonymous checkout. !URL 
+may contain variables $1, $2, etc, which will correspond to the directories 
+in the path given by !CHECKOUT. For example, if !URL = 
+http://svn.foo.com/$2/trunk and !CHECKOUT = foo/bar, !URL will be interpreted 
+as http://svn.foo.com/bar/trunk.
+
+6. !AUTH_URL will specify a different location for an authenticated checkout. 
+If both !AUTH_URL and !URL are defined, !AUTH_URL will take precedence.
+
+7. !CHECKOUT specifies the components to checkout from the repository. 
+!CHECKOUT can contain a path through multiple directories, in which case they 
+must be separated by a /. If there are multiple components to be checked out 
+from a single repository, they should be separated by a newline. Any trailing 
+whitespace or comments will be ignored.
+
+8. !NAME specifies an alternate name for the component to be checked out. 
+That means that if !TARGET is foo, !CHECKOUT is bar, and !NAME is foobar, the 
+resulting directory tree will be foo/foobar.
+
+9. !ANON_USER and !ANON_PASS will specify the login credentials for an 
+anonymous cvs checkout from the repository.
+
+10. !REPO_PATH will specify the location of the item to be checked out within 
+a repository. It can consist of a file path, or $1 or $2, and will essentially
+serve as a prefix to the checkout path when the script is looking for the 
+checkout item.
+
+11. Each directive will be followed by optional whitespace, an =, optional 
+whitespace, the corresponding argument, and more optional whitespace. The end 
+of an argument will be indicated by the ! preceding the next directive. The 
+argument may be enclosed in quotes (" or '), in which case the argument will 
+be taken literally and no variable substitution will occur.
+
+12. Extra newlines may be inserted between sections for greater clarity, and 
+any comments will be preceded by a #.
+
+13. There is an optional section that will contain any definitions i.e. $ROOT.
+These definitions will be preceded by !DEFINE, and then follow the syntax for 
+the directives. Definitions may only be defined once.
+
+=cut

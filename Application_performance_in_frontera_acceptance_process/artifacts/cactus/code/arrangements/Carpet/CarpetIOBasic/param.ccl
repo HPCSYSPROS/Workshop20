@@ -1,0 +1,106 @@
+# Parameter definitions for thorn CarpetIOBasic
+
+SHARES: IO
+
+USES KEYWORD out_criterion
+USES CCTK_INT out_every
+USES CCTK_REAL out_dt
+
+USES BOOLEAN strict_io_parameter_check
+
+
+
+PRIVATE:
+
+CCTK_STRING outInfo_vars "Variables to output in scalar form" STEERABLE = ALWAYS
+{
+  "" :: "A regex which matches everything"
+} ""
+
+CCTK_STRING outInfo_reductions "List of reductions to output in scalar form" STEERABLE = ALWAYS
+{
+  "" :: "A regex which matches everything"
+} "minimum maximum"
+
+
+
+KEYWORD outInfo_criterion "Criterion to select scalar output intervals, overrides out_every" STEERABLE = ALWAYS
+{
+  "never"     :: "Never output"
+  "iteration" :: "Output every so many iterations"
+  "divisor"   :: "Output if iteration mod divisor == 0."
+  "time"      :: "Output every that much coordinate time"
+} "iteration"
+
+CCTK_INT outInfo_every "How often to do scalar output, overrides IO::out_every" STEERABLE = ALWAYS
+{
+   1:* :: "Output every so many time steps"
+  -1:0 :: "No output"
+  -2   :: "Default to IO::out_every"
+} -2
+
+REAL outInfo_dt "How often to do scalar output, overrides out_dt" STEERABLE = ALWAYS
+{
+  (0:* :: "In intervals of that much coordinate time"
+   0   :: "As often as possible"
+  -1   :: "Disable output"
+  -2   :: "Default to IO::out_dt"
+} -2
+
+
+INT outHeader_every "How often to print the header" STEERABLE = ALWAYS
+{
+  1:* :: "Output every so many time steps" 
+ -1   :: "No header output"
+} 20
+
+# Output field widths and precisions
+
+INT iter_width "Field width for the current iteration" STEERABLE = ALWAYS
+{
+  1:* :: ""
+} 9
+
+INT time_width "Field width for the simulation time" STEERABLE = ALWAYS
+{
+  1:* :: ""
+} 9
+
+INT time_prec "Precision for the simulation time" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 3
+
+
+
+INT int_width "Field width for integer values" STEERABLE = ALWAYS
+{
+  1:* :: ""
+} 9
+  
+INT real_width "Field width for real values" STEERABLE = ALWAYS
+{
+  1:* :: ""
+} 12
+  
+INT real_prec "Precision for real values" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 7
+  
+INT real_prec_sci "Precision for real values in scientific notation" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 6
+
+
+
+REAL real_min "Lower bound for numbers that are displayed in fixed notation" STEERABLE = ALWAYS
+{
+  (0.0:* :: ""
+} 1.0e-8
+
+REAL real_max "Upper bound for numbers that are displayed in fixed notation" STEERABLE = ALWAYS
+{
+  (0.0:* :: ""
+} 1.0e+3

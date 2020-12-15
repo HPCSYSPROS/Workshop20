@@ -1,0 +1,32 @@
+# Main make.code.defn file for thorn Carpet   -*-Makefile-*-
+
+# Source files in this directory
+SRCS =	CallFunction.cc				\
+	CarpetBasegrid.cc			\
+	CarpetParamCheck.cc			\
+	CarpetStartup.cc			\
+	Checksum.cc				\
+	Comm.cc					\
+	Cycle.cc				\
+	Evolve.cc				\
+	Hosts.cc				\
+	Initialise.cc				\
+	MultiModel.cc				\
+	OutputGH.cc				\
+	Poison.cc				\
+	Recompose.cc				\
+	Restrict.cc				\
+	ScheduleWrapper.cc			\
+	SetupGH.cc				\
+	Shutdown.cc				\
+	Storage.cc				\
+	Timing.cc				\
+	UnusedMask.cc				\
+	adler32.cc				\
+	helpers.cc				\
+	modes.cc				\
+	variables.cc
+
+# Subdirectories containing source files
+SUBDIRS = LoadBalanceReal
+

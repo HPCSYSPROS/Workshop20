@@ -1,0 +1,15 @@
+# Schedule definitions for thorn CarpetIOBasic
+
+storage: last_output_iteration last_output_time this_iteration
+
+schedule CarpetIOBasicStartup at STARTUP after IOUtil_Startup
+{
+  LANG: C
+  OPTIONS: global
+} "Startup routine"
+
+schedule CarpetIOBasicInit at INITIAL
+{
+  LANG: C
+  OPTIONS: global
+} "Initialisation routine"

@@ -1,0 +1,23 @@
+# Interface definition for thorn CCCCGlobalModes
+# $Header: /home/cvs/cccc/CCCCThorns/CCCCGlobalModes/interface.ccl,v 1.6 2006/06/10 17:49:10 cott Exp $
+
+implements: ZelmaniCoMShift
+
+inherits: GRHydro Grid ADMBase
+
+friend: GRHydro
+
+public:
+
+CCTK_REAL center_of_mass_helpers TYPE=GF TIMELEVELS=3 tags='prolongation="none"'
+{
+ dMx,dMy,dMz,dMass
+}
+
+CCTK_REAL center_of_mass TYPE=SCALAR tags='tensortypealias="Scalar" prolongation="none"'
+{
+	Mx,My,Mz,Mr,Mass
+}
+
+CCTK_INT have_good_data TYPE=SCALAR tags-'tensortypealias="Scalar"'
+

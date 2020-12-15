@@ -1,0 +1,16 @@
+NAMD_ARCH = CRAY-XT
+#CHARMARCH = gemini_gni-crayxe-papi-smp
+CHARMARCH = gemini_gni-crayxe-smp-
+#CHARMARCH = mpi-crayxe-smp-debug
+
+# 
+# The CRAYCC compilers do not support inline ASM instrinsics.
+# Therefore our SSE code will not compile.
+# Disable it trust in the Cray Compiler team's hard work.
+# In my experience it is always slower than g++, YMMV.
+#
+
+CXX = CC -DNOHOSTNAME -DNO_GETPWUID -DNAMD_DISABLE_SSE
+CXXOPTS = -O3 
+CC = cc -DNAMD_DISABLE_SSE
+COPTS = -O3

@@ -1,0 +1,490 @@
+# Parameter definitions for thorn CarpetIOHDF5
+
+
+
+shares: IO
+
+USES STRING  out_dir       AS io_out_dir
+USES KEYWORD out_criterion AS io_out_criterion
+USES INT     out_every     AS io_out_every
+USES REAL    out_dt        AS io_out_dt
+USES BOOLEAN out_unchunked AS io_out_unchunked
+
+USES KEYWORD verbose
+USES BOOLEAN out_single_precision
+USES KEYWORD out_mode 
+USES INT     out_timesteps_per_file
+USES KEYWORD out_save_parameters 
+USES BOOLEAN abort_on_io_errors 
+USES STRING  out_group_separator
+
+USES INT     checkpoint_every
+USES REAL    checkpoint_every_walltime_hours
+USES INT     checkpoint_keep
+USES BOOLEAN checkpoint_ID
+USES BOOLEAN recover_and_remove
+USES BOOLEAN checkpoint_on_terminate
+USES BOOLEAN strict_io_parameter_check
+USES KEYWORD recover
+USES STRING  checkpoint_dir
+USES STRING  checkpoint_ID_file
+USES STRING  checkpoint_file
+USES STRING  recover_dir
+USES STRING  recover_file
+USES STRING  filereader_ID_dir
+
+# 1D slice output
+USES CCTK_INT out_xline_yi
+USES CCTK_INT out_xline_zi
+USES CCTK_INT out_yline_xi
+USES CCTK_INT out_yline_zi
+USES CCTK_INT out_zline_xi
+USES CCTK_INT out_zline_yi
+
+USES CCTK_REAL out_xline_y
+USES CCTK_REAL out_xline_z
+USES CCTK_REAL out_yline_x
+USES CCTK_REAL out_yline_z
+USES CCTK_REAL out_zline_x
+USES CCTK_REAL out_zline_y
+
+# 2D slice output
+USES CCTK_INT out_xyplane_zi
+USES CCTK_INT out_xzplane_yi
+USES CCTK_INT out_yzplane_xi
+
+USES CCTK_REAL out_xyplane_z
+USES CCTK_REAL out_xzplane_y
+USES CCTK_REAL out_yzplane_x
+
+
+shares: Cactus
+
+USES REAL cctk_initial_time
+
+
+
+private:
+
+STRING out_dir "Name of CarpetIOHDF5 output directory, overrides 'IO::out_dir'" STEERABLE = ALWAYS
+{
+  "^$" :: "Empty: use IO::out_dir"
+  ".+" :: "Not empty: directory name"
+} ""
+
+CCTK_STRING out0D_dir "Name of 0D HDF5 slice output directory, overrides IO::out_dir" STEERABLE = ALWAYS
+{
+  "^$" :: "Empty: use IO::out_dir"
+  ".+" :: "Not empty: directory name"
+} ""
+
+CCTK_STRING out1D_dir "Name of 1D HDF5 slice output directory, overrides IO::out_dir" STEERABLE = ALWAYS
+{
+  "^$" :: "Empty: use IO::out_dir"
+  ".+" :: "Not empty: directory name"
+} ""
+
+CCTK_STRING out2D_dir "Name of 2D HDF5 slice output directory, overrides IO::out_dir" STEERABLE = ALWAYS
+{
+  "^$" :: "Empty: use IO::out_dir"
+  ".+" :: "Not empty: directory name"
+} ""
+
+CCTK_STRING out3D_dir "Name of 3D HDF5 slice output directory, overrides IO::out_dir" STEERABLE = ALWAYS
+{
+  "^$" :: "Empty: use IO::out_dir"
+  ".+" :: "Not empty: directory name"
+} ""
+
+STRING out_vars "Variables to output in CarpetIOHDF5 file format" STEERABLE = ALWAYS
+{
+  "" :: "List of group or variable names"
+} ""
+
+CCTK_STRING out0D_vars "Variables to output in 0D HDF5 file format" STEERABLE = ALWAYS
+{
+  "" :: "List of group or variable names"
+} ""
+
+CCTK_STRING out1D_vars "Variables to output in 1D HDF5 file format" STEERABLE = ALWAYS
+{
+  "" :: "List of group or variable names"
+} ""
+
+CCTK_STRING out2D_vars "Variables to output in 2D HDF5 file format" STEERABLE = ALWAYS
+{
+  "" :: "List of group or variable names"
+} ""
+
+CCTK_STRING out3D_vars "Variables to output in 3D HDF5 file format" STEERABLE = ALWAYS
+{
+  "" :: "List of group or variable names"
+} ""
+
+STRING out_extension "File extension to use for CarpetIOHDF5 output" STEERABLE = ALWAYS
+{
+  "" :: "File extension (including a leading dot, if desired)"
+} ".h5"
+
+KEYWORD out_criterion "Criterion to select CarpetIOHDF5 output intervals, overrides out_every" STEERABLE = ALWAYS
+{
+  "default"   :: "Use 'IO::out_criterion'"
+  "never"     :: "Never output"
+  "iteration" :: "Output every so many iterations"
+  "divisor"   :: "Output if (iteration % out_every) == 0."
+  "time"      :: "Output every that much coordinate time"
+} "default"
+
+KEYWORD out0D_criterion "Criterion to select 0D HDF5 slice output intervals, overrides out_every" STEERABLE = ALWAYS
+{
+  "default"   :: "Use IO::out_criterion"
+  "never"     :: "Never output"
+  "iteration" :: "Output every so many iterations"
+  "divisor"   :: "Output if iteration mod divisor == 0."
+  "time"      :: "Output every that much coordinate time"
+} "default"
+
+KEYWORD out1D_criterion "Criterion to select 1D HDF5 slice output intervals, overrides out_every" STEERABLE = ALWAYS
+{
+  "default"   :: "Use IO::out_criterion"
+  "never"     :: "Never output"
+  "iteration" :: "Output every so many iterations"
+  "divisor"   :: "Output if (iteration % out_every) == 0."
+  "time"      :: "Output every that much coordinate time"
+} "default"
+
+KEYWORD out2D_criterion "Criterion to select 2D HDF5 slice output intervals, overrides out_every" STEERABLE = ALWAYS
+{
+  "default"   :: "Use IO::out_criterion"
+  "never"     :: "Never output"
+  "iteration" :: "Output every so many iterations"
+  "divisor"   :: "Output if (iteration % out_every) == 0."
+  "time"      :: "Output every that much coordinate time"
+} "default"
+
+KEYWORD out3D_criterion "Criterion to select 3D HDF5 slice output intervals, overrides out_every" STEERABLE = ALWAYS
+{
+  "default"   :: "Use IO::out_criterion"
+  "never"     :: "Never output"
+  "iteration" :: "Output every so many iterations"
+  "divisor"   :: "Output if (iteration % out_every) == 0."
+  "time"      :: "Output every that much coordinate time"
+} "default"
+
+INT out_every "How often to do CarpetIOHDF5 output, overrides out_every" STEERABLE = ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+  -1:0 :: "No output"
+  -2   :: "Use 'IO::out_every'"
+} -2
+
+CCTK_INT out0D_every "How often to do 0D HDF5 slice output, overrides out_every" STEERABLE = ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+  -1:0 :: "No output"
+  -2   :: "Use IO::out_every"
+} -2
+
+CCTK_INT out1D_every "How often to do 1D HDF5 slice output, overrides out_every" STEERABLE = ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+  -1:0 :: "No output"
+  -2   :: "Use IO::out_every"
+} -2
+
+CCTK_INT out2D_every "How often to do 2D HDF5 slice output, overrides out_every" STEERABLE = ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+  -1:0 :: "No output"
+  -2   :: "Use IO::out_every"
+} -2
+
+CCTK_INT out3D_every "How often to do 3D HDF5 slice output, overrides out_every" STEERABLE = ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+  -1:0 :: "No output"
+  -2   :: "Use IO::out_every"
+} -2
+
+REAL out_dt "How often to do CarpetIOHDF5 output, overrides 'IO::out_dt'" STEERABLE = ALWAYS
+{
+  (0:* :: "In intervals of that much coordinate time"
+   0   :: "As often as possible"
+  -1   :: "Disable output"
+  -2   :: "Default to 'IO::out_dt'"
+} -2
+
+REAL out0D_dt "How often to do 0D HDF5 slice output, overrides IO::out_dt" STEERABLE = ALWAYS
+{
+  (0:* :: "In intervals of that much coordinate time"
+   0   :: "As often as possible"
+  -1   :: "Disable output"
+  -2   :: "Default to IO::out_dt"
+} -2
+
+REAL out1D_dt "How often to do 1D HDF5 slice output, overrides IO::out_dt" STEERABLE = ALWAYS
+{
+  (0:* :: "In intervals of that much coordinate time"
+   0   :: "As often as possible"
+  -1   :: "Disable output"
+  -2   :: "Default to IO::out_dt"
+} -2
+
+REAL out2D_dt "How often to do 2D HDF5 slice output, overrides IO::out_dt" STEERABLE = ALWAYS
+{
+  (0:* :: "In intervals of that much coordinate time"
+   0   :: "As often as possible"
+  -1   :: "Disable output"
+  -2   :: "Default to IO::out_dt"
+} -2
+
+REAL out3D_dt "How often to do 3D HDF5 slice output, overrides IO::out_dt" STEERABLE = ALWAYS
+{
+  (0:* :: "In intervals of that much coordinate time"
+   0   :: "As often as possible"
+  -1   :: "Disable output"
+  -2   :: "Default to IO::out_dt"
+} -2
+
+
+############################################################################
+# 0D slice output
+############################################################################
+CCTK_INT out0D_point_xi "x-index (counting from 0) for 0D points" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+CCTK_INT out0D_point_yi "y-index (counting from 0) for 0D points" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+CCTK_INT out0D_point_zi "z-index (counting from 0) for 0D points" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+
+CCTK_REAL out0D_point_x "x coordinate for 0D points" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+CCTK_REAL out0D_point_y "y coordinate for 0D points" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+CCTK_REAL out0D_point_z "z coordinate for 0D points" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+
+
+
+############################################################################
+# 1D slice output
+############################################################################
+BOOLEAN out1D_x "Do 1D HDF5 slice output in the x-direction" STEERABLE = ALWAYS
+{
+} "yes"
+BOOLEAN out1D_y "Do 1D HDF5 slice output in the y-direction" STEERABLE = ALWAYS
+{
+} "yes"
+BOOLEAN out1D_z "Do 1D HDF5 slice output in the z-direction" STEERABLE = ALWAYS
+{
+} "yes"
+
+CCTK_INT out1D_xline_yi "y-index (counting from 0) for 1D lines in x-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+CCTK_INT out1D_xline_zi "z-index (counting from 0) for 1D lines in x-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+
+CCTK_INT out1D_yline_xi "x-index (counting from 0) for 1D lines in y-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+CCTK_INT out1D_yline_zi "z-index (counting from 0) for 1D lines in y-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+
+CCTK_INT out1D_zline_xi "x-index (counting from 0) for 1D lines in z-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+CCTK_INT out1D_zline_yi "y-index (counting from 0) for 1D lines in z-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+
+CCTK_REAL out1D_xline_y "y coordinate for 1D lines in x-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+CCTK_REAL out1D_xline_z "z coordinate for 1D lines in x-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+
+CCTK_REAL out1D_yline_x "x coordinate for 1D lines in y-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+CCTK_REAL out1D_yline_z "z coordinate for 1D lines in y-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+
+CCTK_REAL out1D_zline_x "x coordinate for 1D lines in z-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+CCTK_REAL out1D_zline_y "y coordinate for 1D lines in z-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+
+
+############################################################################
+# 2D slice output
+############################################################################
+BOOLEAN out2D_xy "Do 2D HDF5 slice output in the xy-direction" STEERABLE = ALWAYS
+{
+} "yes"
+BOOLEAN out2D_xz "Do 2D HDF5 slice output in the xz-direction" STEERABLE = ALWAYS
+{
+} "yes"
+BOOLEAN out2D_yz "Do 2D HDF5 slice output in the yz-direction" STEERABLE = ALWAYS
+{
+} "yes"
+
+CCTK_INT out2D_xyplane_zi "z-index (counting from 0) for 2D planes in xy-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+
+CCTK_INT out2D_xzplane_yi "y-index (counting from 0) for 2D planes in xz-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+
+CCTK_INT out2D_yzplane_xi "x-index (counting from 0) for 2D planes in yz-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+
+CCTK_REAL out2D_xyplane_z "z coordinate for 2D planes in xy-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+
+CCTK_REAL out2D_xzplane_y "y coordinate for 2D planes in xz-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+
+CCTK_REAL out2D_yzplane_x "x coordinate for 2D planes in yz-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+
+#######################################################################
+# general slice output parameters
+#######################################################################
+BOOLEAN output_all_timelevels "Output all timelevels instead of only the current" STEERABLE = ALWAYS
+{
+} "no"
+
+BOOLEAN output_symmetry_points "Output symmetry points (assuming that there are nghostzones symmetry points)" STEERABLE = ALWAYS
+{
+} "yes"
+
+BOOLEAN output_ghost_points "Output ghost points" STEERABLE = ALWAYS
+{
+} "yes"
+
+BOOLEAN output_boundary_points "Output outer boundary points (assuming that there are nghostzones boundary points)" STEERABLE = ALWAYS
+{
+} "yes"
+
+BOOLEAN output_buffer_points "Output refinement buffer points" STEERABLE = ALWAYS
+{
+} "yes"
+
+BOOLEAN out3D_ghosts "Output ghost zones (DEPRECATED)" STEERABLE = ALWAYS
+{
+} "yes"
+
+BOOLEAN out3D_outer_ghosts "Output outer boundary zones (assuming that there are nghostzones boundary points) (DEPRECATED)" STEERABLE = ALWAYS
+{
+} "yes"
+
+# These parameters are here for historic reasons only.
+# They might go away in the future.  Do not use them.
+
+BOOLEAN out1D_d "Do output along the diagonal" STEERABLE = ALWAYS
+{
+} "yes"
+
+#######################################################################
+# checkpoint/recovery
+#######################################################################
+BOOLEAN checkpoint "Do checkpointing with CarpetIOHDF5 ?" STEERABLE = ALWAYS
+{
+} "no"
+
+BOOLEAN checkpoint_next "Checkpoint at next iteration ?" STEERABLE = ALWAYS
+{
+} "no"
+
+INT checkpoint_every_divisor "Checkpoint if (iteration % out_every) == 0" STEERABLE = ALWAYS
+{
+   1:* :: "Every so many iterations"
+  -1:0 :: "Disable periodic checkpointing"
+} -1
+
+BOOLEAN use_reflevels_from_checkpoint "Use 'CarpetRegrid::refinement_levels' from the checkpoint file rather than from the parameter file ?" STEERABLE = RECOVER
+{
+} "no"
+
+BOOLEAN use_grid_structure_from_checkpoint "Use the grid structure stored in the checkpoint file" STEERABLE = RECOVER
+{
+} "yes"
+
+BOOLEAN one_file_per_proc "Write one file per process instead of per variable" STEERABLE = ALWAYS
+{
+} "no"
+
+BOOLEAN one_file_per_group "Write one file per group instead of per variable" STEERABLE = ALWAYS
+{
+} "no"
+
+BOOLEAN open_one_input_file_at_a_time "Open only one HDF5 file at a time when reading data from multiple chunked checkpoint/data files" STEERABLE = ALWAYS
+{
+  "no"  :: "Open all input files first, then import data (most efficient)"
+  "yes" :: "Process input files one after another (reduces memory requirements)"
+} "no"
+
+STRING skip_recover_variables "Skip these variables while recovering" STEERABLE = RECOVER
+{
+  "" :: ""
+} ""
+
+INT compression_level "Compression level to use for writing HDF5 data" STEERABLE = ALWAYS
+{
+  0:9 :: "Higher numbers compress better, a value of zero disables compression"
+} 0
+
+INT minimum_size_for_compression "Only compress datasets larger than this many bytes" STEERABLE = ALWAYS
+{
+  0:* :: "This should to be large enough so that compression gains outweigh the overhead"
+} 32768
+
+BOOLEAN use_checksums "Use checksums for the HDF5 data" STEERABLE = ALWAYS
+{
+} "no"
+
+BOOLEAN output_index "Output an index file for each output file" STEERABLE = ALWAYS
+{
+} "no"

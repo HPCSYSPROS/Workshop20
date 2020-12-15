@@ -1,0 +1,18 @@
+#! /bin/bash
+# @ job_name = @SIMULATION_NAME@.$(jobid)
+# @ job_type = bluegene
+# @ shell = /bin/bash
+# @ wall_clock_limit = @WALLTIME@
+# @ bg_size = @(@PROCS@/@PPN@/@NUM_SMT@)@
+# @ account_no = @ALLOCATION@
+# @ notify_user = @EMAIL@
+# @ notification = always
+# @ initialdir = @RUNDIR@
+# @ input = /dev/null
+# @ environment = COPY_ALL; OMP_NUM_THREADS=@NUM_THREADS@
+# @ output = @RUNDIR@/@SIMULATION_NAME@.out
+# @ error = @RUNDIR@/@SIMULATION_NAME@.err
+# @ queue  
+
+cd @SOURCEDIR@
+@SIMFACTORY@ run @SIMULATION_NAME@ --machine=@MACHINE@ --restart-id=@RESTART_ID@ @FROM_RESTART_COMMAND@

@@ -1,0 +1,10 @@
+# Main make.code.defn file for thorn EOS_Omni
+
+# Source files in this directory
+SRCS = EOS_Omni_Module.F90 EOS_Omni_Startup.F90 EOS_Omni_SingleVarCalls.F90 \
+       EOS_Omni_SingleVarCalls_harm.F90 EOS_Omni_Handles.c \
+       EOS_Omni_MultiVarCalls.F90 EOS_Omni_ColdEOSReadTable.F90  \
+       EOS_Omni_BarotropicReadTable.F90	
+
+# Subdirectories containing source files
+SUBDIRS = nuc_eos_cxx

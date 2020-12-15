@@ -1,0 +1,390 @@
+
+if { ! [myReplica] } {
+  set work_queue {}
+  set worker_stack {}
+  proc workers_idle {} {
+    global worker_stack
+    return [llength $worker_stack]
+  }
+  proc push_worker {w} {
+    global worker_stack
+    lappend worker_stack $w
+  }
+  proc pop_worker {} {
+    global worker_stack
+    set w [lindex $worker_stack end]
+    set worker_stack [lreplace $worker_stack end end]
+    return $w
+  }
+  proc push_work {w} {
+    global work_queue
+    if { $w != {} } {
+      lappend work_queue $w
+    }
+  }
+  proc pop_work {} {
+    global work_queue
+    set w [lindex $work_queue 0]
+    set work_queue [lreplace $work_queue 0 0]
+    return $w
+  }
+  proc enqueue_work_0 work {
+    if [workers_idle] {
+      replicaSend $work [pop_worker]
+    } else {
+      push_work $work
+    }
+  }
+  proc dependent_set_0 {var val} {
+    upvar #0 $var v
+    if { [info exists v] } { 
+      error "dependency variable $var set twice: old value $v, new value $val"
+    }
+    set v $val
+  }
+  proc dependent_work_0 {known future} {
+    if { $future == {} } {
+      enqueue_work_0 $known
+      return
+    }
+    set dname [lindex $future 0]
+    upvar #0 $dname dep
+    if [info exists dep] {
+      set future [lreplace $future 0 0]
+      lappend known $dep
+      dependent_work_0 $known $future
+      return
+    }
+    uplevel #0 [list trace add variable $dname write [list dependent_trace_0 $known $future]]
+  }
+  proc dependent_trace_0 {known future args} {
+    set dname [lindex $future 0]
+    uplevel #0 [list trace remove variable $dname write [list dependent_trace_0 $known $future]]
+    dependent_work_0 $known $future
+  }
+  proc dequeue_work_0 worker {
+    global work_queue
+    if [llength $work_queue] {
+      return [pop_work]
+    }
+    if { [workers_idle] == [numReplicas] - 1 } {
+      while { [workers_idle] } {
+        replicaSend break [pop_worker]
+      }
+      return break
+    }
+    push_worker $worker
+    return {}
+  }
+}
+
+proc dependent_work {known future} {
+  replicaEval 0 [list dependent_work_0 $known $future]
+}
+
+proc dependent_set {var val} {
+  replicaEval 0 [list dependent_set_0 $var $val]
+}
+
+proc enqueue_work work {
+  replicaEval 0 [list enqueue_work_0 $work]
+}
+
+proc schedule_work {} {
+  while { 1 } {
+    set w [replicaEval 0 "dequeue_work_0 [myReplica]"]
+    if { $w == {} } { 
+      set w [replicaRecv 0]
+    }
+    eval $w
+  }
+}
+
+proc replica_open {rep args} {
+  set rep [expr $rep % [numReplicas]]
+  return [list $rep [replicaEval $rep [concat open $args]]]
+}
+
+proc replica_fconfigure {rchan args} {
+  return [replicaEval [lindex $rchan 0] [concat fconfigure [lindex $rchan 1] $args]]
+}
+
+proc replica_puts {rchan str} {
+  return [replicaEval [lindex $rchan 0] [list puts [lindex $rchan 1] $str]]
+}
+
+proc replica_close {rchan} {
+  return [replicaEval [lindex $rchan 0] [list close [lindex $rchan 1]]]
+}
+
+if 0 {
+proc dummy {i i2} {
+  print "WORK $i $i2 on [myReplica]"
+  run 0
+  dependent_set testvar.[expr 2*$i+2] [expr 2*$i+2]
+  dependent_set testvar.[expr 2*$i+1] [expr 2*$i+1]
+  # dependent_set testvar.[expr $i/2] [expr $i/2]
+}
+
+run 0
+
+replicaBarrier
+
+if { ! [myReplica] } {
+  for { set i 0 } { $i < 100 } { incr i } {
+    # enqueue_work [list dummy $i]
+    dependent_work [list dummy $i] [list testvar.$i]
+  }
+  dependent_set testvar.0 0
+}
+
+schedule_work
+
+exit
+}
+
+proc replica_temp { i } {
+  global num_replicas min_temp max_temp
+  return [format "%.2f" [expr ($min_temp * \
+         exp( log(1.0*$max_temp/$min_temp)*(1.0*$i/($num_replicas-1)) ) )]]
+}
+
+proc init_replica {index} {
+  global num_replicas steps_per_run job_output_root
+  set r $index
+  set nr $num_replicas
+  set dict [dict create \
+            i_run 0 \
+            i_step 0 \
+            index $r \
+            dcdindex $r \
+            index_a $r \
+            index_b $r \
+            temperature 0 \
+            exchanges_attempted 0 \
+            exchanges_accepted 0 \
+            POTENTIAL 0 \
+            TEMP 0 \
+            history_file {} \
+            checkpointname init \
+            checkpointloc 0]
+  dict with dict {
+    global first_timestep
+    if {[info exists first_timestep]} {
+      set i_step $first_timestep
+    }
+    if { $r % 2 == 0 && $r+1 < $nr } {
+      set index_a [expr $r+1]
+    }
+    if { $r % 2 == 1 && $r > 0 } {
+      set index_a [expr $r-1]
+    }
+    if { $r % 2 == 1 && $r+1 < $nr } {
+      set index_b [expr $r+1]
+    }
+    if { $r % 2 == 0 && $r > 0 } {
+      set index_b [expr $r-1]
+    }
+    set temperature [replica_temp $index]
+    firsttimestep $i_step
+    checkpointLoad $checkpointname $checkpointloc
+    reinitvels $temperature
+    set checkpointname {}
+  }
+  run_replica $dict 1.0
+}
+
+proc run_replica { dict rescale } {
+  global num_runs steps_per_run runs_per_frame frames_per_restart saved_array restart_root
+  dict with dict {
+
+    # stdout redirect currently has two issues:
+    #   1) requires a file open for every run
+    #   2) does not work for builds based on charmrun
+    # Uncomment the following two lines to enable it anyway:
+    # global job_output_root
+    # stdout [format "$job_output_root.$dcdindex.stdout" $dcdindex]
+
+    firsttimestep $i_step
+    if { $checkpointname != {} } {
+      checkpointLoad $checkpointname $checkpointloc
+      checkpointFree $checkpointname $checkpointloc
+      set checkpointname {}  ; # for restart
+    } else { # start or restart
+      if {$i_run} { # restart
+        reinitatoms [format $restart_root $index].$index
+      }
+      global job_output_root
+      replicaDcdFile $dcdindex [format $job_output_root.$dcdindex.dcd $dcdindex]
+      set history_file [replica_open $dcdindex [format "$job_output_root.$dcdindex.history" $dcdindex] "w"]
+      replica_fconfigure $history_file -buffering line
+    }
+    if { $rescale != 1.0 } {
+      rescalevels $rescale
+    }
+  }
+  if { $i_run % ($runs_per_frame * $frames_per_restart) == 0
+       || $i_run == $num_runs } {  # restart
+    global job_output_root num_replicas i_job
+    set rr "$job_output_root.restart$i_run"
+    set rri [format $rr $index]
+    output $rri.$index
+    set rfile [open "$rri.$index.tcl" "w"]
+    # puts $rfile "set dict \[ dict create $dict \]"
+    puts $rfile [list run_replica $dict 1.0]
+    close $rfile
+    if { $index == 0 } {
+      set deps {}
+      for { set i 0 } { $i < $num_replicas } { incr i } { lappend deps restart.$i_run.$i }
+      dependent_work [list restart_write $rr [expr $i_job + 1] $i_run $i_step] $deps
+    }
+    dependent_set restart.$i_run.$index 1
+  }
+  dict with dict {
+    if { $i_run >= $num_runs } {
+      set attempts $exchanges_attempted
+      if $attempts {
+        if { $index_a > $index } {
+          set iswap $index_a
+        } else {
+          set iswap $index_b
+        }
+        set temp $temperature
+        set temp2 [replica_temp $iswap]
+        set accepts $exchanges_accepted
+        set ratio [expr 1.0*$accepts/$attempts]
+        puts stderr "EXCHANGE_RATIO $temp $temp2 $accepts $attempts $ratio"
+      }
+      return;
+    }
+    langevinTemp $temperature
+    replicaDcdFile $dcdindex
+    run $steps_per_run
+    incr i_run
+    incr i_step $steps_per_run
+  }
+  if { 0 && $i_run % $runs_per_frame == 0 } {
+    global job_output_root
+    set frame_root "$job_output_root.run$i_run"
+    output [format $frame_root.$index $index]
+  }
+  dict with dict {
+    set checkpointname $i_run.$index
+    set checkpointloc [myReplica]
+    checkpointStore $checkpointname $checkpointloc
+    save_array
+    set TEMP $saved_array(TEMP)
+    set POTENTIAL [expr $saved_array(TOTAL) - $saved_array(KINETIC)]
+    replica_puts $history_file "$i_step $index $temperature $TEMP $POTENTIAL"
+    if { $i_run % 2 == 1 } {
+      set iswap $index_a
+    } else {
+      set iswap $index_b
+    }
+  }
+  print dict $index: $dict
+  if { $index < $iswap } { 
+    dependent_work [list swap_replica $dict] [list dict.$i_run.$iswap]
+  } elseif { $index > $iswap } { 
+    dependent_set dict.$i_run.$index $dict
+  } else {
+    enqueue_work [list run_replica $dict 1.0]
+  }
+}
+
+proc restart_write { rr j r s args } {
+  puts stderr "WRITING RESTART AT STEP $s\n"
+  set rfile [open [format "$rr.tcl" ""] "w"]
+  puts $rfile [list set i_job $j]
+  puts $rfile [list set i_run $r]
+  puts $rfile [list set i_step $s]
+  puts $rfile [list set restart_root $rr]
+  close $rfile
+}
+
+proc dict_swap {dict1 dict2 args} {
+  upvar $dict1 d1
+  upvar $dict2 d2
+  foreach f $args {
+    set t1 [dict get $d1 $f]
+    set t2 [dict get $d2 $f]
+    dict set d1 $f $t2
+    dict set d2 $f $t1
+  }
+}
+
+proc swap_replica {self swap} {
+  global num_runs
+  set temp [dict get $self temperature]
+  set rid  [dict get $self index]
+  set temp2 [dict get $swap temperature]
+  set rid2  [dict get $swap index]
+  set BOLTZMAN 0.001987191
+  set dbeta [expr ((1.0/$temp) - (1.0/$temp2)) / $BOLTZMAN]
+  set pot [dict get $self POTENTIAL]
+  set pot2 [dict get $swap POTENTIAL]
+  set delta [expr $dbeta * ($pot2 - $pot)]
+  set doswap [expr $delta < 0. || exp(-1. * $delta) > rand()]
+  if { $doswap } {
+    set i_run [dict get $self i_run]
+    print SWAP $i_run $rid $rid2
+    puts stderr "EXCHANGE_ACCEPT $rid ($temp) $rid2 ($temp2) RUN $i_run"
+    set rescale [expr sqrt(1.0*$temp/$temp2)]
+    set rescale2 [expr sqrt(1.0*$temp2/$temp)]
+    dict_swap self swap checkpointname checkpointloc history_file dcdindex
+  } else {
+    set rescale 1.0
+    set rescale2 1.0
+  }
+  dict with self {
+    incr exchanges_attempted
+    if { $doswap } { incr exchanges_accepted }
+  }
+  enqueue_work [list run_replica $swap $rescale2]
+  run_replica $self $rescale
+}
+
+replicaBarrier
+
+source $namd_config_file
+replicaUniformPatchGrids yes
+temperature 0
+langevinTemp 0
+outputEnergies [expr $steps_per_run / 10]
+dcdFreq [expr $steps_per_run * $runs_per_frame]
+outputname /tmp/foo.[myReplica]
+
+if { ! [info exists i_job] } { set i_job 0 }
+set job_output_root "$output_root.job$i_job"
+
+proc save_callback {labels values} {
+  global saved_labels saved_values
+  set saved_labels $labels
+  set saved_values $values
+}
+callback save_callback
+
+proc save_array {} {
+  global saved_labels saved_values saved_array
+  foreach label $saved_labels value $saved_values {
+    set saved_array($label) $value
+  }
+}
+
+run 0
+
+if { ! [myReplica] } {
+  if {[info exists restart_root]} {  # restart
+    for { set i 0 } { $i < $num_replicas } { incr i } {
+      enqueue_work [list source [format $restart_root $i].$i.tcl]
+    }
+  } else {
+    checkpointStore init 0
+    for { set i 0 } { $i < $num_replicas } { incr i } {
+      enqueue_work [list init_replica $i]
+    }
+  }
+}
+
+schedule_work
+

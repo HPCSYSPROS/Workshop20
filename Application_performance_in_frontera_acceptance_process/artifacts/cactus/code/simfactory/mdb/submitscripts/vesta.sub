@@ -1,0 +1,4 @@
+#! /bin/bash
+# Queueing options are set via qsub options
+cd @SOURCEDIR@
+@SIMFACTORY@ run @SIMULATION_NAME@ --machine=@MACHINE@ --restart-id=@RESTART_ID@ @FROM_RESTART_COMMAND@

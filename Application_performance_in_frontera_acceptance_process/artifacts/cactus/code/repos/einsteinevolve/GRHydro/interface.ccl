@@ -1,0 +1,780 @@
+# Interface definition for thorn GRHydro
+
+####################################################################
+###  GRHydro needs to inherit the metric from Einstein.           ###
+###  Other thorns will need to know what EOS we're using. They   ###
+###  inherit to get the handle.                                  ###
+####################################################################
+
+implements: GRHydro
+inherits: ADMBase, Boundary, SpaceMask, Tmunubase, HydroBase
+
+USES INCLUDE: SpaceMask.h
+USES INCLUDE HEADER: carpet.hh
+
+###############################################################
+###  Provided functions. These are mainly to allow RNSID    ###
+###  to convert back to primitive / conservative variables  ###
+###  without having an explicit coupling to GRHydro.         ###
+###  NOTE: the function that converts conservative to       ###
+###  primitive variables requires pointers to the conserved ###
+###  variables as well as these variables are reset if      ###
+###  we're in the atmosphere.                               ###
+###############################################################
+
+void FUNCTION SpatialDet(CCTK_REAL IN gxx, CCTK_REAL IN gxy, \
+                         CCTK_REAL IN gxz, CCTK_REAL IN gyy, \
+                         CCTK_REAL IN gyz, CCTK_REAL IN gzz, \
+                         CCTK_REAL OUT det)
+
+void FUNCTION UpperMet(CCTK_REAL OUT uxx, CCTK_REAL OUT uxy, \
+                       CCTK_REAL OUT uxz, CCTK_REAL OUT uyy, \
+                       CCTK_REAL OUT uyz, CCTK_REAL OUT uzz, \
+                       CCTK_REAL IN det, CCTK_REAL IN gxx, CCTK_REAL IN gxy, \
+                       CCTK_REAL IN gxz, CCTK_REAL IN gyy, CCTK_REAL IN gyz, \
+                       CCTK_REAL IN gzz)
+
+void FUNCTION Con2PrimGen(CCTK_INT IN handle, CCTK_REAL INOUT dens, \
+                           CCTK_REAL INOUT sx, CCTK_REAL INOUT sy, CCTK_REAL INOUT sz, \
+                           CCTK_REAL INOUT tau, CCTK_REAL INOUT rho, \
+                           CCTK_REAL INOUT velx, CCTK_REAL INOUT vely, CCTK_REAL INOUT velz, \
+                           CCTK_REAL INOUT epsilon, CCTK_REAL INOUT pressure, \
+                           CCTK_REAL INOUT w_lorentz, \
+                           CCTK_REAL IN uxx, CCTK_REAL IN uxy, CCTK_REAL IN uxz, \
+                           CCTK_REAL IN uyy, CCTK_REAL IN uyz, CCTK_REAL IN uzz, \
+                           CCTK_REAL IN det, \
+                           CCTK_REAL IN x, CCTK_REAL IN y, CCTK_REAL IN z, \
+                           CCTK_REAL IN r, \
+                           CCTK_INT OUT epsnegative, \
+		           CCTK_REAL IN GRHydro_rho_min, CCTK_REAL IN pmin, \
+		           CCTK_REAL IN epsmin, \
+                           CCTK_INT IN GRHydro_reflevel, \
+                           CCTK_REAL OUT retval)
+
+void FUNCTION Con2PrimGenMee(CCTK_INT IN handle, CCTK_INT IN keytemp, \
+     CCTK_REAL IN prec, CCTK_REAL IN gamma_eos, \
+     CCTK_REAL INOUT dens, \
+     CCTK_REAL INOUT sx, CCTK_REAL INOUT sy, CCTK_REAL INOUT sz, \
+     CCTK_REAL INOUT tau, \
+     CCTK_REAL IN Bconsx, CCTK_REAL IN Bconsy, CCTK_REAL IN Bconsz, \
+     CCTK_REAL INOUT entropycons, \
+     CCTK_REAL INOUT y_e, CCTK_REAL INOUT temp, CCTK_REAL INOUT rho, \
+     CCTK_REAL INOUT velx, CCTK_REAL INOUT vely, CCTK_REAL INOUT velz, \
+     CCTK_REAL INOUT epsilon, CCTK_REAL INOUT pressure, \
+     CCTK_REAL OUT Bvecx, CCTK_REAL OUT Bvecy, CCTK_REAL OUT Bvecz, \
+     CCTK_REAL OUT Bvecsq, \
+     CCTK_REAL INOUT w_lorentz, \
+     CCTK_REAL IN gxx, CCTK_REAL IN gxy, CCTK_REAL IN gxz, \
+     CCTK_REAL IN gyy, CCTK_REAL IN gyz, CCTK_REAL IN gzz, \
+     CCTK_REAL IN uxx, CCTK_REAL IN uxy, CCTK_REAL IN uxz, \
+     CCTK_REAL IN uyy, CCTK_REAL IN uyz, CCTK_REAL IN uzz, \
+     CCTK_REAL IN det, \
+     CCTK_INT OUT epsnegative, \
+     CCTK_REAL OUT retval)
+
+void FUNCTION Con2PrimGenM(CCTK_INT IN handle, CCTK_INT IN keytemp, CCTK_REAL IN prec,CCTK_REAL IN gamma_eos, CCTK_REAL INOUT dens, \
+                           CCTK_REAL INOUT sx, CCTK_REAL INOUT sy, CCTK_REAL INOUT sz, \
+                           CCTK_REAL INOUT tau, CCTK_REAL IN Bconsx, CCTK_REAL IN Bconsy, CCTK_REAL IN Bconsz, \
+			   CCTK_REAL INOUT y_e,  CCTK_REAL INOUT temp,  CCTK_REAL INOUT rho, \
+                           CCTK_REAL INOUT velx, CCTK_REAL INOUT vely, CCTK_REAL INOUT velz, \
+                           CCTK_REAL INOUT epsilon, CCTK_REAL INOUT pressure, \
+                           CCTK_REAL OUT Bvecx, CCTK_REAL OUT Bvecy, CCTK_REAL OUT Bvecz, \
+                           CCTK_REAL OUT bvecsq, \
+                           CCTK_REAL INOUT w_lorentz, \
+                           CCTK_REAL IN gxx, CCTK_REAL IN gxy, CCTK_REAL IN gxz, \
+                           CCTK_REAL IN gyy, CCTK_REAL IN gyz, CCTK_REAL IN gzz, \
+                           CCTK_REAL IN uxx, CCTK_REAL IN uxy, CCTK_REAL IN uxz, \
+                           CCTK_REAL IN uyy, CCTK_REAL IN uyz, CCTK_REAL IN uzz, \
+                           CCTK_REAL IN det, \
+                           CCTK_INT OUT epsnegative, \
+                           CCTK_REAL OUT retval)
+
+void FUNCTION Con2PrimPoly(CCTK_INT IN handle, CCTK_REAL INOUT dens, \
+                           CCTK_REAL INOUT sx, CCTK_REAL INOUT sy, \
+                           CCTK_REAL INOUT sz, CCTK_REAL OUT tau, \
+                           CCTK_REAL INOUT rho, CCTK_REAL INOUT velx, \
+                           CCTK_REAL INOUT vely, CCTK_REAL INOUT velz, \
+                           CCTK_REAL INOUT epsilon, CCTK_REAL INOUT press, \
+                           CCTK_REAL INOUT w_lorentz, CCTK_REAL IN uxx, \
+                           CCTK_REAL IN uxy, CCTK_REAL IN uxz, \
+                           CCTK_REAL IN uyy, CCTK_REAL IN uyz, \
+                           CCTK_REAL IN uzz, CCTK_REAL IN det, \
+                           CCTK_REAL IN x, CCTK_REAL IN y, CCTK_REAL IN z, \
+                           CCTK_REAL IN r, CCTK_REAL IN rho_min, \
+			   CCTK_INT IN GRHydro_reflevel, CCTK_REAL OUT GRHydro_C2P_failed)
+
+void FUNCTION Con2PrimPolyM(CCTK_INT IN handle, CCTK_REAL IN gamma_eos, CCTK_REAL INOUT dens, \
+                           CCTK_REAL INOUT sx, CCTK_REAL INOUT sy, CCTK_REAL INOUT sz, \
+                           CCTK_REAL INOUT sc, CCTK_REAL IN Bconsx, CCTK_REAL IN Bconsy, CCTK_REAL IN Bconsz, \
+			   CCTK_REAL INOUT rho, \
+                           CCTK_REAL INOUT velx, CCTK_REAL INOUT vely, CCTK_REAL INOUT velz, \
+                           CCTK_REAL INOUT epsilon, CCTK_REAL INOUT pressure, \
+                           CCTK_REAL OUT Bvecx, CCTK_REAL OUT Bvecy, CCTK_REAL OUT Bvecz, \
+                           CCTK_REAL OUT Bvecsq, \
+                           CCTK_REAL INOUT w_lorentz, \
+                           CCTK_REAL IN gxx, CCTK_REAL IN gxy, CCTK_REAL IN gxz, \
+                           CCTK_REAL IN gyy, CCTK_REAL IN gyz, CCTK_REAL IN gzz, \
+                           CCTK_REAL IN uxx, CCTK_REAL IN uxy, CCTK_REAL IN uxz, \
+                           CCTK_REAL IN uyy, CCTK_REAL IN uyz, CCTK_REAL IN uzz, \
+                           CCTK_REAL IN det, \
+                           CCTK_INT OUT epsnegative, \
+                           CCTK_REAL OUT retval)
+
+void FUNCTION Prim2ConGen(CCTK_INT IN handle, \
+                          CCTK_REAL IN gxx, CCTK_REAL IN gxy, \
+                          CCTK_REAL IN gxz, CCTK_REAL IN gyy, \
+                          CCTK_REAL IN gyz, CCTK_REAL IN gzz, \
+                          CCTK_REAL IN det, CCTK_REAL OUT dens, \
+                          CCTK_REAL OUT sx, CCTK_REAL OUT sy, \
+                          CCTK_REAL OUT sz, CCTK_REAL OUT tau, \
+                          CCTK_REAL IN rho, CCTK_REAL IN velx, \
+                          CCTK_REAL IN vely, \
+                          CCTK_REAL IN velz, CCTK_REAL IN epsilon, \
+                          CCTK_REAL OUT press, CCTK_REAL OUT w_lorentz)
+
+void FUNCTION Prim2ConPoly(CCTK_INT IN handle, \
+                           CCTK_REAL IN gxx, CCTK_REAL IN gxy, \
+                           CCTK_REAL IN gxz, CCTK_REAL IN gyy, \
+                           CCTK_REAL IN gyz, CCTK_REAL IN gzz, \
+                           CCTK_REAL IN det, CCTK_REAL OUT dens, \
+                           CCTK_REAL OUT sx, CCTK_REAL OUT sy, \
+                           CCTK_REAL OUT sz, CCTK_REAL OUT tau, \
+                           CCTK_REAL IN rho, CCTK_REAL IN velx, \
+                           CCTK_REAL IN vely, \
+                           CCTK_REAL IN velz, CCTK_REAL OUT epsilon, \
+                           CCTK_REAL OUT press, CCTK_REAL OUT w_lorentz)
+
+void FUNCTION Prim2ConGenM(CCTK_INT IN handle, \
+                          CCTK_REAL IN gxx, CCTK_REAL IN gxy, \
+                          CCTK_REAL IN gxz, CCTK_REAL IN gyy, \
+                          CCTK_REAL IN gyz, CCTK_REAL IN gzz, \
+                          CCTK_REAL IN det, CCTK_REAL OUT dens, \
+                          CCTK_REAL OUT sx, CCTK_REAL OUT sy, \
+                          CCTK_REAL OUT sz, CCTK_REAL OUT tau, \
+                          CCTK_REAL OUT Bconsx, CCTK_REAL OUT Bconsy, \
+                          CCTK_REAL OUT Bconsz, CCTK_REAL IN rho, CCTK_REAL IN velx, \
+                          CCTK_REAL IN vely, \
+                          CCTK_REAL IN velz, CCTK_REAL IN epsilon, \
+                          CCTK_REAL OUT press, CCTK_REAL IN Bvecx, CCTK_REAL IN Bvecy, \
+                          CCTK_REAL IN Bvecz, CCTK_REAL OUT w_lorentz)
+
+void FUNCTION Prim2ConGenM_hot(CCTK_INT IN handle, CCTK_INT IN GRHydro_reflevel, CCTK_INT IN i, CCTK_INT IN j, CCTK_INT IN k, \
+                          CCTK_REAL IN x, CCTK_REAL IN y, CCTK_REAL IN z, \
+                          CCTK_REAL IN gxx, CCTK_REAL IN gxy, \
+                          CCTK_REAL IN gxz, CCTK_REAL IN gyy, \
+                          CCTK_REAL IN gyz, CCTK_REAL IN gzz, \
+                          CCTK_REAL IN det, CCTK_REAL OUT dens, \
+                          CCTK_REAL OUT sx, CCTK_REAL OUT sy, \
+                          CCTK_REAL OUT sz, CCTK_REAL OUT tau, \
+                          CCTK_REAL OUT Bconsx, CCTK_REAL OUT Bconsy, \
+                          CCTK_REAL OUT Bconsz, CCTK_REAL IN rho, CCTK_REAL IN velx, \
+                          CCTK_REAL IN vely, \
+                          CCTK_REAL IN velz, CCTK_REAL IN epsilon, \
+                          CCTK_REAL OUT press, CCTK_REAL IN Bvecx, CCTK_REAL IN Bvecy, \
+                          CCTK_REAL IN Bvecz, CCTK_REAL OUT w_lorentz, \
+                          CCTK_REAL INOUT temperature, CCTK_REAL IN Y_e)
+
+void FUNCTION Prim2ConPolyM(CCTK_INT IN handle, \
+                           CCTK_REAL IN gxx, CCTK_REAL IN gxy, \
+                           CCTK_REAL IN gxz, CCTK_REAL IN gyy, \
+                           CCTK_REAL IN gyz, CCTK_REAL IN gzz, \
+                           CCTK_REAL IN det, CCTK_REAL OUT dens, \
+                           CCTK_REAL OUT sx, CCTK_REAL OUT sy, \
+                           CCTK_REAL OUT sz, CCTK_REAL OUT tau, \
+                           CCTK_REAL OUT Bconsx, CCTK_REAL OUT Bconsy, \
+                           CCTK_REAL OUT Bconsz, CCTK_REAL IN rho, CCTK_REAL IN velx, \
+                           CCTK_REAL IN vely, \
+                           CCTK_REAL IN velz, CCTK_REAL OUT epsilon, \
+                           CCTK_REAL OUT press,  CCTK_REAL IN Bvecx, CCTK_REAL IN Bvecy, \
+                           CCTK_REAL IN Bvecz, CCTK_REAL OUT w_lorentz)
+
+PROVIDES FUNCTION SpatialDet WITH SpatialDeterminant LANGUAGE Fortran
+PROVIDES FUNCTION UpperMet WITH UpperMetric LANGUAGE Fortran
+PROVIDES FUNCTION Con2PrimPoly WITH Con2PrimPolyWrapper LANGUAGE Fortran
+PROVIDES FUNCTION Con2PrimGenM WITH Con2PrimGenMWrapper LANGUAGE Fortran
+PROVIDES FUNCTION Con2PrimGenMee WITH Con2PrimGenMeeWrapper LANGUAGE Fortran
+PROVIDES FUNCTION Con2PrimGen WITH Con2PrimGenWrapper LANGUAGE Fortran
+PROVIDES FUNCTION Con2PrimPolyM WITH Con2PrimPolyMWrapper LANGUAGE Fortran
+PROVIDES FUNCTION Prim2ConGen WITH Prim2ConGenWrapper LANGUAGE Fortran
+PROVIDES FUNCTION Prim2ConPoly WITH Prim2ConPolyWrapper LANGUAGE Fortran
+PROVIDES FUNCTION Prim2ConGenM WITH Prim2ConGenMWrapper LANGUAGE Fortran
+PROVIDES FUNCTION Prim2ConGenM_hot WITH Prim2ConGenM_hotWrapper LANGUAGE Fortran
+PROVIDES FUNCTION Prim2ConPolyM WITH Prim2ConPolyMWrapper LANGUAGE Fortran
+
+####################################################
+###  Functions provided by MoL for registration  ###
+####################################################
+
+CCTK_INT FUNCTION MoLRegisterEvolved(CCTK_INT IN EvolvedIndex, \
+                                         CCTK_INT IN RHSIndex)
+CCTK_INT FUNCTION MoLRegisterEvolvedSlow(CCTK_INT IN EvolvedIndex, \
+                                         CCTK_INT IN RHSIndexSlow)
+CCTK_INT FUNCTION MoLRegisterConstrained(CCTK_INT IN ConstrainedIndex)
+CCTK_INT FUNCTION MoLRegisterEvolvedGroup(CCTK_INT IN EvolvedIndex, \
+                                          CCTK_INT IN RHSIndex)
+CCTK_INT FUNCTION MoLRegisterEvolvedGroupSlow(CCTK_INT IN EvolvedIndex, \
+                                          CCTK_INT IN RHSIndexSlow)
+CCTK_INT FUNCTION MoLRegisterConstrainedGroup(CCTK_INT IN ConstrainedIndex)
+CCTK_INT FUNCTION MoLRegisterSaveAndRestoreGroup(CCTK_INT IN SandRIndex)
+
+USES FUNCTION MoLRegisterEvolved
+USES FUNCTION MoLRegisterEvolvedSlow
+USES FUNCTION MoLRegisterConstrained
+USES FUNCTION MoLRegisterEvolvedGroup
+USES FUNCTION MoLRegisterEvolvedGroupSlow
+USES FUNCTION MoLRegisterConstrainedGroup
+USES FUNCTION MoLRegisterSaveAndRestoreGroup
+
+#########################################
+###  Aliased functions from Boundary  ###
+#########################################
+
+CCTK_INT FUNCTION Boundary_SelectVarForBC(CCTK_POINTER_TO_CONST IN GH, \
+  CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, \
+  CCTK_STRING IN var_name, CCTK_STRING IN bc_name)
+CCTK_INT FUNCTION Boundary_SelectGroupForBC(CCTK_POINTER_TO_CONST IN GH, \
+  CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, \
+  CCTK_STRING IN group_name, CCTK_STRING IN bc_name)
+
+USES FUNCTION Boundary_SelectVarForBC
+USES FUNCTION Boundary_SelectGroupForBC
+
+############################################
+###  Aliased function from DriftCorrect  ###
+############################################
+
+void FUNCTION SetDriftCorrectPosition ( CCTK_POINTER_TO_CONST IN GH_Pointer, \
+                                        CCTK_REAL IN x, \
+                                        CCTK_REAL IN y, \
+                                        CCTK_REAL IN z )
+USES FUNCTION SetDriftCorrectPosition
+
+
+#######################################################
+### Functions provided by the Omni EOS interface    ###
+#######################################################
+
+CCTK_INT FUNCTION EOS_Omni_GetHandle(CCTK_STRING IN name)
+USES FUNCTION EOS_Omni_GetHandle
+
+
+void FUNCTION EOS_Omni_pressOMP(CCTK_INT IN eoskey,         \
+			     CCTK_INT IN havetemp,       \
+			     CCTK_REAL IN rf_precision,   \
+                             CCTK_INT IN npoints,        \
+			     CCTK_REAL IN ARRAY rho,     \
+			     CCTK_REAL INOUT ARRAY eps,  \
+			     CCTK_REAL INOUT ARRAY temp, \
+			     CCTK_REAL IN ARRAY ye,      \
+			     CCTK_REAL OUT ARRAY press,  \
+			     CCTK_INT OUT ARRAY keyerr,  \
+			     CCTK_INT OUT anyerr)
+
+USES FUNCTION EOS_Omni_pressOMP
+
+void FUNCTION EOS_Omni_press(CCTK_INT IN eoskey,         \
+			     CCTK_INT IN havetemp,       \
+			     CCTK_REAL IN rf_precision,   \
+                             CCTK_INT IN npoints,        \
+			     CCTK_REAL IN ARRAY rho,     \
+			     CCTK_REAL INOUT ARRAY eps,  \
+			     CCTK_REAL INOUT ARRAY temp, \
+			     CCTK_REAL IN ARRAY ye,      \
+			     CCTK_REAL OUT ARRAY press,  \
+			     CCTK_INT OUT ARRAY keyerr,  \
+			     CCTK_INT OUT anyerr)
+
+USES FUNCTION EOS_Omni_press
+
+void FUNCTION EOS_Omni_press_cs2(CCTK_INT IN eoskey,         \
+			     CCTK_INT IN havetemp,       \
+			     CCTK_REAL IN rf_precision,   \
+                             CCTK_INT IN npoints,        \
+			     CCTK_REAL IN ARRAY rho,     \
+			     CCTK_REAL INOUT ARRAY eps,  \
+			     CCTK_REAL INOUT ARRAY temp, \
+			     CCTK_REAL IN ARRAY ye,      \
+			     CCTK_REAL OUT ARRAY press,  \
+			     CCTK_REAL OUT ARRAY cs2,    \
+			     CCTK_INT OUT ARRAY keyerr,  \
+			     CCTK_INT OUT anyerr)
+
+USES FUNCTION EOS_Omni_press_cs2
+
+
+void FUNCTION EOS_Omni_DPressByDEps(CCTK_INT IN eoskey,      \
+			     CCTK_INT IN havetemp,           \
+			     CCTK_REAL IN rf_precision,       \
+                             CCTK_INT IN npoints,            \
+			     CCTK_REAL IN ARRAY rho,         \
+			     CCTK_REAL INOUT ARRAY eps,      \
+			     CCTK_REAL INOUT ARRAY temp,     \
+			     CCTK_REAL IN ARRAY ye,          \
+			     CCTK_REAL OUT ARRAY dpdepsrho,  \
+			     CCTK_INT OUT ARRAY keyerr,      \
+			     CCTK_INT OUT anyerr)
+
+USES FUNCTION EOS_Omni_DPressByDEps
+
+
+void FUNCTION EOS_Omni_DPressByDRho(CCTK_INT IN eoskey,         \
+			     CCTK_INT IN havetemp,        	\
+			     CCTK_REAL IN rf_precision,          \
+                             CCTK_INT IN npoints,        	\
+			     CCTK_REAL IN ARRAY rho,     	\
+			     CCTK_REAL INOUT ARRAY eps,  	\
+			     CCTK_REAL INOUT ARRAY temp, 	\
+			     CCTK_REAL IN ARRAY ye,      	\
+			     CCTK_REAL OUT ARRAY dpdrhoeps,  	\
+			     CCTK_INT OUT ARRAY keyerr,  	\
+			     CCTK_INT OUT anyerr)
+
+USES FUNCTION EOS_Omni_DPressByDRho
+
+void FUNCTION EOS_Omni_dpderho_dpdrhoe(CCTK_INT IN eoskey,         \
+                             CCTK_INT IN havetemp,              \
+                             CCTK_REAL IN rf_precision,         \
+                             CCTK_INT IN npoints,               \
+                             CCTK_REAL IN ARRAY rho,            \
+                             CCTK_REAL INOUT ARRAY eps,         \
+                             CCTK_REAL INOUT ARRAY temp,        \
+                             CCTK_REAL IN ARRAY ye,             \
+                             CCTK_REAL OUT ARRAY dpderho,       \
+                             CCTK_REAL OUT ARRAY dpdrhoe,       \
+                             CCTK_INT OUT ARRAY keyerr,         \
+                             CCTK_INT OUT anyerr)
+
+USES FUNCTION EOS_Omni_dpderho_dpdrhoe
+
+void FUNCTION EOS_Omni_cs2(CCTK_INT IN eoskey,                  \
+			     CCTK_INT IN havetemp,              \
+			     CCTK_REAL IN rf_precision,          \
+                             CCTK_INT IN npoints,               \
+			     CCTK_REAL IN ARRAY rho,     	\
+			     CCTK_REAL INOUT ARRAY eps,  	\
+			     CCTK_REAL INOUT ARRAY temp, 	\
+			     CCTK_REAL IN ARRAY ye,      	\
+			     CCTK_REAL OUT ARRAY cs2,  		\
+			     CCTK_INT OUT ARRAY keyerr,   	\
+                             CCTK_INT OUT anyerr)
+
+USES FUNCTION EOS_Omni_cs2 
+
+void FUNCTION EOS_Omni_EpsFromPress(CCTK_INT IN eoskey,         \
+			     CCTK_INT IN havetemp,        	\
+			     CCTK_REAL IN rf_precision,          \
+                             CCTK_INT IN npoints,        	\
+			     CCTK_REAL IN ARRAY rho,     	\
+			     CCTK_REAL INOUT ARRAY eps,  	\
+			     CCTK_REAL INOUT ARRAY temp, 	\
+			     CCTK_REAL IN ARRAY ye,      	\
+			     CCTK_REAL IN ARRAY press,  	\
+			     CCTK_REAL OUT ARRAY xeps,  	\
+			     CCTK_INT OUT ARRAY keyerr,   	\
+                             CCTK_INT OUT anyerr)
+
+USES FUNCTION EOS_Omni_EpsFromPress 
+
+  
+public:
+
+int GRHydro_eos_scalars type = SCALAR
+{
+  GRHydro_eos_handle
+  GRHydro_polytrope_handle
+} "Handle number for EOS"
+
+CCTK_REAL GRHydro_minima type = SCALAR
+{
+  GRHydro_rho_min
+  GRHydro_tau_min
+#  GRHydro_dens_min
+} "Atmosphere values"
+
+real dens type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar" tensorweight=+1.0 jacobian="inverse_jacobian" interpolator="matter"' "generalized particle number"
+
+real tau  type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar" tensorweight=+1.0 jacobian="inverse_jacobian" interpolator="matter"' "internal energy"
+
+real scon[3] type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="D" tensorweight=+1.0 jacobian="inverse_jacobian" interpolator="matter"' "generalized momenta"
+
+real Bcons[3] type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="U" tensorparity=-1 tensorweight=+1.0 jacobian="jacobian" interpolator="matter"' "B-field conservative variable"
+
+real Evec[3] type = GF Timelevels = 1 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="U" tensorweight=+1.0 jacobian="jacobian" interpolator="matter"' "Electric field at edges"
+
+real Y_e_con type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar" tensorweight=+1.0 jacobian="inverse_jacobian" interpolator="matter"' "Conserved electron fraction"
+
+real entropycons type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar" tensorweight=+1.0 jacobian="inverse_jacobian" interpolator="matter"' "Conserved entropy density"
+
+real GRHydro_tracers[number_of_tracers] type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar"'
+{
+  tracer
+} "Tracers"
+
+#real w_lorentz type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar" tensorweight=+1.0 interpolator="matter"' "Lorentz factor"
+
+real sdetg type = GF Timelevels = 1 tags='Prolongation="None" tensortypealias="Scalar" tensorweight=+1.0 interpolator="matter" checkpoint="no"' "Sqrt of the determinant of the 3-metric"
+
+real psidc type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar" tensorweight=+1.0 tensorparity=-1 jacobian="inverse_jacobian" interpolator="matter"' "Psi parameter for divergence cleaning"
+
+real densrhs type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"' "Update term for dens"
+real taurhs  type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"' "Update term for tau"
+real srhs[3] type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"' "Update term for s"
+real Bconsrhs[3] type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"' "Update term for Bcons"
+real Avecrhs[3] type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"' "Update term for Avec"
+real Aphirhs type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"' "Update term for Aphi"
+
+real psidcrhs type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"' "Update term for psidc"
+
+real entropyrhs type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"' "Update term for entropycons"
+
+real divB type = GF Timelevels = 1 tags='Prolongation="Restrict" checkpoint="no" tensorparity=-1' "Magnetic field constraint"
+
+real bcom[3] type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="U" tensorparity=-1 interpolator="matter"' "b^i: comoving contravariant magnetic field 4-vector spatial components"
+real bcom0 type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar" interpolator="matter"' "b^0 component of the comoving contravariant magnetic field 4-vector"
+real bcom_sq type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar" interpolator="matter"' "half of magnectic pressure: contraction of b_a b^a "
+
+##################################################
+### variables in the local tensor basis
+##################################################
+
+CCTK_REAL lvel[3]  type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="U" jacobian="jacobian" interpolator="matter"' "local velocity v^i"
+CCTK_REAL lBvec[3] type = GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="U" jacobian="jacobian" tensorparity=-1 interpolator="matter"' "local Magnetic field components B^i"
+
+# We should only need one timelevel. However, InitialAtmosphereReset also wants to set past timelevels!
+# There must be a better way!
+CCTK_REAL local_metric type = GF Timelevels = 3 tags='Prolongation="None" checkpoint="no"'
+{
+  gaa, gab, gac
+  gbb, gbc
+  gcc
+} "local ADM metric g_ij"
+
+CCTK_REAL local_extrinsic_curvature type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"'
+{
+  kaa, kab, kac
+  kbb, kbc
+  kcc
+} "local extrinsic curvature K_ij"
+
+
+CCTK_REAL local_shift type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"' 
+{
+  betaa, betab, betac
+} "local ADM shift \beta^i"
+
+##################################################
+### These variables are only protected so that ###
+### the tests in init_data work. Should fix.   ###
+##################################################
+
+real GRHydro_prim_bext type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"'
+{
+  rhoplus, velxplus, velyplus, velzplus, pressplus, epsplus, w_lorentzplus, 
+  cs2plus, rhominus, velxminus, velyminus, velzminus, pressminus, epsminus, 
+  w_lorentzminus, cs2minus
+} "Primitive variables extended to the cell boundaries"
+
+int GRHydro_scalars type = SCALAR tags='checkpoint="no"'
+{
+  flux_direction, xoffset, yoffset, zoffset
+} "Which direction are we taking the fluxes in and the offsets"
+
+int GRHydro_atmosphere_mask type = GF Timelevels = 1 tags='Prolongation="None"'
+{
+  atmosphere_mask
+} "Flags to say whether a point needs to be reset to the atmosphere"
+
+# This real mask is set during UpdateAtmosphereMask and sync'ed afterwards (including possible interpatch interpolation)
+# After syn'ing and before any con2prim fun, we set the integer mask above based on the real-valued mask.
+# This ensures that any routine using the int mask is still correctly working.
+real GRHydro_atmosphere_mask_real type = GF Timelevels = 1 tags='Prolongation="sync" checkpoint="no"'
+{
+  atmosphere_mask_real
+} "Flags to say whether a point needs to be reset to the atmosphere. This is sync'ed (and possibly interpolated)!"
+
+int GRHydro_atmosphere_descriptors type=SCALAR
+{
+  atmosphere_field_descriptor
+  atmosphere_atmosp_descriptor
+  atmosphere_normal_descriptor
+}
+
+real GRHydro_cons_tracers[number_of_tracers] TYPE=GF Timelevels = 3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar"'
+{
+  cons_tracer
+} "The conserved tracer variable"
+
+# For measuring separations
+CCTK_REAL GRHydro_maxima_position TYPE=SCALAR tags='checkpoint="no"'
+{
+  maxima_x
+  maxima_y
+  maxima_z
+  maximum_density
+} "The position (coordinate values) of the maximum value of rho"
+
+CCTK_REAL maxrho_global TYPE=SCALAR tags='checkpoint="no"' "store the global maximum of rho, for refinment-grid steering"
+
+# functions can be prolonged only if they are real (not integer).
+CCTK_REAL GRHydro_C2P_failed TYPE=GF Timelevels = 1 tags='Prolongation="restrict" tensortypealias="Scalar" checkpoint="no"' "Mask that stores the points where C2P has failed"
+
+# Should we do the same for the atmo masks?
+
+real GRHydro_fluxes type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"'
+{
+  densflux, sxflux, syflux, szflux, tauflux
+} "Fluxes for each conserved variable"
+
+real GRHydro_Bfluxes type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"'
+{
+  Bconsxflux, Bconsyflux, Bconszflux
+} "Fluxes for each B-field variable"
+
+real GRHydro_psifluxes type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"'
+{
+  psidcflux
+} "Fluxes for the divergence cleaning parameter"
+
+real GRHydro_entropyfluxes type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"'
+{
+  entropyflux
+} "Fluxes for the conserved entropy density"
+
+real GRHydro_Avecfluxes type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"'
+{
+  Avecxflux, Avecyflux, Aveczflux
+} "Fluxes for each Avec variable"
+
+real GRHydro_Aphifluxes type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"'
+{
+  Aphiflux
+} "Fluxes for Aphi"
+
+int evolve_Y_e type = SCALAR tags='checkpoint="no"' "Are we evolving Y_e? Set in Paramcheck"
+
+int evolve_temper type = SCALAR tags='checkpoint="no"' "Are we evolving temperature? Set in Paramcheck"
+
+int evolve_entropy type = SCALAR tags='checkpoint="no"' "Are we evolving entropy? Set in Paramcheck"
+
+int evolve_MHD type = SCALAR tags='checkpoint="no"' "Are we doing MHD? Set in ParamCheck"
+
+int evolve_Lorenz_gge type = SCALAR tags='checkpoint="no"' "Are we evolving the Lorenz gauge?"
+
+int GRHydro_reflevel type = SCALAR tags='checkpoint="no"' "Refinement level GRHydro is working on right now"
+
+private:
+
+int InLastMoLPostStep type = SCALAR tags='checkpoint="no"' "Flag to indicate if we are currently in the last MoL_PostStep"
+
+int execute_MoL_Step type = SCALAR tags='checkpoint="no"' "Flag indicating whether we use the slow sector of multirate RK time integration"
+int execute_MoL_PostStep type = SCALAR tags='checkpoint="no"' "Flag indicating whether we use the slow sector of multirate RK time integration"
+
+real GRHydro_con_bext type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"'
+{
+  densplus, sxplus, syplus, szplus, tauplus,
+  densminus, sxminus, syminus, szminus, tauminus
+} "Conservative variables extended to the cell boundaries"
+
+real GRHydro_MHD_con_bext type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"'
+{
+  Bconsxplus,Bconsyplus,Bconszplus,Bconsxminus,Bconsyminus,Bconszminus
+} "Conservative variables extended to the cell boundaries"
+
+real GRHydro_MHD_prim_bext type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"'
+{
+  Bvecxplus,Bvecyplus,Bveczplus,Bvecxminus,Bvecyminus,Bveczminus
+} "Primitive mhd variables extended to the cell boundaries"
+
+real GRHydro_Avec_bext type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"'
+{
+  Avecxplus,Avecyplus,Aveczplus,Avecxminus,Avecyminus,Aveczminus
+} "Vector potential extended to the cell boundaries"
+
+real GRHydro_Aphi_bext type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"'
+{
+  Aphiplus,Aphiminus
+} "Vector potential phi extended to the cell boundaries"
+
+real GRHydro_MHD_psidc_bext type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"'
+{
+  psidcplus,psidcminus
+} "Divergence cleaning variable extended to the cell boundaries for diverence cleaning"
+
+real GRHydro_entropy_prim_bext type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"'
+{
+  entropyplus,entropyminus
+} "Primitive entropy extended to the cell boundaries"
+
+real GRHydro_entropy_con_bext type = GF Timelevels = 1 tags='Prolongation="None" checkpoint="no"'
+{
+  entropyconsplus,entropyconsminus
+} "Conservative entropy extended to the cell boundaries"
+
+int whichpsidcspeed type = SCALAR tags='checkpoint="no"' "Which speed to set for psidc? Set in ParamCheck"
+
+real GRHydro_coords type=GF timelevels=3 
+{
+  GRHydro_x
+  GRHydro_y
+  GRHydro_z
+} "Coordinates to use with the comoving shift"
+
+real GRHydro_coords_rhs type=GF timelevels=1 tags='Prolongation="None"'
+{
+  GRHydro_x_rhs
+  GRHydro_y_rhs
+  GRHydro_z_rhs
+} "RHS for coordinates to use with the comoving shift"
+
+#real GRHydro_hamiltonian type=GF  tags='tensortypealias="Scalar"'
+#{
+#  GRHydro_hamnormalized
+#  GRHydro_ham
+#} "GRHydro hamiltonian constraints"
+
+#real GRHydro_momentum type=GF tags='tensortypealias="U" checkpoint="no"'
+#{
+#  GRHydro_momx,
+#  GRHydro_momy,
+#  GRHydro_momz  
+#} "GRHydro momentum constraints"
+
+int GRHydro_trivial_rp_gf_group type=GF timelevels=1 tags='Prolongation="None"'
+{
+  GRHydro_trivial_rp_gf_x
+  GRHydro_trivial_rp_gf_y
+  GRHydro_trivial_rp_gf_z
+} "set gf for triv. rp (only for debugging)"
+
+
+real flux_splitting TYPE=GF tags='Prolongation="None" checkpoint="no"'
+{
+  densfplus, densfminus
+  sxfplus, sxfminus
+  syfplus, syfminus
+  szfplus, szfminus
+  taufplus, taufminus
+} "Fluxes for use in the flux splitting"
+
+real fs_alpha TYPE=SCALAR
+{
+  fs_alpha1
+  fs_alpha2
+  fs_alpha3
+  fs_alpha4
+  fs_alpha5
+} "Maximum characteristic speeds for the flux splitting"
+
+public:
+real Y_e_con_rhs TYPE=GF tags='Prolongation="None" checkpoint="no"' "RHS for the electron fraction"
+real Y_e_con_flux TYPE=GF tags='Prolongation="None" checkpoint="no"' "Flux for the electron fraction"
+private:
+real Y_e_plus TYPE=GF tags='Prolongation="None" checkpoint="no"' "Plus state  for the electron fraction"
+real Y_e_minus TYPE=GF tags='Prolongation="None" checkpoint="no"' "Minus state for the electron fraction"
+real tempplus TYPE=GF tags='Prolongation="None" checkpoint="no"' "Plus state  for the temperature"
+real tempminus TYPE=GF tags='Prolongation="None" checkpoint="no"' "Minus state for the temperature"
+
+real GRHydro_tracer_rhs[number_of_tracers] TYPE=GF tags='Prolongation="None" checkpoint="no"'
+{
+  cons_tracerrhs
+} "RHS for the tracer"
+
+real GRHydro_tracer_flux[number_of_tracers] TYPE=GF tags='Prolongation="None" checkpoint="no"'
+{
+  cons_tracerflux
+} "Flux for the tracer"
+
+real GRHydro_tracer_cons_bext[number_of_tracers] TYPE=GF tags='Prolongation="None" checkpoint="no"'
+{
+  cons_tracerplus, cons_tracerminus
+} "Cell boundary values for the tracer"
+
+real GRHydro_tracer_prim_bext[number_of_tracers] TYPE=GF tags='Prolongation="None" checkpoint="no"'
+{
+  tracerplus, tracerminus
+} "Primitive cell boundary values for the tracer"
+
+real GRHydro_tracer_flux_splitting[number_of_tracers] TYPE=GF tags='Prolongation="None" checkpoint="no"'
+{
+  tracerfplus, tracerfminus
+} "Flux splitting for the tracer"
+
+real GRHydro_mppm_eigenvalues TYPE=GF tags='Prolongation="None" checkpoint="no"'
+{
+  GRHydro_mppm_eigenvalue_x_left, GRHydro_mppm_eigenvalue_x_right
+  GRHydro_mppm_eigenvalue_y_left, GRHydro_mppm_eigenvalue_y_right
+  GRHydro_mppm_eigenvalue_z_left, GRHydro_mppm_eigenvalue_z_right
+  GRHydro_mppm_xwind
+} "debug variable for flux eigenvalues in mppm"
+
+
+CCTK_REAL particles TYPE=ARRAY DIM=1 TIMELEVELS=3 SIZE=number_of_particles GHOSTSIZE=0 DISTRIB=DEFAULT
+{
+  particle_x
+  particle_y
+  particle_z
+} "Coordinates of particles to be tracked"
+
+CCTK_REAL particle_rhs TYPE=ARRAY DIM=1 TIMELEVELS=1 SIZE=number_of_particles GHOSTSIZE=0 DISTRIB=DEFAULT
+{
+  particle_x_rhs
+  particle_y_rhs
+  particle_z_rhs
+} "RHS functions for particles to be tracked"
+
+CCTK_REAL particle_arrays TYPE=ARRAY DIM=1 TIMELEVELS=1 SIZE=number_of_particles GHOSTSIZE=0 DISTRIB=DEFAULT tags='checkpoint="no"'
+{
+  particle_vx
+  particle_vy
+  particle_vz
+  particle_alp
+  particle_betax
+  particle_betay
+  particle_betaz
+} "Temporaries to hold interpolated values for particle tracking"
+
+# For measuring separations
+
+CCTK_REAL GRHydro_maxima_location TYPE=SCALAR tags='checkpoint="no"'
+{
+  maxima_i
+  maxima_j
+  maxima_k
+} "The location (point index) of the maximum value of rho"
+
+CCTK_INT GRHydro_maxima_iteration TYPE=SCALAR "Iteration on which maximum was last set"
+
+CCTK_REAL GRHydro_maxima_separation TYPE=SCALAR tags='checkpoint="no"'
+{
+  GRHydro_separation
+  GRHydro_proper_separation
+} "The distance between the centres (locations of maximum density) of a binary NS"
+
+CCTK_REAL DiffRho TYPE=GF tags='Prolongation="None" checkpoint="no"' "The first difference in rho"
+
+# For the new EOS interface a couple of temporaries are required
+
+CCTK_REAL EOS_temps TYPE=GF tags='Prolongation="None" checkpoint="no"'
+{
+  eos_cs2_p, eos_cs2_m
+  eos_dpdeps_p, eos_dpdeps_m
+} "Temporaries for the EOS calls"
+
+CCTK_REAL RoeAverage_temps TYPE=GF tags='Prolongation="None" checkpoint="no"'
+{
+  rho_ave, velx_ave, vely_ave, velz_ave, eps_ave, press_ave
+  eos_cs2_ave, eos_dpdeps_ave
+} "Temporaries for the Roe solver"
+
+CCTK_REAL Con2Prim_temps TYPE=GF tags='Prolongation="None" checkpoint="no"'
+{
+  press_old, press_new
+  eos_dpdeps_temp, eos_dpdrho_temp
+} "Temporaries for the conservative to primitive conversion"
+
+CCTK_REAL H_viscosity_temps TYPE=GF tags='Prolongation="None" checkpoint="no"'
+{
+  eos_c
+} "Temporaries for H viscosity"
+
+

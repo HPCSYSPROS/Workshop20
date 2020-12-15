@@ -1,0 +1,10 @@
+NAMD_ARCH = Linux-POWER
+CHARMARCH = multicore-linux-ppc-xlc64
+
+CXX = xlC_r -w
+CXXOPTS = -O -qnohot -qstrict -qaggrcopy=nooverlap -qalias=ansi -qarch=auto -qtune=auto -qfloat=rsqrt:fltint -DARCH_POWERPC
+CXXNOALIASOPTS = -O3 -qaggrcopy=nooverlap -qalias=noallptrs -qarch=auto -qtune=auto -qfloat=rsqrt:fltint -DARCH_POWERPC
+CXXTHREADOPTS = -O -qstrict -qaggrcopy=nooverlap -qalias=ansi -qarch=auto -qtune=auto -qfloat=rsqrt:fltint -DARCH_POWERPC
+CC = xlc_r -w
+COPTS = -O4 -qarch=auto -qtune=auto
+

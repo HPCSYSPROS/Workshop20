@@ -1,0 +1,12 @@
+#! /bin/sh
+# /*@@
+#   @file      openbsd4.0
+#   @date      Sun Apr  8 20:49:07 CEST 2007
+#   @author    Jonathan Thornburg
+#   @desc
+#              known-architectures file for OpenBSD 4.0
+#   @enddesc 
+#   @version   $Header$
+# @@*/
+
+. $srcdir/known-architectures/openbsd

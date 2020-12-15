@@ -1,0 +1,60 @@
+#! /bin/sh
+# Create all thorn documentations
+# (C) 2003/05/24 Erik Schnetter <schnetter@uni-tuebingen.de>
+# $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/sbin/ThornDoc,v 1.5 2009-11-11 22:32:53 schnetter Exp $
+
+echo "Creating thorn documentations..."
+
+# Selected thorn; process all thorns if this is empty
+selection="$1"
+
+abspath=$PWD
+
+for arr in `cd arrangements; echo *`; do
+    if test -d arrangements/$arr; then
+        for th in `cd arrangements/$arr; echo *`; do
+            if test -d arrangements/$arr/$th; then
+                if test -z "$selection" || test "$th" = "$selection"; then
+                    if test -e arrangements/$arr/$th/doc/documentation.tex; then
+                        echo "  Processing thorn $arr/$th..."
+                        
+                        mkdir doc/ThornDoc 2> /dev/null
+                        mkdir doc/ThornDoc/$arr 2> /dev/null
+                        mkdir doc/ThornDoc/$arr/$th 2> /dev/null
+                        (
+                            cd doc/ThornDoc/$arr/$th
+                            rm -f documentation.tex documentation.pdf
+                            path=$abspath/arrangements/$arr/$th/doc
+                            < $path/documentation.tex sed -e 's+\(\\includegraphics.*\){ *\(.*\) *}+\1{'"$path"'/\2}+g' |
+                            sed -e 's+\(\\input *\)\(.*\)+\1'"$path"'/\2+g' |
+                            sed -e 's+\\begin{document}+\\newlength{\\tableWidth} \\newlength{\\maxVarWidth} \\newlength{\\paraWidth} \\newlength{\\descWidth} \\begin{document}+g' |
+                            sed -e 's+\\end{document}++g' > documentation.tex
+
+                            echo "  Parsing ccl files..."
+                            perl -s $abspath/lib/sbin/ParamLatex.pl -cctk_home=$abspath -directory=$abspath/arrangements -thorn=$arr/$th -outdir=$PWD > LOG_PARAMLATEX_MSGS 2>&1
+                            perl -s $abspath/lib/sbin/InterLatex.pl -cctk_home=$abspath -directory=$abspath/arrangements -thorn=$arr/$th -outdir=$PWD > LOG_INTERLATEX_MSGS 2>&1
+                            perl -s $abspath/lib/sbin/SchedLatex.pl -cctk_home=$abspath -directory=$abspath/arrangements -thorn=$arr/$th -outdir=$PWD > LOG_SCHEDLATEX_MSGS 2>&1
+
+                            inter_file=`echo ${arr}_${th}_inter.tex | tr '[:upper:]' '[:lower:]'`
+                            cat ${arr}_${th}_param.tex >> documentation.tex
+                            cat $inter_file >> documentation.tex
+                            cat ${arr}_${th}_schedule.tex >> documentation.tex
+                            echo "\\end{document}" >> documentation.tex
+                            
+                            {
+                                pdflatex documentation < /dev/null > LATEX_MESSAGES 2>&1
+                                pdflatex documentation < /dev/null > LATEX_MESSAGES 2>&1
+                                pdflatex documentation < /dev/null > LATEX_MESSAGES 2>&1
+                            } ||
+                            echo "    ERROR: Could not create documentation (check for latex errors)"
+                        )
+                        
+                    fi          # if thorn has documentation
+                fi              # if thorn is enabled
+            fi
+        done                    # for thorns
+    fi
+done                            # for arrangements
+
+echo "  Created thorn documentations in doc/ThornDoc directory."
+echo "  Done."

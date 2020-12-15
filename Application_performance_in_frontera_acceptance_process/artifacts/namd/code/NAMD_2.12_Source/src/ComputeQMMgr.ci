@@ -1,0 +1,69 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+module ComputeQMMgr {
+
+  message QMCoordMsg {
+    ComputeQMAtom coord[];
+    int pcIndxs[];
+  };
+  message QMPntChrgMsg {
+    ComputeQMPntChrg coord[];
+  };
+  message QMForceMsg {
+    QMForce force[];
+    LSSSubsDat lssDat[];
+  };
+  message QMGrpResMsg {
+    QMForce force[];
+  };
+  
+  message QMGrpCalcMsg {
+    QMAtomData data[];
+    char configLines[];
+  };
+  
+  group ComputeQMMgr {
+
+    entry ComputeQMMgr(void);
+    
+    entry void recvPartQM(QMCoordMsg *) ;
+    
+    entry void recvFullQM(QMCoordMsg *);
+    
+    entry void recvPntChrg(QMPntChrgMsg *);
+    
+    entry void calcMOPAC(QMGrpCalcMsg *) ;
+    
+    entry void calcORCA(QMGrpCalcMsg *) ;
+    
+    entry void calcUSR(QMGrpCalcMsg *) ;
+    
+    entry void recvQMRes(QMGrpResMsg *) ; // Signal handler
+    
+    entry void storeQMRes(QMGrpResMsg *) ;
+    
+    entry void procQMRes() ; // Processing
+    
+    entry void recvForce(QMForceMsg *) ;
+    
+    entry void recvQMResLoop() {
+        
+        while ( numRecQMRes < numQMGrps ) {
+            when recvQMRes(QMGrpResMsg *fmsg) serial {
+                storeQMRes(fmsg) ;
+            }
+        }
+        
+        serial {
+            procQMRes() ;
+        }
+    }
+    
+  };
+
+}
+

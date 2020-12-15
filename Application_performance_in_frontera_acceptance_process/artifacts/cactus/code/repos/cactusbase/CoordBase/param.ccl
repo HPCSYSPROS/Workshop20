@@ -1,0 +1,251 @@
+# Parameter definitions for thorn CoordBase
+# $Header$
+
+
+
+###############################################################################
+###   Domain specification                                                  ###
+###############################################################################
+
+KEYWORD domainsize "Domain size specification"
+{
+  "minmax"      :: "lower and upper boundary locations"
+  "extent"      :: "coordinate extent"
+  "spacing"     :: "grid spacing and number of grid cells"
+} "minmax"
+
+KEYWORD spacing "Grid spacing specification"
+{
+  "gridspacing" :: "grid spacing"
+  "numcells"    :: "number of grid cells"
+} "gridspacing"
+
+
+
+# Domain description in the x direction.
+# The other domain descriptions are equivalent.
+
+BOOLEAN zero_origin_x "Is the lower boundary located at x=0?"
+{
+} "no"
+
+CCTK_REAL xmin "Location of lower x boundary"
+{
+  (*:*) :: ""
+} 0.0
+
+CCTK_REAL xmax "Location of upper x boundary"
+{
+  (*:*) :: ""
+} 1.0
+
+CCTK_REAL xextent "Domain extent in x direction"
+{
+  (0:*) :: ""
+} 1.0
+
+CCTK_REAL dx "Grid spacing in x direction"
+{
+  (0:*) :: ""
+} 1.0
+
+CCTK_INT ncells_x "Number of grid cells in x direction"
+{
+  0:* :: ""
+} 1
+
+# Domain description in the y direction.
+# The other domain descriptions are equivalent.
+
+BOOLEAN zero_origin_y "Is the lower boundary located at y=0?"
+{
+} "no"
+
+CCTK_REAL ymin "Location of lower y boundary"
+{
+  (*:*) :: ""
+} 0.0
+
+CCTK_REAL ymax "Location of upper y boundary"
+{
+  (*:*) :: ""
+} 1.0
+
+CCTK_REAL yextent "Domain extent in y direction"
+{
+  (0:*) :: ""
+} 1.0
+
+CCTK_REAL dy "Grid spacing in y direction"
+{
+  (0:*) :: ""
+} 1.0
+
+CCTK_INT ncells_y "Number of grid cells in y direction"
+{
+  0:* :: ""
+} 1
+
+# Domain description in the z direction.
+# The other domain descriptions are equivalent.
+
+BOOLEAN zero_origin_z "Is the lower boundary located at z=0?"
+{
+} "no"
+
+CCTK_REAL zmin "Location of lower z boundary"
+{
+  (*:*) :: ""
+} 0.0
+
+CCTK_REAL zmax "Location of upper z boundary"
+{
+  (*:*) :: ""
+} 1.0
+
+CCTK_REAL zextent "Domain extent in z direction"
+{
+  (0:*) :: ""
+} 1.0
+
+CCTK_REAL dz "Grid spacing in z direction"
+{
+  (0:*) :: ""
+} 1.0
+
+CCTK_INT ncells_z "Number of grid cells in z direction"
+{
+  0:* :: ""
+} 1
+
+
+
+###############################################################################
+###   Boundary specification                                                ###
+###############################################################################
+
+# Boundary description for the lower x face.
+# The other boundary descriptions are equivalent.
+
+CCTK_INT boundary_size_x_lower "Boundary zones at the lower x face"
+{
+  0:* :: ""
+} 1
+
+BOOLEAN boundary_internal_x_lower "Do the boundary points extend inwards at the lower x face?"
+{
+} "no"
+
+BOOLEAN boundary_staggered_x_lower "Is the boundary is staggered about the grid points at the lower x face?"
+{
+} "no"
+
+CCTK_INT boundary_shiftout_x_lower "Offset between the boundary location and the first boundary point at the lower x face"
+{
+  *:* :: "when not staggered: use 0 for an open, 1 for a closed manifold"
+} 0
+
+# Boundary description for the upper x face.
+# The other boundary descriptions are equivalent.
+
+CCTK_INT boundary_size_x_upper "Boundary zones at the upper x face"
+{
+  0:* :: ""
+} 1
+
+BOOLEAN boundary_internal_x_upper "Do the boundary points extend inwards at the upper x face?"
+{
+} "no"
+
+BOOLEAN boundary_staggered_x_upper "Is the boundary is staggered about the grid points at the upper x face?"
+{
+} "no"
+
+CCTK_INT boundary_shiftout_x_upper "Offset between the boundary location and the first boundary point at the upper x face"
+{
+  *:* :: "when not staggered: use 0 for an open, 1 for a closed manifold"
+} 0
+
+# Boundary description for the lower y face.
+# The other boundary descriptions are equivalent.
+
+CCTK_INT boundary_size_y_lower "Boundary zones at the lower y face"
+{
+  0:* :: ""
+} 1
+
+BOOLEAN boundary_internal_y_lower "Do the boundary points extend inwards at the lower y face?"
+{
+} "no"
+
+BOOLEAN boundary_staggered_y_lower "Is the boundary is staggered about the grid points at the lower y face?"
+{
+} "no"
+
+CCTK_INT boundary_shiftout_y_lower "Offset between the boundary location and the first boundary point at the lower y face"
+{
+  *:* :: "when not staggered: use 0 for an open, 1 for a closed manifold"
+} 0
+
+# Boundary description for the upper y face.
+# The other boundary descriptions are equivalent.
+
+CCTK_INT boundary_size_y_upper "Boundary zones at the upper y face"
+{
+  0:* :: ""
+} 1
+
+BOOLEAN boundary_internal_y_upper "Do the boundary points extend inwards at the upper y face?"
+{
+} "no"
+
+BOOLEAN boundary_staggered_y_upper "Is the boundary is staggered about the grid points at the upper y face?"
+{
+} "no"
+
+CCTK_INT boundary_shiftout_y_upper "Offset between the boundary location and the first boundary point at the upper y face"
+{
+  *:* :: "when not staggered: use 0 for an open, 1 for a closed manifold"
+} 0
+
+# Boundary description for the lower z face.
+# The other boundary descriptions are equivalent.
+
+CCTK_INT boundary_size_z_lower "Boundary zones at the lower z face"
+{
+  0:* :: ""
+} 1
+
+BOOLEAN boundary_internal_z_lower "Do the boundary points extend inwards at the lower z face?"
+{
+} "no"
+
+BOOLEAN boundary_staggered_z_lower "Is the boundary is staggered about the grid points at the lower z face?"
+{
+} "no"
+
+CCTK_INT boundary_shiftout_z_lower "Offset between the boundary location and the first boundary point at the lower z face"
+{
+  *:* :: "when not staggered: use 0 for an open, 1 for a closed manifold"
+} 0
+
+# Boundary description for the upper z face.
+# The other boundary descriptions are equivalent.
+
+CCTK_INT boundary_size_z_upper "Boundary zones at the upper z face"
+{
+  0:* :: ""
+} 1
+
+BOOLEAN boundary_internal_z_upper "Do the boundary points extend inwards at the upper z face?"
+{
+} "no"
+
+BOOLEAN boundary_staggered_z_upper "Is the boundary is staggered about the grid points at the upper z face?"
+{
+} "no"
+
+CCTK_INT boundary_shiftout_z_upper "Offset between the boundary location and the first boundary point at the upper z face"
+{
+  *:* :: "when not staggered: use 0 for an open, 1 for a closed manifold"
+} 0

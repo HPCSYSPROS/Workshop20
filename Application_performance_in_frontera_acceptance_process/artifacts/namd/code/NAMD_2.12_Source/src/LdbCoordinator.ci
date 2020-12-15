@@ -1,0 +1,32 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+module LdbCoordinator {
+  extern module NamdCentLB;
+  extern module NamdNborLB;
+  extern module NamdHybridLB;
+  extern module NamdDummyLB;
+    
+  message LdbMigrateMsg;
+  message CollectLoadsMsg;
+
+  initproc void LdbCoordinator_initproc(void);
+
+  group LdbCoordinator
+  {
+    entry LdbCoordinator(void);
+    entry void barrier(void);
+    entry void nodeDone(CkReductionMsg *);
+    entry void resume(void);
+    entry void resumeReady(CkQdMsg *);
+    entry void resume2(void);
+    entry void RecvMigrate(LdbMigrateMsg*);
+    entry void ExpectMigrate(LdbMigrateMsg*);
+    entry void updateComputesReady(void);
+    entry void collectLoads(CollectLoadsMsg*);
+  };
+}
+

@@ -1,0 +1,9 @@
+# Main make.code.defn file for thorn SpaceMask
+# $Header$
+
+# Source files in this directory
+SRCS = MaskInit.c MaskUtils.c
+
+# Subdirectories containing source files
+SUBDIRS = 
+

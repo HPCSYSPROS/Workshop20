@@ -1,0 +1,32 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+echo "Checking:"
+pwd
+hostname
+date
+cat ${PBS_NODES} > SIMFACTORY/NODES
+
+echo "Environment:"
+export GMON_OUT_PREFIX=gmon.out
+export OMP_NUM_THREADS=@NUM_THREADS@
+export MPICH_PTL_UNEX_EVENTS=204800
+env | sort > SIMFACTORY/ENVIRONMENT
+
+ulimit -Sa
+ulimit -Ha
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+#${OPENMPI_DIR}/bin/mpirun -np @NUM_PROCS@ @EXECUTABLE@ -L 3 @PARFILE@
+mpirun -np @NUM_PROCS@ @EXECUTABLE@ -L 3 @PARFILE@
+
+echo "Stopping:"
+date
+
+echo "Done."

@@ -1,0 +1,35 @@
+Cactus::cctk_run_title = "Nodes and cores, processes and threads"
+Cactus::cctk_itlast = 0
+Cactus::cctk_full_warnings = yes
+
+ActiveThorns = "IOUtil"
+IO::out_dir = $parfile
+
+ActiveThorns = "InitBase LoopControl"
+ActiveThorns = "Boundary Carpet CarpetLib CarpetReduce CartGrid3D CoordBase SymBase"
+grid::type = "coordbase"
+
+# Check provenance infrastructure
+ActiveThorns = "Formaline"
+
+# Check timing infrastructure
+Carpet::output_initialise_timer_tree = yes
+Carpet::output_timer_tree_every      = 1
+
+ActiveThorns = "CycleClock"
+CycleClock::register_clock = no
+
+ActiveThorns = "hwloc SystemTopology"
+
+ActiveThorns = "MemSpeed"
+MemSpeed::skip_largemem_benchmarks = yes
+
+#ActiveThorns = "PAPI"
+
+ActiveThorns = "TimerReport"
+TimerReport::out_every                  = 1
+TimerReport::out_filename               = "TimerReport"
+TimerReport::output_all_timers_together = yes
+TimerReport::output_all_timers_readable = yes
+#TimerReport::all_timers_clock           = "PAPI_flop"
+TimerReport::n_top_timers               = 20

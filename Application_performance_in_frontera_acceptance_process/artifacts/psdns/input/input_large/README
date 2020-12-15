@@ -1,0 +1,7 @@
+This directory contains the inputs for the large case for PSDNS.   
+
+The only difference between these runs are the task counts, 32x512, 32x1024, and
+32x2048.  The difference input file is just the name of the input directory
+where the code was run.  The original case from Blue Waters used 32x8192 tasks.
+That would not fit on the Skylake nodes.  All that has been changed is the total
+task count.

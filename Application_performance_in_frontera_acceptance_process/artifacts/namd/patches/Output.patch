@@ -1,0 +1,51 @@
+--- Output.C	2017-11-09 13:39:37.000000000 -0600
++++ Output.C.new	2017-11-09 13:39:44.000000000 -0600
+@@ -915,6 +915,8 @@
+ void Output::output_final_coordinates(Vector *coor, int n, int timestep)
+ 
+ {
++  return;
++
+   char output_name[140];  //  Output filename
+   char comment[128];    //  comment for PDB header
+ 
+@@ -958,6 +960,7 @@
+ void Output::output_final_velocities(int timestep, int n, Vector *vel)
+ 
+ {
++  return;
+   char output_name[140];  //  Output filename
+   char comment[128];    //  Comment for PDB header
+ 
+@@ -1670,6 +1673,7 @@
+ }
+ 
+ void ParOutput::output_final_velocities_master(int n){
++    return;
+ #if OUTPUT_SINGLE_FILE
+     char *output_name = new char[strlen(namdMyNode->simParams->outputFilename)+8];
+     //  Build the output filename
+@@ -1686,6 +1690,7 @@
+ }
+ 
+ void ParOutput::output_final_velocities_slave(int fID, int tID, Vector *vecs, int64 offset){
++    return;
+ #if OUTPUT_SINGLE_FILE
+     char *output_name = new char[strlen(namdMyNode->simParams->outputFilename)+8];
+     //  Build the output filename
+@@ -2444,6 +2449,7 @@
+ }
+ 
+ void ParOutput::output_final_coordinates_master(int n){
++    return;
+ #if OUTPUT_SINGLE_FILE
+ 	char *output_name = new char[strlen(namdMyNode->simParams->outputFilename)+8];
+ 
+@@ -2462,6 +2468,7 @@
+ 	delete [] output_name;
+ }
+ void ParOutput::output_final_coordinates_slave(int fID, int tID, Vector *vecs, int64 offset){
++    return;
+ #if OUTPUT_SINGLE_FILE
+     char *output_name = new char[strlen(namdMyNode->simParams->outputFilename)+8];
+ 

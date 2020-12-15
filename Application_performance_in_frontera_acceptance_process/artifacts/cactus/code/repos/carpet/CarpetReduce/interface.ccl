@@ -1,0 +1,96 @@
+# Interface definition for thorn CarpetReduce
+
+IMPLEMENTS: reduce
+
+uses include header: nompi.h
+
+uses include header: defs.hh
+uses include header: dh.hh
+uses include header: dist.hh
+uses include header: vect.hh
+
+uses include header: carpet.hh
+uses include header: carpet.h
+
+uses include header: typecase.hh
+uses include header: typeprops.hh
+
+uses include header: loopcontrol.h
+
+includes header: bits.h IN CarpetReduce_bits.h
+
+
+
+CCTK_INT FUNCTION                           \
+    GetBoundarySpecification     \
+        (CCTK_INT IN size,                  \
+         CCTK_INT OUT ARRAY nboundaryzones, \
+         CCTK_INT OUT ARRAY is_internal,    \
+         CCTK_INT OUT ARRAY is_staggered,   \
+         CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION GetBoundarySpecification
+
+CCTK_INT FUNCTION                           \
+    MultiPatch_GetBoundarySpecification     \
+        (CCTK_INT IN map,                   \
+         CCTK_INT IN size,                  \
+         CCTK_INT OUT ARRAY nboundaryzones, \
+         CCTK_INT OUT ARRAY is_internal,    \
+         CCTK_INT OUT ARRAY is_staggered,   \
+         CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION MultiPatch_GetBoundarySpecification 
+
+CCTK_INT FUNCTION                                                \
+    SymmetryTableHandleForGrid (CCTK_POINTER_TO_CONST IN cctkGH)
+REQUIRES FUNCTION SymmetryTableHandleForGrid
+
+CCTK_INT FUNCTION                         \
+    MultiPatch_GetMaps                    \
+        (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION MultiPatch_GetMaps
+
+CCTK_INT FUNCTION                         \
+    MultiPatch_GetMap                     \
+        (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION MultiPatch_GetMap
+
+CCTK_INT FUNCTION                          \
+    MultiPatch_GetDomainSpecification      \
+        (CCTK_INT IN map,                  \
+         CCTK_INT IN size,                 \
+         CCTK_REAL OUT ARRAY physical_min, \
+         CCTK_REAL OUT ARRAY physical_max, \
+         CCTK_REAL OUT ARRAY interior_min, \
+         CCTK_REAL OUT ARRAY interior_max, \
+         CCTK_REAL OUT ARRAY exterior_min, \
+         CCTK_REAL OUT ARRAY exterior_max, \
+         CCTK_REAL OUT ARRAY spacing)
+USES FUNCTION MultiPatch_GetDomainSpecification
+
+CCTK_INT FUNCTION                          \
+    GetDomainSpecification                 \
+        (CCTK_INT IN size,                 \
+         CCTK_REAL OUT ARRAY physical_min, \
+         CCTK_REAL OUT ARRAY physical_max, \
+         CCTK_REAL OUT ARRAY interior_min, \
+         CCTK_REAL OUT ARRAY interior_max, \
+         CCTK_REAL OUT ARRAY exterior_min, \
+         CCTK_REAL OUT ARRAY exterior_max, \
+         CCTK_REAL OUT ARRAY spacing)
+USES FUNCTION GetDomainSpecification
+
+# Get current refinement level
+CCTK_INT FUNCTION                         \
+    GetRefinementLevel                    \
+        (CCTK_POINTER_TO_CONST IN cctkGH)
+REQUIRES FUNCTION GetRefinementLevel
+
+
+
+INT iweight TYPE=gf TAGS='prolongation="none" InterpNumTimelevels=1 checkpoint="no"' "Integer weight mask, using 2^D bits"
+
+REAL weight TYPE=gf TAGS='prolongation="none" InterpNumTimelevels=1 checkpoint="no"' "Weight function"
+
+REAL one TYPE=gf TAGS='prolongation="none" InterpNumTimelevels=1 checkpoint="no"' "Constant one"
+
+CCTK_REAL excised_cells TYPE=scalar TAGS='checkpoint="no"' "Excised (ignored) volume in the simulation domain, in terms of coarse grid cells"

@@ -1,0 +1,82 @@
+# Schedule definitions for thorn ZelmaniShockTracker
+
+STORAGE: dostuff,dotrack
+STORAGE: saved_regrid_every
+STORAGE: dochangeregrid
+
+STORAGE: shockpos 
+STORAGE: zst_interpolated_variables 
+STORAGE: zst_scalars
+STORAGE: rad 
+STORAGE: phi
+STORAGE: theta
+
+
+# initialization 
+schedule zst_set_origin_init at CCTK_INITIAL
+{
+  LANG: C
+  OPTIONS: global
+} "initialze scalars"
+
+schedule zst_setup at CCTK_INITIAL AFTER zst_set_origin_init
+{
+  LANG: C
+  OPTIONS: global
+} "setup interpolation"
+
+# normal operation
+
+schedule ZelmaniShockTracker2_CheckStatus at CCTK_POSTSTEP
+{
+  LANG: C
+  OPTIONS: global
+} "See if we should do something"
+
+schedule ZelmaniShockTracker2_Find at CCTK_POSTSTEP AFTER ZelmaniShockTracker2_CheckStatus
+{
+  LANG: C
+  OPTIONS: global
+} "Find Shock"
+
+schedule ZelmaniShockTracker2_Track at CCTK_POSTSTEP AFTER ZelmaniShockTracker2_Find
+{
+  LANG: C
+  OPTIONS: global
+} "Track Shock"
+
+
+schedule ZelmaniShockTracker2_Print at Analysis
+{
+  LANG: C
+  OPTIONS: global
+} "Print refinement hierarchy based on CarpetRegrid2"
+
+
+# stuff to do right after recovery
+
+schedule zst_set_origin_init at CCTK_POST_RECOVER_VARIABLES
+{
+  LANG: C
+  OPTIONS: global
+} "initialize scalars"
+
+schedule zst_setup at CCTK_POST_RECOVER_VARIABLES AFTER zst_set_origin_init
+{
+  LANG: C
+  OPTIONS: global
+} "setup interpolation"
+
+schedule ZelmaniShockTracker2_ForceFind at CCTK_POST_RECOVER_VARIABLES AFTER zst_setup
+{
+  LANG: C
+  OPTIONS: global
+} "force finding the horizon"
+
+schedule ZelmaniShockTracker2_Find at CCTK_POST_RECOVER_VARIABLES AFTER ZelmaniShockTracker2_ForceFind
+{
+  LANG: C
+  OPTIONS: global
+} "Print refinement hierarchy based on CarpetRegrid2"
+
+

@@ -1,0 +1,73 @@
+#!/bin/bash
+
+# W. Cyrus Proctor
+# 2017-11-13
+# Stampede2 OpenBabel build script
+
+
+ml reset
+ml gcc
+ml cmake
+ml boost
+
+set -x
+
+#export base=`pwd`
+
+export eigen=${base}/eigen
+export eigen_install=${eigen}/install/${TACC_FAMILY_COMPILER}
+
+export ob=${base}/openbabel
+export ob_install=${ob}/install/${TACC_FAMILY_COMPILER}
+
+export ob_major=2
+export ob_minor=3
+export ob_patch=2
+export ob_version=${ob_major}.${ob_minor}.${ob_patch}
+
+export CTEST_OUTPUT_ON_FAILURE=1
+export ncores=64
+
+export CC=gcc
+export CXX=g++
+export FC=gfortran
+
+export   CFLAGS="-O3 -flto -march=skylake-avx512 -mtune=skylake-avx512 -mavx512f -mavx512cd -mavx512bw -mavx512dq -mavx512vl -mavx512ifma -mavx512vbmi"
+export CXXFLAGS="-O3 -flto -march=skylake-avx512 -mtune=skylake-avx512 -mavx512f -mavx512cd -mavx512bw -mavx512dq -mavx512vl -mavx512ifma -mavx512vbmi -std=c++03"
+export  LDFLAGS="-O3 -flto -march=skylake-avx512 -mtune=skylake-avx512 -mavx512f -mavx512cd -mavx512bw -mavx512dq -mavx512vl -mavx512ifma -mavx512vbmi"
+
+mkdir -p ${ob}
+cd ${ob}
+mkdir -p ${TACC_FAMILY_COMPILER}
+cd ${TACC_FAMILY_COMPILER}
+wget http://downloads.sourceforge.net/project/openbabel/openbabel/${ob_version}/openbabel-${ob_version}.tar.gz
+tar xvfz openbabel-${ob_version}.tar.gz
+mv openbabel-${ob_version} openbabel-${ob_version}.orig
+tar xvfz openbabel-${ob_version}.tar.gz
+patch -p0 < ${ob}/patches/CMakeLists.patch
+sed -i 's#LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib#LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib:$ENV{LD_LIBRARY_PATH}#g' openbabel-2.3.2/test/CMakeLists.txt
+sed -i 's#NOT GCC_IS_NEWER_THAN_4_0#1#g' openbabel-2.3.2/CMakeLists.txt
+cat openbabel-2.3.2/test/CMakeLists.txt | grep LD_LIBRARY_PATH
+cat openbabel-2.3.2/CMakeLists.txt | grep 1
+diff -Naur openbabel-${ob_version}.orig openbabel-${ob_version} > ${base}/patches/openbabel.master.patch
+mkdir -p build
+cd build
+
+cmake                                                \
+-DCMAKE_INSTALL_PREFIX=${ob_install}                 \
+-DCMAKE_VERBOSE_MAKEFILE=ON                          \
+-DCMAKE_CXX_COMPILER="${CXX}"                        \
+-DCMAKE_C_COMPILER="${CC}"                           \
+-DCMAKE_CXX_FLAGS="${CXXFLAGS}"                      \
+-DCMAKE_C_FLAGS="${C_FLAGS}"                         \
+-DCMAKE_EXE_LINKER_FLAGS="${LDFLAGS}"                \
+-DCMAKE_MODULE_LINKER_FLAGS="${LDFLAGS}"             \
+-DCMAKE_SHARED_LINKER_FLAGS="${LDFLAGS}"             \
+-DCMAKE_STATIC_LINKER_FLAGS="${LDFLAGS}"             \
+-DEIGEN3_INCLUDE_DIR=${eigen_install}/include/eigen3 \
+-DENABLE_OPENMP=OFF                                  \
+${ob}/${TACC_FAMILY_COMPILER}/openbabel-${ob_version}
+
+make -j ${ncores}
+make test
+make install

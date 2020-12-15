@@ -1,0 +1,4 @@
+1680_3360_24
+ node = 1680 tpn = 2 task = 3360 thread = 24 
+my_queue : test2 
+ Running spplarge_ddr4_spread_1680_3360p_24t_1 

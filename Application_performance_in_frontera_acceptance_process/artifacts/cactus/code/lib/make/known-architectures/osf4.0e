@@ -1,0 +1,13 @@
+#! /bin/sh
+#  /*@@
+#    @file      osf4.0e
+#    @date      April 23 1999 
+#    @author    Gabrielle Allen 
+#    @desc 
+#   
+#    @enddesc
+#    @version $Header$
+#  @@*/
+
+. $srcdir/known-architectures/osf
+

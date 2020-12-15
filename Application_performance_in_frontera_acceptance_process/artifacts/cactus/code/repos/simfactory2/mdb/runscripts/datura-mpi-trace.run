@@ -1,0 +1,58 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+# for tracing in a first step use modules...
+
+. /etc/profile
+. /etc/profile.d/modules.sh
+
+module load itac/8.0.3.007
+module load mpi/impi/impi4.0.3.008
+
+module li
+
+source /cluster/Compiler/Intel/2012.0.032/itac/8.0.3.007/bin/itacvars.sh
+
+cd @RUNDIR@-active
+
+echo "Checking:"
+pwd
+hostname
+date
+cat ${MPI_NODEFILE} > SIMFACTORY/NODES
+
+# This is necessary for the HDF5 installation, which requires that libimf be found
+#export LD_LIBRARY_PATH=/cluster/Compiler/Intel/11.1.072/lib/intel64:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=/cluster/Compiler/Intel/2012.0.032/composer_xe_2011_sp1.6.233/compiler/lib/intel64:$LD_LIBRARY_PATH
+
+echo "Environment:"
+export GMON_OUT_PREFIX=gmon.out
+export OMP_NUM_THREADS=@NUM_THREADS@
+#export MPIDIR=/cluster/openmpi/SL6/1.5.4/intel/11.1.072/
+export MPI_NODEFILE=${TMPDIR}/machines
+env | sort > SIMFACTORY/ENVIRONMENT
+
+echo "Starting:"
+uniq ${MPI_NODEFILE} > PROC_NODES
+for node in $(cat PROC_NODES); do
+    for (( proc=0; $proc<@(@PPN_USED@/@NUM_THREADS@)@; proc=$proc+1)); do
+        echo ${node}
+    done
+done > ${MPI_NODEFILE}
+
+export VT_CONFIG=$HOME/trace.config
+mpdboot -n @NUM_PROCS@ -f $HOME/mpd.hosts
+
+export CACTUS_STARTTIME=$(date +%s)
+
+time mpiexec -n @NUM_PROCS@ @EXECUTABLE@ -L 3 @PARFILE@
+
+mpdallexit
+
+echo "Stopping:"
+date
+
+echo "Done."

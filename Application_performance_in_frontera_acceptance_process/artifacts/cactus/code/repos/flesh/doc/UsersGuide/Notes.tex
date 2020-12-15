@@ -1,0 +1,1493 @@
+% /*@@
+%   @file      RunningCactus.tex
+%   @date      27 Jan 1999
+%   @author    Tom Goodale, Gabrielle Allen, Gerd Lanferman, Thomas Radke
+%   @desc
+%              How to run Cactus part of the Cactus User's Guide
+%   @enddesc
+%   @version   $Header$
+% @@*/
+
+\begin{cactuspart}{Additional notes}{}{$Revision$}\label{part:Notes}
+\renewcommand{\thepage}{\Alph{part}\arabic{page}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\chapter{Installation}
+\label{cha:in}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Required Software}
+\label{sec:required_software}
+
+In general, Cactus \emph{requires} the following set of software to function
+in single processor mode. Please refer to the architecture section
+\ref{sec:suar} for architecture specific items.
+\begin{Lentry}
+\item[Perl5.0] Perl is used extensively during the Cactus
+  thorn configuration phase. Perl is available for nearly all
+  operating systems known to man, and can be obtained at
+  \url{http://www.perl.org}.
+\item[GNU make] The make
+  process works with the GNU make utility (referred to as \texttt{gmake}
+  henceforth). While other make utilities may also work, this is not
+  guaranteed. Gmake can be obtained from your favorite GNU site, or
+  from \url{http://www.gnu.org}.
+\item[C] C compiler. For example, the GNU compiler. This
+ is available for most supported platforms.  Platform specific compilers
+ should also work.
+\item[CPP] C Preprocessor. For example, the GNU \texttt{cpp}.  These are
+  normally provided on most platforms, and many C compilers have an option
+  to just run as a preprocessor.
+\item[SVN] \textit{Subversion} is not needed
+  to run/compile Cactus, but you are strongly encouraged to install
+  this software to take advantage of the update procedures. It can be
+  downloaded from \url{http://subversion.apache.org}.  
+\end{Lentry}
+
+\noindent
+To use Cactus, with the default driver\footnote{For help with unfamiliar terms,
+please consult the glossary, Appendix \ref{sec:glossary}.}
+(\texttt{CactusPUGH/PUGH}) on multiple
+processors you also need to include the thorn \texttt{ExternalLibraries/MPI}
+in your thornlist, to include support for
+\begin{Lentry}
+\item[MPI] The \textit{Message Passing Interface},
+which provides inter-processor communication.
+Supercomputing sites often supply a native MPI implementation
+that is very likely to be compatible with Cactus. Otherwise, there are
+various freely available ones available, e.g. the OpenMPI
+version of MPI is available for various architectures and operating
+systems at \url{http://www.open-mpi.org/}.
+\end{Lentry}
+
+\noindent
+If you are using any thorns containing routines
+written in C++ you also need
+\begin{Lentry}
+\item[C++] C++ compiler. For example, the GNU compiler. This
+ is available for most supported platforms.  Platform specific compilers
+ should also work.  Note that if a C++ compiler is available, then the
+ \text{main()} routine in the flesh is compiled with C++ to allow static
+ class initialisations.
+\end{Lentry}
+
+\noindent
+If you are using any thorns containing routines
+written in CUDA (Compute Unified Device Architecture), a parallel 
+computing architecture developed by NVIDIA, you also need
+\begin{Lentry}
+\item[CUCC] a CUDA compiler. For example, the NVIDIA C compiler. In many
+cases, you can compile your C and C++ code with a CUDA compiler without 
+encountering any problems, but you are advised to use a CUDA compiler exclusively
+for CUDA code.
+\end{Lentry}
+
+\noindent
+If you are using any thorns containing routines
+written in Fortran you also need
+\begin{Lentry}
+\item[F90] a Fortran compiler.
+\end{Lentry}
+
+\noindent
+While not required for compiling or running Cactus, for thorn development
+it is useful to install
+\begin{Lentry}
+\item[\texttt{ctags/etags}] These programs enable you browse through the
+  calling structure of a program by help of a function call database.
+  Navigating the flesh and arrangements becomes very easy. Emacs and
+  \texttt{vi} both support this method. See \ref{sec:Appendix.tags} for a short
+  guide to tags.
+\end{Lentry}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Supported Architectures}
+\label{sec:suar}
+
+Cactus runs on many machines, under a large number of operating
+systems, on a large number of CPU architectures. Here, we list the
+machines we have recently (in the past few years) compiled and
+verified Cactus on, including some architecture specific notes.
+
+If your system is not on the list, the it is very likely that Cactus
+will work anyway. As a rule of thumb, if the GCC compiler is
+available, Cactus will run.
+
+Operating systems:
+\begin{Lentry}
+\item[\textbf{Linux}] (this includes Blue Gene and Cray systems)
+\item[\textbf{OS X}]
+\item[\textbf{Cygwin}]
+\end{Lentry}
+
+CPU architectures:
+\begin{Lentry}
+\item[\textbf{ARM}]
+\item[\textbf{Blue Gene/P}]
+\item[\textbf{IBM PowerA2}] (aka Blue Gene/Q)
+\item[\textbf{IBM Power}] (Power 5, 6, 7)
+\item[\textbf{MIC}] (aka Xeon Phi)
+\item[\textbf{x86}] (aka IA32)
+\item[\textbf{x86-64}] (aka AMD64)
+\end{Lentry}
+
+Systems that are of historic interest only:
+\begin{Lentry}
+\item[\textbf{SGI}] 32 or 64 bit running Irix.
+\item[\textbf{Cray T3E}]
+\item[\textbf{Compaq Alpha}]  Compaq operating system and Linux.
+  Single processor
+  mode and MPI supported. The Alphas need to have the GNU C/C++
+  compilers installed.
+\item[\textbf{IA64}]  running Linux.
+\item[\textbf{Macintosh PowerPC}] (MacOS X and Linux PPC)
+\item[\textbf{IBM SP2,SP3,SP4}] 32 or 64 bit running AIX.
+\item[\textbf{Hitachi SR8000-F1}]
+\item[\textbf{Sun} Solaris]
+\item[\textbf{Fujitsu}]
+\item[\textbf{NEC SX-5, SX-6}]
+\item[\textbf{HP Exemplar}] (only partially supported)
+\end{Lentry}
+
+\subsection{Note}
+Disk space may be a problem on supercomputers where home directories are small.
+A workaround is to first create a
+configs directory on scratch space, say \texttt{scratch/cactus\_configs/} (where
+\texttt{scratch/} is your scratch directory), and then either
+\begin{itemize}
+\item{} set the environment variable \texttt{CACTUS\_CONFIGS\_DIR} to point to
+this directory
+\end{itemize}
+or
+\begin{itemize}
+\item{}  soft link this directory (\texttt{ln -s
+scratch/cactus\_configs Cactus/configs/}) to the Cactus directory, if your
+filesystem supports soft links.
+\end{itemize}
+
+
+\chapter{Compilation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Configuration Options}
+\label{sec:confopts}
+
+There are four ways to pass options to the configuration process.
+% from the gmake command line.
+\begin{enumerate}
+  \item[1]{}
+    Pass options individually in shell environment variables:
+
+    {\tt export <option name>=<chosen value>    \# for bash}\\
+    {\tt setenv <option name> <chosen value>    \# for (t)csh}\\
+    {\tt gmake <configuration name>-config}
+
+  \item[2a]{}
+    Either: create a default configuration file \texttt{\$\{HOME\}/.cactus/config}.
+
+    All available configuration options may be set in a default options file
+    \texttt{\$\{HOME\}/.cactus/config}, any option which are not set will take a
+    default value. The file should contain lines of the form:
+
+    \texttt{<\var{option}> [=] ...}
+
+    The equals sign is optional. Spaces are allowed everywhere.
+    Text starting wit a \texttt{'\#'} character will be ignored as a comment.
+
+  \item[2b]{}
+    Or: list your Cactus configuration files in an environment variable
+    \texttt{CACTUS\_CONFIG\_FILES}:
+
+    \texttt{gmake <\var{config name}>-config
+                  CACTUS\_CONFIG\_FILES=$<$\var{list of config files}$>$}
+
+    Multiple configuration files, with their file names separated by a
+    \texttt{':'} character, will be processed in order.
+    Each file should be given by its full path.
+    The options file has the same format as \texttt{\$\{HOME\}/.cactus/config}.
+
+  \item[3]{}
+    Add the options to a configuration file and use,
+
+    \texttt{gmake <\var{config name}>-config  options=<\var{filename}>}
+
+    The options file has the same format as \texttt{\$\{HOME\}/.cactus/config}.
+    (Note that these options are \emph{added} to those from the
+    \texttt{\$\{HOME\}/.cactus/config} file.)
+
+  \item[4]{}
+    Pass the options individually on the command line,
+
+    \texttt{gmake <\var{config name}>-config
+                           <\var{option name}>=<\var{chosen value}>, ...}
+
+    Not all configuration options can be set on the command line.
+    Those that can be set are indicated in the table below.
+\end{enumerate}
+
+The options are listed here in order of increasing precedence, e.g. options
+set on the command line will take priority over (potentially
+conflicting) options set in \texttt{\$\{HOME\}/.cactus/config} or other
+Cactus configuration files. Default options from
+\texttt{\$\{HOME\}/.cactus/config} will only be read if the
+environment variable \texttt{CACTUS\_CONFIG\_FILES} is not set.
+
+It is important to note that these methods cannot be used to, for example, add
+options to the default values for \texttt{CFLAGS}.  Setting any variable in the
+configuration file or the command line will overwrite completely the
+default values.
+
+\subsection{Available Options}
+\label{subsec:Compilation-Available_Options}
+
+There is a plethora of available options.
+
+\begin{itemize}
+
+\item {Cross compiling}
+
+If you are compiling on an architecture other than the one you are
+producing an executable for, you will need to pass the
+
+\begin{Lentry}
+\item [\texttt{HOST\_MACHINE=\var{x-x-x}}]
+\end{Lentry}
+option, where \texttt{\var{x-x-x}} is the canonical name of the architecture
+you are compiling for, such as \texttt{sx6-nec-superux};  the format is
+\texttt{\var{processor}-\var{vendor}-\var{OS}}.
+
+\item {Compiled thorns}
+
+These specify the chosen set of thorns for compilation. If the thorn choice is not provided
+during configuration, a list containing all thorns in the
+\texttt{arrangements} directory
+is automatically created, and the user is prompted for any changes.
+
+\begin{Lentry}
+
+\item [\texttt{THORNLIST}] Name of file containing a list of thorns with
+the syntax \texttt{<\var{arrangement name}>/<\var{thorn name}>}. Lines
+beginning with \verb|#| or \texttt{!} are ignored.
+
+\item [\texttt{THORNLIST\_DIR}] Location of directory containing
+\texttt{THORNLIST}.
+This defaults to the current working directory.
+
+
+\end{Lentry}
+
+\item {Compiler and tool specification}
+
+These are used to specify which compilers and other tools to use. Entries followed
+by * may be specified on the command line.
+
+\begin{Lentry}
+\item [\texttt{CC}]   * The C compiler.
+\item [\texttt{CXX}]    The C++ compiler.
+\item [\texttt{CUCC}] * The CUDA compiler.
+\item [\texttt{F90}]  * The Fortran compiler.
+\item [\texttt{F77}]  * Ignored
+\item [\texttt{CPP}]    The preprocessor used to generate dependencies
+for and to preprocess C and C++ code.
+\item [\texttt{FPP}]    The preprocessor used to generate dependencies
+for and to preprocess Fortran code.
+\item [\texttt{LD}]   * The linker.
+\item [\texttt{AR}]     The archiver used for generating libraries.
+\item [\texttt{RANLIB}] The archive indexer to use.
+\item [\texttt{MKDIR}]  The program to use to create a directory.
+\item [\texttt{PERL}]   The name of the Perl executable.
+\end{Lentry}
+
+\item {Output Directory}
+
+By default, Cactus generates intermediate and object files
+underneath a directory named ``configs'' inside the Cactus
+directory. This location may be changed through the use
+of the \texttt{CACTUS\_CONFIGS\_DIR} environment variable.
+See the section on File Layout~\ref{file_layout}.
+
+\item {Compilation and tool flags}
+
+Flags which are passed to the compilers and the tools.
+
+\begin{Lentry}
+\item [\texttt{CFLAGS}]
+Flags for the C compiler.
+
+\item [\texttt{CUCCFLAGS}]
+Flags for the CUDA compiler.
+
+\item [\texttt{CXXFLAGS}]
+Flags for the C++ compiler.
+
+\item [\texttt{F90FLAGS}]
+* Flags for the Fortran compiler.
+
+\item [\texttt{F77FLAGS}]
+* Ignored
+
+\item [\texttt{CPPFLAGS}]
+Flags for the preprocessor (used to generate compilation dependencies
+for and preprocess C and C++ code).
+
+\item [\texttt{FPPFLAGS}]
+Flags for the preprocessor (used to generate compilation dependencies
+for and preprocess Fortran code).
+
+\item [\texttt{MKDIRFLAGS}]
+Flags for \texttt{MKDIR}, so that no error is given if the directory exists.
+
+\item [\texttt{LDFLAGS}]
+* Flags for the linker.  \emph{Warning:} This variable is ignored
+while the compilers and linkers are autodetected.  This can lead to
+strange errors while configuring.  You can pass the linker flags in
+the variable \texttt{LD} instead.
+
+\item [\texttt{BEGIN\_WHOLE\_ARCHIVE\_FLAGS},
+  \texttt{END\_WHOLE\_ARCHIVE\_FLAGS}]
+Optional set of flags for the linker that change the behaviour how
+archives are handled. These flags are used just before and just after
+listing the flesh and all thorn libraries. This mechanism can be used
+to force linking in all object files from the flesh and all thorns,
+which can help detect duplicate definitions. Otherwise, duplicate
+routines may go undetected.
+
+\item [\texttt{ARFLAGS}]
+Flags for the archiver.
+
+\item [\texttt{C\_LINE\_DIRECTIVES}]
+Whether error messages and debug information in the compiled C and C++
+files should point to the original source file or to an internal file
+created by Cactus.  The only options available are \texttt{yes} and
+\texttt{no}, the default is \texttt{yes}.  Set this to \texttt{no} if your
+compiler reports error messages about unrecognised \verb|#| directives.
+
+\item [\texttt{F\_LINE\_DIRECTIVES}]
+Whether error messages and debug information in the compiled Fortran
+files should point to the original source file or to an internal file
+created by Cactus.  The only options available are \texttt{yes} and
+\texttt{no}, the default is \texttt{yes}.  Set this to \texttt{no} if your
+compiler reports error messages about unrecognised \verb|#| directives.
+
+\item [\texttt{CROSS\_COMPILE}] Enables cross compilation.
+  Available options are \texttt{yes} and \texttt{no}, the default is
+  \texttt{no}. To create a cross-compiled configuration one must explicitly set   this option to \texttt{yes}.
+
+\item [\texttt{DISABLE\_INT16}] Disable support for the data type
+\texttt{CCTK\_INT16}.  The only options available are \texttt{yes} and
+\texttt{no}, the default is \texttt{no}.  Cactus autodetects this data type
+  only for C.  If the C compiler supports it, but the Fortran compiler
+  does not, it may be necessary to disable \texttt{CCTK\_INT16}
+  altogether, since Cactus assumes that data types are fully supported
+  if they exist.
+
+\item [\texttt{DISABLE\_REAL16}] Disable support for the data type
+\texttt{CCTK\_REAL16}.  The only options available are \texttt{yes} and
+\texttt{no}, the default is \texttt{no}.  Cactus autodetects this data type
+  only for C.  If the C compiler supports it, but the Fortran compiler
+  does not, it may be necessary to disable \texttt{CCTK\_REAL16}
+  altogether, since Cactus assumes that data types are fully supported
+  if they exist.
+
+\item [\texttt{DEBUG}]
+* Specifies what type of debug mode should be used,
+the default is no debugging.
+Current options are \texttt{yes}, \texttt{no}, or \texttt{memory}. The option
+\texttt{yes} switches on all debugging features, whereas \texttt{memory} just
+employs memory tracing (Section \ref{sec:metr}).
+
+\item [\texttt{C\_DEBUG\_FLAGS}]
+Debug flags for the C compiler, their use depends on the type of
+debugging being used.
+
+\item [\texttt{CUCC\_DEBUG\_FLAGS}]
+Debug flags for the CUDA compiler, their use depends on the type of
+debugging being used.
+
+\item [\texttt{CXX\_DEBUG\_FLAGS}]
+Debug flags for the C++ compiler, their use depends on the type of
+debugging being used.
+
+\item [\texttt{F90\_DEBUG\_FLAGS}]
+Debug flags for the Fortran 90 compiler, their use depends on the
+type of debugging being used.
+
+\item [\texttt{F77\_DEBUG\_FLAGS}]
+Ignored.
+
+\item [\texttt{OPTIMISE, OPTIMIZE}]
+* Specifies what type of optimisation should be used. The only options currently
+available are \texttt{yes} and \texttt{no}.  The default is to use optimisation.\\
+Note that the British spelling \texttt{OPTIMISE} will be checked first and, if set,
+will override any setting of the American-spelled \texttt{OPTIMIZE}.
+
+\item [\texttt{C\_OPTIMISE\_FLAGS}]
+Optimisation flags for the C compiler, their use depends on the type of
+optimisation being used.
+
+\item [\texttt{CUCC\_OPTIMISE\_FLAGS}]
+Optimisation flags for the C compiler, their use depends on the type of
+optimisation being used.
+
+\item [\texttt{CXX\_OPTIMISE\_FLAGS}]
+Optimisation flags for the C++ compiler, their use depends on the type of
+optimisation being used.
+
+\item [\texttt{F90\_OPTIMISE\_FLAGS}]
+Optimisation flags for the Fortran 90 compiler, their use depends on the
+type of optimisation being used.
+
+\item [\texttt{F77\_OPTIMISE\_FLAGS}]
+Ignored.
+
+\item [\texttt{C\_NO\_OPTIMISE\_FLAGS}]
+Optimisation flags used to indicate that no optimisation should be
+performed.  These are invoked when OPTIMISE=no is used.
+
+\item [\texttt{CUCC\_NO\_OPTIMISE\_FLAGS}]
+Optimisation flags used to indicate that no optimisation should be
+performed.  These are invoked when OPTIMISE=no is used.
+
+\item [\texttt{CXX\_NO\_OPTIMISE\_FLAGS}]
+Optimisation flags used to indicate that no optimisation should be
+performed.  These are invoked when OPTIMISE=no is used.
+
+\item [\texttt{F90\_NO\_OPTIMISE\_FLAGS}]
+Optimisation flags used to indicate that no optimisation should be
+performed.  These are invoked when OPTIMISE=no is used.
+
+\item [\texttt{F77\_NO\_OPTIMISE\_FLAGS}]
+Ignored.
+
+\item [\texttt{PROFILE}]
+  * Specifies what type of profiling should be used.  The only options
+  currently available are \texttt{yes} and \texttt{no}.  The default
+  is to use no profiling.
+
+\item [\texttt{C\_PROFILE\_FLAGS}]
+  Profile flags for the C compiler, their use depends on the type of
+  profiling being used.
+
+\item [\texttt{CUCC\_PROFILE\_FLAGS}]
+  Profile flags for the CUDA compiler, their use depends on the type of
+  profiling being used.
+
+\item [\texttt{CXX\_PROFILE\_FLAGS}]
+  Profile flags for the C++ compiler, their use depends on the type of
+  profiling being used.
+
+\item [\texttt{F90\_PROFILE\_FLAGS}]
+  Profile flags for the Fortran 90 compiler, their use depends on the
+  type of profiling being used.
+
+\item [\texttt{F77\_PROFILE\_FLAGS}]
+  Ignored.
+
+\item [\texttt{WARN}]
+  * Specifies what type of build warnings should be used.  The only
+  options currently available are \texttt{yes} and \texttt{no}.  The
+  default is to produce no warnings.
+
+\item [\texttt{C\_WARN\_FLAGS}]
+Warning flags for the C compiler, their use depends on the type of
+warnings used during compilation (Section \ref{sec:gmopfobuco}).
+
+\item [\texttt{CUCC\_WARN\_FLAGS}]
+Warning flags for the CUCC compiler, their use depends on the type of
+warnings used during compilation (Section \ref{sec:gmopfobuco}).
+
+\item [\texttt{CXX\_WARN\_FLAGS}]
+Warning flags for the C++ compiler, their use depends on the type of
+warnings used during compilation (Section \ref{sec:gmopfobuco}).
+
+\item [\texttt{F90\_WARN\_FLAGS}]
+Warning flags for the Fortran 90 compiler, their use depends on the type of
+warnings used during compilation (Section \ref{sec:gmopfobuco}).
+
+\item [\texttt{F77\_WARN\_FLAGS}]
+Ignored.
+
+\end{Lentry}
+
+\item {Architecture-specific flags}
+
+\begin{Lentry}
+\item [\texttt{IRIX\_BITS=32|64}] For Irix SGI systems: whether to build a 32- or 64-bit configuration.
+\end{Lentry}
+
+\begin{Lentry}
+\item [\texttt{AIX\_BITS=32|64}] For IBM SP systems: whether to build a 32- or 64-bit configuration.
+\end{Lentry}
+
+\item {Library flags}
+
+Used to specify auxiliary libraries and directories to find them in.
+
+\begin{Lentry}
+\item [\texttt{LIBS}]
+Additional libraries.
+This variable can also contain linker options, e.g.\ to switch between
+static and dynamic linking.  (Cactus adds a \verb+-l+ prefix to
+library names, but does not modify linker options.)
+\emph{Warning:} This variable is ignored while
+the compilers and linkers are autodetected.  This can lead to strange
+errors while configuring.  You can pass the additional libraries in
+the variable \texttt{LD} instead.
+
+\item [\texttt{LIBDIRS}] Any other library directories.
+This variable can also contain linker options.  (Cactus adds an
+\verb+-L+ prefix to library directories, but does not modify linker
+options.)
+\end{Lentry}
+
+\item {Extra include directories}
+
+\begin{Lentry}
+\item [\texttt{SYS\_INC\_DIRS}]
+Used to specify any additional directories for system include files.
+\end{Lentry}
+
+
+\item {Precision options}
+
+Used to specify the precision of the default real and integer data types,
+by the number of bytes the data takes up.  Note that not all
+values will be valid on all architectures.
+
+\begin{Lentry}
+
+\item [\texttt{REAL\_PRECISION}]
+* Allowed values are \texttt{16, 8, 4}.
+
+\item [\texttt{INTEGER\_PRECISION}]
+* Allowed values are \texttt{8, 4, 2}.
+
+\end{Lentry}
+
+\item {Executable name}
+
+\begin{Lentry}
+\item [\texttt{EXEDIR}] The directory in which to place the executable.
+\item [\texttt{EXE}] The name of the executable.
+\end{Lentry}
+
+\item{Extra packages}
+
+Compiling with extra packages is described fully in
+Section \ref{subsec:cowiexpa},
+which should be consulted for the full range of configuration options.
+
+\item{Miscellaneous}
+
+\begin{Lentry}
+\item [\texttt{PROMPT}] Setting this to \texttt{no} turns off all prompts from the
+make system.
+\item [\texttt{VERBOSE}] Setting this to \texttt{yes} instructs \texttt{gmake} to print the
+commands that it is executing.
+\item [\texttt{SILENT}] Setting this to \texttt{no} is an depreciated way of using \texttt{VERBOSE = yes}.
+\end{Lentry}
+
+\end{itemize}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Compiling with Extra Packages}
+\label{subsec:cowiexpa}
+
+Extra packages are provided through the \textit{ExternalLibraries} thorns each
+of which usually supports a set of variables \texttt{\var{THORN\_DIR}},
+\texttt{\var{THORN\_LIBS}}, \texttt{\var{THORN\_LIB\_DIRS}}, and
+\texttt{\var{THORN\_INC\_DIRS}} to control where include and library files are
+located, where \texttt{THORN} is the name of the \texttt{ExternalLibrary}. The
+actual list of supported variables can be found in each thorn's
+\texttt{configuration.ccl} file.
+
+While not all \texttt{ExternalLibraries} interpret all options in the same way,
+typically options have the following meaning and allowed values:
+
+\texttt{\var{THORN\_DIR}} can take the values:
+\begin{Lentry}
+\item [\texttt{BUILD}] compile included \texttt{THORN} copy.
+\item [\texttt{NO\_BUILD}] search for \texttt{THORN} in
+      \texttt{\var{THORN\_DIR}}.
+\item [\texttt{CUSTOM}] do not search for or build \texttt{THORN}, instead use
+      information provided in \texttt{\var{THORN\_LIBS}},
+      \texttt{\var{THORN\_LIB\_DIRS}}, and \texttt{\var{THORN\_INC\_DIRS}}.
+\item [\texttt{NONE}] use native \texttt{THORN} implementation provided by the
+      compiler or operating system; no further options are used.
+\item [any valid path] search for \texttt{THORN} in the given directory.
+\item [missing] if \texttt{\var{THORN\_DIR}} is missing \texttt{THORN} is searched for in
+      a number of well known locations and built from the included copy if
+      it is not found.
+\end{Lentry}
+
+
+The location of include files, modules and Fortran module files is given via:
+\begin{Lentry}
+\item [\texttt{\var{THORN\_DIR}}] where to search for THORN.
+\item [\texttt{\var{THORN\_LIBS}}] libraries.
+\item [\texttt{\var{THORN\_LIB\_DIRS}}] library directories.
+\item [\texttt{\var{THORN\_INC\_DIRS}}] include file directories.
+\item [\texttt{\var{THORN\_INSTALL\_DIR}}] where to install \texttt{THORN} if the
+      built in copy is used.
+\end{Lentry}
+
+\section{File Layout}
+\label{file_layout}
+
+The configuration process sets up various subdirectories and files in the
+configuration
+directory (this is either a directory
+\texttt{configs} insde the main Cactus directory, or the
+directory pointed to by the \texttt{CACTUS\_CONFIGS\_DIR} environment
+variable).
+to contain the configuration specific files; these
+are placed in a directory with the name of the configuration.
+
+\begin{Lentry}
+
+\item [\texttt{config-data}] contains the files created by the configure
+script:
+
+The most important ones are
+
+\begin{Lentry}
+
+\item [\texttt{make.config.defn}]
+contains compilers and compilation flags for a configuration.
+
+\item [\texttt{make.extra.defn}]
+contains details about extra packages used in the configuration.
+
+\item [\texttt{cctk\_Config.h}]
+The main configuration header file, containing architecture specific
+definitions.
+
+\item [\texttt{cctk\_Archdefs.h}]
+An architecture specific header file containing things which cannot be
+automatically detected, and have thus been hand-coded for this architecture.
+\end{Lentry}
+
+These are the first files which should be checked or modified to suit any
+peculiarities of this configuration.
+
+In addition, the following files may be informative:
+
+\begin{Lentry}
+\item [\texttt{fortran\_name.pl}]
+A Perl script used to determine how the Fortran compiler names subroutines.
+This is used to make some C routines callable from Fortran, and Fortran
+routines callable from C.
+
+\item [\texttt{make.config.deps}]
+Initially empty.  It can be edited to add extra architecture specific dependencies
+needed to generate the executable.
+
+\item [\texttt{make.config.rule}]
+The \texttt{make} rules for generating object files from source files.
+
+\end{Lentry}
+
+Finally, \texttt{autoconf} generates the following files.
+
+\begin{Lentry}
+
+\item [\texttt{config.log}]
+A log of the \texttt{autoconf} process.
+
+\item [\texttt{config.status}]
+A script which may be used to regenerate the configuration.
+
+\item [\texttt{config.cache}]
+An internal file used by \texttt{autoconf}.
+
+\end{Lentry}
+
+\item [\texttt{lib}]
+An empty directory which will contain the libraries created for each thorn.
+
+\item [\texttt{build}]
+An empty directory which will contain the object files generated for this
+configuration, and preprocessed source files.
+
+\item [\texttt{config-info}]
+A file containing information about the configuration (including the options used to configure the configuration).
+
+\item [\texttt{bindings}] A directory which contains all the files
+generated by the CST from the \texttt{.ccl} files.
+
+\item [\texttt{scratch}]
+A scratch directory which is used to accommodate Fortran 90 modules.
+
+\end{Lentry}
+
+
+\section{Building and Administering a Configuration}
+\label{sec:buanadaco}
+
+Once you have created a new configuration, the command
+\\ \\
+\texttt{gmake <\var{configuration name}>}
+\\ \\
+will build an executable, prompting you along the way for the
+thorns which should be included. There is a range of \texttt{gmake}
+targets and options which are detailed in the following sections.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{gmake Targets for Building and Administering Configurations}
+\label{sec:gmtafobuanadco}
+
+A target for \texttt{gmake} can be naively thought of as an argument
+that tells it which of several things listed in the \texttt{Makefile} it
+is to do. The command \texttt{gmake help} lists all \texttt{gmake} targets:
+% colon clarifies that all (config) targets are listed here
+
+\begin{Lentry}
+
+\item [\texttt{gmake <\var{config}>}]
+        builds a configuration. If the configuration doesn't exist,
+        it will create it.
+
+\item [\texttt{gmake <\var{config}>-clean}] removes all object and dependency
+files from a configuration.
+
+\item [\texttt{gmake <\var{config}>-cleandeps}] removes all dependency files
+from a configuration.
+
+\item [\texttt{gmake <\var{config}>-cleanobjs}] removes all object files from
+  a configuration.
+
+\item [\texttt{gmake <\var{config}>-config}] creates a new configuration or
+reconfigures an existing one overwriting any previous configuration options.\\
+The configuration options are stored in a file
+\texttt{configs/<\var{config}>/config-info}.
+
+\item [\texttt{gmake <\var{config}>-configinfo}] displays the options
+of the configuration (\texttt{cat configs/<\var{config}>/config-info}).
+
+%% \item[\texttt{gmake <\var{config}>-cvsupdate}] updates the flesh and this
+%% configuration's thorns from the CVS repositories.
+
+\item [\texttt{gmake <\var{config}>-delete}] deletes a configuration
+(\texttt{rm -r configs/<\var{config}>}).
+
+\item [\texttt{gmake <config>-editthorns}] edits the \texttt{ThornList}.
+
+\item [\texttt{gmake <\var{config}>-examples}] copies all the example parameter files relevant for this configuration to the directory \texttt{examples} in the Cactus home directory. If a file of the same name is already there, it will not overwrite it.
+
+\item [\texttt{gmake <\var{config}>-realclean}] removes from a configuration
+all object and dependency files, as well as files generated from the
+CST (stands for \textit{Cactus Specification Tool}, which is the set of Perl scripts
+which parse the thorn configuration files).  Only the files generated
+by configure and the \texttt{ThornList} file remain.
+
+\item [\texttt{gmake <\var{config}>-rebuild}] rebuilds a configuration (reruns the CST).
+
+\item [\texttt{gmake <\var{config}>-reconfig}] reconfigures an existing
+configuration using its previous configuration options from the file
+\texttt{configs/<\var{config}>/config-info}.
+
+\item [\texttt{gmake <\var{config}>-testsuite}] runs the test programs
+associated with each thorn in the configuration. See section
+\ref{sec:testing} for information about the test suite mechanism.
+
+\item[\texttt{gmake <\var{config}>-ThornGuide}] builds documentation for the
+thorns in this configuration
+  (see section \ref{sec:OtherGmakeTargetsDoc}, page
+  \pageref{sec:OtherGmakeTargetsDoc}, for other targets to build documentation
+  for thorns).
+
+\item [\texttt{gmake <\var{config}>-thornlist}] regenerates the
+\texttt{ThornList} for a configuration.
+
+\item [\texttt{gmake <\var{config}>-utils [UTILS$=$<\var{list}>]}] builds all
+utility programs provided by the thorns of a configuration. Individual
+utilities can be selected by giving their names (ie. name of the source file without extension) in the \texttt{UTILS} variable.
+
+\end{Lentry}
+
+
+
+\subsection{Compiling in Thorns}
+\label{sec:cointh}
+
+Cactus will try to compile all thorns listed in
+\texttt{configs/<\var{config}>/ThornList}.
+The \texttt{ThornList} file is simply a list of the form
+\texttt{<\var{arrangement}>/<\var{thorn}>}.  All text after a pound sign
+`\texttt{\#}' or exclamation mark `\texttt{!}'
+on a line is treated as a comment and ignored.
+If you did
+not specify a ThornList already, the first time that you compile a configuration
+you will be shown a list of all the thorns in your arrangement
+directory, and asked if you with to edit them. You can regenerate
+this list at anytime by typing
+
+\begin{alltt}
+gmake <\var{config}>-thornlist
+\end{alltt},
+
+or you can edit it using
+
+\begin{alltt}
+gmake <\var{config}>-editthorns
+\end{alltt}.
+
+Instead of using the editor to specify the thorns you want to
+  have compiled, you can \emph{edit} the \texttt{ThornList} outside
+  the make process. It is located in \texttt{configs/<\var{config}>/ThornList},
+  where \texttt{<\var{config}>} refers to the name of your configuration.
+  The directory \texttt{./configs} exists \emph{ after} the very first
+  make phase for the first configuration.
+
+\subsection{Notes and Caveats}
+\begin{itemize}
+\item{} If during the build you see the error ``\texttt{missing
+    separator}'', you are probably not using GNU make.
+\item{} \textit{The EDITOR environment variable}. You may not be aware of
+  this, but this thing very often exists and, may be set  by default to
+  something scary like \texttt{vi}. If you don't know how to use \texttt{vi},
+  or wish to
+  use your favorite editor instead, reset this environment variable.
+  (To exit \texttt{vi} type \texttt{<ESC> :q!})
+\end{itemize}
+
+\subsection{\texttt{gmake} Options for building configurations}
+\label{sec:gmopfobuco}
+
+An \textit{option} for \texttt{gmake} can be thought of as an argument which tells
+it how it should make a \textit{target}. Note that the final result is always
+the same.
+
+\begin{Lentry}
+\item [\texttt{gmake <\var{target}> PROMPT=no}] turns off all prompts from the
+make system.
+\item [\texttt{gmake <\var{target}> SILENT=no}] prints the commands that gmake
+is executing.
+\item [\texttt{gmake <\var{target}> WARN=yes}] shows compiler warnings during
+compilation.
+\item [\texttt{gmake <\var{target}> FJOBS=<\var{number}>}] compiles in parallel,
+across files within each thorn.
+\item [\texttt{gmake <\var{target}> TJOBS=<\var{number}>}] compiles in parallel,
+across thorns.
+
+\end{Lentry}
+
+Note that with more modern versions of gmake, it is sufficient to pass the
+normal \texttt{-j <\var{number}>} flag to gmake to get parallel compilation.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Other gmake Targets}
+
+\begin{Lentry}
+
+\item [\texttt{gmake help}] lists all make options.
+
+\item [\texttt{gmake configinfo}] prints configuration options for every
+configuration found in user's \texttt{configs} subdirectory.
+
+\item [\texttt{gmake default}] creates a new configuration with a default name.
+
+\item [\texttt{gmake distclean}] deletes your \texttt{configs} directory, and hence all your configurations.
+
+\item [\texttt{gmake downsize}] removes non-essential files as documents
+  and test suites to allow for minimal installation size.
+
+\item [\texttt{gmake newthorn}] creates a new thorn, prompting for the necessary
+  information and creating template files.
+
+\item [\texttt{gmake TAGS}] creates an Emacs style TAGS file. See section
+  \ref{sec:Appendix.tags} for using tags within Cactus.
+
+\item [\texttt{gmake tags}] creates a \texttt{vi} style tags file. See section
+  \ref{sec:Appendix.tags} for using tags within Cactus.
+
+\end{Lentry}
+
+{\bf Targets to generate Cactus documentation:}
+\label{sec:OtherGmakeTargetsDoc}
+
+\begin{Lentry}
+
+\item[\texttt{gmake <\var{arrangement}>-ArrangementDoc}] builds the
+documentation for the arrangement.
+
+\item[\texttt{gmake ArrangementDoc}] builds the documentation for all
+arrangements.
+
+\item [\texttt{gmake MaintGuide}] runs LaTeX to produce a copy of the
+Maintainers' Guide.
+
+\item [\texttt{gmake ReferenceManual}] runs LaTeX to produce a copy of the
+Reference Manual.
+
+\item[\texttt{gmake <\var{thorn}>-ThornDoc}] builds the documentation for the
+thorn.
+
+\item[\texttt{gmake ThornDoc}] builds the documentation for all thorns.
+
+\item [\texttt{gmake UsersGuide}] runs LaTeX to produce a copy of the Users'
+Guide.
+
+\item [\texttt{gmake AllDoc}] creates all of the above documentations.
+
+\end{Lentry}
+
+
+\section{Testing}
+\label{sec:testing}
+
+Some thorns come with a test suite, consisting of example parameter files
+and the output files generated by running these. To run the test suite
+for the thorns you have compiled use
+
+\texttt{gmake <\var{configuration}>-testsuite}
+
+These test suite serve the dual purpose of
+
+\begin{Lentry}
+\item [Regression testing]
+i.e. making sure that changes to the thorn or the flesh don't affect the
+output from a known parameter file.
+\item [Portability testing]
+i.e. checking that the results are independent of the architecture---this
+is also of use when trying to get Cactus to work on a new architecture.
+\end{Lentry}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Runtime options}
+
+This chapter covers all aspects for running your
+Cactus executable.  These include: command-line options, parameter
+file syntax, understanding screen output, environment variables, and
+creating thorn documentation.
+
+\section{Command-Line Options}
+\label{sec:command_line_options}
+
+Cactus uses the standard GNU style of long-named command-line options;
+many of these options also have traditional Unix single-letter short forms.
+The options follow the usual GNU rules:
+\begin{itemize}
+\item	A long-named option \verb|--foo| which takes an argument \verb|bar|
+	may be written as either \verb|--foo bar| or as \verb|--foo=bar|.
+\item	A long-named option may be abbreviated, so long as the abbreviation
+	is unambiguous.
+\item	The preferred way of spelling a long-named option is \verb|--foo|,
+	but \verb|-foo| also accepted, though this is deprecated.
+\item	A short option, \verb|-X|, which takes an argument \verb|bar|
+	may be written as either \verb|-Xbar| or as \verb|-X=bar|.
+\item	An option which can be interpreted as either a short option,
+	or as an abbreviated \verb|-foo|-style long option, is interpreted
+	as the former.  In particular, \verb|-re| is interpreted as
+	an abbreviation for \verb|-redirect|, rather than as \verb|-r=e|.
+\end{itemize}
+
+The Cactus command-line options are specified in
+Table~\ref{tab:command-line-options}, and are as follows:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{table}
+\texttt{
+\begin{tabular}{|l|l|}
+\hline
+Short Version & Long Version \\
+\hline
+ -O[v] & --describe-all-parameters \\
+\hline
+ -o<\var{param}> & --describe-parameter=<\var{param}> \\
+\hline
+ -S & --print-schedule\\
+\hline
+ -T & --list-thorns\\
+\hline
+ -t<\var{arrangement/thorn}>& --test-thorn-compiled=<\var{arrangement/thorn}>\\
+\hline
+ -h,-? & --help\\
+\hline
+ -v & --version \\
+\hline
+% -x [<nprocs>] & --test-parameters [<nprocs>] \\
+%\hline
+ -L<\var{level}> & --logging-level=<\var{level}> \\
+\hline
+ -W<\var{level}> & --warning-level=<\var{level}> \\
+\hline
+ -E<\var{level}> & --error-level=<\var{level}> \\
+\hline
+ -r[o|e|oe|eo] & --redirect=[o|e|oe|eo]\\
+\hline
+ & --logdir=<\var{directory}> \\
+\hline
+ -b[no|line|full] & --buffering=[no|line|full]\\
+\hline
+    & --parameter-level=<strict|normal|relaxed> \\
+\hline
+ -i & --ignore-next \\
+\hline
+\end{tabular}
+}
+\caption[Command-Line Options]
+	{This table shows all the Cactus command-line options.}
+\label{tab:command-line-options}
+\end{table}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\begin{Lentry}
+
+\item [\texttt{-O} or \texttt{--describe-all-parameters}]
+Prints a full list of all parameters from all thorns which were compiled,
+along with descriptions and allowed values.  This can take an optional extra
+parameter \texttt{v}  (i.e. \texttt{-Ov} to give verbose information about
+all parameters).
+
+\item [\texttt{-o<\var{param}>} or \texttt{--describe-parameter=<\var{param}>}]
+Prints the description and allowed values for a given parameter---takes one
+argument.
+
+\item [\texttt{-S} or \texttt{--print-schedule}]
+Print only the schedule tree.
+
+\item [\texttt{-T} or \texttt{--list-thorns}]
+Prints a list of all the thorns which were compiled in.
+
+\item [\texttt{-t<\var{arrangement or thorn}>} or \texttt{--test-thorn-compiled=<\var{arrangement or thorn>}} ]
+Checks if a given thorn was compiled in---takes one argument.
+
+\item [\texttt{-h}, \texttt{-?} or \texttt{--help}]
+Prints a help message.
+
+\item [\texttt{-v} or \texttt{--version}]
+Prints version information of the code.
+
+%\item [\texttt{-x <nprocs>} or \texttt{--test-parameters <nprocs>}]
+%Runs the code far enough to check the consistency of the parameters.  If
+%given a numeric argument it will attempt to simulate being on that number
+%of processors. [To be implemented.]
+
+\item [\texttt{-L<\var{level}>} or \texttt{--logging-level=<\var{level}>}]
+Sets the logging level of the code.  All warning messages are given a
+level---the lower the level the greater the severity.  This
+parameter \texttt{-L} controls the level of messages to be seen, with all
+warnings of level $\le$ \texttt{<\var{level}>} printed to standard output.  The
+default is a logging level of~0, meaning that only level~0 messages
+should be printed to standard output.
+
+\item [\texttt{-W<\var{level}>} or \texttt{--warning-level=<\var{level}>}]
+Similar to \texttt{-W}, but for standard error instead of
+standard output.  All warnings of level $\le$ \texttt{<\var{level}>} are
+printed to standard error.  The default is a warning level of~1,
+meaning that level~0 and level~1 messages should be printed to
+standard error.
+
+\item [\texttt{-E<\var{level}>} or \texttt{--error-level=<\var{level}>}]
+Similar to \texttt{-W}, but for fatal errors: Cactus treats all
+warnings with level $\le$ \texttt{<\var{level}>} as fatal errors, and aborts
+the Cactus run immediately (after printing the warning message%%%
+\footnote{%%%
+         Cactus imposes the constraint,
+         $\hbox{\texttt{-W} level} \ge \hbox{\texttt{-E} level} \ge 0$,
+         so any fatal-error message will always be printed (first).
+         }%%%
+).  The default value is zero, \ie{} only level~0 warnings
+will abort the Cactus run.
+
+\item [\texttt{-r[o|e|oe|eo]} or \texttt{--redirect=[o|e|oe|eo]}]
+Redirects the standard output (`\texttt{o}') and/or standard error
+(`\texttt{e}') of each processor to a file.  By default,
+the standard outputs from processors other than processor 0 are discarded.
+
+\item [\texttt{--logdir=<\var{directory}>}]
+Sets the output directory for logfiles created by the \texttt{-r} option.
+If the directory doesn't exist yet, it will be created by Cactus.
+
+\item [\texttt{-b[no|line|full]} or \texttt{--buffering=[no|line|full]}]
+  Set the \texttt{stdout} buffering mode.  Buffered I/O is a
+  standard feature of C programmes.  This delays writing the actual
+  output; instead, the output is collected into an internal buffer,
+  and is then written in large chunks.  This improves performance
+  considerably.  Line buffering means that output is written whenever
+  a newline character is encountered; full buffering means that output
+  is written, say, once 1000 characters have accmulated.  The default
+  setting is line buffering for I/O that goes to a terminal, and full
+  buffering for I/O that goes to a file.  For debugging purposes, it
+  is sometimes useful to reduce the amount of buffering.  Error
+  messages, i.e.\ the \texttt{stderr} stream, is always unbuffered
+  (and hence usually slower than \texttt{stdout}).
+
+\item [\texttt{--parameter-level=<strict|normal|relaxed>}]
+Sets the level of parameter checking to be used, one of \texttt{strict}
+(the default), \texttt{normal}, or \texttt{relaxed}.
+See Section~\ref{sec:Parameter_File} for details.
+
+\item [\texttt{-i} or \texttt{--ignore-next}]
+Causes the next argument on the command line to be ignored.
+\end{Lentry}
+
+A dash (``\texttt{-}'') appended at the end of the command line like this:
+
+\texttt{./cactus\_<\var{config}> [\var{command-line options}] -}
+
+lets the user specify parameter values from standard input rather than
+from a parameter file.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Parameter File Syntax}
+\label{sec:Parameter_File}
+
+A \textit{parameter file} (or \textit{par file}) is used to control the
+behaviour of a Cactus executable.  It specifies initial values for parameters
+as defined in the various thorns' \texttt{param.ccl} files
+(see Chapter~\ref{chap:Cactus_parameters}).
+The name of a parameter file is often given the suffix \texttt{.par}, but
+this is not mandatory.
+
+A parameter file is a text file whose lines are either comments
+or parameter statements.
+Comments are blank lines or lines that begin with 
+`\texttt{\#}'.
+A parameter statement
+consists of one or more parameter names, followed by
+an `\texttt{=}', followed by the value(s) for this (these) parameter(s).
+Note that all string parameters are case insensitive.
+
+Parameters statements of numeric or boolean type can use arithmetic
+expressions in place of explicit values. The usual arithmetic operations
+as well as C-like transcendental functions and relational operations are
+supported. Integer division is handled as in C. Logical comparisons and
+variables expect a boolean type, but any non-null value is
+interpreted as logical true (although a warning is generated).
+The exponentiation operator \verb|**| is supported, but can only apply to two values.
+The expression \verb|3**4**2| is not supported, but \verb|(3**4)**2| or
+\verb|3**(4**2)| is supported. 
+Operator precedence follows the C language, but when in doubt use explicit
+parenthesis to force a desired order of evaluation.
+Table~\ref{tab:expression_functions} lists the supported functions.
+Expressions can refer to parameters which are already set by using the fully qualified
+name \texttt{thorn::parameter} as described below.
+
+Arrays of parameters can be set by including an integer expression inside
+the square brackets following the name, e.g. \texttt{thorn::parameters[0]}.
+Optionally, an array of parameters may be set by means of a comma delimted
+list of values inside square brackets. E.g. the following two examples
+are equivalent.
+
+Example 1:
+\begin{verbatim}
+thorn::parameters[0] = 4.8
+thorn::parameters[1] = 3.2
+\end{verbatim}
+
+Example 2:
+\begin{verbatim}
+thorn::parameters = [4.8, 3.2]
+\end{verbatim}
+
+The parameter parser knows about four types: integers, reals, booleans, and strings.
+The \verb|%| operator is applicable only to ints. In cases where this is
+clear, types will be converted, e.g. \verb|3.0| will convert to an integer, but not \verb|3.1|.
+If you wish to prevent the parser from evaluating an expression, you can put it
+in double quotes and make it a string.
+
+Please see the file \texttt{par.peg} in the directory
+\texttt{Cactus/src/piraha/pegs} for the full grammar describing the par file.
+\begin{table}[htbp]
+    \begin{tabular}{|ll@{\hspace{.5cm}}|ll|}
+        \hline
+        \multicolumn{2}{|c|}{Logical operators}        & \verb|+| & no-op\\ 
+        \hline
+        \verb|&&| & logical and		               & \verb|!| & logical not\\
+        \hline
+        \verb%||% & logical or		               & \multicolumn{2}{c|}{Mathematical functions}\\
+        \hline
+        \multicolumn{2}{|c|}{Relational operators}     & \verb|acos| & inverse cosine\\
+        \hline
+        \verb|==| & tests for equality		       & \verb|asin| & inverse sine\\
+        \hline
+        \verb|!=| & tests for inequality	       & \verb|atan| & inverse tangent \\
+        \hline
+        \verb|<| & tests for less than		       & \verb|ceil| & round up to nearest integer \\
+        \hline
+        \verb|>| & tests for greater than	       & \verb|cos| & cosine \\
+        \hline
+        \verb|<=| & tests for less or equal	       & \verb|cosh| & hyperbolic cosine \\
+        \hline
+        \verb|>=| & tests for greater or equal	       & \verb|exp| & exponentiation $e^x$\\
+        \hline
+        \multicolumn{2}{|c|}{Binary operators}	       & \verb|abs| & absolute value $|x|$\\
+        \hline
+        \verb|+| & addition		               & \verb|floor| & round down to nearest integer \\
+        \hline
+        \verb|-| & subtraction		               & \verb|log| & natural logarithm \\
+        \hline
+        \verb|/| & C-like division		       & \verb|bool,int,real| & convert to bool, int, or real \\
+        \hline
+        \verb|%| & remainder of division	       & \verb|sin| & sine \\
+        \hline
+        \verb|*| & multiplication		       & \verb|sinh| & hyperbolic sine \\
+        \hline
+        \verb|**| & exponentiation $x^y$	       & \verb|sqrt| & square root \\
+        \hline
+        \multicolumn{2}{|c|}{Unary operators}	       & \verb|tan| & tangent \\
+        \hline
+        \verb|-| & negate sign		               & \verb|tanh| & hyperbolic tangent \\
+        \hline
+                                                     & & \verb|trunc| & integer part of $x$\\
+	\hline
+    \end{tabular}
+    \caption{Supported functions inside of expressions, in increasing order of
+    precedence.}
+    \label{tab:expression_functions}
+\end{table}
+
+The first parameter statement in any parameter file should set \texttt{ActiveThorns},
+which is a special parameter that tells the
+program which \textit{thorns} are to be activated. However, one may set \texttt{ActiveThorns}
+on any line or lines of the par file. In the case where multiple specifications of
+ActiveThorns are supplied, the values will be concatenated.
+
+Only parameters belonging to active
+thorns can be set (and only those routines \textit{scheduled} by active thorns
+are run).  By default, all thorns are inactive. For example, the first
+entry in a parameter file which is using just the two thorns
+\texttt{CactusPUGH/PUGH} and \texttt{CactusBase/CartGrid3D} should be
+
+\texttt{ActiveThorns = "PUGH CartGrid3D"}
+
+All parameters following the \texttt{ActiveThorns} parameter have names
+whose syntax depends on the scope
+(see Section~\ref{sec:Cactus_parameters.scope})
+of the parameter:
+\begin{Lentry}
+%\item [\texttt{Global parameters}]
+%Just the name of the parameter itself. Global parameters are to be avoided;
+%there are none in the flesh and Cactus Toolkits.
+\item [\texttt{Restricted parameters}]
+The name of the \textit{implementation} which defined the parameter, followed
+by two colons,
+then the name of the parameter---e.g. \texttt{driver::global\_nx}.
+\item [\texttt{Private parameters}]
+The name of the \textit{thorn} which defined the parameter, two colons,
+and the name of the parameter---e.g. \texttt{wavetoyF77::amplitude}.
+\end{Lentry}
+
+This notation is not currently strictly enforced in the code. It is
+sufficient to specify the first part of the parameter name using either
+the implementation name, or the thorn name. However, we recommend
+that the above convention be followed.
+
+The Cactus flesh performs checks for consistency and range of parameters.
+The severity of these checks is controlled by the command-line argument
+\texttt{--parameter-level}, which can take the following values
+\begin{Lentry}
+\item[\texttt{relaxed}] Cactus will issue a level 0 warning (that is, the
+default behaviour will be to terminate) if
+\begin{itemize}
+\item{} The specified parameter value is outside of the allowed range.
+\end{itemize}
+
+\item [\texttt{normal}]
+This is the default, and provides the same warnings as the
+\texttt{relaxed} level, with the addition of a level 0 warning issued for
+\begin{itemize}
+\item{} An implementation and/or thorn \texttt{foo} is active, but the
+        parameter \texttt{foo::bar} was not defined.
+\item{} The parameter \texttt{foo::bar} was successfully set for both an
+        active implementation \texttt{foo} not implemented by a thorn \texttt{foo},
+        and to a thorn \texttt{foo}.
+\end{itemize}
+
+\item [\texttt{strict}]
+This provides the same warnings as the \texttt{normal} level, with the
+addition of a level 0 warning issued for
+\begin{itemize}
+\item{} The parameter \texttt{foo::bar} is specified in the parameter file,
+        but no implementation or thorn with the name \texttt{bar} is active.
+\end{itemize}
+\end{Lentry}
+
+Notes:
+
+\begin{itemize}
+
+\item{} You can obtain lists of the parameters associated with
+each thorn using the command-line options \texttt{-o} and \texttt{-O}
+(Section~\ref{sec:command_line_options}).
+
+\item{} The parameter file is read \emph{sequentially} from top to bottom,
+        this means that if you set the value of a parameter twice in
+        the parameter file, the second value will be used. (This is
+        why the \texttt{ActiveThorns} parameter is always first in the file).
+
+\item{} String parameter values can be specified either as unquoted tokens (not
+        containing any whitespace), or as quoted values. If a quoted string
+        parameter value spans multiple lines, all whitespaces, including newline
+        characters, are preserved.
+
+\item{} Some parameters are \textit{steerable}, and can be changed during
+        the execution of a Cactus program using parameter steering interfaces,
+        for example, thorn \texttt{CactusConnect/HTTPD}, or using a
+        parameter file when recovering from a checkpoint file.
+
+\item{} For examples of parameter files, look in the \texttt{par} directory
+        contained in most thorns.
+
+\end{itemize}
+
+\section{Thorn Documentation}
+\label{sec:thdo}
+
+The Cactus make system provides a mechanism for generating a
+\textit{Thorn Guide} containing separate chapters for each thorn and
+arrangement in your configuration. The documentation provided for an
+individual thorn, obviously depends on what the thorn authors added,
+but the Thorn Guide is a good place to first look for special
+instructions on how to run and interpret the output from a thorn.
+Details about parameters, grid variables and scheduling are
+automatically read from a thorn's CCL files and included in the Thorn
+Guide. To construct a Thorn Guide for the configuration
+\texttt{$<$\var{config}$>$} use
+
+\texttt{gmake $<$\var{config}$>$-ThornGuide}
+
+or to make a Thorn Guide for all the thorns in the \texttt{arrangements} directory
+
+\texttt{gmake $<$\var{config}$>$}.
+
+See Section~\ref{sec:Adding_documentation} for a guide to adding
+documentation to your own thorns.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\chapter{Getting and Looking at Output}
+
+
+\section{Screen Output}
+
+As your Cactus executable runs, standard output and standard error
+are usually written to the screen. Standard output provides you
+with information about the run, and standard error reports warnings
+and errors from the flesh and thorns.
+
+As the program runs, the normal output provides the following information:
+
+\begin{Lentry}
+
+\item [Active thorns]
+        A report is made as each of the thorns in the \texttt{ActiveThorns}
+parameters from the parameter file (see Section~\ref{sec:Parameter_File})
+is attempted to be activated. This report
+shows whether the thorn activation was successful, and if successful, gives the
+thorn's implementation. For example
+
+\begin{verbatim}
+Activating thorn idscalarwave...Success -> active implementation idscalarwave
+\end{verbatim}
+
+\item [Failed parameters]
+         If any of the parameters in the parameter file does not belong to any
+of the active thorns, or if the parameter value is not in the allowed range
+(see Section~\ref{sec:Parameters.Types_and_Ranges}),
+an error is registered. For example, if the parameter is not recognised,
+
+\begin{verbatim}
+Unknown parameter time::ddtfac
+\end{verbatim}
+or if the parameter value is not in the allowed range,
+
+\begin{verbatim}
+Unable to set keyword CartGrid3D::type - ByMouth not in any active range
+\end{verbatim}
+
+\item [Scheduling information]
+        The scheduled routines (see Section~\ref{chap:scheduling})
+are listed, in the order that they will be executed. For example,
+
+\begin{verbatim}
+----------------------------------------------------------------------
+  Startup routines
+    Cactus: Register banner for Cactus
+    CartGrid3D: Register GH Extension for GridSymmetry
+    CartGrid3D: Register coordinates for the Cartesian grid
+    IOASCII: Startup routine
+    IOBasic: Startup routine
+    IOUtil: IOUtil startup routine
+    PUGH: Startup routine
+    WaveToyC: Register banner
+
+  Parameter checking routines
+    CartGrid3D: Check coordinates for CartGrid3D
+    IDScalarWave: Check parameters
+
+  Initialisation
+    CartGrid3D: Set up spatial 3D Cartesian coordinates on the GH
+    PUGH: Report on PUGH set up
+    Time: Set timestep based on speed one Courant condition
+    WaveToyC: Schedule symmetries
+    IDScalarWave: Initial data for 3D wave equation
+
+  do loop over timesteps
+    WaveToyC: Evolution of 3D wave equation
+    t = t+dt
+    if (analysis)
+    endif
+  enddo
+----------------------------------------------------------------------
+\end{verbatim}
+
+\item [Thorn banners]
+        Usually a thorn registers a short piece of text as a \emph{banner}.
+        The banner of each thorn is displayed in the standard output when
+        the thorn is initialised.
+
+\end{Lentry}
+
+
+\section{Output}
+Output methods in Cactus are all provided by thorns.
+Any number of output methods can be used for each run.
+The behaviour of the output thorns in the
+standard arrangements are described in those thorns' documentation.
+
+In general, output thorns decide what to output by parsing a string parameter
+containing the names of those grid variables, or groups of variables, for which
+output is required. The names should be fully qualified with the
+implementation and group or variable names.
+
+There is usually a parameter for each method to denote how often, in evolution
+iterations, this output should be performed.  There is also usually a parameter
+to define the directory in which the output should be placed, defaulting to the
+directory from which the executable is run.
+
+See Chapter~\ref{chap:io_methods} for details on creating your own I/O method.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{cactuspart}

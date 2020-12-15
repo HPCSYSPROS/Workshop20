@@ -1,0 +1,11 @@
+#!/bin/tcsh
+mkdir outpen
+lfs setstripe outpen -c 1 
+cd outpen
+@ n = $1 - 1
+@ i = 0
+while ( $i <= $n )
+mkdir $i
+@ i = $i + 1
+end
+cd ..

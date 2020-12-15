@@ -1,0 +1,246 @@
+#! /bin/sh
+# /*@@
+#   @file      linux
+#   @date      Thu Nov 15 21:30:04 2007
+#   @author    John Shalf
+#   @desc
+#              known-architectures file for Cray XT4 running Compute Node Linux (CNL)
+#   @version   $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/known-architectures/xt4-cray-linux,v 1.4 2010-04-17 02:17:19 schnetter Exp $
+# @@*/
+
+
+echo "This is an Cray XT4:  you always need MPI!"
+echo "  Forcing MPI to NATIVE."
+MPI='NATIVE'
+
+if test -n "$MPI" ; then
+  : ${NATIVE_MPI_LIBS=' '}
+  : ${NATIVE_MPI_LIB_DIRS=' '}
+  : ${NATIVE_MPI_INC_DIRS=' '}
+fi
+
+if test "$CCTK_CONFIG_STAGE" = 'preferred-compilers' ; then
+
+  if test -z "$FPP" -a -z "$FPPFLAGS"; then
+    FPP='/lib/cpp'
+    FPPFLAGS='-traditional'
+    echo "Setting FPP to $FPP"
+    echo "Setting FPPFLAGS to $FPPFLAGS"
+  fi
+
+else
+
+  # Determine which Fortran 90 compiler is in use
+  LINUX_F90_COMP=none
+
+  if test -n "$F90" && test "$F90" != 'none' ; then
+    if test "`$F90 -V 2>&1 | grep -i f90 | grep -i pgf90`" ; then
+      LINUX_F90_COMP=portland
+    elif test "`$F90 -V 2>&1 | grep pgf95`" ; then
+      LINUX_F90_COMP=portland
+    elif test "`$F90 -v 2>&1 | grep -i g77`" ; then
+      LINUX_F90_COMP=gnu77
+    elif test "`$F90 -v 2>&1 | grep PathScale`" ; then
+      LINUX_F90_COMP=PathScale
+    elif test "`$F90 --version 2>&1 | grep 'GNU Fortran'`" ; then
+      LINUX_F90_COMP=gnu95
+    else
+      echo 'Unknown Linux f90 compiler.'
+      echo 'Please add appropriate information to'
+      echo "  $srcdir/known-architectures/linux"
+      echo 'and send the updated file to CactusMaint'
+      echo 'We will try anyway ...'
+    fi
+  elif test -n "$F77" ; then
+    if test "`$F90 -V 2>&1 | grep -i f90 | grep -i pgf90`" ; then
+      LINUX_F90_COMP=portland
+    elif test "`$F90 -V 2>&1 | grep pgf95`" ; then
+      LINUX_F90_COMP=portland
+    elif test "`$F77 -v 2>&1 | grep -i 'gcc version'`" ; then
+      LINUX_F90_COMP=gnu77
+    elif test "`$F77 --version 2>&1 | grep 'GNU Fortran'`" ; then
+      LINUX_F90_COMP=gnu95
+    elif test "`$F90 -v 2>&1 | grep PathScale`" ; then
+      LINUX_F90_COMP=PathScale
+    else
+      echo 'Unknown Linux f77 compiler.'
+      echo 'Please add appropriate information to'
+      echo "  $srcdir/known-architectures/linux"
+      echo 'and send the updated file to CactusMaint'
+      echo 'We will try anyway ...'
+    fi
+  fi
+
+  # find out if we have egcs or not, LIBS is either g2c or f2c
+  LINUX_G77_USES_LIBG2C=
+
+  if test "$LINUX_F90_COMP" = 'gnu77' -o "$LINUX_F90_COMP" = 'pacific' ; then
+    : > foo.f
+    if test -n "`$F77 -v 2>&1 foo.f | grep collect | grep g2c`" ; then
+      LINUX_G77_USES_LIBG2C=yes:w
+
+    else
+      LINUX_G77_USES_LIBG2C=no
+    fi
+    rm foo.f
+  fi
+
+  # Set the appropriate flags
+  case "$LINUX_F90_COMP" in
+    gnu77)
+      if test "$LINUX_G77_USES_LIBG2C" = 'yes' ; then
+        : ${LIBS="g2c m"}
+      fi
+      if test "$LINUX_G77_USES_LIBG2C" = 'no' ; then
+        if test "$host_cpu" = 'powerpc' ; then
+          : ${LIBS='m'}
+        else
+          : ${LIBS='f2c m'}
+        fi
+      fi
+      : ${F77_DEBUG_FLAGS='-g'}
+      : ${F90_DEBUG_FLAGS='-g'}
+      : ${F77_WARN_FLAGS='-Wall'}
+      : ${F90_WARN_FLAGS='-Wall'}
+      F77_VERSION="`$F77 -v 2>&1 | grep -i version | head -n1`"
+      F90_VERSION="`$F90 -v 2>&1 | grep -i version | head -n1`"
+      ;;
+    gnu95)
+      : ${F77_DEBUG_FLAGS='-g'}
+      : ${F90_DEBUG_FLAGS='-g'}
+      : ${F77_WARN_FLAGS='-Wall'}
+      : ${F90_WARN_FLAGS='-Wall'}
+      : ${F77_OPTIMISE_FLAGS='-O3 -funroll-loops'}
+      : ${F90_OPTIMISE_FLAGS='-O3 -funroll-loops'}
+      if test "$LD" != "$F90" ; then
+        gnu95_libdir="`$F90 -print-file-name=libgfortran.a`"
+        gnu95_libdir="`dirname $gnu95_libdir`"
+        : ${LIBS='gfortran'}
+        : ${LIBDIRS="$gnu95_libdir"}
+      fi
+      F77_VERSION="`$F77 --version 2>&1 | grep -i version | head -n1`"
+      F90_VERSION="`$F90 --version 2>&1 | grep -i version | head -n1`"
+      ;;
+    portland)
+      : ${LIBS='pgf90 pgf90rtl pgftnrtl pgf90_rpm1 pghpf2 pgc m'}
+      if test -z "$LIBDIRS" ; then
+        LIBDIRS="`which $F90 | sed 's,/bin/.*,/lib,'`"
+      fi
+      : ${F90='ftn'}
+      : ${F77='ftn'}
+      # workaround for calling C varargs functions from Fortran
+      : ${F77FLAGS='-Mx,125,0x200'}
+      : ${F77_OPTIMISE_FLAGS='-fastsse -Mvect=assoc'}
+      : ${F77_WARN_FLAGS='-Minfo -Mneginfo'}
+      : ${F77_DEBUG_FLAGS='-g'}
+      : ${F90FLAGS='-Mx,125,0x200'}
+      : ${F90_OPTIMISE_FLAGS='-fastsse -Mvect=assoc'}
+      : ${F90_WARN_FLAGS='-Minfo -Mneginfo'}
+      : ${F90_DEBUG_FLAGS='-g'}
+      F90_VERSION="`$F90 -V 2>&1 | grep -i pgf90 | head -n1`"
+      ;;
+    PathScale)
+      : ${F77FLAGS='-fno-second-underscore'}
+      : ${F90FLAGS='-fno-second-underscore'}
+      : ${F77_OPTIMISE_FLAGS='-Ofast'}
+      : ${F90_OPTIMISE_FLAGS='-Ofast'}
+      if test "$OPTIMISE" != 'no'; then
+        : ${LDFLAGS='-Ofast'}
+      fi
+      : ${F77_WARN_FLAGS='-fullwarn'}
+      : ${F90_WARN_FLAGS='-fullwarn'}
+      : ${LIBS='pathfortran mv'}
+      F77_VERSION="`$F77 -v 2>&1 | grep -i version | head -n1`"
+      F90_VERSION="`$F90 -v 2>&1 | grep -i version | head -n1`"
+      ;;
+    none)
+      : ${LIBS='m'}
+      ;;
+    *)
+      echo 'Unknown Linux f90 compiler.'
+      echo 'Please add appropriate information to'
+      echo "  $srcdir/known-architectures/linux-gnu"
+      echo 'and send the updated file to CactusMaint'
+      echo 'We will try anyway ...'
+      ;;
+  esac
+
+  # C compiler
+  # Set the appropriate dependency, warning, and debugging flags
+  # Note that the defaults settings are for gcc/g++ and set by configure
+  case `basename $CC` in
+    # GNU
+    pgcc | cc)
+      : ${CC='cc'}
+      : ${CFLAGS='-DCRAY_XT'}
+      : ${C_OPTIMISE_FLAGS='-fastsse -O3 -Mvect=assoc'}
+      : ${C_WARN_FLAGS='-Minfo -Mneginfo'}
+      : ${C_DEPEND='$(CC) $(CPPFLAGS) $(CFLAGS) -E -M'}
+      CC_VERSION="`$CC -V 2>&1 | grep -i pgcc | head -n1`"
+      ;;
+    pathcc)
+      : ${CFLAGS='-DCRAY_XT'}
+      : ${C_OPTIMISE_FLAGS='-Ofast'}
+      CC_VERSION="`$CC -v 2>&1 | grep -i version | head -n1`"
+      ;;
+    gcc | cc)
+      : ${CFLAGS='-pipe -DCRAY_XT'}
+      : ${C_OPTIMISE_FLAGS='-O3'}
+      CC_VERSION="`$CC -v 2>&1 | grep -i version | head -n1`"
+      ;;
+  esac
+
+  case `basename $CXX` in
+    # GNU
+    pgCC | CC)
+      : ${CXX='CC'}
+      : ${CXXFLAGS='--no_using_std -DCRAY_XT'}
+      : ${CXX_OPTIMISE_FLAGS='-fastsse -O3 -Mvect=assoc'}
+      : ${CXX_WARN_FLAGS='-Minfo -Mneginfo'}
+      : ${CXX_DEPEND='$(CXX) $(CPPFLAGS) $(CXXFLAGS) -E -M'}
+      if test `basename $LD` = 'pgCC'; then
+        : ${LDFLAGS='-Wl,--allow-multiple-definition'}
+      fi
+      CXX_VERSION="`$CXX -V 2>&1 | grep pgCC | head -n1`"
+      ;;
+    pathCC)
+      : ${CXXFLAGS='-DCRAY_XT'}
+      : ${CXX_OPTIMISE_FLAGS='-Ofast'}
+      CXX_VERSION="`$CXX -v 2>&1 | grep -i version | head -n1`"
+      ;;
+    gcc | [gc]++)
+      : ${CXXFLAGS='-pipe -DCRAY_XT'}
+      : ${CXX_OPTIMISE_FLAGS='-O3'}
+      CXX_VERSION="`$CXX -v 2>&1 | grep -i version | head -n1`"
+      ;;
+  esac
+
+  : ${C_DEBUG_FLAGS='-g'}
+  : ${CXX_DEBUG_FLAGS='-g'}
+
+  # Cache stuff
+  if test -z "$CACHELINE_BYTES" ; then
+    CACHELINE_BYTES=64
+    if test -n "$CACHELINE_BYTES" ; then
+      echo "Setting CACHELINE_BYTES to $CACHELINE_BYTES"
+    fi
+  fi
+
+  if test -z "$CACHE_SIZE" ; then
+     CACHE_SIZE="`cat /proc/cpuinfo | perl -nae 'if(m:cache\D+(\d+): && ! $dunnit) {print $1; $dunnit=1}'`"
+     if test -z "$CACHE_SIZE"; then
+       CACHE_SIZE=0
+     fi
+     if test -n "$CACHE_SIZE" ; then
+      CACHE_SIZE="$CACHE_SIZE*1024"
+      echo "Setting CACHE_SIZE to $CACHE_SIZE bytes"
+     else
+      echo 'Unable to determine Cache size on this machine.'
+     fi
+  fi
+
+# MPI stuff
+# Cray XT4 must always use MPI (caught at the top)
+echo "finishing Cray XT4 Script"
+
+fi

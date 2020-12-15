@@ -1,0 +1,32 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+echo "Checking:"
+pwd
+hostname
+date
+cat ${PBS_NODEFILE} > SIMFACTORY/NODES
+
+echo "Environment:"
+export LD_LIBRARY_PATH=/ichec/packages/szip/intel/2.1/lib:/ichec/packages/intel-cluster-studio/2013-sp1/composer_xe_2013_sp1.0.080/compiler/lib/intel64:$LD_LIBRARY_PATH
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export OMP_NUM_THREADS=@NUM_THREADS@
+export MKL_NUM_THREADS=1
+export MPIDIR=/ichec/home/packages/intel-cluster-studio/2013-sp1/impi/4.1.1.036/intel64
+env | sort > SIMFACTORY/ENVIRONMENT
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+
+/usr/bin/time ${MPIDIR}/bin/mpiexec -ppn @(@PPN_USED@/@NUM_THREADS@)@ @EXECUTABLE@ -L 3 @PARFILE@
+
+echo "Stopping:"
+date
+
+echo "Done."

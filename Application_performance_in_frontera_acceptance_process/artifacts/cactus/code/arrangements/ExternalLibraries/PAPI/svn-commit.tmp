@@ -1,0 +1,7 @@
+PAPI: correct use of data pointer in clock_destroy
+
+looks like the wrong code was copied and pasted and it just happened to be
+harmless most of time when memory allocated by malloc happened to be zeroed out
+--This line, and those below, will be ignored--
+
+M    src/clock.c

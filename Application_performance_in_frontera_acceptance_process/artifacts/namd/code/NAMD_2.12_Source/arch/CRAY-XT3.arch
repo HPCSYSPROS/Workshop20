@@ -1,0 +1,13 @@
+NAMD_ARCH = CRAY-XT3
+CHARMARCH = mpi-crayxt3
+CHARMOPTS = -lgmalloc
+# need -lgmalloc because normal Catamount malloc is horribly slow
+
+CXX = CC -DMEMUSAGE_USE_SBRK -DNO_SOCKET -DDUMMY_VMDSOCK -DNOHOSTNAME -DNO_GETPWUID -DNAMD_NO_STDOUT_FLUSH -DNAMD_NO_O_EXCL
+CXXOPTS = -fastsse
+CXXNOALIASOPTS = -fast -Mnodepchk -Msafeptr=arg,global,local,static -Minfo=all -Mneginfo=loop
+# -fastsse with -Mnodepchk -Msafeptr=arg,global,local,static produces bad code
+
+CC = cc
+COPTS = -fast
+

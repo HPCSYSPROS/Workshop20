@@ -1,0 +1,32 @@
+# make.configuration.deps file for thorn HDF5
+
+# Standard HDF5 utilities are copied from the install directory
+
+$(UTIL_DIR)/%: $(HDF5_DIR)/bin/%
+	@echo "Copying $* from $< to $(UTIL_DIR)"
+	-$(MKDIR) $(MKDIRFLAGS) $(UTIL_DIR) 2> /dev/null
+	cp $< $@
+
+
+
+# Cactus HDF5 utilities are built
+
+HDF5_BUILD_DIR = $(BUILD_DIR)/HDF5
+HDF5_SRC_DIR   = $(PACKAGE_DIR)/ExternalLibraries/HDF5/src/util
+
+HDF5_CFLAGS  = $(CPPFLAGS) -DCCODE -I$(CONFIG) -I$(BINDINGS_DIR)/include -I$(BINDINGS_DIR)/include/HDF5 -I$(FLESH_DIR)/include $(HDF5_INC_DIRS:%=-I%) $(MPI_INC_DIRS:%=-I%) $(CFLAGS)
+HDF5_LDFLAGS = $(DEBUG_LD) $(LDFLAGS) $(CXXFLAGS) $(EXTRAFLAGS) $(GENERAL_LIBRARIES)
+
+
+
+# Compile
+$(HDF5_BUILD_DIR)/%.o: $(HDF5_SRC_DIR)/%.c
+	@echo "Compiling $<"
+	-$(MKDIR) $(MKDIRFLAGS) $(HDF5_BUILD_DIR) 2> /dev/null
+	$(CC) $< $(HDF5_CFLAGS) -DTHORN_IS_HDF5 -c -o $@
+
+# Link
+$(UTIL_DIR)/%: $(HDF5_BUILD_DIR)/%.o
+	@echo "Creating $* in $(UTIL_DIR) from $<"
+	-$(MKDIR) $(MKDIRFLAGS) $(UTIL_DIR) 2> /dev/null
+	$(LD) $< -o $@ $(HDF5_LDFLAGS)

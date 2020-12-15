@@ -1,0 +1,360 @@
+% /*@@
+%   @file      RunningCactus.tex
+%   @date      27 Jan 1999
+%   @author    Tom Goodale, Gabrielle Allen, Gerd Lanferman, Thomas Radke
+%   @desc
+%              How to run Cactus part of the Cactus User's Guide
+%   @enddesc
+%   @version   $Header$
+% @@*/
+
+\begin{cactuspart}{Introduction}{}{$Revision$}\label{part:Introduction}
+\renewcommand{\thepage}{\Alph{part}\arabic{page}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Getting Started}
+\label{cha:gs}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Obtaining Cactus}
+\label{sec:checkout}
+
+Cactus is distributed, extended, and maintained using the free Subversion
+software (\url{http://subversion.apache.org/docs/})
+SVN allows many people to work on a large software project
+together without getting into a tangle.
+Since Cactus thorns are distributed from several repositories on the
+main SVN site, and from a growing number of user sites, we provide a
+\texttt{GetComponents} script on our website for checking out the flesh 
+and thorns. The script is available at
+
+\url{https://github.com/gridaphobe/CRL/raw/ET_2011_10/GetComponents}.
+
+The
+script takes as an argument the name of a file containing a \textit{ThornList},
+that is a list of thorns with the syntax
+\begin{alltt}
+<\var{arrangement name}>/<\var{thorn name}>
+\end{alltt}
+
+Optional directives in the ThornList indicate which repository to
+fetch thorns from. The ThornList is written in the {\em Component
+  Retrieval Language}, documented at
+\url{https://github.com/gridaphobe/CRL/wiki/Component-Retrieval-Language}.
+
+The same script can be used to checkout additional thorns, or to update 
+existing ones.
+
+The components that make up Cactus can also be checked out directly
+using SVN from \url{http://svn.cactuscode.org}.
+
+Another script, \texttt{MakeThornList}, can be used to produce a minimal
+ThornList from a given Cactus par file.  It needs a \emph{master} ThornList
+to be copied into your \texttt{Cactus} directory.
+
+See \url{http://cactuscode.org/download/thorns/MakeThornList}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Directory Structure}
+\label{sec:dist}
+
+A fresh checkout creates a directory \texttt{Cactus} with the
+following subdirectories:
+
+\begin{Lentry}
+
+\item[\texttt{.svn}] the SVN bookkeeping directory, present in every subdirectory
+
+\item[\texttt{doc}] Cactus documentation
+
+\item[\texttt{lib}] contains libraries
+
+\item[\texttt{src}] contains the source code for Cactus
+
+\item [\texttt{arrangements}] contains the Cactus arrangements. The arrangements
+  (the actual ``physics'') are not supplied by just checking out just Cactus.
+  If the arrangements you want to use are standard Cactus arrangements, or
+  reside on our SVN repository (\texttt{svn.cactuscode.org}),
+  they can be checked out in similar way to the flesh.
+\end{Lentry}
+
+When Cactus is first compiled, it creates a new directory
+\texttt{Cactus/configs}, which will contain all the source code, object files
+and libraries created during the build process.
+
+Configurations are described in detail in Section \ref{sec:configurations}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Compiling a Cactus application}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+Cactus can be built in different configurations from the same copy of
+the source files, and these different configurations coexist in the
+\texttt{Cactus/configs} directory. Here are several instances in which
+ this can be useful:
+
+\begin{enumerate}
+\item{}Different configurations can be for \emph{different
+architectures}. You can keep executables for multiple architectures
+based on a single copy of source code, shared on a common file
+system.
+\item{} You can compare different \textit{compiler options}, and \textit{debug-modes}.
+  You might want to compile different communication protocols
+  (e.g. MPI or Globus), or leave them out all together.
+\item{} You can have different configurations for \textit{different thorn
+    collections} compiled into your executable.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Creating a Configuration}
+\label{sec:configurations}
+
+At its simplest, this is done by \texttt{gmake <\var{config}>}.
+This generates a
+configuration with the name \texttt{\var{config}}, doing its best to
+automatically determine the default compilers and compilation flags
+suitable for the current architecture.
+
+There are a number of additional command-line arguments which may be supplied
+to override some parts of the procedure; they are listed in Section~\ref{sec:confopts}.
+
+Once you have created a new configuration, the command
+\\ \\
+\texttt{gmake <\var{configuration name}>}
+\\ \\
+will build an executable, prompting you along the way for the
+thorns which should be included. There is a range of \texttt{gmake}
+targets and options which are detailed in Section~\ref{sec:gmtafobuanadco}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Running a Cactus application}
+
+Cactus executables always run from a parameter file (which may be
+provided as a command-line argument taken from standard input), which
+specifies which thorns to use and sets the values of each thorn's 
+parameters (the parameters that are not set will take on default values, 
+see~\ref{sec:Appendix.param}).
+
+There is no restriction on the name
+of the parameter file, although it is conventional to use the file
+extension \texttt{.par}.  Optional command-line arguments can be used
+to customise runtime behaviour, and to provide information about the
+thorns used in the executable. The general syntax for running Cactus from
+a parameter file is then
+
+\texttt{./cactus\_<\var{config}> <\var{parameter file}>
+[\var{command-line options}]}
+
+A parameter file is a text file whose lines are either comments
+or parameter statements.
+Comments are blank lines or lines that begin with either
+`\texttt{\#}' or `\texttt{!}'.
+A parameter statement consists of one or more parameter names, followed by
+an `\texttt{=}', followed by the value(s) for this (these) parameter(s).
+Note that all string parameters are case insensitive.
+
+The first parameter statement in any parameter file should set \texttt{ActiveThorns},
+which is a special parameter that tells the
+program which \textit{thorns} are to be activated.  Only parameters from active
+thorns can be set (and only those routines \textit{scheduled} by active thorns
+are run).  By default all thorns are inactive. For example, the first
+entry in a parameter file which is using just the two thorns
+\texttt{CactusPUGH/PUGH} and \texttt{CactusBase/CartGrid3D} should be
+
+\texttt{ActiveThorns = "PUGH CartGrid3D"}
+
+Parameter specifications following \texttt{ActiveThorns} usually are
+carried out by listing
+the name of the \textit{thorn} which defined the parameter, two colons,
+and the name of the parameter --- e.g.~\texttt{wavetoyF77::amplitude}
+(see Section~\ref{sec:Cactus_parameters.scope} for more information).
+
+Notes:
+
+\begin{itemize}
+
+\item{} You can obtain lists of the parameters associated with
+each thorn using the command-line options \texttt{-o} and \texttt{-O}
+(Section~\ref{sec:command_line_options}).
+
+\item{} For examples of parameter files, look in the \texttt{par} directory
+        which can be found in most thorns.
+
+\item {}
+The Cactus make system provides a mechanism for generating a
+\textit{Thorn Guide} containing separate chapters for each thorn and
+arrangement in your configuration. 
+Details about parameters, grid variables and scheduling are
+automatically included in from a thorns CCL files into the Thorn
+Guide. To construct a Thorn Guide for the configuration
+\texttt{$<$\var{config}$>$} use
+
+\texttt{gmake $<$\var{config}$>$-ThornGuide}
+
+or to make a Thorn Guide for all the thorns in the \texttt{arrangements} directory
+
+\texttt{gmake $<$\var{config}$>$}.
+
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\chapter{Getting and looking at output}
+
+
+\section{Screen output}
+
+As your Cactus executable runs, standard output and standard error
+are usually written to the screen. Standard output provides you
+with information about the run, and standard error reports warnings
+and errors from the flesh and thorns.
+
+As the program runs, the normal output provides the following information:
+
+\begin{Lentry}
+
+\item [Active thorns]
+        A report is made as each of the thorns in the \texttt{ActiveThorns}
+parameters from the parameter file (see Section~\ref{sec:Parameter_File})
+is attempted to be activated. This report
+shows whether the thorn activation was successful, and if successful gives the
+thorn's implementation. For example
+
+\begin{verbatim}
+Activating thorn idscalarwave...Success -> active implementation idscalarwave
+\end{verbatim}
+
+\item [Failed parameters]
+         If any of the parameters in the parameter file does not belong to any
+of the active thorns, or if the parameter value is not in the allowed range
+(see Section~\ref{sec:Parameters.Types_and_Ranges}),
+an error is registered. For example, if the parameter is not recognised
+
+\begin{verbatim}
+Unknown parameter time::ddtfac
+\end{verbatim}
+or if the parameter value is not in the allowed range
+
+\begin{verbatim}
+Unable to set keyword CartGrid3D::type - ByMouth not in any active range
+\end{verbatim}
+
+\item [Scheduling information]
+        The scheduled routines (see Section~\ref{chap:scheduling}),
+are listed, in the order that they will be executed. For example
+
+\begin{verbatim}
+----------------------------------------------------------------------
+  Startup routines
+    Cactus: Register banner for Cactus
+    CartGrid3D: Register GH Extension for GridSymmetry
+    CartGrid3D: Register coordinates for the Cartesian grid
+    IOASCII: Startup routine
+    IOBasic: Startup routine
+    IOUtil: IOUtil startup routine
+    PUGH: Startup routine
+    WaveToyC: Register banner
+
+  Parameter checking routines
+    CartGrid3D: Check coordinates for CartGrid3D
+    IDScalarWave: Check parameters
+
+  Initialisation
+    CartGrid3D: Set up spatial 3D Cartesian coordinates on the GH
+    PUGH: Report on PUGH set up
+    Time: Set timestep based on speed one Courant condition
+    WaveToyC: Schedule symmetries
+    IDScalarWave: Initial data for 3D wave equation
+
+  do loop over timesteps
+    WaveToyC: Evolution of 3D wave equation
+    t = t+dt
+    if (analysis)
+    endif
+  enddo
+----------------------------------------------------------------------
+\end{verbatim}
+
+\item [Thorn banners]
+        Usually a thorn registers a short piece of text as a \emph{banner}.
+        This banner of each thorn is displayed in the standard output when
+        the thorn is initialised.
+
+\end{Lentry}
+
+
+\section{File output}
+Output methods in Cactus are all provided by thorns.
+Any number of output methods can be used for each run.
+The behaviour of the output thorns in the
+standard arrangements are described in those thorns' documentation.
+
+In general, output thorns decide what to output by parsing a string parameter
+containing the names of those grid variables, or groups of variables, for which
+output is required. The names should be fully qualified with the
+implementation and group or variable names.
+
+There is usually a parameter for each method to denote how often, in evolution
+iterations, this output should be performed.  There is also usually a parameter
+to define the directory in which the output should be placed, defaulting to the
+directory from which the executable is run.
+
+See Chapter~\ref{chap:io_methods} for details on creating your own IO method.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Checkpointing/Recovery}
+\label{sec:checkpointing}
+
+Checkpointing is defined as saving the current state of a run (parameter
+settings, contents of grid variables, and other relevant information) to a file.
+At a later time, this run can then be restarted from that state by recovering
+all the data from the checkpoint file.
+
+Cactus checkpointing and recovery methods are provided by thorns.
+In general, these thorns decide how often to generate a checkpoint.
+They also register their recovery routines with the flesh; these recovery
+routines may then be called during initialisation of a subsequent run to
+perform the recovery of the state of the run.
+Such a recovery is requested by setting a parameter in the parameter file.
+
+See Chapter~\ref{chap:cp_recovery_methods} for details of how to create
+your own checkpointing and recovery methods.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Reporting bugs}
+\label{sec:gehe}
+
+For tracking problem reports and bugs, we use the TRAC bug tracking
+system located at \url{http://trac.einsteintoolkit.org} which allows
+easy submission and browsing of problem tickets.
+
+A description of the TRAC categories we use is provided in the Appendix
+\ref{sec:Appendix.trac}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% FIXME: add something quick on required software and supported architectures
+
+%%%% FIXME: add an example
+
+\end{cactuspart}

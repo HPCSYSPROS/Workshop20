@@ -1,0 +1,106 @@
+% /*@@
+%   @file      UsersGuide.tex
+%   @date      27 Jan 1999
+%   @author    Tom Goodale, Gabrielle Allen, Gerd Lanferman
+%   @desc 
+%   Main file for the Cactus User's Guide
+%   @enddesc 
+%   @version $Header$      
+% @@*/
+
+\documentclass{report}
+
+\usepackage[
+pdfauthor={Gabrielle Allen, Tom Goodale, Gerd Lanfermann, Thomas Radke, David Rideout, Erik Schnetter, Jonathan Thornburg, Steve White},
+pdftitle={Cactus Users Guide},
+pdfpagelabels,
+pdfstartview=FitV,
+hypertexnames=false,
+plainpages=false,
+colorlinks=true,
+linkcolor=blue,
+citecolor=blue,
+urlcolor=blue
+]{hyperref}
+
+% disable pdf compression to reduce patch size in version control system
+\ifx\pdfcompresslevel\undefined
+\relax
+\else
+\pdfobjcompresslevel=0
+\pdfcompresslevel=0
+\fi
+
+
+\usepackage{verbatim}
+\usepackage{alltt}
+\newcommand{ \var }[1]{\textsl{\texttt{#1}}}
+
+% This must come after most of the other \usepackages, because we
+% might want to pass options to them
+\usepackage{../latex/cactus}
+
+
+
+\usepackage{tocloft}
+\addtolength{\cftchapnumwidth}{0.5em}
+\addtolength{\cftsecnumwidth}{0.5em}
+\addtolength{\cftsubsecnumwidth}{0.5em}
+\addtolength{\cftsubsubsecnumwidth}{0.5em}
+
+\makeatletter
+\@addtoreset{chapter}{part}
+\makeatother
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\cactustitlepage{Users' Guide}{$ $}{$ $}
+
+\setcounter{page}{1}
+
+% Table of contents
+\pagenumbering{roman}
+
+\ifx \HCode\Undef
+\tableofcontents
+\fi
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\thepart}{\BigAlph{part}}
+\renewcommand{\thechapter}{\BigAlph{part}\arabic{chapter}}
+\renewcommand{\thepage}{\BigAlph{part}\arabic{page}}
+\pagestyle{fancy}
+\parskip = 10 pt
+\parindent = 0pt
+
+\newpage
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\include{Preface}
+
+\include{GettingStarted}
+
+\include{Notes}
+
+\include{ApplicationThorns}
+\include{InfrastructureThorns}
+%\include{FunctionReference}
+
+\include{Appendices}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}

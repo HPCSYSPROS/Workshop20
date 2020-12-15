@@ -1,0 +1,50 @@
+#include "cctk.h"
+  
+#ifndef CCTK_BLAS_INT8
+#  error "Internal error: CCTK_BLAS_INT8 not defined"
+#endif
+#if CCTK_BLAS_INT8
+#  define IK 8
+#else
+#  define IK 4
+#endif
+
+module blas
+  implicit none
+  
+  integer, parameter :: blas_integer_kind = IK
+  
+  interface gemm
+     SUBROUTINE SGEMM(TRANSA,TRANSB,M,N,K,ALPHA,A,LDA,B,LDB,BETA,C,LDC)
+       IMPLICIT NONE
+       REAL ALPHA,BETA
+       INTEGER*IK K,LDA,LDB,LDC,M,N
+       CHARACTER TRANSA,TRANSB
+       REAL A(LDA,*),B(LDB,*),C(LDC,*)
+     END SUBROUTINE SGEMM
+     
+     SUBROUTINE DGEMM(TRANSA,TRANSB,M,N,K,ALPHA,A,LDA,B,LDB,BETA,C,LDC)
+       IMPLICIT NONE
+       DOUBLE PRECISION ALPHA,BETA
+       INTEGER*IK K,LDA,LDB,LDC,M,N
+       CHARACTER TRANSA,TRANSB
+       DOUBLE PRECISION A(LDA,*),B(LDB,*),C(LDC,*)
+     END SUBROUTINE DGEMM
+     
+     SUBROUTINE CGEMM(TRANSA,TRANSB,M,N,K,ALPHA,A,LDA,B,LDB,BETA,C,LDC)
+       IMPLICIT NONE
+       COMPLEX ALPHA,BETA
+       INTEGER*IK K,LDA,LDB,LDC,M,N
+       CHARACTER TRANSA,TRANSB
+       COMPLEX A(LDA,*),B(LDB,*),C(LDC,*)
+     END SUBROUTINE CGEMM
+     
+     SUBROUTINE ZGEMM(TRANSA,TRANSB,M,N,K,ALPHA,A,LDA,B,LDB,BETA,C,LDC)
+       COMPLEX*16 ALPHA,BETA
+       INTEGER*IK K,LDA,LDB,LDC,M,N
+       CHARACTER TRANSA,TRANSB
+       COMPLEX*16 A(LDA,*),B(LDB,*),C(LDC,*)
+     END SUBROUTINE ZGEMM
+  end interface gemm
+  
+end module blas

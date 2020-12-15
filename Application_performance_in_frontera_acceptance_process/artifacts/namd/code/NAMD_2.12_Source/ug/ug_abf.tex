@@ -1,0 +1,678 @@
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% TITLE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+% \title{The adaptive biasing force method user's guide}
+
+This feature has been contributed to \NAMD\ by the following authors:
+
+\begin{quote}
+   J\'er\^ome H\'enin and Christophe Chipot           \\[0.4cm]
+   {\it Equipe de dynamique des assemblages membranaires, }\\
+   {\it Institut nanc\'eien de chimie mol\'eculaire,      }\\
+   {\it UMR CNRS/UHP 7565,                                }\\
+   {\it Universit\'e Henri Poincar\'e,                    }\\
+   {\it BP 239,                                           }\\
+   {\it 54506 Vand\oe uvre--l\`es--Nancy cedex, France    }
+\end{quote}
+
+\copyright~2005, {\sc Centre National de la Recherche Scientifique}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% TEXT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\subsubsection{Introduction and theoretical background}
+
+
+Strictly speaking, a potential of mean force (PMF) is the
+reversible work supplied to the system to bring two solvated
+particles, or ensembles of particles, from an infinite separation
+to some contact distance:~\cite{chan_87_1}
+
+
+\begin{equation}
+\label{pmf}
+w(r) = -\frac{1}{\beta} \ln g(r)
+\end{equation}
+
+
+Here, $g(r)$ is the pair correlation function of the
+two particles, or ensembles thereof.
+The vocabulary ``PMF'' has, however, been extended
+to a wide range of reaction coordinates that go far
+beyond simple interatomic or intermolecular distances.
+In this perspective, generalization of equation~({\ref{pmf}})
+is not straightforward. This explains why it may be
+desirable to turn to a definition suitable for any
+type of reaction coordinate, $\xi$:
+
+
+\begin{equation}
+\label{free}
+{A(\xi) = -\frac{1}{\beta} \ln \pxi + A_0}
+\end{equation}
+
+
+$A(\xi)$ is the free energy of the state
+defined by a particular value of $\xi$, which
+corresponds to an iso--$\xi$ hypersurface in
+phase space. $A_0$ is a constant and $\pxi$
+is the probability density to find the
+chemical system of interest at $\xi$.
+
+
+The connection between
+the derivative of the free energy with respect to
+the reaction coordinate, $\dd A(\xi) / \dd\xi$,
+and the forces exerted along the latter
+may be written as:~\cite{spri_98_1, deno_00_1}
+
+
+\begin{equation}
+\label{derivative}
+\frac{\dd A(\xi)}{\dd\xi} = \left\langle \frac{\dr\pot}{\dr\xi}
+                     - \frac{1}{\beta}
+                       \frac{\dr \ln |J|}{\dr\xi} \right\rangle_\xi
+                     = -\langle F_\xi \rangle_\xi
+\end{equation}
+
+
+where $|J|$ is the determinant of the Jacobian for the
+transformation from generalized to Cartesian coordinates. The
+first term of the ensemble average corresponds to the Cartesian
+forces exerted on the system, derived from the potential energy
+function, $\pot$. The second contribution is a geometric
+correction arising from the change in the metric of the phase
+space due to the use of generalized coordinates.
+It is worth noting, that, contrary to its instantaneous
+component, $F_\xi$, only the average force,
+$\langle F_\xi \rangle_\xi$, is physically meaningful.
+
+
+In the framework of the average biasing force (ABF)
+approach,~\cite{darv_01_1, rodr_04_1}
+$F_\xi$ is accumulated in small windows
+or bins of finite size, $\delta \xi$,
+thereby providing an estimate of the derivative
+$\dd A(\xi) / \dd\xi$ defined in equation~({\ref{derivative}}).
+The force applied along the reaction coordinate,
+$\xi$, to overcome free energy barriers is defined
+by:
+
+
+\begin{equation}
+\label{abf}
+{\bf F}^{\rm ABF} = \gradx \widetilde A
+                  = - \langle F_\xi \rangle_\xi \ \gradx \xi
+\end{equation}
+
+
+where $\widetilde A$ denotes the current estimate of the
+free energy and $\langle F_\xi \rangle_\xi$, the current
+average of $F_\xi$.
+
+
+As sampling of the phase space proceeds, the estimate
+$\gradx \widetilde A$ is progressively refined. The biasing
+force, ${\bf F}^{\rm ABF}$, introduced in the equations of
+motion guarantees that in the bin centered about $\xi$,
+the force acting along the reaction coordinate averages
+to zero over time. Evolution of the system along $\xi$
+is, therefore, governed mainly by its self--diffusion
+properties.
+
+
+A particular feature of the
+instantaneous force, $F_\xi$,
+is its tendency to fluctuate
+significantly.
+As a result, in the beginning of an ABF simulation,
+the accumulated average in each bin will generally
+take large, inaccurate
+values. Under these circumstances,
+applying the biasing force along $\xi$ according
+to equation~({\ref{abf}}) may severely perturb
+the dynamics of the system, thereby
+biasing artificially the accrued average, and,
+thus, impede convergence.
+To avoid such undesirable effects,
+no biasing force is applied in a bin centered about $\xi$
+until a reasonable number of force samples
+has been collected. When the user--defined minimum number
+of samples is reached, the biasing force
+is introduced progressively in the form
+of a linear ramp.
+For optimal efficiency, this minimal number of samples
+should be adjusted on a system--dependent basis.
+
+
+In addition, to alleviate the deleterious
+effects caused by abrupt variations of the force,
+the corresponding fluctuations are smoothed out,
+using a weighted running average over a preset number
+of adjacent bins, in lieu of the average of the
+current bin itself. It is, however, crucial to ascertain
+that the free energy profile varies regularly
+in the $\xi$--interval, over which the
+average is performed.
+
+To obtain an adequate sampling in reasonable
+simulation times, it is recommended to split long reaction
+pathways into consecutive ranges of $\xi$. In contrast with
+probability--based methods, ABF does
+{\itshape not} require that these windows overlap by
+virtue of the continuity of the force across the
+the reaction pathway.
+
+
+A more comprehensive discussion of the theoretical basis of
+the method and its implementation
+in \namd\ can be found in~\cite{heni_04_1}.
+
+
+
+\subsubsection{Using the \namd\ implementation of the adaptive biasing force method}
+
+
+The ABF method has been implemented as a suite of \tcl \
+routines that can be invoked from the main configuration file used
+to run molecular dynamics simulations with \namd.
+
+The routines can be invoked by including the following
+command in the configuration file:
+
+\begin{verbatim}
+source <path to>/lib/abf/abf.tcl
+\end{verbatim}
+
+where \texttt{<path to>/lib/abf/abf.tcl} is the complete path to
+the main ABF file. The other \tcl\ files of the ABF
+package must be located in the same directory.
+
+A second option for loading the ABF module is to source the
+\texttt{lib/init.tcl} file distributed with NAMD, and then use the
+Tcl package facility.  The file may be sourced in the config file:
+
+\begin{verbatim}
+source <path to>/lib/init.tcl
+package require abf
+\end{verbatim}
+
+Or, to make the config file portable, the init file may be the
+first config file passed to NAMD:
+
+\begin{verbatim}
+namd2 <path to>/lib/init.tcl myconfig.namd
+\end{verbatim}
+
+and then the config file need only contain:
+
+\begin{verbatim}
+package require abf
+\end{verbatim}
+
+Note that the ABF code makes use of the {\tt TclForces} and
+{\tt TclForcesScript} commands.
+As a result, \namd\ configuration files
+should not call the latter directly when running ABF.
+
+
+
+\subsubsection{Parameters for ABF simulations}
+
+
+The following parameters have been defined to control ABF \
+calculations. They may be set using the folowing syntax:
+
+{\tt abf <keyword> <value>}
+\index{abf command}
+
+where {\tt <value>} may be a number, a word or a \tcl\ list.
+Keywords are not case--sensitive.
+
+
+\begin{itemize}
+\setlength{\itemsep}{0.4cm}
+
+\item
+\NAMDCONF{coordinate}{Type of reaction coordinate used in the ABF \
+                         simulation}
+{{\tt distance}, {\tt distance-com}, {\tt abscissa}, {\tt zCoord}, 
+{\tt zCoord-1atom} or {\tt xyDistance}}
+{As a function of the system of interest, a number of alternative
+ reaction coordinates may be considered. The ABF code is modular:
+ RC--specific code for each RC\ is contained in a separate \tcl\
+ file.
+ Additional RCs, tailored for a particular problem, may be added
+ by creating a new file providing the required \tcl\ procedures.
+ Existing files such as {\tt distance.tcl} are thoroughly
+ commented, and should provide a good basis for the coding of
+ additional coordinates, together with~\cite{heni_04_1}.
+ \begin{enumerate}
+ \renewcommand{\itemsep}{0.4cm}
+ \renewcommand{\labelenumi}{(\arabic{enumi})}
+ \item
+ {\tt distance} \hfill
+ \begin{minipage}[t]{10.0cm}
+                    corresponds to the distance separating two selected
+                    atoms:
+                    \newline
+                    {\tt abf1}: index of the
+                                first atom of the reaction coordinate;
+                    \newline
+                    {\tt abf2}: index of the
+                                second atom of the reaction coordinate.
+ \end{minipage}
+ \item
+ {\tt distance-com} \hfill
+ \begin{minipage}[t]{10.0cm}
+                    corresponds to the distance separating the center of
+                    mass of two sets of atoms, \eg the distance between the
+                    centroid of two benzene molecules:
+                    \newline
+                    {\tt abf1}: list of indices of atoms participating
+                                to the first center of mass;
+                    \newline
+                    {\tt abf2}: list of indices of atoms participating
+                                to the second center of mass.
+ \end{minipage}
+ \item
+ {\tt abscissa} \hfill
+ \begin{minipage}[t]{10.0cm}
+                    corresponds to the distance between the centers of mass
+            of two sets of atoms along a given direction:
+                    \newline
+                    {\tt direction}: a vector (\tcl\ list of three real numbers)
+                defining the direction of interest
+                    \newline
+                    {\tt abf1}: list of indices of atoms participating
+                                to the first center of mass;
+                    \newline
+                    {\tt abf2}: list of indices of atoms participating
+                                to the second center of mass.
+ \end{minipage}
+ \item
+ {\tt zCoord} \hfill
+ \begin{minipage}[t]{10.0cm}
+                    corresponds to the distance separating two groups of atoms
+                    along the $z$-direction of
+                    Cartesian space. This reaction coordinate is
+                    useful for the estimation of transfer free energies
+                    between two distinct media:
+                    \newline
+                    {\tt abf1}: list of indices of reference atoms
+                    \newline
+                    {\tt abf2}: list of indices of atoms of interest ---
+                                \eg a solute
+ \end{minipage}
+ \item
+ {\tt zCoord-1atom} \hfill
+ \begin{minipage}[t]{10.0cm}
+                    is similar to {\tt zCoord}, but using a single
+                    atom of interest
+                    \newline
+                    {\tt abf1}: list of indices of reference atoms
+                    \newline
+                    {\tt abf2}: index of an atom of interest
+ \end{minipage}
+ \item
+ {\tt xyDistance} \hfill
+ \begin{minipage}[t]{10.0cm}
+                    is the distance between the centers of mass of
+		    two atom groups, projected on
+		    the $(x, y)$ plane:
+                    \newline
+                    {\tt abf1}: list of indices of atoms participating
+                                to the first center of mass;
+                    \newline
+                    {\tt abf2}: list of indices of atoms participating
+                                to the second center of mass.
+ \end{minipage}
+ \end{enumerate}
+ }
+
+
+\item
+\NAMDCONF{xiMin}{Lower bound of the reaction coordinate}
+{decimal number, in \AA}
+{Lower limit of the reaction coordinate, $\xi$, below which no
+ sampling is performed.}
+
+
+\item
+\NAMDCONF{xiMax}{Upper bound of the reaction coordinate}
+{decimal number, in \AA}
+{Upper limit of the reaction coordinate, $\xi$, beyond which no
+ sampling is performed.}
+
+
+\item
+\NAMDCONF{dxi}{Width of the bins in which the forces are accumulated}
+{decimal number, in \AA}
+{Width, $\delta\xi$, of the bins in which the instantaneous components
+ of the force, $F_\xi$, are collected. The choice of this
+ variable is dictated by the nature of the system and how rapidly
+ the free energy changes as a function of $\xi$.}
+
+
+\item
+\NAMDCONFWDEF{forceConst}{Force constant applied at the borders of the
+                          reaction coordinate}
+{positive decimal number, in kcal/mol/\AA$^2$}
+{10.0}
+{If this force constant is nonzero, a harmonic bias is enforced at
+ the borders of the reaction coordinate,
+ \ie at both {\tt xiMin} and {\tt xiMax}, to guarantee that sampling
+ will be confined between these two values.}
+
+
+\item
+\NAMDCONFWDEF{dSmooth}{Length over which force data is averaged when computing
+                       the ABF}
+{positive decimal number, in \AA}
+{0.0}
+{To avoid abrupt variations in the average force and in the free energy,
+ fluctuations are smoothed out by means of a weighted running average over
+ adjacent bins on each side of $\xi$. When the free energy derivative varies
+ slowly, smoothing can be performed across several contiguous bins. Great attention
+ should be paid, however, when the free energy varies sharply with $\xi$.}
+
+
+\item \NAMDCONFWDEF{fullSamples}{Number of samples in a bin prior
+              to application of the ABF}
+{positive integer}
+{200}
+{To avoid nonequilibrium effects in the dynamics of the system, due to large
+ fluctuations of the force exerted along the reaction coordinate, $\xi$, it
+ is recommended to apply the biasing force only after a reasonable estimate
+ of the latter has been obtained.}
+
+
+\item
+\NAMDCONFWDEF{outFile}{Output file of an ABF calculation}
+{\unix \ filename}
+{\texttt{abf.dat}}
+{Output file containing, for each value of the reaction
+ coordinate, $\xi$, the free energy, $A(\xi)$, the average
+ force, $\left\langle F_\xi \right\rangle$, and the number
+ of samples accrued in the bin.}
+
+
+\item
+\NAMDCONFWDEF{historyFile}{History of the force data over time}
+{\unix \ filename}
+{\texttt{none}}
+{This file contains a history of the information stored in
+\texttt{outFile}, and is written every tenth update of \texttt{outFile}.
+Data for different timesteps are separated by \& signs for easier
+visualization using the Grace plotting software.
+This is useful for assessing the convergence of the free energy
+profile.}
+
+
+\item
+\NAMDCONFWDEF{inFiles}{Input files for an ABF calculation}
+{\tcl\ list of \unix\ filenames}
+{empty list}
+{Input files containing the same data as in {\tt outFileName}, and
+ that may, therefore, be used to restart an ABF simulation. The
+ new free energies and forces will then be written out based on the
+ original information supplied by these files. This command may also
+ be used to combine data obtained from separate runs.}
+
+
+\item
+\NAMDCONFWDEF{outputFreq}{Frequency at which {\tt outFileName} is
+                          updated}
+{positive integer}
+{5000}
+{The free energy, $A(\xi)$, the average
+ force, $\left\langle F_\xi \right\rangle$, and the number
+ of samples accrued in the bin will be written to the ABF \
+ output file every \texttt{ABFoutFreq} timesteps.}
+
+
+\item
+\NAMDCONFWDEF{writeXiFreq}{Frequency at which the time series of $\xi$ is
+                           written}
+{positive integer}
+{0}
+{If this parameter is nonzero, the instantaneous value of the
+ reaction coordinate, $\xi$, is written in the \namd \ standard
+ output every \texttt{writeXiFreq} time steps.}
+
+
+\item
+\NAMDCONFWDEF{distFile}{Output file containing force distributions}
+{\unix \ filename}
+{\none}
+{Output file containing a distribution of the instantaneous
+ components of the force, $F_\xi$, for every bin comprised
+ between {\tt xiMin} and {\tt xiMax}. This is useful for
+ performing error analysis for the resulting free energy profile}
+
+
+\item
+\NAMDCONFWDEF{fMax}{Half--width of the force histograms}
+{positive decimal number, in kcal/mol/\AA}
+{60.0}
+{When force distributions are written in {\tt distFile},
+ the histogram collects $F_\xi$ values ranging
+ from $-${\tt fMax} to $+${\tt fMax}.}
+
+
+\item
+\NAMDCONFWDEF{moveBoundary}{Number of samples beyond which {\tt xiMin} and {\tt xiMax}
+                            are updated}
+{positive integer}
+{0}
+{Slow relaxation in the degrees of freedom orthogonal to the reaction
+ coordinate, $\xi$, results in a non--uniform sampling along the latter.
+ To force exploration of $\xi$ in quasi non--ergodic situations, the
+ boundaries of the reaction pathway may be modified dynamically when a
+ preset minimum number of samples is attained. As a result, the
+ interval between {\tt xiMin} and {\tt xiMax} is progressively narrowed
+ down as this threshold is being reached for all values of $\xi$.
+ It should be clearly understood that uniformity of the sampling
+ is artificial and is only used to force diffusion along $\xi$. Here,
+ uniform sampling does not guarantee the proper convergence of the
+ simulation. }
+
+
+\item
+\NAMDCONFWDEF{restraintList}{Apply external restraints}
+{list of formatted entries}
+{empty list}
+{For a detailed description of
+ this feature, see next subsection.}
+
+
+\item
+\NAMDCONFWDEF{applyBias}{Apply a biasing force in the simulation~?}
+{\yes \ or \no}
+{\yes}
+{By default, a biasing force is applied along the reaction coordinate,
+ $\xi$, in ABF calculations. It may be, however, desirable to set
+ this option to \no \ to monitor the evolution of the system along
+ $\xi$ and collect the forces and the free energy, yet,
+ without introducing any bias in the simulation.}
+
+
+\item
+\NAMDCONFWDEF{usMode}{Run umbrella sampling simulation~?}
+{\yes \ or \no}
+{\no}
+{When setting this option, an ``umbrella sampling''~\cite{torr_77_2}
+ calculation
+ is performed, supplying a probability distribution
+ for the reaction coordinate, $\xi$. As an initial
+ guess of the biases required to overcome the free energy
+ barriers, use can be made of a previous ABF simulation ---
+ \cf {\tt inFiles}. In addition, specific restraints may
+ be defined using the {\tt restraintList} feature described below.}
+
+\end{itemize}
+
+
+
+\subsubsection{Including restraints in ABF simulations}
+
+
+In close connection with the possibility to run umbrella sampling simulations, the
+ABF module of \namd \ also includes the capability to add sets of
+restraints to confine the system in selected regions of configurational
+space. Incorporation of harmonic restraints may be invoked using a syntax
+similar in spirit to that adopted in the conformational free energy
+module of \namd:
+
+
+\begin{verbatim}
+abf restraintList {
+   angle1  {angle {A 1 CA} {G 1 N3} {G 1 N1}          40.0 30.0}
+   dihe1   {dihe  {A 1 O1} {A 1 CA} {A 1 O2} {G 1 N3} 40.0  0.0}
+   dihe2   {dihe  {A 1 CA} {A 1 O2} {G 1 N2} {G 1 N3} 40.0  0.0}
+}
+\end{verbatim}
+
+
+The general syntax of an item of this list is:
+
+\begin{verbatim}
+name {type atom1 atom2 [atom3] [atom4] k reference}
+\end{verbatim}
+
+
+where {\tt name} could be any word used to refer to the restraint in the
+\namd \ output. {\tt type} is the type of restraint, \ie a distance,
+{\tt dist}, a valence angle, {\tt angle}, or a dihedral angle, {\tt dihe}.
+Definition of the successive atoms follows the syntax of \namd \
+conformation free energy calculations. {\tt k} is the force constant
+of the harmonic restraint, the unit of which depends on
+{\tt type}. {\tt reference} is the reference, target value of
+the restrained coordinate.
+
+
+Aside from {\tt dist}, {\tt angle} and {\tt dihe}, which correspond to
+harmonic restraints, linear ramps have been added for distances, using
+the specific keyword {\tt distLin}. In this particular case, generally
+useful in umbrella sampling free energy calculations, the syntax is:
+
+
+\begin{verbatim}
+name {distLin atom1 atom2 F r1 r2}
+\end{verbatim}
+
+
+where {\tt F} is the force in kcal/mol/\AA. The restraint is
+applied over the interval between {\tt r1} and {\tt r2}.
+
+The {\tt harm} restraint applies, onto one single atom, a harmonic potential
+of the form\\
+\begin{displaymath}
+V(x,y,z) = \frac{1}{2} k_x (x-x_0)^2
++ \frac{1}{2} k_y (y-y_0)^2 + \frac{1}{2} k_z (z-z_0)^2
+\end{displaymath}
+
+This way, atoms may be restrained to the vicinity of a plane, an axis, or
+a point, depending on the number of nonzero force constants. The syntax is:
+\begin{verbatim}
+name {harm atom {kx ky kz} {x0 y0 z0} }
+\end{verbatim}
+
+
+
+\subsubsection{Important recommendations when running ABF simulations}
+
+
+The formalism implemented in \namd \ had been originally devised in the
+framework of unconstrained MD. Holonomic constraints may, however,
+be introduced without interfering with the computation of the bias and, hence,
+the PMF, granted that some precautions are taken.
+
+
+Either of the following strategies may be adopted:
+\begin{enumerate}
+\renewcommand{\labelenumi}{(\arabic{enumi})}
+\item Atoms involved in the computation of $F_\xi$ do not participate in
+constrained degrees of freedom.
+If, for instance, chemical bonds between hydrogen and heavy
+atoms are frozen, $\xi$ could
+be chosen as a distance between atoms that are not involved
+in a constraint.
+
+
+In some cases, not all atoms used for defining $\xi$ are involved in
+the computation of the force component $F_\xi$. Specifically, reference
+atoms \texttt{abf1} in the RC\ types \texttt{zCoord} and \texttt{zCoord-1atom}
+are not taken into account in $F_\xi$. Therefore, constraints involving
+those atoms have no effect on the ABF protocol.
+
+
+\item The definition of $\xi$ involves atoms forming constrained bonds.
+In this case, the effect of constraints on ABF can be eliminated
+by using a group--based RC\ built on atom groups
+containing both ``ends'' of all rigid bonds involved, \ie hydrogens
+together with their mother atom.
+\end{enumerate}
+
+
+For example, if the distance from a methane molecule to the center
+of mass of a water lamella is studied with the \texttt{zCoord}
+RC\ by taking water oxygens as a reference (\texttt{abf1}) and
+all five atoms of methane as the group of interest (\texttt{abf2}):
+\begin{itemize}
+\item Water molecules may be constrained because the reference
+atoms are not used to compute the force component;
+\item C---H bonds in methane may be constrained as well, because
+the contributions of constraint forces on the carbon and hydrogens
+to $F_\xi$ will cancel out.
+\end{itemize}
+
+
+
+\subsubsection{Example of input file for computing potentials of mean force}
+
+
+In this example,
+the system consists of a short,
+ten-residue peptide, formed by {\sc l}-alanine amino acids.
+Reversible folding/unfolding of
+this peptide is carried out using as a reaction coordinate the carbon
+atom of the first and the last carbonyl groups --- $\xi$, hence,
+corresponds to a a simple interatomic distance, defined by the
+keyword {\tt distance}. The reaction pathway is explored between
+12 and 32~\AA, \ie, over a distance of 20~\AA, in a single window.
+The variations of the free energy derivative are soft enough to warrant
+the use of bins with a width of 0.2~\AA, in which forces are accrued.
+
+
+\begin{verbatim}
+source                ~/lib/abf/abf.tcl
+
+abf coordinate        distance
+
+abf abf1              4
+abf abf2              99
+
+abf dxi               0.2
+abf xiMin             12.0
+abf xiMax             32.0
+abf outFile           deca-alanine.dat
+abf fullSamples       500
+abf inFiles           {}
+abf distFile          deca-alanine.dist
+abf dSmooth           0.4
+\end{verbatim}
+
+
+Here, the ABF is applied after 500 samples have been
+collected, which, in vacuum, have proven to be sufficient
+to get a reasonable estimate of $\left\langle F_\xi \right\rangle$.
+

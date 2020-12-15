@@ -1,0 +1,39 @@
+# Schedule definitions for thorn CarpetMask
+
+SCHEDULE CarpetSurfaceParamCheck AT paramcheck
+{
+  LANG: C
+  OPTIONS: global
+} "Check parameters"
+
+# TODO: Schedule this only if there is an excluded centre which is active
+SCHEDULE GROUP MaskBase_SetupMask AT poststep AFTER SphericalSurface_HasBeenSet
+{
+} "Set up the weight function"
+
+# these two need to be global loop-local since SphericalSurface_Set and
+# AHFinder are global
+SCHEDULE CarpetExcludedSetup IN SetupIMask
+{
+  LANG: C
+  OPTIONS: global loop-local
+} "Set up the weight function for the excluded regions"
+
+SCHEDULE CarpetSurfaceSetup IN SetupIMask
+{
+  LANG: C
+  OPTIONS: global loop-local
+} "Set up the weight function for the excluded spherical surfaces"
+
+
+
+
+#SCHEDULE CarpetExcludedSetup IN SetupMask_LevelMode
+#{
+#  LANG: C
+#} "Set up the weight function for the excluded regions"
+#
+#SCHEDULE CarpetSurfaceSetup IN SetupMask_LevelMode
+#{
+#  LANG: C
+#} "Set up the weight function for the excluded spherical surfaces"

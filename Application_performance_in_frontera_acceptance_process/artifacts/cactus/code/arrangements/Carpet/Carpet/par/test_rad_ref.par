@@ -1,0 +1,54 @@
+!DESC "Octant evolution with radiation boundaries"
+
+# $Id: test_rad_ref.par,v 1.2 2002/10/24 21:11:53 schnetter Exp $
+#
+# /*@@
+#   @file      test_rad.par
+#   @date      Saturday 18th September
+#   @author    Gabrielle Allen
+#   @desc
+#   Wavetoy parameter file demonstrating radiation boundaries in Octant
+#   @enddesc
+# @@*/          
+
+ActiveThorns = "boundary iobasic idscalarwavec time wavetoyc carpet carpetlib carpetregrid carpetreduce cartgrid3d coordbase symbase ioutil carpetioascii"
+ 
+time::dtfac = 0.5
+
+idscalarwave::initial_data = "gaussian"
+idscalarwave::sigma = 2.8
+idscalarwave::radius = 5
+
+wavetoyc::bound = "radiation"
+
+grid::type = "BySpacing"
+grid::domain = "octant"
+grid::dxyz = 0.6
+grid::avoid_origin = "no"
+
+# this file produces wrong output because the coordinat thorn
+# produces wrong coordinate arrays.
+
+driver::global_nx = 15
+driver::global_ny = 15
+driver::global_nz = 15
+
+Carpet::max_refinement_levels = 2
+CarpetRegrid::refinement_levels = 2
+CarpetRegrid::refined_regions = manual-gridpoint-list
+CarpetRegrid::gridpoints = "[ [ ([2,2,2]:[15,15,15]:[1,1,1]) ] ]"
+CarpetRegrid::outerbounds = "[ [ [[1,0],[1,0],[1,0]] ] ]"
+
+cactus::cctk_itlast = 20
+
+IOBasic::outScalar_every = 1
+IOBasic::outScalar_vars = "wavetoy::phi"
+
+IOASCII::out1D_every = 1
+IOASCII::out1D_z = "no"
+IOASCII::out1D_y = "no"
+IOASCII::out1D_d = "no"
+IOASCII::out1D_vars = "wavetoy::phi "
+
+IO::out_dir       = "test_rad_ref"
+IO::out_fileinfo = "none"

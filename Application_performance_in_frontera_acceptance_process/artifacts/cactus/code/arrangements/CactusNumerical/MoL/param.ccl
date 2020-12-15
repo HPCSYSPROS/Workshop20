@@ -1,0 +1,223 @@
+# Parameter definitions for thorn MoL
+# $Header$
+
+restricted:
+
+CCTK_INT MoL_Num_Evolved_Vars "The maximum number of variables to be evolved by MoL (DPRECATED)" ACCUMULATOR = (x+y)
+{
+  0:*		:: "Anything non negative. Added to by other thorns."
+} 0
+
+CCTK_INT MoL_Num_Evolved_Vars_Slow "The maximum number of 'slow' variables to be evolved by MoL (DPRECATED)" ACCUMULATOR = (x+y)
+{
+  0:*		:: "Anything non negative. Added to by other thorns."
+} 0
+
+
+CCTK_INT MoL_Num_Constrained_Vars "The maximum number of constrained variables with timelevels that MoL needs to know about (DPRECATED)" ACCUMULATOR = (x+y)
+{
+  0:*		:: "Anything non negative. Added to by other thorns."
+} 0
+
+CCTK_INT MoL_Num_SaveAndRestore_Vars "The maximum number of variables to be evolved outside of MoL but that MoL needs to know about (DPRECATED)" ACCUMULATOR = (x+y)
+{
+  0:*		:: "Anything non negative. Added to by other thorns."
+} 0
+
+CCTK_INT MoL_Max_Evolved_Array_Size "The maximum total size of any grid arrays to be evolved" ACCUMULATOR = (x+y)
+{
+  0:*          :: "Anything non negative. Accumulated by other thorns"
+} 0
+
+CCTK_INT MoL_Num_ArrayEvolved_Vars "The maximum number of array variables to be evolved by MoL (DPRECATED)" ACCUMULATOR = (x+y)
+{
+  0:*		:: "Anything non negative. Added to by other thorns."
+} 0
+
+CCTK_INT MoL_Num_ArrayConstrained_Vars "The maximum number of array constrained variables with timelevels that MoL needs to know about (DPRECATED)" ACCUMULATOR = (x+y)
+{
+  0:*		:: "Anything non negative. Added to by other thorns."
+} 0
+
+CCTK_INT MoL_Num_ArraySaveAndRestore_Vars "The maximum number of array variables to be evolved outside of MoL but that MoL needs to know about (DPRECATED)" ACCUMULATOR = (x+y)
+{
+  0:*		:: "Anything non negative. Added to by other thorns."
+} 0
+
+CCTK_INT MoL_Num_Scratch_Levels "Number of scratch levels required by the ODE method"
+{
+  0:*		:: "Anything non negative"
+} 0
+
+private:
+
+KEYWORD ODE_Method "The ODE method use by MoL to do time integration"
+{
+  "Generic"	:: "Generic Shu-Osher Runge-Kutta type"
+  "ICN"		:: "Iterative Crank Nicholson"
+  "ICN-avg"	:: "Iterative Crank Nicholson with averaging"
+  "Euler"	:: "Euler"
+  "RK2"		:: "Efficient RK2"
+  "RK2-central"	:: "Central RK2"
+  "RK3"		:: "Efficient RK3"
+  "RK4"		:: "Efficient RK4"
+  "RK45"        :: "RK45 (Fehlberg) with error estimation"
+  "RK45CK"      :: "RK45CK (Cash-Karp) with error estimation"
+  "RK65"        :: "RK65 with error estimation"
+  "RK87"        :: "RK87 with error estimation"
+  "AB"          :: "Adams-Bashforth"
+  "RK2-MR-2:1"  :: "2nd order 2:1 multirate RK scheme based on RK2 due to Schlegel et al 2009. This requires init_RHS_zero='no'."
+  "RK4-MR-2:1"  :: "3rd order 2:1 multirate RK scheme based on RK43 due to Schlegel et al 2009. This requires init_RHS_zero='no'."
+  "RK4-RK2"     :: "RK4 as fast method and RK2 as slow method"
+} "ICN"
+
+KEYWORD Generic_Type "If using the generic method, which sort"
+{
+  "RK"		:: "One of the standard TVD Runge-Kutta methods"
+  "ICN"		:: "Iterative Crank Nicholson as a generic method"
+  "Table"       :: "Given from the generic method descriptor parameter"
+  "Classic RK3"	:: "Efficient RK3 - classical version"
+} "RK"
+
+CCTK_REAL ICN_avg_theta "theta of averaged ICN method, usually 0.5"
+{
+  0:1 :: "0 <= theta <= 1"
+} 0.5
+
+BOOLEAN ICN_avg_swapped "Use swapped averages in ICN method?"
+{
+} "no"
+
+KEYWORD AB_Type "If using the the AB method, which sort"
+{
+  "1" :: "same as forward Euler"
+  "2" :: "second order"
+  "3" :: "third order"
+  "4" :: "fourth order"
+  "5" :: "fifth order"
+} "1"
+
+BOOLEAN AB_initially_reduce_order "Reduce order of accuracy initially so that no past timelevels of initial data are required"
+{
+} "yes"
+
+CCTK_INT MoL_Intermediate_Steps "Number of intermediate steps taken by the ODE method"
+{
+  1:*		:: "Anything greater than 1"
+} 3
+
+BOOLEAN MoL_Memory_Always_On "Do we keep the scratch arrays allocated all the time?"
+{
+} "yes"
+
+CCTK_REAL MoL_Tiny "Effective local machine zero; required by generic solvers"
+{
+  0:*		:: "Defaults to 1.e-15"
+} 1.e-15
+
+BOOLEAN initial_data_is_crap "If the initial data routine fails to set up the previous time levels, copy the current backwards"
+{
+} "no"
+
+# If  initial_data_is_crap  is false, this parameter is ignored.
+# If  initial_data_is_crap  is true, this parameter controls *when*
+#   in CCTK_POSTINITIAL we copy the initial data to previous time levels,
+#   relative to our scheduling of MoL_PostStep.
+#   false ==> copy *before* MoL_PostStep  (default, matches old behavior)
+#   true  ==> copy *after*  MoL_PostStep  (may be preferable for new code)
+BOOLEAN copy_ID_after_MoL_PostStep \
+  "if  initial_data_is_crap  is true, *when* should we copy the		\
+   current time level to all previous time levels:			\
+   false ==> copy *before* MoL_PostStep  (default, matches old behavior)\
+   true  ==> copy *after*  MoL_PostStep  (maybe preferable for new code)"
+{
+} "no"
+
+BOOLEAN run_MoL_PostStep_in_Post_Recover_Variables "Schedule the PostStep parts after recovery so that symmetries are automatically done correctly." STEERABLE=recover
+{
+} "yes"
+
+
+BOOLEAN set_ID_boundaries "Should boundaries be overwritten (via synchronization, prolongation, boundary conditions) by MoL?"
+{
+} "yes"
+
+
+
+# The default for this parameter corresponds to generic RK2
+STRING Generic_Method_Descriptor "A string used to create a table containing the description of the generic method"
+{
+  ".*"          :: "Should contain the Alpha and Beta arrays, and the number of intermediate steps"
+} "GenericIntermediateSteps = 2 \
+   GenericAlphaCoeffs = { 1.0 0.0 0.5 0.5 } \
+   GenericBetaCoeffs = { 1.0 0.5 }"
+       
+BOOLEAN MoL_NaN_Check "Should the RHS GFs be checked for NaNs?"
+{
+} "no"
+
+BOOLEAN disable_prolongation "If Mesh refinement is enabled should we use buffer zones in intermediate steps?"
+{
+} "yes"
+
+
+
+BOOLEAN skip_initial_copy "Skip initial copy from previous to current time level" STEERABLE=recover
+{
+} "no"
+
+BOOLEAN init_RHS_zero "Initialise the RHS to zero" STEERABLE=recover
+{
+} "yes"
+
+
+
+BOOLEAN adaptive_stepsize "Choose the time step size adaptively"
+{
+} "no"
+
+REAL maximum_absolute_error "Maximum allowed absolute error for adaptive stepsize control"
+{
+  0.0:*) :: ""
+} 1.0e-6
+
+REAL maximum_relative_error "Maximum allowed relative error for adaptive stepsize control"
+{
+  0.0:*) :: ""
+} 1.0e-6
+
+REAL RHS_error_weight "Weight of the RHS in the relative error calculation"
+{
+  0.0:* :: "should be between zero and one"
+} 1.0
+
+REAL safety_factor "Safety factor for stepsize control"
+{
+  (0.0:*) :: "should be less than one"
+} 0.9
+
+REAL maximum_decrease "Maximum stepsize decrease factor"
+{
+  (1.0:*) :: "should be larger than one"
+} 10.0
+
+REAL maximum_increase "Maximum stepsize increase factor"
+{
+  (1.0:*) :: "should be larger than one"
+} 5.0
+
+
+
+KEYWORD verbose "How verbose should MoL be?"
+{
+  "none"     :: "No output at all (not implemented)"
+  "normal"   :: "Standard verbosity"
+  "register" :: "List the variables registered as well"
+  "extreme"  :: "Everything you never wanted to know"
+} "normal"
+
+
+
+shares: Cactus
+
+USES CCTK_REAL cctk_initial_time

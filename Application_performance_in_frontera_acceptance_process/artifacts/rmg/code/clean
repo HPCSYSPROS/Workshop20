@@ -1,0 +1,9 @@
+#!/bin/bash
+
+
+
+rm -rf eigen
+rm -rf openbabel
+rm -rf plplot
+rm -rf rmg
+rm -f buildme.log

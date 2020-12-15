@@ -1,0 +1,10 @@
+Cactus Code Thorn CarpetIOHDF5
+Author(s)    : Erik Schnetter <schnetter@cct.lsu.edu>
+Maintainer(s): Erik Schnetter <schnetter@cct.lsu.edu>
+Licence      : GPLv2+
+--------------------------------------------------------------------------
+
+1. Purpose
+
+This thorn provides HDF5 based file I/O for Carpet.  See
+http://www.hdfgroup.org/HDF5/ for information about HDF5.

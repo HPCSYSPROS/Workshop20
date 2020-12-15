@@ -1,0 +1,13 @@
+# -*-conf-*-
+
+# Defaults for all machines
+[default]
+user            = YOUR_LOGIN 
+email           = YOUR@EMAIL.ADDRESS
+thornlist       = YOUR_THORNLIST
+
+## Customize user names for each machine
+#[qb]
+#user            = YOUR_QUEENBEE_LOGIN
+#sourcebasedir   = /home/@USER@
+#allocation      = YOUR_ALLOCATION

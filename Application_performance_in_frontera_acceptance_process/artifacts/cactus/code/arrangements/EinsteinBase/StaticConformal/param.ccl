@@ -1,0 +1,21 @@
+# Parameter definitions for thorn StaticConformal
+# $Header$
+
+shares: ADMBase
+
+EXTENDS KEYWORD metric_type
+{
+  "static conformal" :: "Metric is conformal with static conformal factor, extrinsic curvature is physical"
+}
+
+restricted:
+
+KEYWORD conformal_storage "How much conformal storage do we have ?"
+{
+  "factor"                   :: "Just the conformal factor"
+  "factor+derivs"            :: "Conformal factor plus first derivatives"
+  "factor+derivs+2nd derivs" :: "Conformal factor plus first and second derivatives"
+} "factor+derivs+2nd derivs"
+
+private:
+

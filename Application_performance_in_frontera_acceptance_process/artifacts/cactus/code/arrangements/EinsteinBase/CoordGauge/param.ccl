@@ -1,0 +1,34 @@
+# Parameter definitions for thorn CoordGauge
+# $Header$
+
+shares: ADMBase
+
+EXTENDS KEYWORD lapse_evolution_method
+{
+  "coordgauge" :: "Use dynamic stuff from CoordGauge"
+}
+
+EXTENDS KEYWORD shift_evolution_method
+{
+  "coordgauge" :: "Use dynamic stuff from CoordGauge"
+}
+
+restricted:
+
+STRING lapse_list "List of allowed lapses to use"
+{
+  ".*" :: "Any string"
+} ""
+
+STRING shift_list "List of allowed shifts to use"
+{
+  ".*" :: "Any string"
+} ""
+
+private:
+
+KEYWORD slicing_verbose "Print information on current slicing"
+{
+  "yes" :: "print slicing info"
+  "no"  :: "do not print slicing info"
+} "no"

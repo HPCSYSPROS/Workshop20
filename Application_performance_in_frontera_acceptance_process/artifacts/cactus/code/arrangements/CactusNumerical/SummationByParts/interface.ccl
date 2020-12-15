@@ -1,0 +1,149 @@
+# Interface definition for thorn SummationByParts
+# $Header$
+
+implements: SummationByParts
+#inherits: grid
+
+SUBROUTINE Diff_gf ( CCTK_POINTER_TO_CONST IN cctkGH, \
+                     CCTK_INT IN dir, \
+                     CCTK_STRING IN var_name, \
+                     CCTK_STRING IN dvar_name )
+PROVIDES FUNCTION Diff_gf WITH DiffGf LANGUAGE C
+
+SUBROUTINE Diff_gv ( CCTK_POINTER_TO_CONST IN cctkGH, \
+                     CCTK_INT IN dir, \
+                     CCTK_REAL IN ARRAY var, \
+                     CCTK_REAL OUT ARRAY dvar, \
+                     CCTK_INT IN table_handle )
+PROVIDES FUNCTION Diff_gv WITH DiffGv LANGUAGE C
+
+SUBROUTINE Diff_up_gv ( CCTK_POINTER_TO_CONST IN cctkGH, \
+                     CCTK_INT IN dir, \
+                     CCTK_REAL IN ARRAY var, \
+                     CCTK_REAL OUT ARRAY dvar, \
+                     CCTK_REAL IN ARRAY up, \
+                     CCTK_INT IN table_handle )
+PROVIDES FUNCTION Diff_up_gv WITH DiffUpGv LANGUAGE C
+
+SUBROUTINE Diff2_gv ( CCTK_POINTER_TO_CONST IN cctkGH, \
+                     CCTK_INT IN dir1, \
+                     CCTK_INT IN dir2, \
+                     CCTK_REAL IN ARRAY var, \
+                     CCTK_REAL OUT ARRAY dvar, \
+                     CCTK_INT IN table_handle )
+PROVIDES FUNCTION Diff2_gv WITH DiffGv2 LANGUAGE C
+
+SUBROUTINE Diff_coeff ( CCTK_POINTER_TO_CONST IN cctkGH, \
+                        CCTK_INT IN dir, \
+                        CCTK_INT IN nsize, \
+                        CCTK_INT OUT ARRAY imin, \
+                        CCTK_INT OUT ARRAY imax, \
+                        CCTK_REAL OUT ARRAY q, \
+                        CCTK_INT IN table_handle )
+PROVIDES FUNCTION Diff_coeff WITH DiffCoeff LANGUAGE C
+
+SUBROUTINE Diff_up_coeff ( CCTK_POINTER_TO_CONST IN cctkGH, \
+                        CCTK_INT IN dir, \
+                        CCTK_INT IN nsize, \
+                        CCTK_INT OUT ARRAY imin, \
+                        CCTK_INT OUT ARRAY imax, \
+                        CCTK_REAL OUT ARRAY q, \
+                        CCTK_INT IN up, \
+                        CCTK_INT IN table_handle )
+PROVIDES FUNCTION Diff_up_coeff WITH DiffUpCoeff LANGUAGE C
+
+SUBROUTINE Diff2_coeff ( CCTK_POINTER_TO_CONST IN cctkGH, \
+                         CCTK_INT IN dir, \
+                         CCTK_INT IN nsize, \
+                         CCTK_INT OUT ARRAY imin, \
+                         CCTK_INT OUT ARRAY imax, \
+                         CCTK_REAL OUT ARRAY q, \
+                         CCTK_INT IN table_handle )
+PROVIDES FUNCTION Diff2_coeff WITH DiffCoeff2 LANGUAGE C
+
+#Routine to return the coefficients for the diagonal norms.
+SUBROUTINE GetScalProdDiag ( CCTK_POINTER_TO_CONST IN cctkGH, \
+                             CCTK_INT IN dir, \
+                             CCTK_INT IN nsize, \
+                             CCTK_REAL OUT ARRAY sigmad )
+PROVIDES FUNCTION GetScalProdDiag WITH SBP_GetScalProdDiag LANGUAGE Fortran
+
+CCTK_REAL FUNCTION GetScalProdCoeff ()
+PROVIDES FUNCTION GetScalProdCoeff WITH GetCoeff LANGUAGE Fortran
+
+SUBROUTINE GetLshIndexRanges ( \
+                CCTK_POINTER_TO_CONST IN cctkGH, \
+                CCTK_INT OUT ARRAY imin, \
+                CCTK_INT OUT ARRAY imax )
+PROVIDES FUNCTION GetLshIndexRanges WITH get_lsh_iranges LANGUAGE C
+ 
+SUBROUTINE GetBoundWidth (\
+                CCTK_POINTER_TO_CONST IN cctkGH, \
+                CCTK_INT OUT ARRAY bsize, \
+                CCTK_INT IN table_handle )
+PROVIDES FUNCTION GetBoundWidth WITH Get_Bound_Width LANGUAGE C
+
+CCTK_INT FUNCTION GetDomainSpecification \
+  (CCTK_INT IN size, \
+   CCTK_REAL OUT ARRAY physical_min, \
+   CCTK_REAL OUT ARRAY physical_max, \
+   CCTK_REAL OUT ARRAY interior_min, \
+   CCTK_REAL OUT ARRAY interior_max, \
+   CCTK_REAL OUT ARRAY exterior_min, \
+   CCTK_REAL OUT ARRAY exterior_max, \
+   CCTK_REAL OUT ARRAY spacing)
+USES FUNCTION GetDomainSpecification
+
+CCTK_INT FUNCTION                           \
+    GetBoundarySpecification     \
+        (CCTK_INT IN size,                  \
+         CCTK_INT OUT ARRAY nboundaryzones, \
+         CCTK_INT OUT ARRAY is_internal,    \
+         CCTK_INT OUT ARRAY is_staggered,   \
+         CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION GetBoundarySpecification
+
+CCTK_INT FUNCTION                           \
+    MultiPatch_GetBoundarySpecification     \
+        (CCTK_INT IN map,                   \
+         CCTK_INT IN size,                  \
+         CCTK_INT OUT ARRAY nboundaryzones, \
+         CCTK_INT OUT ARRAY is_internal,    \
+         CCTK_INT OUT ARRAY is_staggered,   \
+         CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION MultiPatch_GetBoundarySpecification 
+
+CCTK_INT FUNCTION \
+    SymmetryTableHandleForGrid (CCTK_POINTER_TO_CONST IN cctkGH)
+REQUIRES FUNCTION SymmetryTableHandleForGrid
+
+CCTK_INT FUNCTION MultiPatch_GetMap (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION MultiPatch_GetMap
+
+CCTK_INT FUNCTION MultiPatch_GetMaps (CCTK_POINTER_TO_CONST IN cctkGH)
+USES FUNCTION MultiPatch_GetMaps
+
+CCTK_INT FUNCTION                         \
+    MultiPatch_GetBbox                    \
+        (CCTK_POINTER_TO_CONST IN cctkGH, \
+         CCTK_INT IN size,                \
+         CCTK_INT OUT ARRAY bbox)
+USES FUNCTION MultiPatch_GetBbox
+
+CCTK_INT FUNCTION SymmetryHandleOfName (CCTK_STRING IN sym_name)
+REQUIRES FUNCTION SymmetryHandleOfName
+
+CCTK_INT FUNCTION MoLQueryEvolvedRHS (CCTK_INT IN EvolvedIndex)
+USES FUNCTION MoLQueryEvolvedRHS
+
+public:
+
+CCTK_REAL normmask TYPE=gf TAGS='tensortypealias="scalar" Prolongation="None" checkpoint="no"'
+{
+  nmask
+} "Mask for the norm calculation"
+
+CCTK_REAL deltas TYPE=gf TIMELEVELS=1 TAGS='tensortypealias="U" Prolongation="None"'
+{
+  sbp_dx, sbp_dy, sbp_dz
+} "Dissipation deltas"

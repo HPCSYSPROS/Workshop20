@@ -1,0 +1,15 @@
+Cactus Code Thorn MoL
+Author(s)    : Ian Hawke
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+This thorn provides generic time integrators.
+This allows clean coupling when multiple thorns wish to integrate at the
+same time.
+It also means a physics thorn doesn't have to rewrite its own time
+integrator.
+This version is designed to work with Mesh Refinement codes as well as
+unigrid.

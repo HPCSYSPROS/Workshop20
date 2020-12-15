@@ -1,0 +1,12 @@
+#!/bin/sh
+# /*@@
+#   @file    aix5.2.0.0
+#   @date    29 Dec 2003
+#   @author  Thomas Radke
+#   @desc
+#            Known-architecture file for AIX 5.2.0.0
+#   @enddesc
+#   @version $Header$
+# @@*/
+
+. $srcdir/known-architectures/aix

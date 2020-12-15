@@ -1,0 +1,10 @@
+# Lines starting with '#' are considered comments.
+
+m/ML_*
+m/CL_*
+m/*.err
+m/*.out
+
+*.[oa]
+*~
+.#*

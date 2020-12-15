@@ -1,0 +1,14 @@
+# Main make.code.deps file for thorn HDF5
+
+export ZLIB_DIR ZLIB_INC_DIRS ZLIB_LIB_DIRS ZLIB_LIBS
+
+export HDF5_ENABLE_CXX HDF5_ENABLE_FORTRAN
+export LIBSZ_DIR LIBZ_DIR
+export HDF5_INSTALL_DIR
+
+$(CCTK_TARGET) $(OBJS) $(SRCS:%=%.d): $(SCRATCH_BUILD)/done/$(THORN)
+
+ifneq ($(HDF5_BUILD),)
+$(SCRATCH_BUILD)/done/$(THORN): $(SRCDIR)/build.sh
+	+$(SRCDIR)/build.sh
+endif

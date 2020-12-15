@@ -1,0 +1,58 @@
+# Parameter definitions for thorn PAPI
+
+BOOLEAN verbose "Output debug messages?" STEERABLE=always
+{
+} "no"
+
+BOOLEAN per_thread_statistics "Collect statistics per thread (instead of per process)" STEERABLE=recover
+{
+} "yes"
+
+BOOLEAN define_statistics_clocks "Define multiple clocks for each PAPI counter, providing min/max/avg/sdv" STEERABLE=recover
+{
+} "no"
+
+BOOLEAN use_multiplexing "Use multiplexing to gather more, but less accurate information" STEERABLE=recover
+{
+} "yes"
+
+INT out_every "Output statistics every so many iterations" STEERABLE=always
+{
+  0   :: "after initial data and shutdown"
+  1:* :: "every so many iterations"
+  -1  :: "no statistics output"
+} 0
+
+
+
+STRING events_flops "PAPI events for flop/sec" STEERABLE=recover
+{
+  "" :: ""
+} "PAPI_FP_OPS PAPI_DP_OPS PAPI_VEC_DP PAPI_TOT_CYC PAPI_REF_CYC SIMD_FP_256:PACKED_DOUBLE"
+
+STRING events_ipc "PAPI events for instructions/cycle" STEERABLE=recover
+{
+  "" :: ""
+} "PAPI_TOT_CYC PAPI_TOT_INS PAPI_FP_INS PAPI_INT_INS"
+
+STRING events_icache "PAPI events for instruction cache usage" STEERABLE=recover
+{
+  "" :: ""
+} "PAPI_L1_ICA PAPI_L1_ICM PAPI_L2_ICA PAPI_L2_ICM PAPI_L3_ICA PAPI_L3_ICM"
+
+STRING events_dcache "PAPI events for data cache usage" STEERABLE=recover
+{
+  "" :: ""
+} "PAPI_L1_DCA PAPI_L1_DCM PAPI_L2_DCA PAPI_L2_DCM PAPI_L3_DCA PAPI_L3_DCM"
+
+STRING events_memory "PAPI evens for memory accesses" STEERABLE=recover
+{
+  "" :: ""
+} "PAPI_LD_INS PAPI_SR_INS PAPI_MEM_RCY PAPI_MEM_WCY"
+
+
+
+INT dgemm_N "Matrix size; mem = 32 N^2 bytes, cpu = 2 N^3 flop"
+{
+  1:* :: "N=2000 requires 128 Mbyte and 16 Gflop; N=5000 requires 800 Mbyte and 250 Gflop"
+} 1000

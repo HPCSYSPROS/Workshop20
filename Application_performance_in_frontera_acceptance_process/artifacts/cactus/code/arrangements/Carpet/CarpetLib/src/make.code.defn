@@ -1,0 +1,65 @@
+# Main make.code.defn file for thorn CarpetLib   -*-Makefile-*-
+
+# Source files in this directory
+SRCS =	backtrace.cc				\
+	balance.cc				\
+	bbox.cc					\
+	bboxset.cc				\
+	bboxset1.cc				\
+	bboxset2.cc				\
+	bintree.cc				\
+	cacheinfo.cc				\
+	commstate.cc				\
+	data.cc					\
+	defs.cc					\
+	dh.cc					\
+	dist.cc					\
+	fulltree.cc				\
+	gdata.cc				\
+	gf.cc					\
+	ggf.cc					\
+	gh.cc					\
+	limits.cc				\
+	mem.cc					\
+	memstat.cc				\
+	mpi_string.cc				\
+	region.cc				\
+	startup_time.cc				\
+	th.cc					\
+	timestat.cc				\
+	vect.cc					\
+	copy_3d.cc				\
+	copy_4d.cc				\
+	interpolate_3d_2tl.cc			\
+	interpolate_3d_3tl.cc			\
+	interpolate_3d_4tl.cc			\
+	interpolate_3d_5tl.cc			\
+	interpolate_eno_3d_3tl.cc		\
+	restrict_3d_cc_rf2.cc			\
+	restrict_3d_cc_o3_rf2.cc		\
+	restrict_3d_cc_o5_rf2.cc		\
+	restrict_3d_rf2.cc			\
+	restrict_3d_stagger011.cc		\
+	restrict_3d_stagger101.cc		\
+	restrict_3d_stagger110.cc		\
+	restrict_3d_stagger111.cc		\
+	restrict_3d_vc_rf2.cc			\
+	restrict_3d_dgfe_rf2.cc			\
+	restrict_4d_rf2.cc			\
+	prolongate_3d_stagger011.cc		\
+	prolongate_3d_stagger101.cc		\
+	prolongate_3d_stagger110.cc		\
+	prolongate_3d_stagger111.cc		\
+	prolongate_3d_rf2.cc			\
+	prolongate_3d_cc_rf2.cc			\
+	prolongate_3d_cc_eno_rf2.cc		\
+	prolongate_3d_o5_monotone_rf2.cc	\
+	prolongate_3d_real8_eno.F90		\
+	prolongate_3d_real8_tvd.F90		\
+	prolongate_3d_cc_real8_tvd.F90		\
+	prolongate_3d_real8_weno.F90		\
+	prolongate_3d_dgfe_rf2.cc		\
+	prolongate_4d_o1_rf2.cc
+
+# Subdirectories containing source files
+SUBDIRS = 

@@ -1,0 +1,67 @@
+#!/usr/bin/bash
+
+#SBATCH -J run-JK_ompi       # Job Name
+#SBATCH -o run-JK_ompi.o%j    # Name of the output and error file (%j expands to jobID)
+#SBATCH -N 1408        # Total number of Nodes
+#SBATCH -n 33792          # Total number of mpi tasks requested
+#SBATCH -p test2
+#SBATCH -t 08:00:00     # Run time (hh:mm:ss) - 2.5 hours
+#SBATCH -d singleton
+#SBATCH -A A-ccsc
+
+here="/scratch/projects/tacc/spp/cazes/ppm/PPM2F_5120_33792_tasks_4threads_ompi"
+data=DATA5120
+rm -rf $here/$data
+mkdir -p $here/$data
+#cd $here/$data
+
+export MPICH_RANK_REORDER_METHOD=3
+$here/generate-MPICH_RANK_ORDER  33792 64
+
+touch $here/PPM4Fperf.ppm
+
+export MV2_SHOW_CPU_BINDING=1
+
+ulimit -s unlimited
+export OMP_STACKSIZE=500M
+
+# The number of threads is set in the code with a num_threads clause. Note that the code has a single (large) parallel region
+export OMP_NUM_THREADS=4
+export OMP_PLACES=cores
+export OMP_PROC_BIND=spread
+
+# Load the right MPI module :: mvapich2, currently private module from Jerry
+#module use -a /work/01538/viennej/stampede2/Apps/modulefiles
+#module load mvapich2
+#Nope try i mpi
+#module swap mvapich2 impi
+#Should be openmpi
+module list
+
+source ./setup_frontier_run.sh
+# Special path to ibrun and tacc_affinity
+export ANTIAFFINITY=0
+echo -----------------------------
+echo This will be used:
+wtac=`which tacc_affinity`
+echo "tacc_affinity   :: $wtac "
+#cp /scratch/hpc_tools/spp_ibrun/tacc_affinity tacc_affinity
+echo ibrun           :: ./ibrun
+#cp /scratch/hpc_tools/spp_ibrun ibrun
+wins=`which instrumented_run.sh `
+echo "instrumentation :: $wins "
+echo ANTIAFFINITY= $ANTIAFFINITY
+echo OMP_NUM_THREADS= $OMP_NUM_THREADS
+echo -----------------------------
+
+
+##################################################
+####  Flat Quadrant with Numa node 0  ############
+##################################################
+name=DATA5120.1408_perf_Cazes-compiled_th4_01_ompi
+echo name= $name
+
+date
+/usr/bin/time -p ./ibrun tacc_affinity ./ppm2f_5120_33792_tasks_4threads_ompi
+date
+

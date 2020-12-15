@@ -1,0 +1,36 @@
+# Schedule definitions for thorn TerminationTrigger
+
+STORAGE: watchminutes
+
+
+
+SCHEDULE TerminationTrigger_StartTimer AT wragh
+{
+  LANG: C
+} "Start timer"
+
+SCHEDULE TerminationTrigger_ResetMinutes AT post_recover_variables
+{
+  LANG: C
+  OPTIONS: global
+} "Reset Watchtime"
+
+SCHEDULE TerminationTrigger_CheckWalltime AT analysis
+{
+  LANG: C
+} "Check elapsed job walltime"
+
+
+
+if (create_termination_file)
+{
+  SCHEDULE TerminationTrigger_CreateFile AT wragh
+  {
+    LANG: C
+  } "Create termination file"
+}
+
+SCHEDULE TerminationTrigger_CheckFile AT analysis
+{
+  LANG: C
+} "Check termination file"

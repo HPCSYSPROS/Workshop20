@@ -1,0 +1,64 @@
+# Interface definition for thorn TmunuBase
+
+IMPLEMENTS: TmunuBase
+
+INHERITS: ADMBase StaticConformal
+
+FRIEND: ADMCoupling
+
+INCLUDES SOURCE: TmunuBase_CalcTmunu.inc IN CalcTmunu.inc
+
+
+
+# These are our grid functions.
+# They contain T_munu, the complete stress energy tensor.
+
+PUBLIC:
+
+INT stress_energy_state TYPE=scalar "State of storage for stress-energy tensor"
+
+REAL stress_energy_scalar TYPE=gf TIMELEVELS=3 TAGS='tensortypealias="Scalar" ProlongationParameter="TmunuBase::prolongation_type"'
+{
+  eTtt
+} "Stress-energy tensor, 3-scalar part T_00"
+
+REAL stress_energy_vector TYPE=gf TIMELEVELS=3 TAGS='tensortypealias="D" ProlongationParameter="TmunuBase::prolongation_type"'
+{
+  eTtx eTty eTtz
+} "Stress-energy tensor, 3-vector part T_0i"
+
+REAL stress_energy_tensor TYPE=gf TIMELEVELS=3 TAGS='tensortypealias="DD_sym" ProlongationParameter="TmunuBase::prolongation_type"'
+{
+  eTxx eTxy eTxz eTyy eTyz eTzz  
+} "Stress-energy tensor, 3-tensor part T_ij"
+
+
+
+# These are (almost) copies our grid functions.
+# They contain T_munu, the stress energy tensor, excluding the contributions
+# that other thorns add via the CalcTmunu.inc mechanism.
+# That is, this copy includes only the contributions from the AddToTmunu
+# mechanism.
+
+# This copy is protected, so that it is pushed into ADMCoupling's list of
+# grid functions, so that other thorns can access it implicitly via the
+# CalcTmunu.inc mechanism.
+
+PROTECTED:
+
+INT stress_energy_2_state TYPE=scalar "State of storage for stress-energy tensor"
+
+REAL stress_energy_2_scalar TYPE=gf TAGS='tensortypealias="Scalar" checkpoint="no" prolongation="none"'
+{
+  eT2tt
+} "Stress-energy tensor, 3-scalar part T_00"
+
+REAL stress_energy_2_vector TYPE=gf TAGS='tensortypealias="D" checkpoint="no" prolongation="none"'
+{
+  eT2tx eT2ty eT2tz
+} "Stress-energy tensor, 3-vector part T_0i"
+
+REAL stress_energy_2_tensor TYPE=gf TAGS='tensortypealias="DD_sym" checkpoint="no" prolongation="none"'
+{
+  eT2xx eT2xy eT2xz eT2yy eT2yz eT2zz  
+} "Stress-energy tensor, 3-tensor part T_ij"

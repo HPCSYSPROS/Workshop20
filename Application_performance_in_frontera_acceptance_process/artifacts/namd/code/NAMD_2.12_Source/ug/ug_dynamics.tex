@@ -1,0 +1,903 @@
+\section{Standard Minimization and Dynamics Parameters}
+\label{section:dynamics}
+
+
+\subsection{Boundary Conditions}
+
+In addition to periodic boundary conditions, NAMD provides spherical and
+cylindrical boundary potentials to contain atoms in a given volume.
+To apply more general boundary potentials written in Tcl, use
+{\tt tclBC} as described in Sec.~\ref{section:tclBC}.
+
+\subsubsection{Periodic boundary conditions}
+
+\NAMD\ provides periodic boundary conditions in 1, 2 or 3 dimensions.
+The following parameters are used to define these boundary conditions.  
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{cellBasisVector1}{basis vector for periodic boundaries (\AA)}{vector}{0 0 0}
+{Specifies a basis vector for periodic boundary conditions.}
+
+\item
+\NAMDCONFWDEF{cellBasisVector2}{basis vector for periodic boundaries (\AA)}{vector}{0 0 0}
+{Specifies a basis vector for periodic boundary conditions.}
+
+\item
+\NAMDCONFWDEF{cellBasisVector3}{basis vector for periodic boundaries (\AA)}{vector}{0 0 0}
+{Specifies a basis vector for periodic boundary conditions.}
+
+\item
+\NAMDCONFWDEF{cellOrigin}{center of periodic cell (\AA)}{position}{0 0 0}
+{When position rescaling is used to control pressure, this location will remain constant.  Also used as the center of the cell for wrapped output coordinates.}
+
+\item
+\NAMDCONF{extendedSystem}{XSC file to read cell parameters from}{file name}
+{In addition to .coor and .vel output files, \NAMD\ generates a .xsc (eXtended System Configuration) file which contains the periodic cell parameters and extended system variables, such as the strain rate in constant pressure simulations.  Periodic cell parameters will be read from this file if this option is present, ignoring the above parameters.}
+
+\item
+\NAMDCONFWDEF{XSTfile}{XST file to write cell trajectory to}{file name}{{\it outputname}{\tt.xst}}
+{\NAMD\ can also generate a .xst (eXtended System Trajectory) file which contains a record of the periodic cell parameters and extended system variables during the simulation.  If {\tt XSTfile} is defined, then {\tt XSTfreq} must also be defined.}
+
+\item
+\NAMDCONF{XSTfreq}{how often to append state to XST file}{positive integer}
+{Like the {\tt DCDfreq} option, controls how often the extended system configuration will be appended to the XST file.}
+
+\item
+\NAMDCONFWDEF{wrapWater}{wrap water coordinates around periodic boundaries?}{on or off}{off}
+{Coordinates are normally output relative to the way they were read in.  Hence, if part of a molecule crosses a periodic boundary it is not translated to the other side of the cell on output.  This option alters this behavior for water molecules only.}
+
+\item
+\NAMDCONFWDEF{wrapAll}{wrap all coordinates around periodic boundaries?}{on or off}{off}
+{Coordinates are normally output relative to the way they were read in.  Hence, if part of a molecule crosses a periodic boundary it is not translated to the other side of the cell on output.  This option alters this behavior for all contiguous clusters of bonded atoms.}
+
+\item
+\NAMDCONFWDEF{wrapNearest}{use nearest image to cell origin when wrapping coordinates?}{on or off}{off}
+{Coordinates are normally wrapped to the diagonal unit cell centered on the origin.  This option, combined with {\tt wrapWater} or {\tt wrapAll}, wraps coordinates to the nearest image to the origin, providing hexagonal or other cell shapes.}
+
+\end{itemize}
+
+
+\subsubsection{Spherical harmonic boundary conditions}
+
+\NAMD\ provides spherical harmonic boundary conditions.  These 
+boundary conditions can consist of a single potential or a 
+combination of two potentials.
+The following parameters are used to define these boundary conditions.  
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{sphericalBC}{use spherical boundary conditions?}{{\tt on} or {\tt off}}{{\tt off}}
+{Specifies whether or not spherical boundary conditions 
+are to be applied to the system.  If 
+set to {\tt on}, then {\tt sphericalBCCenter}, {\tt sphericalBCr1} and {\tt sphericalBCk1} 
+must be defined, and {\tt sphericalBCexp1}, {\tt sphericalBCr2}, 
+{\tt sphericalBCk2}, and {\tt sphericalBCexp2} can optionally be 
+defined.}
+
+\item
+\NAMDCONF{sphericalBCCenter}{center of sphere (\AA)}{position}
+{Location around which sphere is centered.}
+
+\item
+\NAMDCONF{sphericalBCr1}{radius for first boundary condition (\AA)}{positive decimal}
+{Distance at which the first potential of the boundary conditions takes
+effect.  This distance is a radius from the center.}
+
+\item
+\NAMDCONF{sphericalBCk1}{force constant for first potential}{non-zero decimal}
+{Force constant for the first harmonic potential.  A positive
+value will push atoms toward the center, and a negative
+value will pull atoms away from the center.}
+
+\item
+\NAMDCONFWDEF{sphericalBCexp1}{exponent for first potential}{positive, even integer}{2}
+{Exponent for first boundary potential.  The only likely values to
+use are 2 and 4.}
+
+\item
+\NAMDCONF{sphericalBCr2}{radius for second boundary condition (\AA)}{positive decimal}
+{Distance at which the second potential of the boundary conditions takes
+effect.  This distance is a radius from the center.
+If this parameter is defined, then {\tt spericalBCk2} must also
+be defined.}
+
+\item
+\NAMDCONF{sphericalBCk2}{force constant for second potential}{non-zero decimal}
+{Force constant for the second harmonic potential.  A positive
+value will push atoms toward the center, and a negative
+value will pull atoms away from the center.}
+
+\item
+\NAMDCONFWDEF{sphericalBCexp2}{exponent for second potential}{positive, even integer}{2}
+{Exponent for second boundary potential.  The only likely values to
+use are 2 and 4.}
+
+\end{itemize}
+
+\subsubsection{Cylindrical harmonic boundary conditions}
+
+\NAMD\ provides cylindrical harmonic boundary conditions.  These 
+boundary conditions can consist of a single potential or a 
+combination of two potentials.
+The following parameters are used to define these boundary conditions.  
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{cylindricalBC}{use cylindrical boundary conditions?}{{\tt on} or {\tt off}}{{\tt off}}
+{Specifies whether or not cylindrical boundary conditions 
+are to be applied to the system.  If 
+set to {\tt on}, then {\tt cylindricalBCCenter}, {\tt cylindricalBCr1}, {\tt cylindricalBCl1} and {\tt cylindricalBCk1} 
+must be defined, and {\tt cylindricalBCAxis}, {\tt cylindricalBCexp1}, {\tt cylindricalBCr2}, {\tt cylindricalBCl2},
+{\tt cylindricalBCk2}, and {\tt cylindricalBCexp2} can optionally be 
+defined.}
+
+\item
+\NAMDCONF{cylindricalBCCenter}{center of  cylinder (\AA)}{position}
+{Location around which cylinder is centered.}
+
+\item
+\NAMDCONF{cylindricalBCAxis}{axis of  cylinder (\AA)}{{\tt x}, {\tt y}, or {\tt z}}
+{Axis along which cylinder is aligned.}
+
+\item
+\NAMDCONF{cylindricalBCr1}{radius for first boundary condition (\AA)}{positive decimal}
+{Distance at which the first potential of the boundary conditions takes
+effect along the non-axis plane of the cylinder.}
+
+\item
+\NAMDCONF{cylindricalBCl1}{distance along cylinder axis for first boundary condition (\AA)}{positive decimal}
+{Distance at which the first potential of the boundary conditions takes
+effect along the cylinder axis.}
+
+\item
+\NAMDCONF{cylindricalBCk1}{force constant for first potential}{non-zero decimal}
+{Force constant for the first harmonic potential.  A positive
+value will push atoms toward the center, and a negative
+value will pull atoms away from the center.}
+
+\item
+\NAMDCONFWDEF{cylindricalBCexp1}{exponent for first potential}{positive, even integer}{2}
+{Exponent for first boundary potential.  The only likely values to
+use are 2 and 4.}
+
+\item
+\NAMDCONF{cylindricalBCr2}{radius for second boundary condition (\AA)}{positive decimal}
+{Distance at which the second potential of the boundary conditions takes
+effect along the non-axis plane of the cylinder.
+If this parameter is defined, then {\tt cylindricalBCl2} and {\tt spericalBCk2} must also
+be defined.}
+
+\item
+\NAMDCONF{cylindricalBCl2}{radius for second boundary condition (\AA)}{positive decimal}
+{Distance at which the second potential of the boundary conditions takes
+effect along the cylinder axis.
+If this parameter is defined, then {\tt cylindricalBCr2} and {\tt spericalBCk2} must also
+be defined.}
+
+\item
+\NAMDCONF{cylindricalBCk2}{force constant for second potential}{non-zero decimal}
+{Force constant for the second harmonic potential.  A positive
+value will push atoms toward the center, and a negative
+value will pull atoms away from the center.}
+
+\item
+\NAMDCONFWDEF{cylindricalBCexp2}{exponent for second potential}{positive, even integer}{2}
+{Exponent for second boundary potential.  The only likely values to
+use are 2 and 4.}
+
+\end{itemize}
+
+
+\subsection{Energy Minimization}
+
+\subsubsection{Conjugate gradient parameters}
+
+The default minimizer uses a sophisticated conjugate gradient and
+line search algorithm with much better performance than the older
+velocity quenching method.
+The method of conjugate gradients is used to select successive search
+directions (starting with the initial gradient) which eliminate
+repeated minimization along the same directions.
+Along each direction, a minimum is first bracketed (rigorously bounded)
+and then converged upon by either a golden section search, or, when
+possible, a quadratically convergent method using gradient information.
+
+For most systems, it just works.
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{minimization}{Perform conjugate gradient energy minimization?}{{\tt on} or {\tt off}}{{\tt off}}
+{Turns efficient energy minimization {\tt on} or {\tt off}.}
+
+\item
+\NAMDCONFWDEF{minTinyStep}{first initial step for line minimizer}{positive decimal}{1.0e-6}
+{If your minimization is immediately unstable, make this smaller.}
+
+\item
+\NAMDCONFWDEF{minBabyStep}{max initial step for line minimizer}{positive decimal}{1.0e-2}
+{If your minimization becomes unstable later, make this smaller.}
+
+\item
+\NAMDCONFWDEF{minLineGoal}{gradient reduction factor for line minimizer}{positive decimal}{1.0e-4}
+{Varying this might improve conjugate gradient performance.}
+
+\end{itemize}
+
+\subsubsection{Velocity quenching parameters}
+
+You can perform energy minimization using a simple quenching
+scheme.   While this algorithm is not the most rapidly convergent, it
+is sufficient for most applications.  There are only two parameters
+for minimization:  one to activate minimization and another
+to specify the maximum movement of any atom.  
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{velocityQuenching}{Perform old-style energy minimization?}{{\tt on} or {\tt off}}{{\tt off}}
+{Turns slow energy minimization {\tt on} or {\tt off}.}
+
+\item
+\NAMDCONFWDEF{maximumMove}{maximum distance an atom can move during each step (\AA)}
+{positive decimal}
+{$0.75\times\mbox{{\tt cutoff}}/\mbox{{\tt stepsPerCycle}}$}
+{Maximum distance that an atom can move during any single timestep of
+minimization.  This is to insure that atoms do not go flying off into
+space during the first few timesteps when the largest energy conflicts
+are resolved.}
+
+\end{itemize}
+
+
+\subsection{Dynamics}
+\label{section:config_basic}
+
+\subsubsection{Timestep parameters}
+
+\begin{itemize}
+\item
+\NAMDCONF{numsteps}{number of timesteps}{positive integer}
+{\label{param:numsteps}
+%% This parameter is {\it required\/} for every simulation.
+The number of simulation timesteps to be performed.  
+An integer greater than 0 is acceptable.  
+The total amount of simulation 
+time is $\mbox{{\tt numsteps}} \times \mbox{{\tt timestep}}$.}
+
+\item
+\NAMDCONFWDEF{timestep}{timestep size (fs)}{non-negative decimal}{1.0}
+{The timestep size to use when integrating each step of the simulation.  
+The value is specified in femtoseconds.}
+
+\item
+\NAMDCONFWDEF{firsttimestep}{starting timestep value}{non-negative integer}{0}
+{The number of the first timestep.  This value is typically used only 
+when a simulation is a continuation of a previous simulation.  In this 
+case, rather than having the timestep restart at 0, a specific timestep 
+number can be specified.}
+
+\end{itemize}
+
+
+\subsubsection{Initialization}
+
+\begin{itemize}
+\item
+\NAMDCONF{temperature}{initial temperature (K)}{positive decimal}
+{\label{param:temperature}
+Initial temperature value for the system.  
+Using this option will generate a random
+velocity distribution for the initial velocities 
+for all the atoms such that the system 
+is at the desired temperature.  
+Either the {\tt temperature} 
+or the {\tt velocities}/{\tt binvelocities}
+option must be defined to determine an initial set of velocities.  
+Both options cannot be used together.}
+
+\item
+\NAMDCONFWDEF{COMmotion}{allow initial center of mass motion?}
+{{\tt yes} or {\tt no}}{{\tt no}}
+{
+Specifies whether or not motion of 
+the center of mass of the entire system is allowed.  
+If this option is set to {\tt no}, the initial velocities of the system 
+will be adjusted to remove center of mass motion of the system.
+Note that this does not preclude later center-of-mass motion due to 
+external forces such as random noise in Langevin dynamics, boundary
+potentials, and harmonic restraints.}
+
+\item
+\NAMDCONFWDEF{seed}{random number seed}{positive integer}
+{pseudo-random value based on current UNIX clock time}
+{Number used to seed the random number generator 
+if {\tt temperature} or {\tt langevin} is selected.  This can be
+used so that consecutive simulations produce the same results.
+If no value is specified, \NAMD\ will choose a pseudo-random
+value based on the current UNIX clock time.  The random number
+seed will be output during the simulation startup so that
+its value is known and can be reused for subsequent simulations.
+Note that if Langevin dynamics are used in a parallel simulation 
+(i.e., a simulation using more than one processor) 
+even using the same seed will {\it not} guarantee reproducible results.
+}
+
+\end{itemize}
+
+
+\subsubsection{Conserving momentum}
+
+\begin{itemize}
+\item
+\NAMDCONFWDEF{zeroMomentum}{remove center of mass drift due to PME}
+{{\tt yes} or {\tt no}}{{\tt no}}
+{
+If enabled, the net momentum of the simulation and any resultant drift
+is removed before every full electrostatics step.
+This correction should conserve energy and have minimal impact on
+parallel scaling.
+This feature should only be used for simulations that would
+conserve momentum except for the slight errors in PME.
+(Features such as fixed atoms, harmonic restraints, steering forces,
+and Langevin dynamics do not conserve momentum; use in combination
+with these features should be considered experimental.)
+Since the momentum correction is delayed, enabling outputMomenta 
+will show a slight nonzero linear momentum but there should be no
+center of mass drift.
+}
+\end{itemize}
+
+
+\subsubsection{Multiple timestep parameters}
+\label{section:mts}
+
+To further reduce the cost of computing full electrostatics, 
+\NAMD\ uses a multiple timestepping integration scheme.  In this scheme, 
+the total force acting on each atom is broken into two pieces, a quickly varying local 
+component and a slower long range component.  
+The local force component is defined in terms of a {\it splitting function}.  The local force component consists of all bonded and van der Waals interactions
+as well as that portion of electrostatic interactions for pairs that are separated by less than the local interaction distance determined by the splitting function.  
+The long range component consists only of 
+electrostatic interactions outside of the local interaction distance.
+Since the long range forces are slowly varying, they are not evaluated
+every timestep.  Instead, they are evaluated every $k$ timesteps,
+specified by the \NAMD\ parameter {\tt fullElectFrequency}.  
+An impulse of $k$ times the long range force is applied to the system
+every $k$ timesteps (i.e., the r-RESPA integrator is used).
+For appropriate values of $k$,
+it is believed that the error introduced by this infrequent evaluation
+is modest compared to the error already incurred by the use of the numerical
+(Verlet) integrator.  
+Improved methods for incorporating these long range forces
+are currently being investigated, 
+with the intention of improving accuracy as well as 
+reducing the frequency of long range force evaluations.  
+\prettypar
+In the scheme described above, the van der Waals forces are still 
+truncated at the local interaction distance.  
+Thus, the van der Waals cutoff distance 
+forms a lower limit to the local interaction distance.  While this is
+believed to be sufficient, there are investigations underway to remove
+this limitation and provide full van der Waals calculations in 
+${\mathcal O}(N)$ time as well.  
+
+One of the areas of current research being studied using \NAMD\ is the
+exploration of better methods for performing multiple timestep integration.
+Currently the only available method is the impulse-based Verlet-I or r-RESPA
+method which is stable for timesteps up to 4~fs for long-range electrostatic
+forces, 2~fs for short-range nonbonded forces, and 1~fs for bonded forces
+Setting {\tt rigid all} (i.e., using SHAKE) increases these timesteps to
+6~fs, 2~fs, and 2~fs respectively but eliminates bond motion for hydrogen.
+The mollified impulse method (MOLLY) reduces the resonance which limits
+the timesteps and thus increases these timesteps to 6~fs, 2~fs, and 1~fs
+while retaining all bond motion.
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{fullElectFrequency}{number of timesteps between full electrostatic evaluations}{positive integer factor of {\tt stepspercycle}}{{\tt nonbondedFreq}}
+{This parameter specifies the number of timesteps between each full electrostatics evaluation.
+It is recommended that {\tt fullElectFrequency} be chosen so that 
+the product of {\tt fullElectFrequency} and {\tt timestep} does 
+not exceed $4.0$ unless {\tt rigidBonds all} or {\tt molly on} is specified, 
+in which case the upper limit is perhaps doubled.}
+
+\item
+\NAMDCONFWDEF{nonbondedFreq}{timesteps between nonbonded evaluation}{positive integer factor of {\tt fullElectFrequency}}{1}
+{This parameter specifies how often short-range nonbonded interactions should be calculated.  Setting {\tt nonbondedFreq} between 1 and {\tt fullElectFrequency} allows triple timestepping where, for example, one could evaluate bonded forces every 1 fs, short-range nonbonded forces every 2 fs, and long-range electrostatics every 4 fs.} 
+
+\item
+\NAMDCONFWDEF{MTSAlgorithm}{MTS algorithm to be used}{{\tt impulse/verletI} or {\tt constant/naive}}{{\tt impulse}}
+{Specifies the multiple timestep algorithm used to integrate the 
+long and short range forces.  {\tt impulse/verletI} is the same as r-RESPA.
+{\tt constant/naive} is the stale force extrapolation method.}
+
+\item
+\NAMDCONFWDEF{longSplitting}{how should long and short range forces be split?}{{\tt c1}, {\tt c2}}{{\tt c1}}
+{Specifies the method used to split electrostatic forces between long 
+and short range potentials.  
+The {\tt c1} option uses a cubic polynomial splitting function,
+$$S_3(r) = 1 - \frac{3}{2}\left(\frac{r}{r_{\text{cut}}}\right)
++ \frac{1}{2}\left(\frac{r}{r_{\text{cut}}}\right)^3,$$
+to affect $C^1$ continuity in the splitting of the electrostatic potential
+\mycite{Skeel \ETAL}{SKEE94}.
+The {\tt c2} option uses a quintic polynomial splitting function,
+$$S_5(r) = 1 - 10\left(\frac{r}{r_{\text{cut}}}\right)^3
++ 15\left(\frac{r}{r_{\text{cut}}}\right)^4
+- 6\left(\frac{r}{r_{\text{cut}}}\right)^5,$$
+to affect $C^2$ continuity in the splitting of the electrostatic potential.
+The $S_5$ splitting function,
+contributed by Bruce Berne, Ruhong Zhou, and Joe Morrone,
+produces demonstrably better long time stability than $S_3$
+without requiring any additional
+computational cost during simulation,
+since the nonbonded forces are calculated via a lookup table.
+Note that earlier options
+{\tt xplor} and {\tt sharp} are no longer supported.
+}
+
+\item
+\NAMDCONFWDEF{molly}{use mollified impulse method (MOLLY)?}
+{{\tt on} or {\tt off}}{{\tt off}}
+{
+This method eliminates the components of the long range electrostatic
+forces which contribute to resonance along bonds to hydrogen atoms,
+allowing a fullElectFrequency of 6 (vs.\ 4) with a 1~fs timestep
+without using {\tt rigidBonds all}.  You may use {\tt rigidBonds water} but
+using {\tt rigidBonds all} with MOLLY makes no sense since the degrees of
+freedom which MOLLY protects from resonance are already frozen.
+}
+
+\item
+\NAMDCONFWDEF{mollyTolerance}{allowable error for MOLLY}
+{positive decimal}{0.00001}
+{
+Convergence criterion for MOLLY algorithm.
+}
+
+\item
+\NAMDCONFWDEF{mollyIterations}{maximum MOLLY iterations}{positive integer}{100}
+{
+Maximum number of iterations for MOLLY algorithm.
+}
+
+\end{itemize}
+
+
+\subsection{Temperature Control and Equilibration}
+
+\subsubsection{Langevin dynamics parameters}
+
+\NAMD\ is capable
+of performing Langevin dynamics, where additional damping and
+random forces are introduced to the system.  This capability
+is based on that implemented in X-PLOR which is detailed
+in the X-PLOR {\it User's Manual} \mycite{(Br\"unger, 1992)}{BRUN92b},
+although a different integrator is used.
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{langevin}{use Langevin dynamics?}{{\tt on} or {\tt off}}{{\tt off}}
+{Specifies whether or not Langevin dynamics active.  
+If set to {\tt on}, then the parameter {\tt langevinTemp} must be set 
+and the parameters {\tt langevinFile} and {\tt langevinCol} can
+optionally be set to control the behavior of this feature.} 
+
+\item
+\NAMDCONF{langevinTemp}{temperature for Langevin calculations (K)}{positive decimal}
+{Temperature to which atoms affected by Langevin dynamics will be adjusted.  
+This temperature will be roughly maintained across the affected atoms 
+through the addition of friction and random forces.}
+
+\item
+\NAMDCONFWDEF{langevinDamping}{damping coefficient for Langevin dynamics (1/ps)}{positive decimal}{per-atom values from PDB file}
+{Langevin coupling coefficient to be applied to all atoms (unless {\tt langevinHydrogen} is {\tt off}, in which case only non-hydrogen atoms are affected).
+If not given, a PDB file is used to obtain coefficients for each atom (see {\tt langevinFile} and {\tt langevinCol} below).}
+
+\item
+\NAMDCONFWDEF{langevinHydrogen}{Apply Langevin dynamics to hydrogen atoms?}{{\tt on} or {\tt off}}{{\tt on}}
+{If {\tt langevinDamping} is set then setting {\tt langevinHydrogen} to {\tt off} will turn off Langevin dynamics for hydrogen atoms.  This parameter has no effect if Langevin coupling coefficients are read from a PDB file.}
+
+\item
+\NAMDCONFWDEF{langevinFile}{PDB file containing Langevin parameters}
+{UNIX filename}{{\tt coordinates}}
+{PDB file to use for the Langevin coupling coefficients for each atom.  
+If this parameter is not specified, then 
+the PDB file specified by {\tt coordinates} is used.}
+
+\item
+\NAMDCONFWDEF{langevinCol}{column of PDB from which to read coefficients}
+{{\tt X}, {\tt Y}, {\tt Z}, {\tt O}, or {\tt B}}{{\tt O}} 
+{Column of the PDB file to use for the Langevin coupling coefficients for 
+each atom.  The coefficients can be read from any 
+floating point column of the PDB file.  
+A value of 0 indicates that the atom will remain unaffected.}
+
+\end{itemize}
+
+\subsubsection{Temperature coupling parameters}
+
+\NAMD\ is capable
+of performing temperature coupling, in which forces are added or 
+reduced to simulate the coupling of the system to a heat bath 
+of a specified temperature.  
+This capability is based on that implemented in X-PLOR which is detailed
+in the X-PLOR {\it User's Manual} \mycite{(Br\"unger, 1992)}{BRUN92b}.
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{tCouple}{perform temperature coupling?}{{\tt on} or {\tt off}}{{\tt off}}
+{Specifies whether or not temperature coupling is active.  
+If set to {\tt on}, then the parameter {\tt tCoupleTemp} must be set and 
+the parameters {\tt tCoupleFile} and {\tt tCoupleCol} can 
+optionally be set to control the behavior of this feature.} 
+
+\item
+\NAMDCONF{tCoupleTemp}{temperature for heat bath (K)}{positive decimal}
+{Temperature to which atoms affected 
+by temperature coupling will be adjusted.  
+This temperature will be roughly maintained across the affected atoms 
+through the addition of forces.}
+
+\item
+\NAMDCONFWDEF{tCoupleFile}{PDB file with tCouple parameters}
+{UNIX filename}{{\tt coordinates}}
+{PDB file to use for the temperature coupling coefficient for each atom.  
+If this parameter is not specified, then 
+the PDB file specified by {\tt coordinates} is used.} 
+
+\item
+\NAMDCONFWDEF{tCoupleCol}{column of PDB from which to read coefficients}
+{{\tt X}, {\tt Y}, {\tt Z}, {\tt O}, or {\tt B}}{{\tt O}} 
+{Column of the PDB file to use for the temperature coupling coefficient for 
+each atom.  This value can be read from any 
+floating point column of the PDB file.  
+A value of $0$ indicates that the atom will remain unaffected.}
+
+\end{itemize}
+
+\subsubsection{Temperature rescaling parameters}
+
+\NAMD\ allows equilibration of a system by means of temperature 
+rescaling.  Using this method, all of the velocities in the system 
+are periodically rescaled so that the entire system is set to the 
+desired temperature.  The following parameters specify how often 
+and to what temperature this rescaling is performed.  
+
+\begin{itemize}
+
+\item
+\NAMDCONF{rescaleFreq}{number of timesteps between temperature rescaling}{positive integer}
+{The equilibration feature of \NAMD\ is activated by 
+specifying the number of timesteps between each temperature rescaling.  
+If this value is given, then the {\tt rescaleTemp} parameter must also 
+be given to specify the target temperature. }
+
+\item
+\NAMDCONF{rescaleTemp}{temperature for equilibration (K)}{positive decimal}
+{The temperature to which all velocities will be rescaled
+every {\tt rescaleFreq} timesteps.  
+This parameter is valid only if {\tt rescaleFreq} has been set.}
+
+\end{itemize}
+
+\subsubsection{Temperature reassignment parameters}
+
+\NAMD\ allows equilibration of a system by means of temperature 
+reassignment.  Using this method, all of the velocities in the system 
+are periodically reassigned so that the entire system is set to the 
+desired temperature.  The following parameters specify how often 
+and to what temperature this reassignment is performed.  
+
+\begin{itemize}
+
+\item
+\NAMDCONF{reassignFreq}{number of timesteps between temperature reassignment}{positive integer}
+{The equilibration feature of \NAMD\ is activated by 
+specifying the number of timesteps between each temperature reassignment.
+If this value is given, then the {\tt reassignTemp} parameter must also 
+be given to specify the target temperature. }
+
+\item
+\NAMDCONFWDEF{reassignTemp}{temperature for equilibration (K)}{positive decimal}{{\tt temperature} if set, otherwise none}
+{The temperature to which all velocities will be reassigned
+every {\tt reassignFreq} timesteps.  
+This parameter is valid only if {\tt reassignFreq} has been set.}
+
+\item
+\NAMDCONFWDEF{reassignIncr}{temperature increment for equilibration (K)}{decimal}{0}
+{In order to allow simulated annealing or other slow heating/cooling protocols, {\tt reassignIncr} will be added to {\tt reassignTemp} after each reassignment.
+(Reassignment is carried out at the first timestep.)  The {\tt reassignHold} parameter may be set to limit the final temperature.
+This parameter is valid only if {\tt reassignFreq} has been set.}
+
+\item
+\NAMDCONF{reassignHold}{holding temperature for equilibration (K)}{positive decimal}
+{The final temperature for reassignment when {\tt reassignIncr} is set; {\tt reassignTemp} will be held at this value once it has been reached.
+This parameter is valid only if {\tt reassignIncr} has been set.}
+
+\end{itemize}
+
+\subsubsection{Lowe-Andersen dynamics parameters}
+
+\NAMD\ can perform Lowe-Andersen dynamics, a variation of Andersen dynamics whereby the radial relative velocities of atom pairs are randomly modified based on a thermal distribution.
+The Lowe-Andersen thermostat is Galilean invariant, therefore conserving momentum, and is thus independent of absolute atom velocities.
+Forces are applied only between non-bonded, non-hydrogen pairs of atoms.
+When using rigid bonds, forces are applied to the center of mass of hydrogen groups.
+The implementation is based on Koopman and Lowe~\mycite{(Koopman and Lowe, 2006)}{KOOP2006}.
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{loweAndersen}{use Lowe-Andersen dynamics?}{{\tt on} or {\tt off}}{{\tt off}}
+{Specifies whether or not Lowe-Andersen dynamics are active.
+If set to {\tt on}, then the parameter {\tt loweAndersenTemp} must be set and the parameters {\tt loweAndersenCutoff} and {\tt loweAndersenRate} can optionally be set.}
+
+\item
+\NAMDCONF{loweAndersenTemp}{temperature for Lowe-Andersen calculations (K)}{positive decimal}
+{Temperature of the distribution used to set radial relative velocities.
+This determines the target temperature of the system.}
+
+\item
+\NAMDCONFWDEF{loweAndersenCutoff}{cutoff radius for Lowe-Andersen collisions (\AA)}{positive decimal}{2.7}
+{Forces are only applied to atoms within this distance of one another.}
+
+\item
+\NAMDCONFWDEF{loweAndersenRate}{rate for Lowe-Andersen collisions (1/ps)}{positive decimal}{50}
+{Determines the probability of a collision between atoms within the cutoff radius.
+The probability is the rate specified by this keyword times the non-bonded timestep.}
+
+\end{itemize}
+
+
+\subsection{Pressure Control}
+
+Constant pressure simulation (and pressure calculation) require periodic
+boundary conditions.  Pressure is controlled by dynamically adjusting
+the size of the unit cell and rescaling all atomic coordinates (other than
+those of fixed atoms) during the simulation.
+
+Pressure values in NAMD output are in bar.
+PRESSURE is the pressure calculated based on individual atoms, while
+GPRESSURE incorporates hydrogen atoms into the heavier atoms to which
+they are bonded, producing smaller fluctuations.
+The TEMPAVG, PRESSAVG, and GPRESSAVG are the average of temperature and
+pressure values since the previous ENERGY output; for the first step
+in the simulation they will be identical to TEMP, PRESSURE, and GPRESSURE.
+
+The phenomenological pressure of bulk matter reflects averaging in both
+space and time of the sum of a large positive term (the kinetic pressure,
+$nRT/V$), and a large cancelling negative term (the static pressure).
+The instantaneous pressure of a simulation cell as simulated by NAMD
+will have mean square fluctuations (according to David Case quoting
+Section 114 of {\em Statistical Physics} by Landau and Lifshitz)
+of $kT/(V \beta)$, where $\beta$ is the compressibility, which is
+RMS of roughly 100 bar for a 10,000 atom biomolecular system.
+Much larger fluctuations are regularly observed in practice.
+
+The instantaneous pressure for a biomolecular system is well defined for
+``internal'' forces that are based on particular periodic images of the
+interacting atoms, conserve momentum, and are translationally invariant.
+When dealing with externally applied forces such as harmonic constraints,
+fixed atoms, and various steering forces, NAMD bases its pressure calculation
+on the relative positions of the affected atoms in the input coordinates
+and assumes that the net force will average to zero over time.  For time
+periods during with the net force is non-zero, the calculated pressure
+fluctuations will include a term proportional to the distance to the
+affected from the user-defined cell origin.
+A good way to observe these effects and to confirm that pressure for
+external forces is handled reasonably is to run a constant volume cutoff
+simulation in a cell that is larger than the molecular system by at least
+the cutoff distance; the pressure for this isolated system should average
+to zero over time.
+
+Because NAMD's impluse-basd multiple timestepping system alters the
+balance between bonded and non-bonded forces from every timestep to an
+average balance over two steps, the calculated pressure on even and odd
+steps will be different.  The PRESSAVG and GPRESSAVG fields provide the
+average over the non-printed intermediate steps.  If you print energies on
+every timestep you will see the effect clearly in the PRESSURE field.
+
+The following options affect all pressure control methods.
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{useGroupPressure}{group or atomic quantities}
+{{\tt yes} or {\tt no}}{{\tt no}}
+{Pressure can be calculated using either the atomic virial and kinetic
+energy (the default) or a hydrogen-group based pseudo-molecular
+virial and kinetic energy.  The latter fluctuates less and is
+required in conjunction with rigidBonds (SHAKE).}
+
+\item
+\NAMDCONFWDEF{useFlexibleCell}{anisotropic cell fluctuations}
+{{\tt yes} or {\tt no}}{{\tt no}}
+{\NAMD\ allows the three orthogonal dimensions of the periodic cell
+to fluctuate independently when this option is enabled.}
+
+\item
+\NAMDCONFWDEF{useConstantRatio}{constant shape in first two cell dimensions}
+{{\tt yes} or {\tt no}}{{\tt no}}
+{When enabled, \NAMD\ keeps the ratio of the unit cell in the x-y plane 
+constant while allowing fluctuations along all axes.  The {\tt useFlexibleCell} option is required for this option.}
+
+\item
+\NAMDCONFWDEF{useConstantArea}{constant area and normal pressure conditions}
+{{\tt yes} or {\tt no}}{{\tt no}}
+{When enabled, \NAMD\ keeps the dimension of the unit cell in the x-y plane 
+constant while allowing fluctuations along the z axis.
+This is not currently implemented in Berendsen's method.}
+
+\end{itemize}
+
+\subsubsection{Berendsen pressure bath coupling}
+
+\NAMD\ provides constant pressure simulation using Berendsen's method.  
+The following parameters are used to define the algorithm.  
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{BerendsenPressure}{use Berendsen pressure bath coupling?}{{\tt on} or {\tt off}}{{\tt off}}
+{Specifies whether or not Berendsen pressure bath coupling is active.  
+If set to {\tt on}, then the parameters {\tt BerendsenPressureTarget}, {\tt BerendsenPressureCompressibility} and {\tt BerendsenPressureRelaxationTime} must be set 
+and the parameter {\tt BerendsenPressureFreq} can
+optionally be set to control the behavior of this feature.} 
+
+\item
+\NAMDCONF{BerendsenPressureTarget}{target pressure (bar)}{positive decimal}
+{Specifies target pressure for Berendsen's method.
+A typical value would be 1.01325 bar, atmospheric pressure at sea level.}
+
+\item
+\NAMDCONF{BerendsenPressureCompressibility}{compressibility (bar$^{-1}$)}{positive decimal}
+{Specifies compressibility for Berendsen's method.
+A typical value would be 4.57E-5 bar$^{-1}$, corresponding to liquid water.
+The higher the compressibility, the more volume will be adjusted for a
+given pressure difference.
+The compressibility and the relaxation time appear only as a ratio in the
+dynamics, so a larger compressibility is equivalent to a smaller relaxation
+time.}
+
+\item
+\NAMDCONF{BerendsenPressureRelaxationTime}{relaxation time (fs)}{positive decimal}
+{Specifies relaxation time for Berendsen's method.
+If the instantaneous pressure did not fluctuate randomly during a simulation
+and the compressibility estimate was exact then
+the inital pressure would decay exponentially to the target pressure with
+this time constant.
+Having a longer relaxation time results in more averaging over pressure
+measurements and hence smaller fluctuations in the cell volume.
+A reasonable choice for relaxation time would be 100 fs.
+The compressibility and the relaxation time appear only as a ratio in the
+dynamics, so a larger compressibility is equivalent to a smaller relaxation
+time.}
+
+\item
+\NAMDCONFWDEF{BerendsenPressureFreq}{how often to rescale positions}{positive multiple of {\tt nonbondedFrequency} and {\tt fullElectFrequency}}{{\tt nonbondedFrequency} or {\tt fullElectFrequency} if used}
+{Specifies number of timesteps between position rescalings for Berendsen's method.
+Primarily to deal with multiple timestepping integrators, but also to reduce
+cell volume fluctuations, cell rescalings can occur on a longer interval.
+This could reasonably be between 1 and 20 timesteps, but the relaxation time
+should be at least ten times larger.
+}
+
+\end{itemize}
+
+\subsubsection{Nos\'{e}-Hoover Langevin piston pressure control}
+
+\NAMD\ provides constant pressure simulation using a modified Nos\'{e}-Hoover method in which Langevin dynamics is used to control fluctuations in the barostat.
+This method should be combined with a method of temperature control, such as Langevin dynamics, in order to simulate the NPT ensemble.
+
+The Langevin piston Nose-Hoover method in NAMD is a combination of the
+Nose-Hoover constant pressure method as described in 
+GJ Martyna, DJ Tobias and ML Klein, "Constant pressure molecular dynamics
+algorithms", J. Chem. Phys 101(5), 1994,
+with piston fluctuation control implemented using Langevin dynamics as in
+SE Feller, Y Zhang, RW Pastor and BR Brooks, "Constant pressure molecular
+dynamics simulation: The Langevin piston method", J. Chem. Phys. 103(11),
+1995.
+
+The equations of motion are:
+\begin{eqnarray*}
+       r' &=& p/m + e' r  \\
+       p' &=& F - e' p - g p + R \\
+       V' &=& 3 V e' \\
+       e'' &=& 3V/W (P - P_0) - g_e e' + R_e/W  \\
+       W &=&  3 N \tau^2 k T  \\
+       <R^2> &=& 2 m g k T / h \\
+       \tau &=& {\rm oscillation period} \\
+       <R_e^2> &=& 2 W g_e k T / h
+\end{eqnarray*}
+Here, $W$ is the mass of piston, $R$ is noise on atoms, and $R_e$ is
+the noise on the piston.
+
+The user specifies the desired pressure, oscillation and decay times
+of the piston, and temperature of the piston.  The compressibility of  
+the system is not required.  In addition, the user specifies the
+damping coefficients and temperature of the atoms for Langevin dynamics.
+
+The following parameters are used to define the algorithm.  
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{LangevinPiston}{use Langevin piston pressure control?}{{\tt on} or {\tt off}}{{\tt off}}
+{Specifies whether or not Langevin piston pressure control is active.  
+If set to {\tt on}, then the parameters {\tt LangevinPistonTarget}, {\tt LangevinPistonPeriod}, {\tt LangevinPistonDecay} and {\tt LangevinPistonTemp} must be set.}
+
+\item
+\NAMDCONF{LangevinPistonTarget}{target pressure (bar)}{positive decimal}
+{Specifies target pressure for Langevin piston method.
+A typical value would be 1.01325 bar, atmospheric pressure at sea level.}
+
+\item
+\NAMDCONF{LangevinPistonPeriod}{oscillation period (fs)}{positive decimal}
+{Specifies barostat oscillation time scale for Langevin piston method.
+If the instantaneous pressure did not fluctuate randomly during a simulation
+and the decay time was infinite (no friction) then the cell volume would
+oscillate with this angular period.
+Having a longer period results in more averaging over pressure measurements
+and hence slower fluctuations in the cell volume.
+A reasonable choice for the piston period would be 200 fs.
+}
+
+\item
+\NAMDCONF{LangevinPistonDecay}{damping time scale (fs)}{positive decimal}
+{Specifies barostat damping time scale for Langevin piston method.
+A value larger than the piston period would result in underdamped
+dynamics (decaying ringing in the cell volume) while a smaller value
+approaches exponential decay as in Berendsen's method above.
+A smaller value also corresponds to larger random forces with increased
+coupling to the Langevin temperature bath.
+Typically this would be chosen equal to or smaller than the piston period,
+such as 100 fs.
+}
+
+\item
+\NAMDCONF{LangevinPistonTemp}{noise temperature (K)}{positive decimal}
+{Specifies barostat noise temperature for Langevin piston method.
+This should be set equal to the target temperature for the chosen method of temperature control.}
+
+\item
+\NAMDCONFWDEF{SurfaceTensionTarget}{Surface tension target (dyn/cm)}
+{decimal}{0.0}{Specifies surface tension target.  Must be used with 
+{\tt useFlexibleCell} and periodic boundary conditions.  The pressure 
+specified in {\tt LangevinPistonTarget} becomes the pressure along the z
+axis, and surface tension is applied in the x-y plane.}
+
+\item
+\NAMDCONFWDEF{StrainRate}{initial strain rate}{decimal triple (x y z)}
+{0. 0. 0.}
+{Optionally specifies the initial strain rate for pressure control.
+Is overridden by value read from file specified with {\tt extendedSystem}.
+There is typically no reason to set this parameter.}
+
+\item
+\NAMDCONFWDEF{ExcludeFromPressure}{Should some atoms be excluded from pressure
+rescaling?}{{\tt on} or {\tt off}}{{\tt off}}
+{Specifies whether or not to exclude some atoms from pressure rescaling.  The
+coordinates and velocites of such atoms are not rescaled during constant
+pressure simulations, though they do contribute to the virial calculation. 
+May be useful for membrane protein simulation.  EXPERIMENTAL.}
+
+\item
+\NAMDCONFWDEF{ExcludeFromPressureFile}{File specifying excluded atoms}
+{PDB file}{coordinates file}
+{PDB file with one column specifying which atoms to exclude from pressure
+rescaling.  Specify 1 for excluded and 0 for not excluded.}
+
+\item
+\NAMDCONFWDEF{ExcludeFromPressureCol}{Column in PDB file for specifying
+excluded atoms}{O, B, X, Y, or Z}{O}
+{Specifies which column of the pdb file to check for excluded atoms.}
+
+\end{itemize}
+

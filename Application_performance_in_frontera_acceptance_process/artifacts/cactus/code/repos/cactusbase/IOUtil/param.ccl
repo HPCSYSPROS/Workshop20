@@ -1,0 +1,334 @@
+# Parameter definitione for thorn IOUtil
+# $Header$
+
+#############################################################################
+### declare IOUtil parameters
+### These are declared protected so that they can be seen by other I/O thorns.
+#############################################################################
+restricted:
+
+####################
+# Output directories
+####################
+STRING out_dir "Default output directory" STEERABLE = RECOVER
+{
+  ".+" :: "A valid directory name"
+} "."
+
+########################
+# How often to do output
+########################
+KEYWORD out_criterion "Criterion to select output intervals"
+{
+  "never"     :: "Never output"
+  "iteration" :: "Output every so many iterations"
+  "time"      :: "Output every that much coordinate time"
+} "iteration"
+INT out_every "How often to do output by default" STEERABLE = ALWAYS
+{
+   1:* :: "Every so many iterations"
+  -1:0 :: "Disable output"
+} -1
+REAL out_dt "How often to do output by default" STEERABLE = ALWAYS
+{
+  (0:* :: "In intervals of that much coordinate time"
+   0   :: "As often as possible"
+  -1   :: "Disable output"
+  -2   :: "Disable output"
+} -2
+
+################
+# various things
+################
+KEYWORD verbose "Level of screen output for I/O" STEERABLE = ALWAYS
+{
+  "none"     :: "No output"
+  "standard" :: "Initial description for each I/O method"
+  "full"     :: "Maximal output"
+} "standard"
+BOOLEAN print_timing_info "Print timing information on I/O operations." STEERABLE = RECOVER
+{
+} "no"
+BOOLEAN new_filename_scheme "Use the new filename scheme for output files ?" STEERABLE = RECOVER
+{
+} "yes"
+BOOLEAN require_empty_output_directory "Require that IO::out_dir is empty at startup ?" STEERABLE = RECOVER
+{
+} "no"
+BOOLEAN strict_io_parameter_check "Stop on errors while parsing I/O parameters from parameter file ?" STEERABLE = RECOVER
+{
+} "yes"
+BOOLEAN abort_on_io_errors "Abort on I/O errors (rather than just print a warning) ?" STEERABLE = ALWAYS
+{
+} "no"
+KEYWORD out_fileinfo "Add some useful file information to output files ?" STEERABLE = RECOVER
+{
+  "none"               :: "no file information"
+  "creation date"      :: "add creation date"
+  "parameter filename" :: "add parameter filename"
+  "axis labels"        :: "add axis labels information to output files"
+  "all"                :: "add all available file information"
+} "all"
+STRING out_group_separator "String to separate group name from variable name in file name" STEERABLE = ALWAYS
+{
+  "" :: "Note: The old default was'::'"
+} "-"
+
+#######################
+# Specific to 3D output
+#######################
+KEYWORD out_mode "Which mode to use for output" STEERABLE = RECOVER
+{
+  "proc"    :: "Every processor writes its share of data into a separate file"
+  "np"      :: "Data is collected and written by every N'th processor into a separate file, where N is specified by the parameter IO::out_proc_every"
+  "onefile" :: "All output is written into a single file by processor 0"
+} "proc"
+
+INT out_proc_every "Do output on every N processors" STEERABLE = RECOVER
+{
+  1:* :: "A number between [1, nprocs)"
+} 8
+INT out_timesteps_per_file "How many timesteps to write to a single file" STEERABLE = RECOVER
+{
+#   1:* :: "Number of timesteps per file"
+   1:1 :: "Number of timesteps per file (can only be 1 so far)"
+  -1:  :: "All timesteps in a single file"
+} -1
+BOOLEAN out3D_septimefiles "Write one file per time slice, as opposed to all data in one file" STEERABLE = RECOVER
+{
+} "no"
+BOOLEAN out_unchunked "Don't write data in chunks. This parameter is ignored for single-processor runs where output is always done in unchunked mode." STEERABLE = RECOVER
+{
+} "no"
+KEYWORD out_save_parameters "Save current parameter settings in output files ?" STEERABLE = RECOVER
+{
+  "all"      :: "Save all parameter settings"
+  "only set" :: "Only save parameters which have been set before"
+  "no"       :: "Don't save parameter settings"
+} "only set"
+
+
+##############################################
+# Downsampling parameters (only for 3D output)
+##############################################
+INT out_downsample_x "Factor by which to downsample output in x direction. Point (0,0,0) is always included." STEERABLE = ALWAYS
+{
+  1:* :: "A positive integer"
+} 1
+INT out_downsample_y "Factor by which to downsample output in y direction. Point (0,0,0) is always included." STEERABLE = ALWAYS
+{
+  1:* :: "A positive integer"
+} 1
+INT out_downsample_z "Factor by which to downsample output in z direction. Point (0,0,0) is always included." STEERABLE = ALWAYS
+{
+  1:* :: "A positive integer"
+} 1
+BOOLEAN out_single_precision "Output data in single precision ?" STEERABLE = ALWAYS
+{
+} "no"
+
+
+###################################
+# Checkpointing/recovery parameters
+###################################
+BOOLEAN checkpoint_ID "Checkpoint initial data ?" STEERABLE = RECOVER
+{
+} "no"
+KEYWORD recover "Recover from a checkpoint file ?" STEERABLE = RECOVER
+{
+  "no"        :: "Don't recover"
+  "manual"    :: "Recover from the checkpoint file as given in IO::recover_dir and IO::recover_file"
+  "auto"      :: "Automatically recover from the latest checkpoint file found in <recover_dir>"
+  "autoprobe" :: "Probe for checkpoint files and automatically recover, continue as usual if nothing was found"
+} "no"
+INT checkpoint_every "How often to checkpoint" STEERABLE = ALWAYS
+{
+   1:* :: "Every so many iterations"
+  -1:0 :: "Disable periodic checkpointing"
+} -1
+REAL checkpoint_every_walltime_hours "How often to checkpoint" STEERABLE = ALWAYS
+{
+  (0:* :: "After so much walltime has passed"
+  -1   :: "Disable periodic walltime checkpointing"
+} -1
+BOOLEAN checkpoint_on_terminate "Checkpoint after last iteration" STEERABLE = ALWAYS
+{
+} "no"
+INT checkpoint_keep "How many checkpoint files to keep" STEERABLE = ALWAYS
+{
+   1:* :: "1 overwrites the latest checkpoint file"
+  -1:  :: "Keep all checkpoint files"
+} 1
+STRING checkpoint_file "File name for regular checkpoint" STEERABLE = ALWAYS
+{
+  ".+" :: "A valid filename"
+} "checkpoint.chkpt"
+STRING checkpoint_ID_file "File name for initial data checkpoint" STEERABLE = ALWAYS
+{
+  ".+" :: "A valid filename"
+} "checkpoint.chkpt"
+STRING recover_file "Basename of recovery file" STEERABLE = ALWAYS
+{
+  ".+" :: "A valid filename"
+} "checkpoint.chkpt"
+STRING checkpoint_dir "Output directory for checkpoint files" STEERABLE = ALWAYS
+{
+  ".+" :: "A valid directory name"
+} "."
+STRING recover_dir "Directory to look for recovery files" STEERABLE = RECOVER
+{
+  ".+" :: "A valid directory name"
+} "."
+STRING filereader_ID_dir "Directory to look for input files" STEERABLE = RECOVER
+{
+  ".+" :: "A valid directory name"
+} "."
+STRING filereader_ID_files "List of basenames of files to read in as initial data (e.g. omit the filename extention here)" STEERABLE = RECOVER
+{
+  ".+" :: "Space-separated list of initial data filenames (basenames, e.g. excluding the file name extention)"
+  "^$" :: "An empty string for not recovering initial data"
+} ""
+STRING filereader_ID_vars "List of variables to read in from the given initial data files" STEERABLE = RECOVER
+{
+  "all" :: "Read all variables contained in the initial data files"
+  ".+"  :: "Space-separated list of fully qualified variable/group names"
+  "^$"  :: "An empty string for not recovering initial data"
+} "all"
+BOOLEAN recover_and_remove "Remove checkpoint file after successful recovery ?"  STEERABLE = RECOVER
+{
+} "no"
+
+
+###################################
+# Parameter file writing parameters
+###################################
+KEYWORD parfile_write "Write a parameter file to 'IO::out_dir'" STEERABLE = RECOVER
+{
+  "no"               :: "Do not write a parameter file"
+  "copy"             :: "Copy the original parameter file"
+  "generate"         :: "Generate a parameter file from the current settings"
+#  "verbose generate" :: "Like \"generate\" but describe all parameters in detail"
+} "copy"
+STRING parfile_name "Filename for the parameter file to be written" STEERABLE = RECOVER
+{
+  ".+" :: "A valid filename"
+  "^$" :: "An empty string to choose the original parameter filename"
+} ""
+INT parfile_update_every "How often to update the parameter file for steered parameters" STEERABLE = ALWAYS
+{
+  1:* :: "Every so many iterations"
+  0:  :: "Disable updating"
+} 0
+
+
+#######################################
+# 1D line slice center setup parameters
+#######################################
+REAL out_xline_y "y-coord for 1D lines in x-direction" STEERABLE = RECOVER
+{
+  *:* :: "A value between [ymin, ymax]"
+} 0.0
+REAL out_xline_z "z-coord for 1D lines in x-direction" STEERABLE = RECOVER
+{
+  *:* :: "A value between [zmin, zmax]"
+} 0.0
+REAL out_yline_x "x-coord for 1D lines in y-direction" STEERABLE = RECOVER
+{
+  *:* :: "A value between [xmin, xmax]"
+} 0.0
+REAL out_yline_z "z-coord for 1D lines in y-direction" STEERABLE = RECOVER
+{
+  *:* :: "A value between [zmin, zmax]"
+} 0.0
+REAL out_zline_x "x-coord for 1D lines in z-direction" STEERABLE = RECOVER
+{
+  *:* :: "A value between [xmin, xmax]"
+} 0.0
+REAL out_zline_y "y-coord for 1D lines in z-direction" STEERABLE = RECOVER
+{
+  *:* :: "A value between [ymin, ymax]"
+} 0.0
+
+INT out_xline_yi "y-index (from 0) for 1D lines in x-direction, overrides IO::out_xline_y" STEERABLE = RECOVER
+{
+   0:* :: "An index between [0, ny)"
+  -1:  :: "Default to physical coordinate IO::out_xline_y if it is within grid bounds, otherwise revert to using 0"
+  -2:  :: "Default to physical coordinate IO::out_xline_y if it is within grid bounds, otherwise revert to using the y-center of the box"
+} -2
+INT out_xline_zi "z-index (from 0) for 1D lines in x-direction, overrides IO::out_xline_z" STEERABLE = RECOVER
+{
+   0:* :: "An index between [0, nz)"
+  -1:  :: "Default to physical coordinate IO::out_xline_z if it is within grid bounds, otherwise revert to using 0"
+  -2:  :: "Default to physical coordinate IO::out_xline_z if it is within grid bounds, otherwise revert to using the z-center of the box"
+} -2
+INT out_yline_xi "x-index (from 0) for 1D lines in y-direction, overrides IO::out_yline_x" STEERABLE = RECOVER
+{
+   0:* :: "An index between [0, nx)"
+  -1:  :: "Default to physical coordinate IO::out_yline_x if it is within grid bounds, otherwise revert to using 0"
+  -2:  :: "Default to physical coordinate IO::out_yline_x if it is within grid bounds, otherwise revert to using the x-center of the box"
+} -2
+INT out_yline_zi "z-index (from 0) for 1D lines in y-direction, overrides IO::out_yline_z" STEERABLE = RECOVER
+{
+   0:* :: "An index between [0, nz)"
+  -1:  :: "Default to physical coordinate IO::out_yline_z if it is within grid bounds, otherwise revert to using 0"
+  -2:  :: "Default to physical coordinate IO::out_yline_z if it is within grid bounds, otherwise revert to using the z-center of the box"
+} -2
+INT out_zline_xi "x-index (from 0) for 1D lines in z-direction, overrides IO::out_zline_x" STEERABLE = RECOVER
+{
+   0:* :: "An index between [0, nx)"
+  -1:  :: "Default to physical coordinate IO::out_zline_x if it is within grid bounds, otherwise revert to using 0"
+  -2:  :: "Default to physical coordinate IO::out_zline_x if it is within grid bounds, otherwise revert to using the x-center of the box"
+} -2
+INT out_zline_yi "y-index (from 0) for 1D lines in z-direction, overrides IO::out_zline_y" STEERABLE = RECOVER
+{
+   0:* :: "An index between [0, ny)"
+  -1:  :: "Default to physical coordinate IO::out_zline_y if it is within grid bounds, otherwise revert to using 0"
+  -2:  :: "Default to physical coordinate IO::out_zline_y if it is within grid bounds, otherwise revert to using the y-center of the box"
+} -2
+
+
+##################################
+# 2D plane center setup parameters
+##################################
+REAL out_yzplane_x "x-coord for 2D planes in yz" STEERABLE = RECOVER
+{
+  *:* :: "A value between [xmin, xmax]"
+} 0.0
+REAL out_xzplane_y "y-coord for 2D planes in xz" STEERABLE = RECOVER
+{
+  *:* :: "A value between [ymin, ymax]"
+} 0.0
+REAL out_xyplane_z "z-coord for 2D planes in xy" STEERABLE = RECOVER
+{
+  *:* :: "A value between [zmin, zmax]"
+} 0.0
+
+INT out_yzplane_xi "x-index (from 0) for 2D planes in yz, overrrides IO::out_yzplane_x" STEERABLE = RECOVER
+{
+   0:* :: "An index between [0, nx)"
+  -1:  :: "Default to physical coordinate IO::out_yzplane_x if it is within grid bounds, otherwise revert to using 0"
+  -2:  :: "Default to physical coordinate IO::out_yzplane_x if it is within grid bounds, otherwise revert to using the x-center of the box"
+} -2
+INT out_xzplane_yi "y-index (from 0) for 2D planes in xz, overrrides IO::out_xzplane_y" STEERABLE = RECOVER
+{
+  0:* :: "An index between [0, ny)"
+  -1:  :: "Default to physical coordinate IO::out_xzplane_y if it is within grid bounds, otherwise revert to using 0"
+  -2:  :: "Default to physical coordinate IO::out_xzplane_y if it is within grid bounds, otherwise revert to using the y-center of the box"
+} -2
+INT out_xyplane_zi "z-index (from 0) for 2D planes in xy, overrrides IO::out_xyplane_z" STEERABLE = RECOVER
+{
+   0:* :: "An index between [0, nz)"
+  -1:  :: "Default to physical coordinate IO::out_xyplane_z if it is within grid bounds, otherwise revert to using 0"
+  -2:  :: "Default to physical coordinate IO::out_xyplane_z if it is within grid bounds, otherwise revert to using the z-center of the box"
+} -2
+
+
+private:
+
+BOOLEAN truncate_files "Truncate existing output files from previous runs (except when recovering) ?" STEERABLE = ALWAYS
+{
+} "yes"
+
+BOOLEAN truncate_files_after_recovering "Truncate existing output files after recovering ?" STEERABLE = RECOVER
+{
+} "no"

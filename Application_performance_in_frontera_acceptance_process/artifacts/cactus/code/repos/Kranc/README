@@ -1,0 +1,252 @@
+
+========================================
+    KRanc Assembles Numerical Codes
+========================================
+
+What is Kranc?
+--------------
+
+Kranc is a set of Mathematica scripts to convert systems of time
+evolution PDEs into code for numerical simulations using the Cactus
+infrastructure.  You need Mathematica in order to use Kranc.
+
+NOTE: This README has not been updated for use with modern versions of
+Kranc and the instructions below will not work.
+
+What is here?
+-------------
+
+README           This file
+
+COPYING          Licensing information - Kranc is licensed under the GPL
+
+Tools            Mathematica packages used in the conversion of a PDE system
+                 to a numerical code
+
+Examples         Worked out examples (massive scalar field, Maxwell equations, ADM
+                 formulation of general relativity) -- Not currently included
+
+Auxiliary        Auxiliary code required for compilation of the code produced
+                 by the scripts
+
+
+Getting up and running with the examples
+----------------------------------------
+
+For the following instructions, we assume that you are working
+on a Unix-type system, and that you have Mathematica and a C compiler
+installed.  We have tested with Mathematica version 8.
+The example for the Einstein equations requires a Fortran 90 compiler, as it
+relies on existing Fortran code for initial data.
+
+We assume that your Kranc directory lives in your home directory, so
+that this file is ~/Kranc/README.  If this is not the case, modify the
+pathnames given in the following accordingly.  We will be creating a
+standard Cactus directory as well, as ~/Cactus.  These instructions
+are for the Klein-Gordon example, which is the simplest example.
+There are also notes at the end on things you need if you want to try
+out the other examples.
+
+Building the Massive Klein-Gordon arrangement
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Change into the directory appropriate for this example:
+
+  cd ~/Kranc/Examples/KleinGordon
+
+Invoke a Mathematica command line session with input from the source
+file (this relies on the Kranc packages being found in the correct
+place relative to the current directory):
+
+  math < MKGTT.m
+
+There will be some output, and an arrangement directory MKG will be
+created containing the thorns.  A thorn list will also be created as
+MKG/MKG.th
+
+
+Installing the Cactus flesh and the required standard thorns
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Login to the cactusdevcvs repository (you only need to do this once;
+the login information is cached in your home directory):
+
+cvs -d :pserver:cvs_anon@cvs.cactuscode.org:/cactusdevcvs login
+
+Enter the password "anon".
+
+Check out the Cactus "flesh" from CVS.  This command will check out
+the beta 14 version.
+
+  cvs -d :pserver:cvs_anon@cvs.cactuscode.org:/cactusdevcvs co -r Cactus_4_0_Beta_14 Cactus
+
+Change into the Cactus directory:
+
+  cd Cactus
+
+You can use this Cactus directory for all the examples, and all your
+work with Kranc.
+
+Make a directory for your thornlists:
+
+  mkdir thornlists
+
+Link the MKG.th thornlist into this directory (replace with the
+correct path to your thornlist):
+
+  ln -s ~/Kranc/Examples/KleinGordon/MKG/MKG.th thornlists/MKG.th
+
+Run the program used for checking out public thorns:
+
+  gmake checkout
+
+Enter "arr" to download thorns by arrangement, choose default option to
+download all arrangements. Press q to quit the checkout program.
+
+For consistency with the Cactus 4.0 Beta14 release, you need to
+checkout the MoL thorns separately. Enter the Cactus/arrangements directory
+and issue the command 
+
+  cvs -d :pserver:cvs_anon@cvs.cactuscode.org:/cactusdevcvs co -r Cactus_4_0_Beta_14 AlphaThorns/MoL
+
+Verify that the thorns have been downloaded into the Cactus/arrangements
+directory.
+
+Linking the extra thorns into your Cactus installation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You should have a ~/Cactus/arrangements directory into which the
+standard Cactus thorns have been downloaded.
+
+Create a symbolic link from the MKG arrangement to here:
+
+  ln -s ~/Kranc/Examples/KleinGordon/MKG ~/Cactus/arrangements/MKG
+
+Create a symbolic link from the KrancNumericalTools arrangement to here:
+
+  ln -s ~/Kranc/Auxiliary/Cactus/KrancNumericalTools ~/Cactus/arrangements/KrancNumericalTools
+
+
+Building a Cactus configuration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You need to create a Cactus "configuration"; this is a directory in
+Cactus/configs in which a particular set of thorns (in this case those
+listed in MKG.th) are compiled.  For simplicity, you may like to use a
+new configuration for each of the examples.  However, it is also
+possible to manually merge the thornlists generated from many
+different Kranc arrangements and create just one configuration for all
+of them.
+
+gmake mkg-config THORNLIST=thornlists/MKG.th
+
+Now compile the configuration:
+
+gmake mkg
+
+An executable program called cactus_mkg should be created in the
+Cactus/exe directory.  See the Cactus documentation for instructions
+concerning how to compile using optimization.
+
+Running the examples
+~~~~~~~~~~~~~~~~~~~~
+
+Create a directory to run Cactus in for the MKG example:
+
+  mkdir MKG
+  cd MKG
+
+Run the cactus_mkg executable with the example parameter file.
+
+  ~/Cactus/exe/cactus_mkg ~/Kranc/Examples/KleinGordon/MKG100.par
+
+A directory MKG_100 will be created containing output from the run.
+
+Viewing the output
+~~~~~~~~~~~~~~~~~~
+
+Cactus based codes can generate output in many formats.  For getting
+started we recommend ygraph (http://www.aei.mpg.de/~pollney/ygraph) to
+look at 1D data.
+
+ygraph MKG_100/phi_x_\[6]\[6].xg
+
+
+Running the other examples
+--------------------------
+
+We also supply Maxwell's equations and the ADM form of the Einstein
+equations as examples.  To run the ADM example, you will need an extra
+thorn ("Exact") which is not part of Cactus.
+
+cd ~/Cactus
+
+Login to the numrelcvs repository
+
+cvs -d :pserver:cvs_anon@cvs.aei.mpg.de:/numrelcvs login
+Password: anon
+
+Check out the necessary thorns:
+
+cvs -d :pserver:cvs_anon@cvs.aei.mpg.de:/numrelcvs co AEIThorns/Exact
+
+Link the AEIThorns arrangement into your Cactus/arrangements directory:
+
+ln -s ~/Cactus/AEIThorns ~/Cactus/arrangements/AEIThorns
+
+You also have to add the following thorns to the thornlist KrancADM.th:
+
+AEIThorns/Exact
+CactusEinstein/ADMCoupling
+CactusEinstein/CoordGauge
+CactusEinstein/StaticConformal
+
+
+NB: You will need a Fortran 90 compiler to compile the Exact thorn,
+and several of the standard Cactus thorns needed for Einstein's
+equations.  We recommend the Intel Fortran Compiler, version 8 as of
+the time of writing.  See the Cactus documentation for details about
+telling Cactus which compiler to use for a particular configuration.
+
+Contributing to Kranc
+---------------------
+
+In order to contribute a patch to Kranc, first ensure that you are
+working with a clone of the Kranc repository, obtained by
+
+  git clone http://github.com/ianhinder/kranc
+
+Commit your patches to your local working copy, preferably with each
+new feature in a separate patch, and make sure the repository is up to
+date by using
+
+  git pull --rebase
+
+every so often.  The --rebase makes sure that your commits are moved
+to the end of the history.  It is wise to do this frequently to avoid
+complicated merging.  When your patches are ready, use
+
+  git format-patch origin
+
+which will output numbered .patch files, one per commit, to the
+current directory.  Commits which are present in your repository but
+not in the public repository you cloned from (origin) will be output.
+
+Email these to the maintainers for review and inclusion.
+
+Authors:
+--------
+
+Sascha Husa
+
+Christiane Lechner
+
+Ian Hinder
+
+  Max Planck Institute for Gravitational Physics / Albert Einstein Institute
+  Am Muehlenberg 1
+  14476 Potsdam
+  Germany
+
+  http://numrel.aei.mpg.de
+

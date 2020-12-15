@@ -1,0 +1,62 @@
+W. Cyrus Proctor
+2017-11-13
+
+
+cproctor@staff.st2:code>pwd
+/scratch/03078/cproctor/apps/spp/rmg/for_damon/code
+cproctor@staff.st2:code>tree
+.
+├── buildme
+├── clean
+├── eigen.st2.build.gcc
+├── openbabel.st2.build.gcc
+├── patches
+│   ├── CMakeLists.patch
+│   ├── CMakeLists.txt
+│   ├── CMakeLists.txt.orig
+│   ├── gen_patches
+│   ├── openbabel.master.patch
+│   ├── rmg.master.patch
+│   ├── shared_ptr.h
+│   ├── shared_ptr.h.orig
+│   └── shared_ptr.patch
+├── plplot.st2.build.gcc
+├── README
+└── rmg.st2.build.gcc
+
+1 directory, 16 files
+
+
+
+
+Build Instructions:
+Start an interactive development session on an SKX node.
+From this directory, launch "buildme":
+./buildme 2>&1 | tee buildme.log
+
+
+This will build:
+1.) eigen
+2.) openbabel
+3.) plplot
+4.) rmg
+
+each in an independent directory.
+
+TPLs for this version of RMG include:
+1.) eigen
+  a.) fftw3
+  b.) petsc
+  c.) boost
+  d.) superlu
+2.) openbabel
+  a.) eigen
+  b.) boost
+3.) plplot
+4.) rmg
+  a.) boost
+  b.) fftw3
+  c.) intel mkl
+  d.) openbabel
+  e.) plplot
+

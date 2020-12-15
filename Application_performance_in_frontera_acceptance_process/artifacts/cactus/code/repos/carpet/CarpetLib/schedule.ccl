@@ -1,0 +1,26 @@
+# Schedule definitions for thorn CarpetLib
+
+SCHEDULE CarpetLib_test_prolongate_3d_rf2 AT paramcheck
+{
+  LANG: C
+  OPTIONS: global
+} "Test prolongation operators"
+
+if (test_backtrace) {
+  SCHEDULE CarpetLib_BacktraceTest AT wragh
+  {
+    LANG: C
+  } "Test stack backtraces"
+}
+
+SCHEDULE CarpetLib_printtimestats AT analysis
+{
+  LANG: C
+  OPTIONS: global
+} "Print timing statistics if desired"
+
+SCHEDULE CarpetLib_printmemstats AT analysis
+{
+  LANG: C
+  OPTIONS: global
+} "Print memory statistics if desired"

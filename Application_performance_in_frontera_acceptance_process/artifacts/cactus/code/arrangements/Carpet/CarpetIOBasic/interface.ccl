@@ -1,0 +1,15 @@
+# Interface definition for thorn CarpetIOBasic
+
+IMPLEMENTS: IOBasic
+
+INHERITS: IO
+
+CCTK_INT last_output_iteration TYPE=scalar
+CCTK_REAL last_output_time TYPE=scalar
+CCTK_INT this_iteration TYPE=scalar
+
+USES INCLUDE HEADER: Timer.hh
+
+USES INCLUDE HEADER: carpet.hh
+USES INCLUDE HEADER: typecase.hh
+USES INCLUDE HEADER: typeprops.hh

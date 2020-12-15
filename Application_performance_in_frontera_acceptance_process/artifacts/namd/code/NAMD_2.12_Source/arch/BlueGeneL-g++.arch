@@ -1,0 +1,15 @@
+NAMD_ARCH = BlueGeneL
+CHARMARCH = bluegenel
+
+BGL_INC=/auto/BGX/floor/bglsys/include
+BGL_LIB=/auto/BGX/floor/bglsys/lib
+BGL_BIN=/auto/BGX/floor/blrts-gnu/bin
+
+BGL_CFLAGS=-I$(BGL_INC) 
+
+CXX = $(BGL_BIN)/powerpc-bgl-blrts-gnu-g++ $(BGL_CFLAGS) -DNO_SOCKET  -DDUMMY_VMDSOCK -DNOHOSTNAME -DNO_GETPWUID -DNO_CHDIR -DNETWORK_PROGRESS -DUSE_TOPOMAP=1
+
+CXXOPTS = -O1
+CC = $(BGL_BIN)/powerpc-bgl-blrts-gnu-gcc $(BGL_CFLAGS)
+COPTS = -O4 
+

@@ -1,0 +1,7 @@
+# Main make.code.defn file for thorn CarpetRhoRegrid
+
+# Source files in this directory
+SRCS = corecollapsecontrol_PMR.cc output_control.cc max_entropy.cc track_max_rho.cc paramcheck.c
+
+# Subdirectories containing source files
+SUBDIRS = 

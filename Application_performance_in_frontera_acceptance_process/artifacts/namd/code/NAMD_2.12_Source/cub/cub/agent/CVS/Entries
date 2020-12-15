@@ -1,0 +1,14 @@
+/agent_histogram.cuh/1.1/Thu Sep  8 21:02:01 2016//THEAD
+/agent_radix_sort_downsweep.cuh/1.1/Thu Sep  8 21:02:01 2016//THEAD
+/agent_radix_sort_upsweep.cuh/1.1/Thu Sep  8 21:02:01 2016//THEAD
+/agent_reduce.cuh/1.1/Thu Sep  8 21:02:01 2016//THEAD
+/agent_reduce_by_key.cuh/1.1/Thu Sep  8 21:02:01 2016//THEAD
+/agent_rle.cuh/1.1/Thu Sep  8 21:02:01 2016//THEAD
+/agent_scan.cuh/1.1/Thu Sep  8 21:02:01 2016//THEAD
+/agent_segment_fixup.cuh/1.1/Thu Sep  8 21:02:01 2016//THEAD
+/agent_select_if.cuh/1.1/Thu Sep  8 21:02:02 2016//THEAD
+/agent_spmv_csrt.cuh/1.1/Thu Sep  8 21:02:02 2016//THEAD
+/agent_spmv_orig.cuh/1.1/Thu Sep  8 21:02:02 2016//THEAD
+/agent_spmv_row_based.cuh/1.1/Thu Sep  8 21:02:02 2016//THEAD
+/single_pass_scan_operators.cuh/1.1/Thu Sep  8 21:02:02 2016//THEAD
+D

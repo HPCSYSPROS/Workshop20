@@ -1,0 +1,56 @@
+# Interface definition for thorn ADMBase
+# $Header$
+
+implements: ADMBase
+inherits: grid
+USES INCLUDE HEADER: Symmetry.h
+
+CCTK_INT FUNCTION GetBoundarySpecification \
+  (CCTK_INT IN size, \
+   CCTK_INT OUT ARRAY nboundaryzones, \
+   CCTK_INT OUT ARRAY is_internal, \
+   CCTK_INT OUT ARRAY is_staggered, \
+   CCTK_INT OUT ARRAY shiftout)
+REQUIRES FUNCTION GetBoundarySpecification
+
+public:
+
+INT shift_state TYPE = SCALAR "state of storage for shift"
+INT dtlapse_state TYPE = SCALAR "state of storage for dtlapse"
+INT dtshift_state TYPE = SCALAR "state of storage for dtshift"
+
+REAL metric TYPE = GF timelevels = 3 tags='tensortypealias="DD_sym" ProlongationParameter="ADMBase::metric_prolongation_type"'
+{
+  gxx,gxy,gxz,gyy,gyz,gzz
+} "ADM 3-metric g_ij"
+
+REAL curv TYPE = GF timelevels = 3 tags='tensortypealias="DD_sym" ProlongationParameter="ADMBase::metric_prolongation_type"'
+{
+  kxx,kxy,kxz,kyy,kyz,kzz
+} "ADM extrinsic curvature K_ij"
+
+REAL lapse TYPE = GF timelevels = 3 tags='tensortypealias="Scalar" ProlongationParameter="ADMBase::lapse_prolongation_type"'
+{
+  alp
+} "ADM lapse function alpha"
+
+REAL shift TYPE = GF timelevels = 3 tags='tensortypealias="U" ProlongationParameter="ADMBase::shift_prolongation_type"'
+{
+  betax,betay,betaz
+} "ADM shift function beta^i"
+
+REAL dtlapse TYPE = GF timelevels = 3 tags='tensortypealias="Scalar" ProlongationParameter="ADMBase::lapse_prolongation_type"'
+{
+  dtalp
+} "Time derivative of ADM lapse function alpha"
+
+REAL dtshift TYPE = GF timelevels = 3 tags='tensortypealias="U" ProlongationParameter="ADMBase::shift_prolongation_type"'
+{
+  dtbetax,dtbetay,dtbetaz
+} "Time derivative of ADM shift function beta^i"
+
+#  Aliased function from thorn Boundary
+CCTK_INT FUNCTION Boundary_SelectGroupForBC(CCTK_POINTER_TO_CONST IN GH,   \
+  CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, \
+  CCTK_STRING IN group_name, CCTK_STRING IN bc_name)
+USES FUNCTION Boundary_SelectGroupForBC

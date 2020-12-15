@@ -1,0 +1,849 @@
+This file contains any messages produced by compilers while
+running configure, to aid debugging if configure makes a mistake.
+
+configure:904: checking host system type
+configure:950: checking whether make sets ${MAKE}
+configure:983: checking for gcc-mp-4.4
+configure:983: checking for gcc-mp-4.3
+configure:983: checking for gcc-mp-4.2
+configure:983: checking for gcc
+configure:1015: checking whether the C compiler (gcc  ) works
+configure:1032: gcc -o conftest    conftest.c  1>&5
+configure:1029:1: warning: return type defaults to 'int' [-Wimplicit-int]
+configure:1061: checking whether the C compiler (gcc  ) is a cross-compiler
+configure:1069: checking whether we are using GNU C
+configure:1078: gcc -E conftest.c
+configure:1094: checking for g++-mp-4.4
+configure:1094: checking for g++-mp-4.2
+configure:1094: checking for g++-mp-4.2
+configure:1094: checking for c++
+configure:1126: checking whether the C++ compiler (c++  ) works
+configure:1143: c++ -o conftest    conftest.C  1>&5
+configure:1169: checking whether the C++ compiler (c++  ) is a cross-compiler
+configure:1177: checking whether we are using GNU C++
+configure:1186: c++ -E conftest.C
+configure:1202: checking for nvcc
+configure:1237: checking for ranlib
+configure:1273: checking for cpp
+configure:1363: checking for perl
+configure:1400: checking for gtar
+configure:1437: checking for xargs
+configure:1474: checking for gzip
+configure:1511: checking for gpatch
+configure:1511: checking for patch
+configure:1548: checking for git
+configure:1585: checking for f90
+configure:1585: checking for pgf90
+configure:1585: checking for xlf90
+configure:1585: checking for ifort
+configure:1622: checking for ar
+configure:1659: checking for mkdir
+configure:1698: checking for bash
+configure:1975: checking how to run the C preprocessor
+configure:2055: checking for ANSI C header files
+configure:2068: /lib/cpp  conftest.c >/dev/null 2>conftest.out
+configure:2135: gcc -o conftest -pipe -std=gnu99   conftest.c  1>&5
+configure: In function 'main':
+configure:2130:67: warning: implicit declaration of function 'exit' [-Wimplicit-function-declaration]
+configure:2130:67: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2130:67: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2131:1: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2131:1: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2162: checking for C99 features
+configure:2180: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:2209: checking for M_PI
+configure:2224: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:2249: checking for C strdup
+configure:2262: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:2297: checking for C++ strdup
+configure:2310: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:2342: checking whether byte ordering is bigendian
+configure:2360: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:2375: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure: In function 'main':
+configure:2370:2: error: unknown type name 'not'
+configure:2370:10: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'endian'
+configure: failed program was:
+#line 2364 "configure"
+#include "confdefs.h"
+#include <sys/types.h>
+#include <sys/param.h>
+int main() {
+
+#if BYTE_ORDER != BIG_ENDIAN
+ not big endian
+#endif
+; return 0; }
+configure:2451: checking size of long long
+configure:2470: gcc -o conftest -pipe -std=gnu99   conftest.c  1>&5
+configure:2461:1: warning: return type defaults to 'int' [-Wimplicit-int]
+configure: In function 'main':
+configure:2464:11: warning: implicit declaration of function 'exit' [-Wimplicit-function-declaration]
+configure:2464:11: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2464:11: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2466:3: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2466:3: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2495: checking size of long int
+configure:2514: gcc -o conftest -pipe -std=gnu99   conftest.c  1>&5
+configure:2505:1: warning: return type defaults to 'int' [-Wimplicit-int]
+configure: In function 'main':
+configure:2508:11: warning: implicit declaration of function 'exit' [-Wimplicit-function-declaration]
+configure:2508:11: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2508:11: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2510:3: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2510:3: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2539: checking size of int
+configure:2558: gcc -o conftest -pipe -std=gnu99   conftest.c  1>&5
+configure:2549:1: warning: return type defaults to 'int' [-Wimplicit-int]
+configure: In function 'main':
+configure:2552:11: warning: implicit declaration of function 'exit' [-Wimplicit-function-declaration]
+configure:2552:11: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2552:11: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2554:3: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2554:3: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2583: checking size of short int
+configure:2602: gcc -o conftest -pipe -std=gnu99   conftest.c  1>&5
+configure:2593:1: warning: return type defaults to 'int' [-Wimplicit-int]
+configure: In function 'main':
+configure:2596:11: warning: implicit declaration of function 'exit' [-Wimplicit-function-declaration]
+configure:2596:11: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2596:11: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2598:3: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2598:3: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2629: checking size of long double
+configure:2648: gcc -o conftest -pipe -std=gnu99   conftest.c  1>&5
+configure:2639:1: warning: return type defaults to 'int' [-Wimplicit-int]
+configure: In function 'main':
+configure:2642:11: warning: implicit declaration of function 'exit' [-Wimplicit-function-declaration]
+configure:2642:11: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2642:11: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2644:3: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2644:3: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2673: checking size of double
+configure:2692: gcc -o conftest -pipe -std=gnu99   conftest.c  1>&5
+configure:2683:1: warning: return type defaults to 'int' [-Wimplicit-int]
+configure: In function 'main':
+configure:2686:11: warning: implicit declaration of function 'exit' [-Wimplicit-function-declaration]
+configure:2686:11: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2686:11: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2688:3: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2688:3: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2718: checking size of float
+configure:2737: gcc -o conftest -pipe -std=gnu99   conftest.c  1>&5
+configure:2728:1: warning: return type defaults to 'int' [-Wimplicit-int]
+configure: In function 'main':
+configure:2731:11: warning: implicit declaration of function 'exit' [-Wimplicit-function-declaration]
+configure:2731:11: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2731:11: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2733:3: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2733:3: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2764: checking size of char *
+configure:2783: gcc -o conftest -pipe -std=gnu99   conftest.c  1>&5
+configure:2774:1: warning: return type defaults to 'int' [-Wimplicit-int]
+configure: In function 'main':
+configure:2777:11: warning: implicit declaration of function 'exit' [-Wimplicit-function-declaration]
+configure:2777:11: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2777:11: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2779:3: warning: incompatible implicit declaration of built-in function 'exit'
+configure:2779:3: note: include '<stdlib.h>' or provide a declaration of 'exit'
+configure:2818: checking for the null device
+configure:2881: checking for gethostbyname
+configure:2909: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5
+configure:2982: checking whether mode_t is defined
+configure:2997: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3023: checking for availability of gettimeofday timing
+configure:3036: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5
+configure: In function 'main':
+configure:3031:1: warning: implicit declaration of function 'gettimeofday' [-Wimplicit-function-declaration]
+configure:3058: checking if gettimeofday needs timezone
+configure:3076: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5
+configure:3099: checking for availability of getrusage timing
+configure:3117: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5
+configure:3139: checking for availability of _ftime timing
+configure:3157: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5
+configure: In function 'main':
+configure:3150:17: error: storage size of 'timebs' isn't known
+configure:3151:3: warning: implicit declaration of function '_ftime' [-Wimplicit-function-declaration]
+configure: failed program was:
+#line 3144 "configure"
+#include "confdefs.h"
+#include <stdio.h>
+#include <time.h>
+#include <sys/types.h>
+#include <sys/timeb.h>
+int main() {
+  struct _timeb timebs;
+  _ftime(&timebs);
+  printf("%f\n",(double)(timebs.time + timebs.millitm/1000.0));
+  return 0;
+; return 0; }
+configure:3184: checking for time.h
+configure:3197: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3224: checking for sys/time.h
+configure:3237: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3264: checking for sys/types.h
+configure:3277: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3304: checking for unistd.h
+configure:3317: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3344: checking for string.h
+configure:3357: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3384: checking for assert.h
+configure:3397: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3424: checking for tgmath.h
+configure:3437: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3464: checking for sys/stat.h
+configure:3477: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3504: checking for getopt.h
+configure:3517: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3544: checking for dirent.h
+configure:3557: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3584: checking for c_asm.h
+configure:3597: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3591:19: fatal error: c_asm.h: No such file or directory
+compilation terminated.
+configure: failed program was:
+#line 3589 "configure"
+#include "confdefs.h"
+ 
+#include <c_asm.h>
+int main() {
+ 
+; return 0; }
+configure:3624: checking for intrinsics.h
+configure:3637: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3631:24: fatal error: intrinsics.h: No such file or directory
+compilation terminated.
+configure: failed program was:
+#line 3629 "configure"
+#include "confdefs.h"
+ 
+#include <intrinsics.h>
+int main() {
+ 
+; return 0; }
+configure:3664: checking for mach/mach_time.h
+configure:3677: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3671:28: fatal error: mach/mach_time.h: No such file or directory
+compilation terminated.
+configure: failed program was:
+#line 3669 "configure"
+#include "confdefs.h"
+ 
+#include <mach/mach_time.h>
+int main() {
+ 
+; return 0; }
+configure:3701: checking for regex.h
+configure:3714: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3739: checking for sys/filio.h
+configure:3754: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3748:23: fatal error: sys/filio.h: No such file or directory
+compilation terminated.
+configure: failed program was:
+#line 3744 "configure"
+#include "confdefs.h"
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif 
+#include <sys/filio.h>
+int main() {
+ 
+; return 0; }
+configure:3781: checking for sys/ioctl.h
+configure:3796: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3823: checking for sys/socket.h
+configure:3838: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3865: checking for netinet/in.h
+configure:3880: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3907: checking for netdb.h
+configure:3922: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3949: checking for arpa/inet.h
+configure:3964: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3991: checking for winsock2.h
+configure:4004: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:3998:22: fatal error: winsock2.h: No such file or directory
+compilation terminated.
+configure: failed program was:
+#line 3996 "configure"
+#include "confdefs.h"
+ 
+#include <winsock2.h>
+int main() {
+ 
+; return 0; }
+configure:4031: checking for crypt.h
+configure:4046: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:4073: checking for signal.h
+configure:4086: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:4113: checking for malloc.h
+configure:4126: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:4153: checking for sched.h
+configure:4166: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:4193: checking for execinfo.h
+configure:4206: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:4231: checking whether time.h and sys/time.h may both be included
+configure:4245: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:4270: checking whether socklen_t is defined
+configure:4295: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:4320: checking whether SOCKET is defined
+configure:4345: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure: In function 'main':
+configure:4341:1: error: unknown type name 'SOCKET'
+configure: failed program was:
+#line 4325 "configure"
+#include "confdefs.h"
+#include <stdio.h>
+#include <stdlib.h>
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif
+#ifdef HAVE_SYS_SOCKET_H
+#include <sys/socket.h>
+#endif
+#ifdef HAVE_WINSOCK2_H
+#include <winsock2.h>
+#endif
+int main() {
+SOCKET foo; return 0
+; return 0; }
+configure:4371: checking for hrtime_t
+configure:4407: checking for gethrtime
+configure:4435: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5
+/tmp/ccr8Xn7y.o: In function `main':
+conftest.c:(.text+0xa): undefined reference to `gethrtime'
+collect2: error: ld returned 1 exit status
+configure: failed program was:
+#line 4412 "configure"
+#include "confdefs.h"
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char gethrtime(); below.  */
+#include <assert.h>
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char gethrtime();
+
+int main() {
+
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_gethrtime) || defined (__stub___gethrtime)
+choke me
+#else
+gethrtime();
+#endif
+
+; return 0; }
+configure:4407: checking for read_real_time
+configure:4435: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5
+/tmp/ccewZ47K.o: In function `main':
+conftest.c:(.text+0xa): undefined reference to `read_real_time'
+collect2: error: ld returned 1 exit status
+configure: failed program was:
+#line 4412 "configure"
+#include "confdefs.h"
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char read_real_time(); below.  */
+#include <assert.h>
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char read_real_time();
+
+int main() {
+
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_read_real_time) || defined (__stub___read_real_time)
+choke me
+#else
+read_real_time();
+#endif
+
+; return 0; }
+configure:4407: checking for time_base_to_time
+configure:4435: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5
+/tmp/cc90rKcV.o: In function `main':
+conftest.c:(.text+0xa): undefined reference to `time_base_to_time'
+collect2: error: ld returned 1 exit status
+configure: failed program was:
+#line 4412 "configure"
+#include "confdefs.h"
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char time_base_to_time(); below.  */
+#include <assert.h>
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char time_base_to_time();
+
+int main() {
+
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_time_base_to_time) || defined (__stub___time_base_to_time)
+choke me
+#else
+time_base_to_time();
+#endif
+
+; return 0; }
+configure:4407: checking for clock_gettime
+configure:4435: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5
+configure:4407: checking for mach_absolute_time
+configure:4435: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5
+/tmp/ccZk0gVj.o: In function `main':
+conftest.c:(.text+0xa): undefined reference to `mach_absolute_time'
+collect2: error: ld returned 1 exit status
+configure: failed program was:
+#line 4412 "configure"
+#include "confdefs.h"
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char mach_absolute_time(); below.  */
+#include <assert.h>
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char mach_absolute_time();
+
+int main() {
+
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_mach_absolute_time) || defined (__stub___mach_absolute_time)
+choke me
+#else
+mach_absolute_time();
+#endif
+
+; return 0; }
+configure:4461: checking for _rtc intrinsic
+configure:4473: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5
+configure: In function 'main':
+configure:4469:1: warning: implicit declaration of function '_rtc' [-Wimplicit-function-declaration]
+/tmp/ccWGvhpo.o: In function `main':
+conftest.c:(.text+0xa): undefined reference to `_rtc'
+collect2: error: ld returned 1 exit status
+configure: failed program was:
+#line 4464 "configure"
+#include "confdefs.h"
+#ifdef HAVE_INTRINSICS_H
+#include <intrinsics.h>
+#endif
+int main() {
+_rtc()
+; return 0; }
+configure:4494: checking for mallinfo
+configure:4522: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5
+configure:4551: checking for mallopt
+configure:4579: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5
+configure:4607: checking whether M_MMAP_THRESHOLD is defined
+configure:4622: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:4649: checking for sched_getaffinity
+configure:4677: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5
+configure:4706: checking for getpid
+configure:4734: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5
+configure:4763: checking if __int64 is defined
+configure:4775: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure: In function 'main':
+configure:4771:1: error: unknown type name '__int64'
+configure: failed program was:
+#line 4768 "configure"
+#include "confdefs.h"
+
+int main() {
+__int64 foo; return 0
+; return 0; }
+configure:4797: checking if __int128 is defined
+configure:4809: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:4844: checking for vector
+configure:4857: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:4844: checking for vector.h
+configure:4857: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:4851:20: fatal error: vector.h: No such file or directory
+compilation terminated.
+configure: failed program was:
+#line 4849 "configure"
+#include "confdefs.h"
+ 
+#include <vector.h>
+int main() {
+ 
+; return 0; }
+configure:4895: checking for getopt_long_only
+configure:4923: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5
+configure:4966: checking for working const
+configure:5020: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:5042: checking for C inline
+configure:5056: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:5102: checking for C static inline
+configure:5124: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5 conftest2.c
+configure:5112:18: warning: return type defaults to 'int' [-Wimplicit-int]
+configure:5112:27: warning: return type defaults to 'int' [-Wimplicit-int]
+configure:5120:18: warning: return type defaults to 'int' [-Wimplicit-int]
+configure:5120:27: warning: return type defaults to 'int' [-Wimplicit-int]
+configure:5150: checking for C restrict
+configure:5182: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:5212: checking for C++ restrict
+configure:5252: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:5229:19: error: expected initializer before 'p1'
+configure:5230:19: error: expected initializer before 'p2'
+configure:5231:20: error: expected ';' at end of member declaration
+configure:5231:29: error: 'arr' does not name a type
+configure:5232:20: error: expected ';' at end of member declaration
+configure:5232:29: error: 'arr' does not name a type
+configure:5233:26: error: expected ',' or '...' before 'p'
+configure:5234:26: error: expected ',' or '...' before 'p'
+configure:5235:26: error: expected ',' or '...' before 'p'
+configure:5238:26: error: expected ',' or '...' before 'p'
+configure:5239:26: error: expected ',' or '...' before 'p'
+configure:5240:26: error: expected ',' or '...' before 'p'
+configure: In function 'int main()':
+configure:5246:19: error: expected initializer before 'v1'
+configure:5247:19: error: expected initializer before 'v2'
+configure: failed program was:
+#line 5227 "configure"
+#include "confdefs.h"
+
+double * restrict p1;
+double * restrict p2[3];
+struct s1 { char * restrict arr; };
+struct s2 { char * restrict arr[3]; };
+void f1 (void * restrict p);
+void f2 (void * restrict p[]);
+void f3 (void * restrict p[3]);
+// void f4 (void * restrict p[restrict]);
+// void f5 (void * restrict p[restrict 3]);
+void f1 (void * restrict p) { }
+void f2 (void * restrict p[]) { }
+void f3 (void * restrict p[3]) { }
+// void f4 (void * restrict p[restrict]) { }
+// void f5 (void * restrict p[restrict 3]) { }
+
+int main() {
+
+double * restrict v1;
+double * restrict v2[3];
+
+; return 0; }
+configure:5252: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:5293: checking for C++ copysign
+configure:5334: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure: In function 'int main()':
+configure:5322:22: error: no matching function for call to 'copysign(float)'
+In file included from configure:5316:0:
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1320:3: note: candidate: constexpr float std::copysign(float, float)
+   copysign(float __x, float __y)
+   ^~~~~~~~
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1320:3: note:   candidate expects 2 arguments, 1 provided
+In file included from /usr/include/features.h:375:0,
+                 from /opt/apps/gcc/6.3.0/include/c++/6.3.0/x86_64-pc-linux-gnu/bits/os_defines.h:39,
+                 from /opt/apps/gcc/6.3.0/include/c++/6.3.0/x86_64-pc-linux-gnu/bits/c++config.h:507,
+                 from /opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:41,
+                 from configure:5316:
+/usr/include/bits/mathcalls.h:218:1: note: candidate: double copysign(double, double)
+ __MATHCALLX (copysign,, (_Mdouble_ __x, _Mdouble_ __y), (__const__));
+ ^
+/usr/include/bits/mathcalls.h:218:1: note:   candidate expects 2 arguments, 1 provided
+In file included from configure:5316:0:
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1324:3: note: candidate: constexpr long double std::copysign(long double, long double)
+   copysign(long double __x, long double __y)
+   ^~~~~~~~
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1324:3: note:   candidate expects 2 arguments, 1 provided
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1331:5: note: candidate: template<class _Tp, class _Up> constexpr typename __gnu_cxx::__promote_2<_Tp, _Up>::__type std::copysign(_Tp, _Up)
+     copysign(_Tp __x, _Up __y)
+     ^~~~~~~~
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1331:5: note:   template argument deduction/substitution failed:
+configure:5322:22: note:   candidate expects 2 arguments, 1 provided
+configure:5323:21: error: no matching function for call to 'copysign(double)'
+In file included from configure:5316:0:
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1320:3: note: candidate: constexpr float std::copysign(float, float)
+   copysign(float __x, float __y)
+   ^~~~~~~~
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1320:3: note:   candidate expects 2 arguments, 1 provided
+In file included from /usr/include/features.h:375:0,
+                 from /opt/apps/gcc/6.3.0/include/c++/6.3.0/x86_64-pc-linux-gnu/bits/os_defines.h:39,
+                 from /opt/apps/gcc/6.3.0/include/c++/6.3.0/x86_64-pc-linux-gnu/bits/c++config.h:507,
+                 from /opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:41,
+                 from configure:5316:
+/usr/include/bits/mathcalls.h:218:1: note: candidate: double copysign(double, double)
+ __MATHCALLX (copysign,, (_Mdouble_ __x, _Mdouble_ __y), (__const__));
+ ^
+/usr/include/bits/mathcalls.h:218:1: note:   candidate expects 2 arguments, 1 provided
+In file included from configure:5316:0:
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1324:3: note: candidate: constexpr long double std::copysign(long double, long double)
+   copysign(long double __x, long double __y)
+   ^~~~~~~~
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1324:3: note:   candidate expects 2 arguments, 1 provided
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1331:5: note: candidate: template<class _Tp, class _Up> constexpr typename __gnu_cxx::__promote_2<_Tp, _Up>::__type std::copysign(_Tp, _Up)
+     copysign(_Tp __x, _Up __y)
+     ^~~~~~~~
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1331:5: note:   template argument deduction/substitution failed:
+configure:5323:21: note:   candidate expects 2 arguments, 1 provided
+configure:5327:22: error: no matching function for call to 'copysign(float)'
+In file included from configure:5316:0:
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1320:3: note: candidate: constexpr float std::copysign(float, float)
+   copysign(float __x, float __y)
+   ^~~~~~~~
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1320:3: note:   candidate expects 2 arguments, 1 provided
+In file included from /usr/include/features.h:375:0,
+                 from /opt/apps/gcc/6.3.0/include/c++/6.3.0/x86_64-pc-linux-gnu/bits/os_defines.h:39,
+                 from /opt/apps/gcc/6.3.0/include/c++/6.3.0/x86_64-pc-linux-gnu/bits/c++config.h:507,
+                 from /opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:41,
+                 from configure:5316:
+/usr/include/bits/mathcalls.h:218:1: note: candidate: double copysign(double, double)
+ __MATHCALLX (copysign,, (_Mdouble_ __x, _Mdouble_ __y), (__const__));
+ ^
+/usr/include/bits/mathcalls.h:218:1: note:   candidate expects 2 arguments, 1 provided
+In file included from configure:5316:0:
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1324:3: note: candidate: constexpr long double std::copysign(long double, long double)
+   copysign(long double __x, long double __y)
+   ^~~~~~~~
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1324:3: note:   candidate expects 2 arguments, 1 provided
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1331:5: note: candidate: template<class _Tp, class _Up> constexpr typename __gnu_cxx::__promote_2<_Tp, _Up>::__type std::copysign(_Tp, _Up)
+     copysign(_Tp __x, _Up __y)
+     ^~~~~~~~
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1331:5: note:   template argument deduction/substitution failed:
+configure:5327:22: note:   candidate expects 2 arguments, 1 provided
+configure:5328:21: error: no matching function for call to 'copysign(double)'
+In file included from configure:5316:0:
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1320:3: note: candidate: constexpr float std::copysign(float, float)
+   copysign(float __x, float __y)
+   ^~~~~~~~
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1320:3: note:   candidate expects 2 arguments, 1 provided
+In file included from /usr/include/features.h:375:0,
+                 from /opt/apps/gcc/6.3.0/include/c++/6.3.0/x86_64-pc-linux-gnu/bits/os_defines.h:39,
+                 from /opt/apps/gcc/6.3.0/include/c++/6.3.0/x86_64-pc-linux-gnu/bits/c++config.h:507,
+                 from /opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:41,
+                 from configure:5316:
+/usr/include/bits/mathcalls.h:218:1: note: candidate: double copysign(double, double)
+ __MATHCALLX (copysign,, (_Mdouble_ __x, _Mdouble_ __y), (__const__));
+ ^
+/usr/include/bits/mathcalls.h:218:1: note:   candidate expects 2 arguments, 1 provided
+In file included from configure:5316:0:
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1324:3: note: candidate: constexpr long double std::copysign(long double, long double)
+   copysign(long double __x, long double __y)
+   ^~~~~~~~
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1324:3: note:   candidate expects 2 arguments, 1 provided
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1331:5: note: candidate: template<class _Tp, class _Up> constexpr typename __gnu_cxx::__promote_2<_Tp, _Up>::__type std::copysign(_Tp, _Up)
+     copysign(_Tp __x, _Up __y)
+     ^~~~~~~~
+/opt/apps/gcc/6.3.0/include/c++/6.3.0/cmath:1331:5: note:   template argument deduction/substitution failed:
+configure:5328:21: note:   candidate expects 2 arguments, 1 provided
+configure: failed program was:
+#line 5313 "configure"
+#include "confdefs.h"
+
+/* See note in cctk_Math.h regarding these include statements */
+#include <cmath>
+#include <math.h>
+
+int main() {
+
+{
+  std::copysign (1.0f);
+  std::copysign (1.0);
+}
+using namespace std;
+{
+  std::copysign (1.0f);
+  std::copysign (1.0);
+}
+
+; return 0; }
+configure:5334: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:5372: checking for C++ fpclassify
+configure:5413: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:5451: checking for C++ isfinite
+configure:5492: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:5530: checking for C++ isinf
+configure:5571: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:5609: checking for C++ isnan
+configure:5650: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:5688: checking for C++ isnormal
+configure:5729: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:5767: checking for C++ signbit
+configure:5808: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:5844: checking for C _Pragma
+configure:5865: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:5903: checking for C function __attribute__((__noinline__))
+configure:5916: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:5938: checking for C++ function __attribute__((__noinline__))
+configure:5959: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:5988: checking for C++ member function __attribute__((__noinline__))
+configure:6009: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:6040: checking for C function __attribute__((__always_inline__))
+configure:6053: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:6075: checking for C++ function __attribute__((__always_inline__))
+configure:6096: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:6125: checking for C++ member function __attribute__((__always_inline__))
+configure:6146: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:6177: checking for C __attribute__((__unused__))
+configure:6190: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:6212: checking for C++ __attribute__((__unused__))
+configure:6233: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:6264: checking for C __attribute__((__aligned__(...)))
+configure:6277: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:6299: checking for C++ __attribute__((__aligned__(...)))
+configure:6320: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:6351: checking for C __attribute__((__cold__))
+configure:6364: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure: In function 'main':
+configure:6360:1: warning: '__cold__' attribute ignored [-Wattributes]
+configure:6386: checking for C++ __attribute__((__cold__))
+configure:6407: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure: In function 'int main()':
+configure:6403:38: warning: '__cold__' attribute ignored [-Wattributes]
+configure:6438: checking for C __attribute__((__hot__))
+configure:6451: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure: In function 'main':
+configure:6447:1: warning: '__hot__' attribute ignored [-Wattributes]
+configure:6473: checking for C++ __attribute__((__hot__))
+configure:6494: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure: In function 'int main()':
+configure:6490:37: warning: '__hot__' attribute ignored [-Wattributes]
+configure:6525: checking for C __attribute__((__format__(printf, 1, 2)))
+configure:6538: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:6560: checking for C++ __attribute__((__format__(printf, 1, 2)))
+configure:6581: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:6612: checking for C __attribute__((__noreturn__))
+configure:6625: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:6647: checking for C++ __attribute__((__noreturn__))
+configure:6668: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:6699: checking for C __attribute__((__nonnull__))
+configure:6727: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:6749: checking for C++ __attribute__((__nonnull__))
+configure:6785: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:6816: checking for C __attribute__((__returns_nonnull__))
+configure:6838: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:6860: checking for C++ __attribute__((__returns_nonnull__))
+configure:6890: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:6921: checking for C __builtin_expect
+configure:6934: gcc -o conftest -pipe -std=gnu99   conftest.c  1>&5
+configure:6956: checking for C++ __builtin_expect
+configure:6977: c++ -o conftest -pipe -std=c++0x   conftest.C  1>&5
+configure:7008: checking for C __builtin_unreachable
+configure:7021: gcc -o conftest -pipe -std=gnu99   conftest.c  1>&5
+configure:7043: checking for C++ __builtin_unreachable
+configure:7064: c++ -o conftest -pipe -std=c++0x   conftest.C  1>&5
+configure:7095: checking for C __builtin_assume_aligned
+configure:7110: gcc -o conftest -pipe -std=gnu99   conftest.c  1>&5
+configure:7132: checking for C++ __builtin_assume_aligned
+configure:7155: c++ -o conftest -pipe -std=c++0x   conftest.C  1>&5
+configure:7186: checking for C++ static_assert
+configure:7207: c++ -o conftest -pipe -std=c++0x   conftest.C  1>&5
+configure:7238: checking for C++ auto specifier
+configure:7259: c++ -o conftest -pipe -std=c++0x   conftest.C  1>&5
+configure:7288: checking for C++ lambda expressions
+configure:7309: c++ -o conftest -pipe -std=c++0x   conftest.C  1>&5
+configure:7338: checking for C++ range-based for statements
+configure:7360: c++ -o conftest -pipe -std=c++0x   conftest.C  1>&5
+configure:7402: checking for Fortran REAL*4
+configure:7419: ifort -c  conftest.f 1>&5
+configure:7448: checking for Fortran REAL*8
+configure:7465: ifort -c  conftest.f 1>&5
+configure:7494: checking for Fortran REAL*16
+configure:7511: ifort -c  conftest.f 1>&5
+configure:7541: checking for Fortran COMPLEX*8
+configure:7558: ifort -c  conftest.f 1>&5
+configure:7587: checking for Fortran COMPLEX*16
+configure:7604: ifort -c  conftest.f 1>&5
+configure:7633: checking for Fortran COMPLEX*32
+configure:7650: ifort -c  conftest.f 1>&5
+configure:7697: checking for cxxabi.h
+configure:7710: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:7734: checking for __cxa_demangle
+configure:7746: c++ -c -pipe -std=c++0x  conftest.C 1>&5
+configure:7778: checking for Dl_info.dli_sname
+configure:7793: gcc -c -pipe -std=gnu99  conftest.c 1>&5
+configure:7833: checking for dladdr
+configure:7861: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  >&5
+/tmp/ccKfKnRD.o: In function `main':
+conftest.c:(.text+0xa): undefined reference to `dladdr'
+collect2: error: ld returned 1 exit status
+configure: failed program was:
+#line 7838 "configure"
+#include "confdefs.h"
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char dladdr(); below.  */
+#include <assert.h>
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char dladdr();
+
+int main() {
+
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_dladdr) || defined (__stub___dladdr)
+choke me
+#else
+dladdr();
+#endif
+
+; return 0; }
+configure:7883: checking for dladdr in library dl
+configure:7903: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  -ldl >&5
+configure:7951: checking for backtrace
+configure:7979: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  -ldl >&5
+configure:8009: checking for backtrace_symbols
+configure:8037: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  -ldl >&5
+configure:8067: checking for crypt
+configure:8095: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  -ldl >&5
+/tmp/cc05kare.o: In function `main':
+conftest.c:(.text+0xa): undefined reference to `crypt'
+collect2: error: ld returned 1 exit status
+configure: failed program was:
+#line 8072 "configure"
+#include "confdefs.h"
+/* System header to define __stub macros and hopefully few prototypes,
+    which can conflict with char crypt(); below.  */
+#include <assert.h>
+/* Override any gcc2 internal prototype to avoid an error.  */
+/* We use char because int might match the return type of a gcc2
+    builtin and then its argument prototype would still apply.  */
+char crypt();
+
+int main() {
+
+/* The GNU C library defines this for functions which it implements
+    to always fail with ENOSYS.  Some functions are actually named
+    something starting with __ and the normal name is an alias.  */
+#if defined (__stub_crypt) || defined (__stub___crypt)
+choke me
+#else
+crypt();
+#endif
+
+; return 0; }
+configure:8117: checking for crypt in library crypt
+configure:8137: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  -lcrypt -ldl >&5
+configure:8177: checking for finite in header math.h and library m
+configure:8194: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  -lm -lcrypt -ldl >&5
+configure:8235: checking for copysign in header math.h and library m
+configure:8252: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  -lm -lm -lcrypt -ldl >&5
+configure:8293: checking for fpclassify in header math.h and library m
+configure:8310: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  -lm -lm -lm -lcrypt -ldl >&5
+configure:8351: checking for isfinite in header math.h and library m
+configure:8368: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  -lm -lm -lm -lm -lcrypt -ldl >&5
+configure:8409: checking for isinf in header math.h and library m
+configure:8426: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  -lm -lm -lm -lm -lm -lcrypt -ldl >&5
+configure:8467: checking for isnan in header math.h and library m
+configure:8484: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  -lm -lm -lm -lm -lm -lm -lcrypt -ldl >&5
+configure:8525: checking for isnormal in header math.h and library m
+configure:8542: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  -lm -lm -lm -lm -lm -lm -lm -lcrypt -ldl >&5
+configure:8583: checking for signbit in header math.h and library m
+configure:8600: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  -lm -lm -lm -lm -lm -lm -lm -lm -lcrypt -ldl >&5
+configure:8645: checking for mkstemp
+configure:8673: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  -lm -lm -lm -lm -lm -lm -lm -lm -lcrypt -ldl >&5
+configure:8755: checking for va_copy
+configure:8767: gcc -o conftest -pipe -std=gnu99   conftest.c  -L/opt/intel/compilers_and_libraries_2018.2.199/linux/bin/lib  -lm -lm -lm -lm -lm -lm -lm -lm -lcrypt -ldl >&5

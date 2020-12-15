@@ -1,0 +1,31 @@
+# Schedule definitions for thorn DriftCorrect4
+# $Header: /numrelcvs/AEIDevelopment/DriftCorrect4/schedule.ccl,v 1.3 2004/09/13 19:05:09 schnetter Exp $
+
+STORAGE: dc4_state dc4_current_time
+STORAGE: dc4_position 
+
+
+SCHEDULE dcm_init_drift AT initial
+{
+  LANG: Fortran
+  OPTIONS: global
+} "Initialise drift correction"
+
+if(first_activation_on_recovery) {
+  SCHEDULE dcm_init_drift_recover AT post_recover_variables AFTER ZelmaniCoMShift_Reductions
+  {
+    LANG: Fortran
+    OPTIONS: global
+  } "Initialise drift correction after recovery"
+}
+
+SCHEDULE dcm_calculate_correction AT POSTSTEP AFTER ZelmaniCoMShift_Reductions
+{
+  LANG: Fortran
+  OPTIONS: global
+} "Calculate the CoM drift correction"
+
+SCHEDULE dcm_correct_drift IN MoL_PostRHS
+{
+  LANG: C
+} "Apply the CoM drift correction"

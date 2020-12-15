@@ -1,0 +1,58 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+echo "Checking:"
+pwd
+hostname
+date
+cat ${PBS_NODEFILE} > SIMFACTORY/NODES
+
+echo "Environment:"
+module load compilers/intel/intel-64.v13.1.046
+module load mpi/openmpi/1.8.2/intel-64.v13.1.046
+export LD_LIBRARY_PATH=/opt/apps/compilers/intel.v13.1.046/lib/intel64:$LD_LIBRARY_PATH
+echo "Environment:"
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export GMON_OUT_PREFIX=gmon.out
+export OMP_NUM_THREADS=@NUM_THREADS@
+export MPIDIR=/opt/apps/mpi/openmpi/1.8.2/intel-64.v13.1.046/
+export MPD_NODEFILE=mpd_nodefile
+export MPI_NODEFILE=mpi_nodefile
+
+echo "Starting:"
+uniq ${PBS_NODEFILE} > ${MPD_NODEFILE}
+for node in $(cat ${MPD_NODEFILE}); do
+    for ((proc=0; $proc<@(@PPN_USED@/@NUM_THREADS@)@; proc=$proc+1)); do
+        echo ${node}
+    done
+done > ${MPI_NODEFILE}
+export CACTUS_STARTTIME=$(date +%s)
+
+env | sort > SIMFACTORY/ENVIRONMENT
+
+echo "Job setup:"
+echo "   Allocated:"
+echo "      Nodes:                      @NODES@"
+echo "      Cores per node:             @PPN@"
+echo "   Running:"
+echo "      MPI processes:              @NUM_PROCS@"
+echo "      OpenMP threads per process: @NUM_THREADS@"
+echo "      MPI processes per node:     @(1.0*@NUM_PROCS@/@NODES@)@"
+echo "      OpenMP threads per core:    @(1.0*(@NUM_PROCS@*@NUM_THREADS@)/(@NODES@*@PPN@))@"
+echo "      OpenMP threads per node:    @PPN_USED@"
+
+if [ @RUNDEBUG@ -eq 0 ]
+then
+	time ${MPIDIR}/bin/mpirun -v --mca btl openib,self --mca mpi_leave_pinned 0 -np @NUM_PROCS@ -npernode @(@PPN_USED@/@NUM_THREADS@)@ @EXECUTABLE@ -L 3 @PARFILE@
+fi
+
+echo "Stopping:"
+date
+
+echo "Done."

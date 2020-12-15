@@ -1,0 +1,13 @@
+# Main make.code.defn file for thorn AEILocalInterp
+# $Header$
+
+# Source files in this directory
+SRCS = startup.c						\
+       InterpLocalUniform.c molecule_posn.c util.c		\
+							# end of list
+
+# Subdirectories containing source files
+SUBDIRS = common						\
+          Lagrange-tensor-product Lagrange-maximum-degree	\
+          Hermite						\
+							# end of list

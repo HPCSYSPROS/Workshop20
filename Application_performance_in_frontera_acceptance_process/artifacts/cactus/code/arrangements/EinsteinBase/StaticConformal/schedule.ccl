@@ -1,0 +1,36 @@
+# Schedule definitions for thorn StaticConformal
+# $Header$
+
+
+
+# Putting in an else here because people want to use conformal_state
+# even if the metric is not "static conformal".  They should still
+# check the metric_type and know they can deal with it, 'though.
+STORAGE: conformal_state
+
+SCHEDULE StaticConformal_InitialiseState at CCTK_INITIAL before ADMBase_InitialData
+{
+  LANG: C
+} "Set the conformal_state variable to 0"
+
+
+
+if(CCTK_Equals(metric_type,"static conformal"))
+{
+
+  if(CCTK_Equals(conformal_storage, "factor"))
+  {
+    STORAGE: confac[1]
+  }
+  
+  if(CCTK_Equals(conformal_storage, "factor+derivs"))
+  {
+    STORAGE: confac[1], confac_1derivs[1]
+  }
+  
+  if(CCTK_Equals(conformal_storage, "factor+derivs+2nd derivs"))
+  {
+    STORAGE: confac[1], confac_1derivs[1], confac_2derivs[1]
+  }
+
+}

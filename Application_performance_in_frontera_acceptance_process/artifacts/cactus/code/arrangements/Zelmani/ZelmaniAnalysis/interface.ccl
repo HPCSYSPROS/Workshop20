@@ -1,0 +1,90 @@
+
+# Interface definition for thorn ZelmaniAnalysis
+# $Header:$
+
+implements: ZelmaniAnalysis 
+
+inherits: GRHydro ADMBase TGRtensor Coordinates EOS_Omni
+#ML_BSSN ML_ADMQuantities 
+friend: GRHydro
+
+# stuff for EOS call
+## EOS function
+void FUNCTION EOS_Omni_short(CCTK_INT IN eoskey,                \
+                             CCTK_INT IN havetemp,              \
+                             CCTK_REAL IN rf_precision,         \
+                             CCTK_INT IN npoints,               \
+                             CCTK_REAL IN ARRAY rho,            \
+                             CCTK_REAL INOUT ARRAY eps,         \
+                             CCTK_REAL INOUT ARRAY temp,        \
+                             CCTK_REAL IN ARRAY ye,             \
+                             CCTK_REAL OUT ARRAY press,         \
+                             CCTK_REAL INOUT ARRAY entropy,     \
+                             CCTK_REAL OUT ARRAY cs2,           \
+                             CCTK_REAL OUT ARRAY dedt,          \
+                             CCTK_REAL OUT ARRAY dpderho,       \
+                             CCTK_REAL OUT ARRAY dpdrhoe,       \
+                             CCTK_REAL OUT ARRAY munu,          \
+                             CCTK_INT OUT ARRAY keyerr,         \
+                             CCTK_INT OUT anyerr)
+
+USES FUNCTION EOS_Omni_short
+
+
+# inner core analysis
+CCTK_REAL inner_core_local TYPE=GF TIMELEVELS=3 tags='tensortypealias="Scalar"'
+{
+  proper_mass_ic_local,kinetic_energy_ic_local,
+  gravitational_mass_ic_local,angular_momentum_ic_local
+}
+
+CCTK_REAL inner_core_global TYPE=SCALAR 
+{
+  proper_mass_ic,kinetic_energy_ic,
+  gravitational_mass_ic,angular_momentum_ic,
+  T_over_W_ic, W_ic
+}
+
+
+
+CCTK_REAL baryonic_mass TYPE=SCALAR tags='checkpoint="no"'
+CCTK_REAL baryonic_mass_local TYPE=GF TIMELEVELS=3 tags='tensortypealias="Scalar" checkpoint="no"'
+
+CCTK_REAL baryonic_mass_interior[number_of_spheres] TYPE=SCALAR tags='checkpoint="no"'
+CCTK_REAL baryonic_mass_interior_local[number_of_spheres] TYPE=GF TIMELEVELS=3 tags='tensortypealias="Scalar" checkpoint="no"'
+
+CCTK_REAL adm_mass_volume[number_of_spheres] TYPE=SCALAR tags='checkpoint="no"'
+CCTK_REAL adm_mass_volume_local[number_of_spheres] TYPE=GF TIMELEVELS=3 tags='tensortypealias="Scalar" prolongation="none" checkpoint="no"'
+
+CCTK_REAL enu_interior[number_of_spheres] TYPE=SCALAR tags='checkpoint="no"'
+CCTK_REAL enu_interior_local[number_of_spheres] TYPE=GF TIMELEVELS=3 tags='tensortypealias="Scalar" prolongation="none" checkpoint="no"'
+
+CCTK_REAL proper_mass TYPE=SCALAR tags='checkpoint="no"'
+CCTK_REAL proper_mass_local TYPE=GF TIMELEVELS=3 tags='tensortypealias="Scalar" checkpoint="no"'
+
+CCTK_REAL gravitational_mass TYPE=SCALAR tags='checkpoint="no"'
+CCTK_REAL gravitational_mass_local TYPE=GF TIMELEVELS=3 tags='tensortypealias="Scalar" checkpoint="no"'
+
+CCTK_REAL gravitational_mass_in1e12 TYPE=SCALAR tags='checkpoint="no"'
+CCTK_REAL gravitational_mass_local_in1e12 TYPE=GF TIMELEVELS=3 tags='tensortypealias="Scalar" checkpoint="no"'
+
+CCTK_REAL baryonic_mass_in1e12 TYPE=SCALAR tags='checkpoint="no"'
+CCTK_REAL baryonic_mass_local_in1e12 TYPE=GF TIMELEVELS=3 tags='tensortypealias="Scalar" checkpoint="no"'
+
+CCTK_REAL kinetic_energy TYPE=SCALAR tags='checkpoint="no"'
+CCTK_REAL kinetic_energy_local TYPE=GF TIMELEVELS=3 tags='tensortypealias="Scalar" checkpoint="no"'
+
+CCTK_REAL total_kinetic_energy TYPE=SCALAR tags='checkpoint="no"'
+CCTK_REAL total_kinetic_energy_local TYPE=GF TIMELEVELS=3 tags='tensortypealias="Scalar" checkpoint="no"'
+
+CCTK_REAL angular_momentum TYPE=SCALAR tags='checkpoint="no"'
+CCTK_REAL angular_momentum_local TYPE=GF TIMELEVELS=3 tags='tensortypealias="Scalar" checkpoint="no"'
+
+CCTK_REAL T_over_W TYPE=SCALAR tags='checkpoint="no"'
+CCTK_REAL W TYPE=SCALAR tags='checkpoint="no"'
+
+CCTK_REAL Madm_red TYPE=SCALAR tags='checkpoint="no"'
+CCTK_REAL Jadm_z_red TYPE=SCALAR tags='checkpoint="no"'
+
+CCTK_REAL angular_velocity TYPE=GF TIMELEVELS=3 tags='tensortypealias="Scalar" checkpoint="no"'
+

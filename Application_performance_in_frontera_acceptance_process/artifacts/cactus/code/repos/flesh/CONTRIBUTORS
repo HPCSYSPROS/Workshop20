@@ -1,0 +1,48 @@
+ /*@@
+   @file      CONTRIBUTORS
+   @date      Tue Feb  8 16:08:24 2000
+   @author    Tom Goodale
+   @desc 
+   List of contributors to Cactus   
+   @enddesc 
+   @version $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/CONTRIBUTORS,v 1.6 2005-03-10 12:18:19 schnetter Exp $
+ @@*/
+
+These people and organisations have contributed code, ideas 
+or support to the Cactus development. 
+
+This list will be reformatted nicely with more details in
+the future.
+
+People:
+------
+
+Gabrielle Allen
+Werner Benger
+Bernd Bruegmann
+Tom Goodale
+Ian Hawke
+Gerd Lanfermann
+Joan Masso
+Andre Merzky
+Mark Miller
+Thomas Radke
+David Rideout
+Erik Schnetter
+Ed Seidel
+John Shalf
+Bernard Schutz
+Wai-Mo Suen
+Jonathan Thornburg
+Malcolm Tobias
+Paul Walker
+
+
+Organisations:
+--------------
+
+Max Planck Institute for Gravitational Physics (Albert Einstein Institute)
+The National Center for Supercomputing Applications (NCSA)
+Washington University
+University of Tuebingen
+Louisiana State University

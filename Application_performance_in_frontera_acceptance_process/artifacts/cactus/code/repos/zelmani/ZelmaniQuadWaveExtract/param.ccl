@@ -1,0 +1,55 @@
+# Parameter definitions for thorn ZelmaniQuadWaveExtract
+
+
+
+CCTK_INT compute_every "perform wave extration every n-th timestep" STEERABLE=ALWAYS
+{
+	1:*  :: "Greater then or equal to 1, I guess"
+       -1  :: "Never extract"
+} 1
+
+
+KEYWORD integrand_type "Type of Integrand formulstion" STEERABLE=ALWAYS
+{
+	"legacy" :: "Standard behavior"
+	"legacy_density_criterion" :: "Legacy Integrand with density criterion"
+	"legacy_radius_criterion" :: "Legacy Integrand with radius criterion"
+	"shibata" :: "Shibata like v^i"
+	"edens_radius_criterion"   :: "use total energy density with radius criterion"
+} "legacy"
+
+CCTK_REAL start_time "Start at time [ms]" STEERABLE=ALWAYS
+{
+	0.0:* :: "Greater then or equal to 0.0, I guess"
+} 0.0
+
+CCTK_REAL outer_radius "Radius [cactii] beyond which everything is set to zero" STEERABLE=ALWAYS
+{
+	0.0:* :: "Greater then or equal to 0.0, I guess"
+} 1.0e9
+
+
+CCTK_REAL rho_min "Threshold density [cgs] for material to be included in the integrals" STEERABLE=ALWAYS
+{
+	0.0:* :: "Greater then or equal to 0.0, I guess"
+} 1.0e6
+
+
+
+BOOLEAN verbose "Produce verbose stdout"
+{
+} "no"
+
+
+BOOLEAN vphys "Use physical velocities"
+{
+} "no"
+
+
+shares: IO
+
+USES STRING out_dir
+
+shares: grid
+
+USES KEYWORD domain

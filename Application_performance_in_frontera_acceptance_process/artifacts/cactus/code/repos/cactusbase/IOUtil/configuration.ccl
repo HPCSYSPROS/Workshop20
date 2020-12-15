@@ -1,0 +1,10 @@
+# Configuration definitions for thorn IOUTIL
+# $Header$
+
+# In future we can hopefully use function aliasing instead.
+
+PROVIDES IOUTIL
+{
+  SCRIPT
+  LANG
+}

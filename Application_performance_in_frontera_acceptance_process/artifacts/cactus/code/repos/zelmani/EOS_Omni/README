@@ -1,0 +1,24 @@
+Cactus Code Thorn EOS_Omni
+Author(s)    : Christian D. Ott <cott@tapir.caltech.edu>
+Maintainer(s): Christian D. Ott <cott@tapir.caltech.edu>
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+This Thorn provides a one-fits-all EOS handler.
+All EOS are actually implemented right inside this single
+thorn without crazy interfaces and lots of function calls.
+
+eoskey controls the type of EOS being used:
+
+eoskey:
+
+1 --- polytropic EOS
+2 --- gamma-law EOS
+3 --- hybrid EOS
+4 --- finite-T microphysical NSE EOS
+
+
+keyerr settings:
+
+-1 -- called EOS routine with keytemp=1, but
+      routine does not allow such a call

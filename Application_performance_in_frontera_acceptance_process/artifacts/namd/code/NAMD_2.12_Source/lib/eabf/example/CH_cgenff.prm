@@ -1,0 +1,125 @@
+*  --------------------------------------------------------------------------  *
+*         CGenFF: Parameters for the Charmm General Force Field v. 3.0.1       *
+*                    for Small Molecule Drug Design                            *
+*  --------------------------------------------------------------------------  *
+*
+
+!  --------------------------------------------------------------------------  !
+! References: - K. Vanommeslaeghe, E. Hatcher, C. Acharya, S. Kundu, S. Zhong, !
+!      J. Shim, E. Darian, O. Guvench, P. Lopes, I. Vorobyov and               !
+!      A. D. Mackerell Jr., J. Comput. Chem. 2010, 31, 671-690.                !
+!             - W. Yu, X. He, K. Vanommeslaeghe, A. D. MacKerell Jr.,          !
+!      J. Comput. Chem. 2012, 33, 2451-2468.                                   !
+!  --------------------------------------------------------------------------  !
+!  Notes: - CGenFF is an ongoing project that is updated regularly. Please     !
+!             check http://mackerell.umaryland.edu/~kenno/cgenff/download.html !
+!             and/or http://mackerell.umaryland.edu/ for updates!              !
+!         - As more functional groups will be introduced, small changes in     !
+!             existing parameters and/or charges may occur.                    !
+!         - Comments in this file may be misleading.                           !
+!  --------------------------------------------------------------------------  !
+!  Contributors: abar  = Arghya Barman                                         !
+!                adm   = Alexander D. MacKerell Jr.                            !
+!                alr   = Ashley L. Ringer                                      !
+!                cacha = Chayan Acharya                                        !
+!                ctsai = Cheng-Chieh Tsai                                      !
+!                ed    = Eva Darian                                            !
+!                ejd   = Elizabeth J. Denning                                  !
+!                erh   = Elizabeth R. Hatcher Frush                            !
+!                isg   = Ignacio Soteras Gutiérrez                             !
+!                jal   = Justin A. Lemkul                                      !
+!                jhs   = JiHyun Shim                                           !
+!                kevo  = Kenno VanOmmeslaeghe                                  !
+!                kundu = Sibsankar Kundu                                       !
+!                lf    = Lei Fang                                              !
+!                lsk   = Lakkaraju Sirish Kaushik                              !
+!                mcs   = Meagan C. Small                                       !
+!                mnoon = Muhammad Noon                                         !
+!                my    = Mingjun Yang                                          !
+!                oashi = Taiji Oashi                                           !
+!                og    = Olgun Guvench                                         !
+!                peml  = Pedro Lopes                                           !
+!                pram  = E. Prabhu Raman                                       !
+!                rima  = Madhurima Jana                                        !
+!                rting = Ting Ran                                              !
+!                sc    = Sherry (Hua) Chen                                     !
+!                sna   = Shanthi Nagarajan                                     !
+!                sz    = Shijun Zhong                                          !
+!                viv   = Igor Vorobyov                                         !
+!                xhe   = Xibing He                                             !
+!                xxwy  = Wenbo Yu                                              !
+!                yapol = Iakov Polyak                                          !
+!                yin   = Daxu Yin                                              !
+!  --------------------------------------------------------------------------  !
+!  All comments to ADM jr. via the CHARMM web site: www.charmm.org             !
+!                 parameter set discussion forum                               !
+!  --------------------------------------------------------------------------  !
+!  ORDER OF PREFERENCE FOR SORTING PARAMETERS:                                 !
+!         + C < N < O < P < S < HALOGENS (LOW TO HIGH Z) < MISC. (BY Z) < H    !
+!         + ATOMS TYPES WITHIN THE SAME ELEMENT ARE SORTED ALPHABETICALLY      !
+!  --------------------------------------------------------------------------  !
+!  RULES FOR SORTING THE COLUMS ON EACH LINE:                                  !
+!         + IN BONDS, THE LOWEST PRIORITY ATOM ALWAYS COMES FIRST              !
+!         + FOR ANGLES, IF COLUMN 3 HAS A LOWER PRIORITY THAN COLUMN 1,        !
+!           COLUMNS 1 & 3 ARE SWAPPED                                          !
+!         + FOR DIHEDRALS, IF COLUMN 3 HAS LOWER PRIORITY THAN COLUMN 2, THE   !
+!           ORDER FOR THE ENTIRE DIHEDRAL IS REVERSED                          !
+!         + FOR DIHEDRALS, IF COLUMNS 2 & 3 HAVE THE SAME PRIORITY, COLUMS     !
+!           1 & 4 ARE CONSIDERED INSTEAD. IF 4 HAS LOWER PRIORITY THAN 1, THE  !
+!           ORDER FOR THE ENTIRE DIHEDRAL IS REVERSED                          !
+!         + FOR IMPROPERS, NO SORTING IS PERFORMED *AFTER* PARAMETRIZATION,    !
+!           BUT THE FOLLOWING RULES APPLY *DURING* PARAMETRIZATION:            !
+!               - COLUMN 1 IS ALWAYS THE CENTRAL ATOM                          !
+!               - IF 2 OF THE SUBSTITUENTS HAVE IDENTICAL TYPES, THESE SHOULD  !
+!                 BE IN COLUMNS 2 & 3 (BUT THEY CANNOT BE MOVED AROUND         !
+!                 WITHOUT RE-OPTIMIZING THE PARAMETER)                         !
+!               - IF THE SUBSTITUENTS ARE ALL DIFFERENT, COLUMNS 2, 3 & 4      !
+!                 SHOULD BE SORTED BY INCREASING PRIORITY. COLUMNS 2 AND 3     !
+!                 CAN BE SWAPPED WITHOUT CHANGING THE PARAMETER BUT OTHER      !
+!                 PERMUTATIONS MANDATE RE-OPTIMIZATION                         !
+!  --------------------------------------------------------------------------  !
+!  PRIORITY OF COLUMNS FOR THE PURPOSE OF SORTING THE LINES IN EACH SECTION:   !
+!           BONDS     -- 1,2                                                   !
+!           ANGLES    -- 2,1,3                                                 !
+!           DIHEDRALS -- 2,3,1,4                                               !
+!           IMPROPERS -- 1,4,2,3                                               !
+!  WHERE 1,2,3,4 INDICATE COLUMN NO, EG. ANGLES ARE FIRST SORTED BY COLUMN 2,  !
+!  THEN (IF COLUMN 2 IS THE SAME) BY COLUMN 1, THEN BY COLUMN 3.               !
+!  --------------------------------------------------------------------------  !
+
+ATOMS
+MASS   257 HGA2     1.00800  ! alphatic proton, CH2
+MASS   318 CG321   12.01100  ! aliphatic C for CH2
+
+BONDS
+CG321  CG321   222.50     1.5300 ! PROT alkane update, adm jr., 3/2/92
+CG321  HGA2    309.00     1.1110 ! PROT alkane update, adm jr., 3/2/92
+
+ANGLES
+CG321  CG321  CG321    58.35    113.60   11.16   2.56100 ! PROT alkane update, adm jr., 3/2/92
+CG321  CG321  HGA2     26.50    110.10   22.53   2.17900 ! PROT alkane update, adm jr., 3/2/92
+HGA2   CG321  HGA2     35.50    109.00    5.40   1.802  ! PROT alkane update, adm jr., 3/2/92
+
+DIHEDRALS
+CG321  CG321  CG321  CG321      0.06450 2     0.00 ! LIPID alkane, 4/04, jbk (Jeff Klauda)
+CG321  CG321  CG321  CG321      0.14975 3   180.00 ! LIPID alkane, 4/04, jbk
+CG321  CG321  CG321  CG321      0.09458 4     0.00 ! LIPID alkane, 4/04, jbk
+CG321  CG321  CG321  CG321      0.11251 5     0.00 ! LIPID alkane, 4/04, jbk
+CG321  CG321  CG321  HGA2       0.1950  3     0.00 ! LIPID alkanes
+HGA2   CG321  CG321  HGA2       0.2200  3     0.00 ! LIPID alkanes
+
+IMPROPERS
+
+NONBONDED nbxmod  5 atom cdiel fshift vatom vdistance vfswitch -
+cutnb 14.0 ctofnb 12.0 ctonnb 10.0 eps 1.0 e14fac 1.0 wmin 1.5
+
+!see mass list above for better description of atom types
+!hydrogens
+HGA2     0.0       -0.0350     1.3400 ! alkane, igor, 6/05
+CG321    0.0       -0.0560     2.0100   0.0 -0.01 1.9 ! alkane (CT2), 4/98, yin, adm jr, also used by viv
+
+HBOND CUTHB 0.5  ! If you want to do hbond analysis (only), then use
+                 ! READ PARAM APPEND CARD
+                 ! to append hbond parameters from the file: par_hbond.inp
+
+END

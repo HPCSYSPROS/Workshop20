@@ -1,0 +1,107 @@
+
+@ARTICLE{Comer2014c,
+  author = {Comer, J. and Phillips, J. and Schulten, K. and Chipot, C.},
+  title = {Multiple-walker strategies for free-energy calculations in NAMD:
+	Shared adaptive biasing force and walker selection rules},
+  journal = {J. Chem. Theor. Comput.},
+  year = {2014},
+  volume = {10},
+  pages = {5276-5285},
+  owner = {chipot},
+  timestamp = {2014.08.13}
+}
+
+@ARTICLE{Darve2001,
+  author = {Darve, E. and Pohorille, A.},
+  title = {Calculating free energies using average force},
+  journal = {J. Chem. Phys.},
+  year = {2001},
+  volume = {115},
+  pages = {9169-9183}
+}
+
+@ARTICLE{Fu2016,
+  author = {Fu, H. and Shao, X. and Chipot, C. and Cai, W.},
+  title = {Extended adaptive biasing force algorithm. An on--the--fly implementation
+	for accurate free--energy calculations},
+  journal = {J. Chem. Theory Comput.},
+  year = {2016},
+  abstract = {Proper use of the adaptive biasing force (ABF) algorithm in free-energy
+	calculations needs certain prerequisites to be met, namely, that
+	the Jacobian for the metric transformation and its first derivative
+	be available and the coarse variables be independent and fully decoupled
+	from any holonomic constraint or geometric restraint, thereby limiting
+	singularly the field of application of the approach. The extended
+	ABF (eABF) algorithm circumvents these intrinsic limitations by applying
+	the time-dependent bias onto a fictitious particle coupled to the
+	coarse variable of interest by means of a stiff spring. However,
+	with the current implementation of eABF in the popular molecular
+	dynamics engine NAMD, a trajectory-based post-treatment is necessary
+	to derive the underlying free-energy change. Usually, such a posthoc
+	analysis leads to a decrease in the reliability of the free-energy
+	estimates due to the inevitable loss of information, as well as to
+	a drop in efficiency, which stems from substantial read-write accesses
+	to file systems. We have developed a user-friendly, on-the-fly code
+	for performing eABF simulations within NAMD. In the present contribution,
+	this code is probed in eight illustrative examples. The performance
+	of the algorithm is compared with traditional ABF, on the one hand,
+	and the original eABF implementation combined with a posthoc analysis,
+	on the other hand. Our results indicate that the on-the-fly eABF
+	algorithm (i) supplies the correct free-energy landscape in those
+	critical cases where the coarse variables at play are coupled to
+	either each other or to geometric restraints or holonomic constraints,
+	(ii) greatly improves the reliability of the free-energy change,
+	compared to the outcome of a posthoc analysis, and (iii) represents
+	a negligible additional computational effort compared to regular
+	ABF. Moreover, in the proposed implementation, guidelines for choosing
+	two parameters of the eABF algorithm, namely the stiffness of the
+	spring and the mass of the fictitious particles, are proposed. The
+	present on-the-fly eABF implementation can be viewed as the second
+	generation of the ABF algorithm, expected to be widely utilized in
+	the theoretical investigation of recognition and association phenomena
+	relevant to physics, chemistry, and biology.},
+  doi = {10.1021/acs.jctc.6b00447},
+  institution = {Collaborative Innovation Center of Chemical Science and Engineering
+	(Tianjin), Tianjin 300071, China.},
+  language = {eng},
+  medline-pst = {aheadofprint},
+  owner = {chipot},
+  pmid = {27398726},
+  timestamp = {2016.07.25},
+  url = {http://dx.doi.org/10.1021/acs.jctc.6b00447}
+}
+
+@ARTICLE{Henin2004,
+  author = {H\'enin, J. and Chipot, C.},
+  title = {Overcoming free energy barriers using unconstrained
+	 molecular dynamics simulations},
+  journal = {J. Chem. Phys.},
+  year = {2004},
+  volume = {121},
+  pages = {2904-2914}
+}
+
+@ARTICLE{Minoukadeh2010,
+  author = {K. Minoukadeh and C. Chipot and T. Leli\`evre},
+  title = {Potential of mean force calculations: A multiple-walker adaptive
+	biasing force approach},
+  journal = {J. Chem. Theor. Comput.},
+  year = {2010},
+  volume = {6},
+  pages = {1008-1017},
+  owner = {C.Chipot},
+  timestamp = {2009.09.05}
+}
+
+@ARTICLE{Zheng2012,
+  author = {L. Zheng and W. Yang},
+  title = {Practically efficient and robust free energy calculations: Double-integration
+	orthogonal space tempering},
+  journal = {J. Chem. Theor. Compt.},
+  year = {2012},
+  volume = {8},
+  pages = {810-823},
+  owner = {chipot},
+  timestamp = {2013.06.21}
+}
+

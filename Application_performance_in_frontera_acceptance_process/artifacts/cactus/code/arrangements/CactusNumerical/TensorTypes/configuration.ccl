@@ -1,0 +1,8 @@
+# Configuration definition for thorn TensorTypes
+# $Header$
+
+PROVIDES TensorTypes
+{
+  SCRIPT
+  LANG
+}

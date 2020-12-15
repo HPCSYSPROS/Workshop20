@@ -1,0 +1,11 @@
+NODES in allocation is 1296
+cores_per_node on each node is 24
+cpus_per_node on each node is 96
+/tmp/slurmd/job359035/slurm_script: Using 62208 MPI rank(s), ibrun tacc_affinity rank(s) per NUMA domain, 1 thread(s) per rank
+/tmp/slurmd/job359035/slurm_script: Running lattice 72x72x72x144 on 1296 nodes
+/tmp/slurmd/job359035/slurm_script: Begin time: Fri Nov  3 23:01:57 CDT 2017
+UNIX_TIME_START=1509768117
+sh: /opt/apps/xalt/1.7/libexec/xalt_run_submission: No such file or directory
+sh: /opt/apps/xalt/1.7/libexec/xalt_run_submission: No such file or directory
+/tmp/slurmd/job359035/slurm_script: End time: Fri Nov  3 23:24:41 CDT 2017
+UNIX_TIME_END=1509769481

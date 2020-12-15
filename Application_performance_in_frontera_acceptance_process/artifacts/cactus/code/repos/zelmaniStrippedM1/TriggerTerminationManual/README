@@ -1,0 +1,12 @@
+
+Cactus Code Thorn TriggerTerminateManual
+Thorn Author(s)     : Christian D. Ott <cott@tapir.caltech.edu>
+Thorn Maintainer(s) : Christian D. Ott <cott@tapir.caltech.edu>
+--------------------------------------------------------------------------
+
+
+Purpose of the thorn:
+
+Watch the gone by walltime.  Trigger termination if only n minutes are
+left to some limit set by the user.  Alternatively, trigger
+termination if a special file with a special content exists.

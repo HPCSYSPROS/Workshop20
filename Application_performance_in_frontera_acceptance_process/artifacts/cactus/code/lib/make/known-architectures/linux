@@ -1,0 +1,607 @@
+#! /bin/sh
+# /*@@
+#   @file      linux
+#   @date      Thu Jul 15 21:30:04 1999
+#   @author    Tom Goodale
+#   @desc
+#              known-architectures file for systems running Linux
+#   @enddesc
+#   @version   $Header$
+# @@*/
+
+
+if test "$CCTK_CONFIG_STAGE" = 'preferred-compilers' ; then
+
+ if test -z "$FPP" -a -z "$FPPFLAGS"; then
+   FPP='/lib/cpp'
+   FPPFLAGS='-traditional'
+   echo "Setting FPP to $FPP"
+   echo "Setting FPPFLAGS to $FPPFLAGS"
+ fi
+
+else
+
+ # Determine which Fortran 90 compiler is in use
+ LINUX_F90_COMP=none
+
+ if test -n "$F90" && test "$F90" != 'none' ; then
+   if test "`$F90 -V 2>&1 | grep -i intel`" ; then
+     LINUX_F90_COMP=Intel
+   elif test "`$F90 -V 2>&1 | grep -i f90 | grep -i vast`" ; then
+     LINUX_F90_COMP=pacific
+   elif test "`$F90 -V 2>&1 | grep -i f90 | grep -i absoft`" ; then
+     LINUX_F90_COMP=absoft
+   elif test "`$F90 -V 2>&1 | grep NAGWare`" ; then
+     LINUX_F90_COMP=nag
+   elif test "`$F90 -V 2>&1 | grep -i fujitsu`" ; then
+     LINUX_F90_COMP=fujitsu
+   elif test "`$F90 -V 2>&1 | grep -i f90 | grep -i pgf90`" ; then
+     LINUX_F90_COMP=portland
+   elif test "`$F90 -V 2>&1 | grep pgf95`" ; then
+     LINUX_F90_COMP=portland
+   elif test "`$F90 -v 2>&1 | grep -i g77`" ; then
+     LINUX_F90_COMP=gnu77
+   elif test "`$F90 -v 2>&1 | grep -i SGIcc`" ; then
+     LINUX_F90_COMP=SGI
+   elif test "`$F90 -v 2>&1 | grep -i compaq`" ; then
+     LINUX_F90_COMP=Compaq
+   elif test "`$F90 -v 2>&1 | grep PathScale`" ; then
+     LINUX_F90_COMP=PathScale
+   elif test "`$F90 --version 2>&1 | grep 'GNU Fortran'`" ; then
+     LINUX_F90_COMP=gnu95
+   elif test "`$F90 -? 2>&1 | grep -i absoft`" ; then
+     LINUX_F90_COMP=absoft77
+   elif test "`$F90 --version 2>&1 | grep -i lahey/fujitsu`" ; then
+     LINUX_F90_COMP=lahey
+   elif test "`$F90 -qversion 2>&1 | grep IBM`" ; then
+     LINUX_F90_COMP=IBM
+   else
+     # Ok, those were the easy ones, now try more obscure things
+     echo "      subroutine foo" > foo.f
+     echo "      end subroutine foo" >> foo.f
+
+     if test "`/opt/absoft/bin/f95 -V foo.f 2>&1 | grep Absoft`" ; then
+       LINUX_F90_COMP=absoft
+     else
+       echo "Unknown Linux f90 compiler '$F90'."
+       echo 'Please add appropriate information to'
+       echo "  $srcdir/known-architectures/linux"
+       echo 'and send the updated file to CactusMaint'
+       echo 'We will try anyway ...'
+     fi
+     rm foo.f
+   fi
+ elif test -n "$F77" && test "$F77" != 'none' ; then
+   if test "`$F77 -v 2>&1 | grep -i 'gcc version'`" ; then
+     LINUX_F90_COMP=gnu77
+   elif test "`$F77 --version 2>&1 | grep 'GNU Fortran'`" ; then
+     LINUX_F90_COMP=gnu95
+   elif test "`$F77 -? 2>&1 | grep -i absoft`" ; then
+     LINUX_F90_COMP=absoft77
+   elif test "`$F77 -V 2>&1 | grep NAGWare`" ; then
+     LINUX_F90_COMP=nag
+   elif test "`$F90 -V 2>&1 | grep -i intel`" ; then
+     LINUX_F90_COMP=Intel
+   elif test "`$F90 -v 2>&1 | grep -i compaq`" ; then
+     LINUX_F90_COMP=Compaq
+   elif test "`$F90 -v 2>&1 | grep PathScale`" ; then
+     LINUX_F90_COMP=PathScale
+   elif test "`$F77 -qversion 2>&1 | grep IBM`" ; then
+     LINUX_F90_COMP=IBM
+   else
+     echo "Unknown Linux f77 compiler '$F77'."
+     echo 'Please add appropriate information to'
+     echo "  $srcdir/known-architectures/linux"
+     echo 'and send the updated file to CactusMaint'
+     echo 'We will try anyway ...'
+   fi
+ fi
+
+ # find out if we have egcs or not, LIBS is either g2c or f2c
+ LINUX_G77_USES_LIBG2C=
+
+ if test "$LINUX_F90_COMP" = 'gnu77' -o "$LINUX_F90_COMP" = 'pacific' ; then
+   : > foo.f
+   if test -n "`$F77 -v 2>&1 foo.f | grep collect | grep g2c`" ; then
+     LINUX_G77_USES_LIBG2C=yes
+   else
+     LINUX_G77_USES_LIBG2C=no
+   fi
+   rm foo.f
+ fi
+
+ # Set the appropriate flags
+ case "$LINUX_F90_COMP" in
+   gnu77)
+     if test "$LINUX_G77_USES_LIBG2C" = 'yes' ; then
+       : ${LIBS="g2c m"}
+     fi
+     if test "$LINUX_G77_USES_LIBG2C" = 'no' ; then
+       if test "$host_cpu" = 'powerpc' ; then
+         : ${LIBS='m'}
+       else
+         : ${LIBS='f2c m'}
+       fi
+     fi
+     : ${F77_DEBUG_FLAGS='-g'}
+     : ${F90_DEBUG_FLAGS='-g'}
+     : ${F77_WARN_FLAGS='-Wall'}
+     : ${F90_WARN_FLAGS='-Wall'}
+     F77_VERSION="`$F77 -v 2>&1 | grep -i version | head -n1`"
+     F90_VERSION="`$F90 -v 2>&1 | grep -i version | head -n1`"
+     ;;
+   gnu95)
+     : ${F77_DEBUG_FLAGS='-g'}
+     : ${F90_DEBUG_FLAGS='-g'}
+     : ${F77_WARN_FLAGS='-Wall'}
+     : ${F90_WARN_FLAGS='-Wall'}
+     : ${F77_OPTIMISE_FLAGS='-O3 -funroll-loops'}
+     : ${F90_OPTIMISE_FLAGS='-O3 -funroll-loops'}
+     if test "$LD" != "$F90" ; then
+       gnu95_libdir="`$F90 -print-file-name=libgfortran.a`"
+       gnu95_libdir="`dirname $gnu95_libdir`"
+       : ${LIBS='gfortran'}
+       : ${LIBDIRS="$gnu95_libdir"}
+     fi
+     F77_VERSION="`$F77 --version 2>&1 | grep GNU | head -n1`"
+     F90_VERSION="`$F90 --version 2>&1 | grep GNU | head -n1`"
+     # only gfortran versions 4.1 and higher support OpenMP
+     major_version=`echo $F77_VERSION | cut -d')' -f2 | tr -d ' ' | cut -d'.' -f1`
+     minor_version=`echo $F77_VERSION | cut -d')' -f2 | cut -d'.' -f2`
+     if test ! \( $major_version -lt 4 -o \( $major_version = 4 -a $minor_version -lt 1 \) \) ; then
+       : ${F77_OPENMP_FLAGS='-fopenmp'}
+     fi
+     major_version=`echo $F90_VERSION | cut -d')' -f2 | tr -d ' ' | cut -d'.' -f1`
+     minor_version=`echo $F90_VERSION | cut -d')' -f2 | cut -d'.' -f2`
+     if test ! \( $major_version -lt 4 -o \( $major_version = 4 -a $minor_version -lt 1 \) \) ; then
+       : ${F90_OPENMP_FLAGS='-fopenmp'}
+     fi
+     ;;
+   pacific)
+     if test "$LINUX_G77_USES_LIBG2C" = 'yes' ; then
+       : ${LIBS='vast90 g2c m'}
+     fi
+     if test "$LINUX_G77_USES_LIBG2C" = 'no' ; then
+       : ${LIBS='vast90 f2c m'}
+     fi
+     : ${F77_DEBUG_FLAGS="-g"}
+     : ${F90_DEBUG_FLAGS="-g"}
+     : ${F77_WARN_FLAGS="-Wall"}
+     : ${F90_WARN_FLAGS="-Wall"}
+     F90_VERSION="`$F90 -V 2>&1 | grep -i version | head -n1`"
+     ;;
+   absoft)
+     : ${LIBS='f90math fio f77math m'}
+     : ${F90_OPTIMISE_FLAGS='-s -O'}
+     : ${F77_OPTIMISE_FLAGS='-s -O'}
+     # Test if it is a version of the absoft compiler which has the library in a custom place.
+     if test -n "$ABSOFT" ; then
+       : ${LIBDIRS='$(ABSOFT)/lib'}
+     fi
+     : ${F77_DEBUG_FLAGS='-g'}
+     : ${F90_DEBUG_FLAGS='-g'}
+     : ${F77_WARN_FLAGS='-m0'}
+     : ${F90_WARN_FLAGS='-m0'}
+     F90_VERSION="`$F90 -V 2>&1 | grep -i version | head -n1`"
+     ;;
+   absoft77)
+     : ${LIBS='fio f77math m'}
+     F77FLAGS='-f'
+     F90FLAGS='-f'
+     # Test if it is a version of the absoft compiler which has the library in a custom place.
+     if test -n "$ABSOFT" ; then
+       : ${LIBDIRS='$(ABSOFT)/lib'}
+     fi
+     : ${F77_DEBUG_FLAGS='-g'}
+     : ${F90_DEBUG_FLAGS='-g'}
+     : ${F77_WARN_FLAGS='-m0'}
+     : ${F90_WARN_FLAGS='-m0'}
+     F77_VERSION="`$F77 -? 2>&1 | grep -i version | head -n1`"
+     ;;
+   nag)
+     : ${F77FLAGS='-maxcontin=100 -mismatch -w=x77 -w=uda -w=usy'}
+     : ${F90FLAGS='-maxcontin=100 -mismatch -w=x77 -w=uda -w=usy'}
+     : ${F77_OPTIMISE_FLAGS='-O4'}
+     : ${F90_OPTIMISE_FLAGS='-O4'}
+     F77_VERSION="`$F77 -V 2>&1 | grep -i version | head -n1`"
+     F90_VERSION="`$F90 -V 2>&1 | grep -i version | head -n1`"
+     ;;
+   portland)
+     : ${LIBS='pgf90 pgf90rtl pgftnrtl pgf90_rpm1 pghpf2 pgc m'}
+     if test -z "$LIBDIRS" ; then
+       LIBDIRS="`which $F90 | sed 's,/bin/.*,/lib,'`"
+     fi
+     # workaround for calling C varargs functions from Fortran
+     : ${F77FLAGS='-Mx,125,0x200'}
+     : ${F90FLAGS='-Mx,125,0x200'}
+     : ${F77_OPENMP_FLAGS='-mp'}
+     : ${F77_OPTIMISE_FLAGS='-fast -Mvect=assoc'}
+     : ${F77_WARN_FLAGS='-Minfo -Mneginfo'}
+     : ${F90_OPENMP_FLAGS='-mp'}
+     : ${F90_OPTIMISE_FLAGS='-fast -Mvect=assoc'}
+     : ${F90_WARN_FLAGS='-Minfo -Mneginfo'}
+     : ${F77_DEBUG_FLAGS='-g'}
+     : ${F90_DEBUG_FLAGS='-g'}
+     F90_VERSION="`$F90 -V 2>&1 | grep -i pgf90 | head -n1`"
+     ;;
+   fujitsu)
+     : ${LIBS='fj9i6 fj9e6 fj9f6'}
+     F90_VERSION="`$F90 -V 2>&1 | grep -i version | head -n1`"
+     ;;
+   lahey)
+     : ${F77_DEBUG_FLAGS='-g --chk'}
+     : ${F90_DEBUG_FLAGS='-g --chk'}
+     : ${F77_WARN_FLAGS='--warn'}
+     : ${F90_WARN_FLAGS='--warn'}
+     : ${F77_OPTIMISE_FLAGS='-O'}
+     : ${F90_OPTIMISE_FLAGS='-O'}
+     if test -n "$LAHEY" ; then
+       : ${LIBDIRS="$LAHEY/lib"}
+     else
+       if test -d '/usr/local/lf9555/lib' ; then
+         : ${LIBDIRS='/usr/local/lf9555/lib'}
+       elif test -d '/usr/local/lf9560/lib' ; then
+         : ${LIBDIRS='/usr/local/lf9560/lib'}
+       fi
+     fi
+     if test -z "${LIBDIRS}" ; then
+       echo 'Unable to locate LAHEY installation directory'
+       echo 'Please configure with LAHEY=... or set LAHEY in your environment'
+       exit 2
+     fi
+     if test -f "${LIBDIRS}/libfccx86_6a.a" ; then
+       : ${LIBS='fj9i6 fj9f6 fj9e6 fccx86_6a'}
+     else
+       : ${LIBS='fj9i6 fj9e6 fj9f6'}
+     fi
+     F90_VERSION="`$F90 --version 2>&1 | grep -i version | head -n1`"
+     ;;
+   SGI)
+     : ${F77_WARN_FLAGS='-fullwarn'}
+     : ${F90_WARN_FLAGS='-fullwarn'}
+     : ${F77_DEBUG_FLAGS='-g3'}
+     : ${F90_DEBUG_FLAGS='-g3'}
+     : ${F77_OPTIMISE_FLAGS='-O3'}
+     : ${F90_OPTIMISE_FLAGS='-O3'}
+     : ${LIBS='fortran ffio m'}
+     F90_VERSION="`$F90 -v 2>&1 | grep -i version | head -n1`"
+     ;;
+  Intel)
+     if test "$OPTIMISE" = 'no'; then
+       : ${F77FLAGS='-align -w95 -O0'}
+       : ${F90FLAGS='-align -w95 -O0'}
+     else
+       : ${F77FLAGS='-align -w95'}
+       : ${F90FLAGS='-align -w95'}
+     fi
+
+     : ${F77_OPENMP_FLAGS='-openmp'}
+     : ${F90_OPENMP_FLAGS='-openmp'}
+
+     intel_dir="$(dirname $(dirname $(which $F90)))"
+
+     intel_subdir=""
+     if [ ! -d "$intel_dir/lib" -a -d "$(dirname $intel_dir)/lib" ]; then
+         intel_subdir="/$(basename $(dirname $(which $F90)))"
+         intel_dir="$(dirname $intel_dir)"
+     fi
+     intel_libdir="$intel_dir/lib$intel_subdir"
+
+     case "$host_cpu" in
+       i?86 | x86_64)
+         # add the necessary libraries according to the compiler version
+         if test "`$F90 -V 2>&1 | grep Version | sed 's/.*Version //' | sed 's/\..*//'`" -ge 8; then
+           : ${LIBS='ifcore imf svml m'}
+         else
+           : ${LIBS='intrins IEPCF90 F90 imf svml m irc cxa cprts cxa pthread'}
+         fi
+         # add the libpath
+         : ${LIBDIRS="$intel_libdir"}
+         # add the linker script if the linker is not Intel
+         if test `basename $LD` != 'icc' -a `basename $LD` != 'icpc' -a -e "$intel_libdir/icrt.link" ; then
+           : ${LDFLAGS="-Qy $intel_libdir/icrt.link"}
+         fi
+         ;;
+
+       ia64)
+         # add the necessary libraries according to the compiler version
+         if test "`$F90 -V 2>&1 | grep Version | sed 's/.*Version //' | sed 's/\..*//'`" -ge 8; then
+           : ${LIBS='ifcore dl imf m'}
+         else
+           : ${LIBS='intrins IEPCF90 F90 imf m irc cxa cprts cxa'}
+         fi
+
+         if test "$LD" != 'ecc' -a "$LD" != 'ecpc' ; then
+           : ${LIBDIRS="$intel_libdir"}
+         fi
+         ;;
+
+       *)
+         echo "Don't know compiler options for cpu $host_cpu"
+         ;;
+     esac
+     # Be conservative about the default optimisation options; the
+     # user can always override them
+     : ${F77_OPTIMISE_FLAGS="-O2 -ip"}
+     : ${F90_OPTIMISE_FLAGS="-O2 -ip"}
+     F77_VERSION="`$F77 -V 2>&1 | grep -i version | head -n1`"
+     F90_VERSION="`$F90 -V 2>&1 | grep -i version | head -n1`"
+     ;;
+   Compaq)
+     : ${LIBS='for m'}
+     F77_VERSION="`$F77 -v 2>&1 | grep -i version | head -n1`"
+     F90_VERSION="`$F90 -v 2>&1 | grep -i version | head -n1`"
+     ;;
+   PathScale)
+     : ${F77FLAGS='-fno-second-underscore'}
+     : ${F90FLAGS='-fno-second-underscore'}
+     : ${F77_OPENMP_FLAGS='-openmp'}
+     : ${F90_OPENMP_FLAGS='-openmp'}
+     : ${F77_OPTIMISE_FLAGS='-Ofast'}
+     : ${F90_OPTIMISE_FLAGS='-Ofast'}
+     if test "$OPTIMISE" != 'no'; then
+       : ${LDFLAGS='-Ofast'}
+     fi
+     : ${F77_WARN_FLAGS='-fullwarn'}
+     : ${F90_WARN_FLAGS='-fullwarn'}
+     : ${LIBS='pathfortran mv'}
+     F77_VERSION="`$F77 -v 2>&1 | grep -i version | head -n1`"
+     F90_VERSION="`$F90 -v 2>&1 | grep -i version | head -n1`"
+     ;;
+   IBM)
+     : ${F77FLAGS='-q64 -qextname -qsuppress=1501-510:cmpmsg'}
+     : ${F90FLAGS='-q64 -qextname -qsuppress=1501-510:cmpmsg'}
+     : ${F77_OPTIMISE_FLAGS='-O3 -qhot -qarch=auto -qtune=auto -qcache=auto'}
+     : ${F90_OPTIMISE_FLAGS='-O3 -qhot -qarch=auto -qtune=auto -qcache=auto'}
+     : ${F77_OPENMP_FLAGS='-qsmp=omp'}
+     : ${F90_OPENMP_FLAGS='-qsmp=omp'}
+     : ${LIBS='xlf90'}
+     F77_VERSION="`$F77 -qversion 2>&1 | head -n1`"
+     F90_VERSION="`$F90 -qversion 2>&1 | head -n1`"
+     CCTK_WriteLine make.arch.defn 'F90FLAGS += $(IBM_$(subst .,,$(suffix $<))_FLAGS)' 
+     CCTK_WriteLine make.arch.defn 'F77FLAGS += $(IBM_$(subst .,,$(suffix $<))_FLAGS)'
+     CCTK_WriteLine make.arch.defn 'IBM_F90_FLAGS = -qfree'
+     CCTK_WriteLine make.arch.defn 'IBM_f90_FLAGS = -qfree'
+     CCTK_WriteLine make.arch.defn 'IBM_F77_FLAGS = -qfixed'
+     CCTK_WriteLine make.arch.defn 'IBM_f77_FLAGS = -qfixed'
+     CCTK_WriteLine make.arch.defn 'IBM_F_FLAGS = -qfixed'
+     CCTK_WriteLine make.arch.defn 'IBM_f_FLAGS = -qfixed'
+     ;;
+   none)
+     : ${LIBS='m'}
+     ;;
+   *)
+     echo "Unknown Linux f90 compiler '$F90'."
+     echo 'Please add appropriate information to'
+     echo "  $srcdir/known-architectures/linux-gnu"
+     echo 'and send the updated file to CactusMaint'
+     echo 'We will try anyway ...'
+     ;;
+ esac
+
+ # C compiler
+ # Set the appropriate dependency, warning, and debugging flags
+ # Note that the defaults settings are for gcc/g++ and set by configure
+ case `basename $CC` in
+   # GNU
+   gcc | cc)
+     : ${CFLAGS='-pipe -std=gnu99'}
+     : ${C_OPTIMISE_FLAGS='-O3'}
+     CC_VERSION="`$CC -v 2>&1 | grep -i "gcc version" | head -n1`"
+     major_version=`echo $CC_VERSION | cut -f3 -d' ' | cut -f1 -d'.'`
+     minor_version=`echo $CC_VERSION | cut -f3 -d' ' | cut -f2 -d'.'`
+     # only GCC versions 4.1 and higher support OpenMP
+     if test ! \( $major_version -lt 4 -o \( $major_version -eq 4 -a $minor_version -lt 1 \) \) ; then
+       : ${C_OPENMP_FLAGS='-fopenmp'}
+     fi
+     ;;
+   # Intel
+   [ei]cc)
+     icc_version=`$CC -V 2>&1 | grep Version | sed 's/.*Version //' | cut -f1 -d.`
+     if test "$OPTIMISE" = 'no'; then
+       icc_opt='-O0'
+     else
+       icc_opt=''
+     fi
+     if test $icc_version -ge 8; then
+       icc_c99='-std=c99 -U__STRICT_ANSI__'
+     else
+       icc_c99='-c99'
+     fi
+     : ${CFLAGS="$icc_opt $icc_c99"}
+     : ${C_DEPEND='$(CC) -M $(CPPFLAGS) $(CFLAGS)'}
+     if test $icc_version -ge 8; then
+       c_warn_flags='-Wall -w1 -Wcheck'
+     else
+       c_warn_flags='-Wall -w1'
+     fi
+     : ${C_WARN_FLAGS="$c_warn_flags"}
+     CC_VERSION="`$CC -V 2>&1 | grep -i version | head -n1`"
+     : ${C_OPENMP_FLAGS='-openmp'}
+     ;;
+   sgicc)
+     : ${C_OPTIMISE_FLAGS='-O3'}
+     : ${C_DEBUG_FLAGS='-g3'}
+     CC_VERSION="`$CC -v 2>&1 | grep -i version | head -n1`"
+     ;;
+   pgcc)
+     : ${C_OPENMP_FLAGS='-mp'}
+     : ${C_OPTIMISE_FLAGS='-fast -O3 -Mvect=assoc'}
+     : ${C_WARN_FLAGS='-Minfo -Mneginfo'}
+     CC_VERSION="`$CC -V 2>&1 | grep -i pgcc | head -n1`"
+     ;;
+   pathcc)
+     : ${CFLAGS='-std=gnu99'}
+     : ${C_OPTIMISE_FLAGS='-Ofast'}
+     CC_VERSION="`$CC -v 2>&1 | grep -i version | head -n1`"
+     : ${C_OPENMP_FLAGS='-openmp'}
+     ;;
+   xlc | xlc_r | bgxlc | bgxlc_r)
+     : ${CFLAGS='-q64'}
+     : ${C_DEPEND='$(CXX) -E -M $(CPPFLAGS)'}
+     : ${C_DEPEND_OUT=' > /dev/null ; mv $(basename $(basename $@)).d $@'}
+     : ${C_OPENMP_FLAGS='-qsmp=omp'}
+     : ${C_OPTIMISE_FLAGS='-O3 -qhot -qarch=auto -qtune=auto -qcache=auto'}
+     CC_VERSION="`$CC -qversion 2>&1 | head -n1`"
+     ;;
+ esac
+
+ case `basename $CXX` in
+   # GNU
+   gcc | [gc]++)
+     : ${CXXFLAGS='-pipe -std=c++0x'}
+     : ${CXX_OPTIMISE_FLAGS='-O3'}
+     CXX_VERSION="`$CXX -v 2>&1 | grep -i "gcc version" | head -n1`"
+     major_version=`echo $CXX_VERSION | cut -f3 -d' ' | cut -f1 -d'.'`
+     minor_version=`echo $CXX_VERSION | cut -f3 -d' ' | cut -f2 -d'.'`
+     # only GCC versions 4.1 and higher support OpenMP
+     if test ! \( $major_version -lt 4 -o \( $major_version = 4 -a $minor_version -lt 1 \) \) ; then
+       : ${CXX_OPENMP_FLAGS='-fopenmp'}
+     fi
+     ;;
+   # Intel
+   [ei]cc | [ei]cpc)
+     if test "$OPTIMISE" = 'no'; then
+       : ${CXXFLAGS='-restrict -std=c++0x -O0'}
+     else
+       : ${CXXFLAGS='-restrict -std=c++0x'}
+     fi
+     icpc_fullversion=`$CXX -V 2>&1 | grep Version | sed 's/.*Version //' | cut -c1-3`
+     icpc_version=`echo $icpc_fullversion | cut -f1 -d.`
+     if test -z "$CXX_OPTIMISE_FLAGS"; then
+       if test "$host_cpu" = 'ia64' -o "$host_cpu" = 'x86_64'; then
+         CXX_OPTIMISE_FLAGS='-O2'
+       else
+         CXX_OPTIMISE_FLAGS='-O3'
+       fi
+       # Intel 8.1 and 9.0 have a bug when using anonymous namespaces
+       # taking out '-ip' bypasses this optimization bug
+       if test "$icpc_fullversion" != '8.1' -a "$icpc_fullversion" != '9.0'; then
+         CXX_OPTIMISE_FLAGS="$CXX_OPTIMISE_FLAGS -ip"
+       fi
+     fi
+     if test $icpc_version -ge 8; then
+       cxx_warn_flags='-Wall -w1 -Wcheck'
+     else
+       cxx_warn_flags='-Wall -w1'
+     fi
+     : ${CXX_WARN_FLAGS="$cxx_warn_flags"}
+     : ${CXX_DEPEND='$(CXX) -M $(CPPFLAGS) $(CXXFLAGS)'}
+     CXX_VERSION="`$CXX -V 2>&1 | grep -i version | head -n1`"
+     : ${CXX_OPENMP_FLAGS='-openmp'}
+     ;;
+   sgiCC)
+     : ${CXX_OPTIMISE_FLAGS='-O3'}
+     : ${CXX_DEBUG_FLAGS='-g3'}
+     CXX_VERSION="`$CXX -v 2>&1 | grep -i version | head -n1`"
+     ;;
+   pgCC)
+     : ${CXXFLAGS='--no_using_std'}
+     : ${CXX_OPENMP_FLAGS='-mp'}
+     : ${CXX_OPTIMISE_FLAGS='-fast -O3 -Mvect=assoc'}
+     : ${CXX_WARN_FLAGS='-Minfo -Mneginfo'}
+     if test `basename $LD` = 'pgCC'; then
+       : ${LDFLAGS='-Wl,--allow-multiple-definition'}
+     fi
+     CXX_VERSION="`$CXX -V 2>&1 | grep pgCC | head -n1`"
+     ;;
+   pathCC)
+     : ${CXX_OPTIMISE_FLAGS='-Ofast'}
+     CXX_VERSION="`$CXX -v 2>&1 | grep -i version | head -n1`"
+     : ${CXX_OPENMP_FLAGS='-openmp'}
+     ;;
+   xlC | xlC_r | bgxlC | bgxlC_r)
+     : ${CXXFLAGS='-q64'}
+     : ${CXX_DEPEND='$(CXX) -E -M $(CPPFLAGS)'}
+     : ${CXX_DEPEND_OUT=' > /dev/null ; mv $(basename $(basename $@)).d $@'}
+     : ${CXX_OPENMP_FLAGS='-qsmp=omp'}
+     : ${CXX_OPTIMISE_FLAGS='-O3 -qhot -qarch=auto -qtune=auto -qcache=auto'}
+     CXX_VERSION="`$CXX -qversion 2>&1 | head -n1`"
+     ;;
+ esac
+
+ : ${C_DEBUG_FLAGS='-g'}
+ : ${CXX_DEBUG_FLAGS='-g'}
+
+ # Cache stuff
+ if test -z "$CACHELINE_BYTES" ; then
+   case "$host_cpu" in
+     i?86 | powerpc | armv6l)
+       CACHELINE_BYTES=32
+       ;;
+     ia64)
+       CACHELINE_BYTES=128
+       ;;
+     x86_64)
+       CACHELINE_BYTES=64
+       ;;
+     *)
+       echo "Don't know cacheline size for cpu $host_cpu"
+       ;;
+   esac
+   if test -n "$CACHELINE_BYTES" ; then
+     echo "Setting CACHELINE_BYTES to $CACHELINE_BYTES"
+   fi
+ fi
+
+ if test -z "$CACHE_SIZE" ; then
+   if test "x$cross_compiling" = "xno" ; then
+     if test "$host_cpu" = 'ia64'; then
+       # for IA64 set it to 2MB for now (actually it's the L3 cache size)
+       CACHE_SIZE=2*1024
+     else
+       CACHE_SIZE="`cat /proc/cpuinfo | perl -nae 'if(m:cache\D+(\d+): && ! $dunnit) {print $1; $dunnit=1}'`"
+       if test -z "$CACHE_SIZE"; then
+         CACHE_SIZE=0
+       fi
+     fi
+     if test -n "$CACHE_SIZE" ; then
+       CACHE_SIZE="$CACHE_SIZE*1024"
+       echo "Setting CACHE_SIZE to $CACHE_SIZE bytes"
+     else
+       echo 'Unable to determine Cache size on this machine.'
+     fi
+   else
+     echo 'Cross compiling - unable to determine cache size'
+   fi
+ fi
+
+ if test "x$cross_compiling" = 'xyes' ; then
+   case "$host_cpu" in
+     i?86)
+       ENDIAN=little
+       SIZEOF_LONG_LONG=8
+       SIZEOF_LONG_INT=4
+       SIZEOF_INT=4
+       SIZEOF_SHORT_INT=2
+
+       SIZEOF_LONG_DOUBLE=8
+       SIZEOF_DOUBLE=8
+       SIZEOF_FLOAT=4
+
+       SIZEOF_POINTER=4
+     ;;
+     ia64)
+       ENDIAN=little
+       SIZEOF_LONG_LONG=8
+       SIZEOF_LONG_INT=8
+       SIZEOF_INT=4
+       SIZEOF_SHORT_INT=2
+
+       SIZEOF_LONG_DOUBLE=8
+       SIZEOF_DOUBLE=8
+       SIZEOF_FLOAT=4
+
+       SIZEOF_POINTER=8
+     ;;
+     *)
+       echo "Don't know details for cross-compilation to $host_cpu"
+   esac
+ fi
+
+# MPI stuff
+#
+# Linux has no native MPI, so we don't set any NATIVE_MPI_XXX variables.
+# This is caught by lib/make/extras/MPI/NATIVE then.
+
+fi

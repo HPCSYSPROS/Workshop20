@@ -1,0 +1,45 @@
+# Schedule definitions for thorn PNSMapper
+
+STORAGE: PNSinput
+STORAGE: PNSoneD
+STORAGE: pnszones
+
+schedule GROUP PNSMapper_InitialData IN HydroBase_Initial
+{
+    SYNC: ADMBase::metric
+    SYNC: ADMBase::curv
+    SYNC: ADMBase::lapse
+    SYNC: ADMBase::shift
+    SYNC: hydrobase::rho
+    SYNC: hydrobase::press
+    SYNC: hydrobase::eps
+    SYNC: hydrobase::vel
+    SYNC: hydrobase::temperature
+    SYNC: hydrobase::entropy
+    SYNC: hydrobase::Y_e
+    SYNC: hydrobase::w_lorentz
+    SYNC: GRHydro::dens
+    SYNC: GRHydro::tau
+    SYNC: GRHydro::scon
+    SYNC: GRHydro::y_e_con
+
+} "Group for the PNS initial data"
+
+
+schedule PNSMapper_ReadProfile IN PNSMapper_InitialData
+{
+  LANG: Fortran
+  OPTION: global
+} "Read profile"
+
+schedule PNSMapper_SolveMetric IN PNSMapper_InitialData AFTER PNSMapper_ReadProfile
+{
+  LANG: C
+  OPTION: global
+} "Solve metric"
+
+schedule PNSMapper_Map IN PNSMapper_InitialData AFTER PNSMapper_SolveMetric
+{
+  LANG: Fortran
+} "Map 1D to 3D"
+

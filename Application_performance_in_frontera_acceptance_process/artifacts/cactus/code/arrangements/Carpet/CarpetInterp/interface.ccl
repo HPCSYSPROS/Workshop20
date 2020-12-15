@@ -1,0 +1,73 @@
+# Interface definition for thorn CarpetInterp
+
+IMPLEMENTS: interp
+
+uses include header: nompi.h
+
+uses include header: data.hh
+uses include header: bbox.hh
+uses include header: data.hh
+uses include header: defs.hh
+uses include header: dist.hh
+uses include header: ggf.hh
+uses include header: timestat.hh
+uses include header: typecase.hh
+uses include header: typeprops.hh
+uses include header: vect.hh
+
+uses include header: carpet.hh
+
+
+
+# Interpolation
+CCTK_INT FUNCTION                                           \
+    SymmetryInterpolate                                     \
+        (CCTK_POINTER_TO_CONST IN cctkGH,                   \
+         CCTK_INT IN N_dims,                                \
+         CCTK_INT IN local_interp_handle,                   \
+         CCTK_INT IN param_table_handle,                    \
+         CCTK_INT IN coord_system_handle,                   \
+         CCTK_INT IN N_interp_points,                       \
+         CCTK_INT IN interp_coords_type,                    \
+         CCTK_POINTER_TO_CONST ARRAY IN interp_coords,      \
+         CCTK_INT IN N_input_arrays,                        \
+         CCTK_INT ARRAY IN input_array_indices,             \
+         CCTK_INT IN N_output_arrays,                       \
+         CCTK_INT ARRAY IN output_array_types,              \
+         CCTK_POINTER ARRAY IN output_arrays)
+USES FUNCTION SymmetryInterpolate
+
+
+
+CCTK_INT FUNCTION                                           \
+    DriverInterpolate                                       \
+        (CCTK_POINTER_TO_CONST IN cctkGH,                   \
+         CCTK_INT IN N_dims,                                \
+         CCTK_INT IN local_interp_handle,                   \
+         CCTK_INT IN param_table_handle,                    \
+         CCTK_INT IN coord_system_handle,                   \
+         CCTK_INT IN N_interp_points,                       \
+         CCTK_INT IN interp_coords_type,                    \
+         CCTK_POINTER_TO_CONST ARRAY IN interp_coords,      \
+         CCTK_INT IN N_input_arrays,                        \
+         CCTK_INT ARRAY IN input_array_indices,             \
+         CCTK_INT IN N_output_arrays,                       \
+         CCTK_INT ARRAY IN output_array_types,              \
+         CCTK_POINTER ARRAY IN output_arrays)
+PROVIDES FUNCTION DriverInterpolate \
+   WITH Carpet_DriverInterpolate    \
+   LANGUAGE C
+
+
+
+# Access coordinate information (on the coarse level)
+CCTK_INT FUNCTION GetCoordRange        \
+    (CCTK_POINTER_TO_CONST IN  cctkGH, \
+     CCTK_INT              IN  m,      \
+     CCTK_INT              IN  ml,     \
+     CCTK_INT              IN  size,   \
+     CCTK_INT        ARRAY OUT gsh,    \
+     CCTK_REAL       ARRAY OUT lower,  \
+     CCTK_REAL       ARRAY OUT upper,  \
+     CCTK_REAL       ARRAY OUT delta)
+REQUIRES FUNCTION GetCoordRange

@@ -1,0 +1,20 @@
+Cactus Code Thorn IOUtil
+Author(s)    : Gabrielle Allen
+               Tom Goodale
+               Thomas Radke
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+This thorn is the flesh for IO - it always needs to be activated
+if you want to do some IO in Cactus.
+
+The thorn just provides basic IO parameters.
+These are used in other IO thorns which do the real work.
+
+It also provides a method for registration of recovery routines.
+
+
+2. Additional information

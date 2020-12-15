@@ -1,0 +1,131 @@
+# Parameter definitions for thorn PNSHelper
+
+BOOLEAN solve_after_recovery "solve for constraints after recovery" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN verbose "Do you want me to talk?" STEERABLE=ALWAYS
+{
+} "no"
+
+CCTK_INT update_GR_every "how often to update GR" STEERABLE=ALWAYS
+{
+-1   :: "don't do anything"
+ 1:* :: ""
+} 8 
+
+CCTK_INT update_GR_every_start "how often to update GR at the beginning" STEERABLE=ALWAYS
+{
+ 1:* :: ""
+-1   :: "don't do anything"
+} 1
+
+CCTK_INT extrapolation_order "order of metric extrapolation" STEERABLE=ALWAYS
+{
+ 0:* :: "0 or larger integer"
+} 2
+
+
+CCTK_REAL update_GR_switch_time "switching to normal evolution after this cctk_time" STEERABLE=ALWAYS
+{
+ 0.0:* :: ""
+} 0.0
+
+
+CCTK_INT nrad "Number of radial grid points on equidistant part of the grid" STEERABLE=ALWAYS
+{
+  0:* :: ""
+} 600
+
+CCTK_INT nrad_outer "Number of radial grid points on nonequidistant part of the grid" STEERABLE=ALWAYS
+{
+  0:* :: ""
+} 0
+
+CCTK_INT ntheta "Number of grid points in the theta direction" STEERABLE=ALWAYS
+{
+  0:* :: ""
+} 3
+
+CCTK_INT nphi "Number of grid points in the phi direction" STEERABLE=ALWAYS
+{
+  0:* :: ""
+} 1
+
+CCTK_REAL rad_max "Maximum radius for equidistant part of tau" STEERABLE=always
+{
+  0:* :: ""
+} 300.0e0
+
+CCTK_REAL rad_max_outer "Maximum radius for non-equidistant part of tau" STEERABLE=always
+{
+  0:* :: ""
+} 0.0
+
+
+
+KEYWORD symm "Symmetry"  STEERABLE=always
+{
+ "octant" :: "Octant symmetry"
+ "bitant" :: "Bitant symmetry"
+ "full"   :: "Full grid"
+} "full"
+
+KEYWORD collect "How to collect data into 1d arrays" STEERABLE=recover
+{
+  "interpolate" :: "interpolate data"
+  "distribute"  :: "distribute (bin) data"
+} "interpolate"
+
+STRING interpolator "Interpolator" STEERABLE=always
+{
+  "" :: "must be a registered interpolator"
+} "Lagrange polynomial interpolation"
+
+STRING interpolator_options "Options for the interpolator" STEERABLE=always
+{
+  "" :: "must be a valid options specification"
+} "order=2"
+
+STRING coordinate_system "Coordinate system" STEERABLE=always
+{
+  "" :: "must be a registered coordinate system"
+} "cart3d"
+
+
+shares: ADMBase
+
+extends keyword evolution_method
+{
+  "PNSHelper" :: "PNSHelper evolution"
+}
+
+extends keyword lapse_evolution_method
+{
+  "PNSHelper" :: "PNSHelper lapse evolution"
+}
+
+extends keyword shift_evolution_method
+{
+  "PNSHelper" :: "PNSHelper shift evolution"
+}
+
+extends keyword dtlapse_evolution_method
+{
+  "PNSHelper" :: "PNSHelper dtlapse evolution"
+}
+
+extends keyword dtshift_evolution_method
+{
+  "PNSHelper" :: "PNSHelper dtshift evolution"
+}
+
+shares: MethodOfLines
+USES CCTK_INT MoL_Num_Constrained_Vars
+
+restricted:
+
+CCTK_INT PNSHelper_MaxNumConstrainedVars "The maximum number of constrained variables used by GRHydro" ACCUMULATOR-BASE=MethodofLines::MoL_Num_Constrained_Vars
+{
+  15:30          :: "A small range, depending on testing or not"
+} 15

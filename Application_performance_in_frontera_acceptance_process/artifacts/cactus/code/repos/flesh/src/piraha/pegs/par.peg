@@ -1,0 +1,41 @@
+skipper = ([ \t\r\n]|\#.*)*
+# comment
+skipeol = ([ \t\r]|\#.*)*($|\n)
+any = [^]
+stringcomment = #.*
+stringparser = ^({stringcomment}|{var}|{name}|{any})*$
+# Note that / occurs in some par files. It is my
+# feeling that this should require quote marks.
+name = [a-zA-Z][a-zA-Z0-9_]*
+dname = [0-9][a-zA-Z_]{2,}
+inquot = ({var}|\\.|[^\\"])*
+fname = \.?/[-\./0-9a-zA-Z_]+
+quot = "{inquot}"|{fname}
+num = ([0-9]+(\.[0-9]*|)|\.[0-9]+)([ed][+-]?[0-9]+|)
+env = ENV\{{name}\}
+var = \$({env}|{name}|\{{name}\})
+powexpr = {value}( \*\* {value})?
+mulop = [*/%]
+mexpr = {powexpr}( {mulop} {powexpr})*
+addop = [+-]
+aexpr = {mexpr}( {addop} {mexpr})*
+compop = [<>]=?
+compexpr = {aexpr}( {compop} {aexpr})?
+eqop = [!=]=
+eqexpr = {compexpr}( {eqop} {eqexpr})?
+andexpr = {eqexpr}( && {eqexpr})?
+expr = {andexpr}( \|\| {andexpr})?
+eval = {expr}
+paren = \( {expr} \)
+par = {name} :: {name}( {parindex})?
+func = {name} \( {expr} \)
+array = \[ {expr}( , {expr})* \]
+value = {unop}?({par}|{func}|{paren}|{dname}|{num}|{quot}|{name}|{var})
+unop = [-!]
+int = [0-9]+
+index = \[ {int} \]
+parindex = \[ {expr} \]
+active = (?i:ActiveThorns)
+set = ({active} = ({quot}|{name})|{par}( {index}|) = ({array}|\+?{expr})){-skipeol}
+desc = !DESC {quot}
+file = ^( ({desc}|{set}|{active}) )*$

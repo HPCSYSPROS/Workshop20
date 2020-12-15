@@ -1,0 +1,28 @@
+CARPETIOHDF5_BUILD_DIR = $(BUILD_DIR)/CarpetIOHDF5
+CARPETIOHDF5_SRC_DIR   = $(PACKAGE_DIR)/Carpet/CarpetIOHDF5/src/util
+
+CARPETIOHDF5_CXXFLAGS  = -DCCODE $(CXXFLAGS)
+
+# Extend CXXFLAGS if HDF5 library was built with LFS support
+ifneq ($(strip $(HDF5_LFS_FLAGS)),)
+  CARPETIOHDF5_CXXFLAGS += $(HDF5_LFS_FLAGS)
+endif
+
+# Add includes
+CARPETIOHDF5_CXXFLAGS += -I$(CONFIG) -I$(BINDINGS_DIR)/include -I$(FLESH_DIR)/include -I$(PACKAGE_DIR) $(HDF5_INC_DIRS:%=-I%) $(MPI_INC_DIRS:%=-I%)
+
+CARPETIOHDF5_LDFLAGS = $(CARPETIOHDF5_CXXFLAGS) $(DEBUG_LD) $(LDFLAGS) $(EXTRAFLAGS) $(GENERAL_LIBRARIES)
+
+
+
+# general linking rule
+$(UTIL_DIR)/%: $(CARPETIOHDF5_BUILD_DIR)/%.o
+	@echo Creating $* in $(UTIL_DIR) from $<
+	-$(MKDIR) $(MKDIRFLAGS) $(UTIL_DIR)
+	$(LD) $< $(CARPETIOHDF5_LDFLAGS) -o $@
+
+# general compile rule
+$(CARPETIOHDF5_BUILD_DIR)/%.o: $(CARPETIOHDF5_SRC_DIR)/%.cc
+	@echo Compiling $<
+	-$(MKDIR) $(MKDIRFLAGS) $(CARPETIOHDF5_BUILD_DIR)
+	$(CXX) $< $(CARPETIOHDF5_CXXFLAGS) -DTHORN_IS_CarpetIOHDF5 -c -o $@

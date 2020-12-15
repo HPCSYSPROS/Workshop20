@@ -1,0 +1,25 @@
+# Schedule definitions for thorn SymBase
+# $Header$
+
+SCHEDULE SymBase_Startup AT CCTK_STARTUP
+{
+  LANG: C
+} "Register GH Extension for SymBase"
+
+SCHEDULE GROUP SymBase_Wrapper AT CCTK_WRAGH
+{
+} "Wrapper group for SymBase"
+
+SCHEDULE GROUP SymmetryRegister IN SymBase_Wrapper
+{
+} "Register your symmetries here"
+
+SCHEDULE SymBase_Statistics IN SymBase_Wrapper AFTER SymmetryRegister
+{
+  LANG: C
+} "Print symmetry boundary face descriptions"
+
+SCHEDULE SymBase_Check AT CCTK_BASEGRID
+{
+  LANG: C
+} "Check whether the driver set up the grid consistently"

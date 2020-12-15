@@ -1,0 +1,609 @@
+# File produced by Kranc
+
+STORAGE: Psi0r_group[timelevels]
+
+STORAGE: Psi0i_group[timelevels]
+
+STORAGE: Psi1r_group[timelevels]
+
+STORAGE: Psi1i_group[timelevels]
+
+STORAGE: Psi2r_group[timelevels]
+
+STORAGE: Psi2i_group[timelevels]
+
+STORAGE: Psi3r_group[timelevels]
+
+STORAGE: Psi3i_group[timelevels]
+
+STORAGE: Psi4r_group[timelevels]
+
+STORAGE: Psi4i_group[timelevels]
+
+STORAGE: curvIr_group[timelevels]
+
+STORAGE: curvIi_group[timelevels]
+
+STORAGE: curvJr_group[timelevels]
+
+STORAGE: curvJi_group[timelevels]
+
+STORAGE: curvJ1_group[timelevels]
+
+STORAGE: curvJ2_group[timelevels]
+
+STORAGE: curvJ3_group[timelevels]
+
+STORAGE: curvJ4_group[timelevels]
+schedule WeylScal4_Startup at STARTUP
+{
+  LANG: C
+  OPTIONS: meta
+} "create banner"
+
+schedule WeylScal4_RegisterSymmetries in SymmetryRegister
+{
+  LANG: C
+  OPTIONS: meta
+} "register symmetries"
+
+if (CCTK_EQUALS(calc_scalars, "psi4"))
+{
+  if (CCTK_EQUALS(fd_order, "Nth"))
+  {
+    schedule group WeylScal4_psi4_calc_Nth_group in MoL_PseudoEvolution after ADMBase_SetADMVars
+    {
+    } "WeylScal4_psi4_calc_Nth"
+  }
+}
+
+schedule WeylScal4_psi4_calc_Nth in WeylScal4_psi4_calc_Nth_group
+{
+  LANG: C
+  READS: admbase::kxx(Everywhere)
+  READS: admbase::kxy(Everywhere)
+  READS: admbase::kxz(Everywhere)
+  READS: admbase::kyy(Everywhere)
+  READS: admbase::kyz(Everywhere)
+  READS: admbase::kzz(Everywhere)
+  READS: admbase::gxx(Everywhere)
+  READS: admbase::gxy(Everywhere)
+  READS: admbase::gxz(Everywhere)
+  READS: admbase::gyy(Everywhere)
+  READS: admbase::gyz(Everywhere)
+  READS: admbase::gzz(Everywhere)
+  READS: grid::x(Everywhere)
+  READS: grid::y(Everywhere)
+  READS: grid::z(Everywhere)
+  WRITES: WeylScal4::Psi4i(Interior)
+  WRITES: WeylScal4::Psi4r(Interior)
+} "WeylScal4_psi4_calc_Nth"
+
+schedule WeylScal4_psi4_calc_Nth_SelectBCs in WeylScal4_psi4_calc_Nth_bc_group
+{
+  LANG: C
+  OPTIONS: level
+  SYNC: Psi4i_group
+  SYNC: Psi4r_group
+} "WeylScal4_psi4_calc_Nth_SelectBCs"
+
+schedule group ApplyBCs as WeylScal4_psi4_calc_Nth_ApplyBCs in WeylScal4_psi4_calc_Nth_bc_group after WeylScal4_psi4_calc_Nth_SelectBCs
+{
+} "Apply BCs for groups set in WeylScal4_psi4_calc_Nth"
+
+if (CCTK_EQUALS(calc_scalars, "psi4"))
+{
+  if (CCTK_EQUALS(fd_order, "Nth"))
+  {
+    schedule group WeylScal4_psi4_calc_Nth_bc_group in WeylScal4_psi4_calc_Nth_group after WeylScal4_psi4_calc_Nth
+    {
+    } "WeylScal4_psi4_calc_Nth"
+  }
+}
+
+if (CCTK_EQUALS(calc_scalars, "psi4"))
+{
+  if (CCTK_EQUALS(fd_order, "Nth"))
+  {
+    schedule group WeylScal4_psi4_calc_Nth_bc_group in MoL_PseudoEvolutionBoundaries after MoL_PostStep
+    {
+    } "WeylScal4_psi4_calc_Nth"
+  }
+}
+
+if (CCTK_EQUALS(calc_scalars, "psi4"))
+{
+  if (CCTK_EQUALS(fd_order, "2nd"))
+  {
+    schedule group WeylScal4_psi4_calc_2nd_group in MoL_PseudoEvolution after ADMBase_SetADMVars
+    {
+    } "WeylScal4_psi4_calc_2nd"
+  }
+}
+
+schedule WeylScal4_psi4_calc_2nd in WeylScal4_psi4_calc_2nd_group
+{
+  LANG: C
+  READS: admbase::kxx(Everywhere)
+  READS: admbase::kxy(Everywhere)
+  READS: admbase::kxz(Everywhere)
+  READS: admbase::kyy(Everywhere)
+  READS: admbase::kyz(Everywhere)
+  READS: admbase::kzz(Everywhere)
+  READS: admbase::gxx(Everywhere)
+  READS: admbase::gxy(Everywhere)
+  READS: admbase::gxz(Everywhere)
+  READS: admbase::gyy(Everywhere)
+  READS: admbase::gyz(Everywhere)
+  READS: admbase::gzz(Everywhere)
+  READS: grid::x(Everywhere)
+  READS: grid::y(Everywhere)
+  READS: grid::z(Everywhere)
+  WRITES: WeylScal4::Psi4i(Interior)
+  WRITES: WeylScal4::Psi4r(Interior)
+} "WeylScal4_psi4_calc_2nd"
+
+schedule WeylScal4_psi4_calc_2nd_SelectBCs in WeylScal4_psi4_calc_2nd_bc_group
+{
+  LANG: C
+  OPTIONS: level
+  SYNC: Psi4i_group
+  SYNC: Psi4r_group
+} "WeylScal4_psi4_calc_2nd_SelectBCs"
+
+schedule group ApplyBCs as WeylScal4_psi4_calc_2nd_ApplyBCs in WeylScal4_psi4_calc_2nd_bc_group after WeylScal4_psi4_calc_2nd_SelectBCs
+{
+} "Apply BCs for groups set in WeylScal4_psi4_calc_2nd"
+
+if (CCTK_EQUALS(calc_scalars, "psi4"))
+{
+  if (CCTK_EQUALS(fd_order, "2nd"))
+  {
+    schedule group WeylScal4_psi4_calc_2nd_bc_group in WeylScal4_psi4_calc_2nd_group after WeylScal4_psi4_calc_2nd
+    {
+    } "WeylScal4_psi4_calc_2nd"
+  }
+}
+
+if (CCTK_EQUALS(calc_scalars, "psi4"))
+{
+  if (CCTK_EQUALS(fd_order, "2nd"))
+  {
+    schedule group WeylScal4_psi4_calc_2nd_bc_group in MoL_PseudoEvolutionBoundaries after MoL_PostStep
+    {
+    } "WeylScal4_psi4_calc_2nd"
+  }
+}
+
+if (CCTK_EQUALS(calc_scalars, "psi4"))
+{
+  if (CCTK_EQUALS(fd_order, "4th"))
+  {
+    schedule group WeylScal4_psi4_calc_4th_group in MoL_PseudoEvolution after ADMBase_SetADMVars
+    {
+    } "WeylScal4_psi4_calc_4th"
+  }
+}
+
+schedule WeylScal4_psi4_calc_4th in WeylScal4_psi4_calc_4th_group
+{
+  LANG: C
+  READS: admbase::kxx(Everywhere)
+  READS: admbase::kxy(Everywhere)
+  READS: admbase::kxz(Everywhere)
+  READS: admbase::kyy(Everywhere)
+  READS: admbase::kyz(Everywhere)
+  READS: admbase::kzz(Everywhere)
+  READS: admbase::gxx(Everywhere)
+  READS: admbase::gxy(Everywhere)
+  READS: admbase::gxz(Everywhere)
+  READS: admbase::gyy(Everywhere)
+  READS: admbase::gyz(Everywhere)
+  READS: admbase::gzz(Everywhere)
+  READS: grid::x(Everywhere)
+  READS: grid::y(Everywhere)
+  READS: grid::z(Everywhere)
+  WRITES: WeylScal4::Psi4i(Interior)
+  WRITES: WeylScal4::Psi4r(Interior)
+} "WeylScal4_psi4_calc_4th"
+
+schedule WeylScal4_psi4_calc_4th_SelectBCs in WeylScal4_psi4_calc_4th_bc_group
+{
+  LANG: C
+  OPTIONS: level
+  SYNC: Psi4i_group
+  SYNC: Psi4r_group
+} "WeylScal4_psi4_calc_4th_SelectBCs"
+
+schedule group ApplyBCs as WeylScal4_psi4_calc_4th_ApplyBCs in WeylScal4_psi4_calc_4th_bc_group after WeylScal4_psi4_calc_4th_SelectBCs
+{
+} "Apply BCs for groups set in WeylScal4_psi4_calc_4th"
+
+if (CCTK_EQUALS(calc_scalars, "psi4"))
+{
+  if (CCTK_EQUALS(fd_order, "4th"))
+  {
+    schedule group WeylScal4_psi4_calc_4th_bc_group in WeylScal4_psi4_calc_4th_group after WeylScal4_psi4_calc_4th
+    {
+    } "WeylScal4_psi4_calc_4th"
+  }
+}
+
+if (CCTK_EQUALS(calc_scalars, "psi4"))
+{
+  if (CCTK_EQUALS(fd_order, "4th"))
+  {
+    schedule group WeylScal4_psi4_calc_4th_bc_group in MoL_PseudoEvolutionBoundaries after MoL_PostStep
+    {
+    } "WeylScal4_psi4_calc_4th"
+  }
+}
+
+if (CCTK_EQUALS(calc_scalars, "psis"))
+{
+  if (CCTK_EQUALS(fd_order, "Nth"))
+  {
+    schedule group WeylScal4_psis_calc_Nth_group in MoL_PseudoEvolution after ADMBase_SetADMVars
+    {
+    } "WeylScal4_psis_calc_Nth"
+  }
+}
+
+schedule WeylScal4_psis_calc_Nth in WeylScal4_psis_calc_Nth_group
+{
+  LANG: C
+  READS: admbase::kxx(Everywhere)
+  READS: admbase::kxy(Everywhere)
+  READS: admbase::kxz(Everywhere)
+  READS: admbase::kyy(Everywhere)
+  READS: admbase::kyz(Everywhere)
+  READS: admbase::kzz(Everywhere)
+  READS: admbase::gxx(Everywhere)
+  READS: admbase::gxy(Everywhere)
+  READS: admbase::gxz(Everywhere)
+  READS: admbase::gyy(Everywhere)
+  READS: admbase::gyz(Everywhere)
+  READS: admbase::gzz(Everywhere)
+  READS: grid::x(Everywhere)
+  READS: grid::y(Everywhere)
+  READS: grid::z(Everywhere)
+  WRITES: WeylScal4::Psi0i(Interior)
+  WRITES: WeylScal4::Psi0r(Interior)
+  WRITES: WeylScal4::Psi1i(Interior)
+  WRITES: WeylScal4::Psi1r(Interior)
+  WRITES: WeylScal4::Psi2i(Interior)
+  WRITES: WeylScal4::Psi2r(Interior)
+  WRITES: WeylScal4::Psi3i(Interior)
+  WRITES: WeylScal4::Psi3r(Interior)
+  WRITES: WeylScal4::Psi4i(Interior)
+  WRITES: WeylScal4::Psi4r(Interior)
+} "WeylScal4_psis_calc_Nth"
+
+schedule WeylScal4_psis_calc_Nth_SelectBCs in WeylScal4_psis_calc_Nth_bc_group
+{
+  LANG: C
+  OPTIONS: level
+  SYNC: Psi0i_group
+  SYNC: Psi0r_group
+  SYNC: Psi1i_group
+  SYNC: Psi1r_group
+  SYNC: Psi2i_group
+  SYNC: Psi2r_group
+  SYNC: Psi3i_group
+  SYNC: Psi3r_group
+  SYNC: Psi4i_group
+  SYNC: Psi4r_group
+} "WeylScal4_psis_calc_Nth_SelectBCs"
+
+schedule group ApplyBCs as WeylScal4_psis_calc_Nth_ApplyBCs in WeylScal4_psis_calc_Nth_bc_group after WeylScal4_psis_calc_Nth_SelectBCs
+{
+} "Apply BCs for groups set in WeylScal4_psis_calc_Nth"
+
+if (CCTK_EQUALS(calc_scalars, "psis"))
+{
+  if (CCTK_EQUALS(fd_order, "Nth"))
+  {
+    schedule group WeylScal4_psis_calc_Nth_bc_group in WeylScal4_psis_calc_Nth_group after WeylScal4_psis_calc_Nth
+    {
+    } "WeylScal4_psis_calc_Nth"
+  }
+}
+
+if (CCTK_EQUALS(calc_scalars, "psis"))
+{
+  if (CCTK_EQUALS(fd_order, "Nth"))
+  {
+    schedule group WeylScal4_psis_calc_Nth_bc_group in MoL_PseudoEvolutionBoundaries after MoL_PostStep
+    {
+    } "WeylScal4_psis_calc_Nth"
+  }
+}
+
+if (CCTK_EQUALS(calc_scalars, "psis"))
+{
+  if (CCTK_EQUALS(fd_order, "2nd"))
+  {
+    schedule group WeylScal4_psis_calc_2nd_group in MoL_PseudoEvolution after ADMBase_SetADMVars
+    {
+    } "WeylScal4_psis_calc_2nd"
+  }
+}
+
+schedule WeylScal4_psis_calc_2nd in WeylScal4_psis_calc_2nd_group
+{
+  LANG: C
+  READS: admbase::kxx(Everywhere)
+  READS: admbase::kxy(Everywhere)
+  READS: admbase::kxz(Everywhere)
+  READS: admbase::kyy(Everywhere)
+  READS: admbase::kyz(Everywhere)
+  READS: admbase::kzz(Everywhere)
+  READS: admbase::gxx(Everywhere)
+  READS: admbase::gxy(Everywhere)
+  READS: admbase::gxz(Everywhere)
+  READS: admbase::gyy(Everywhere)
+  READS: admbase::gyz(Everywhere)
+  READS: admbase::gzz(Everywhere)
+  READS: grid::x(Everywhere)
+  READS: grid::y(Everywhere)
+  READS: grid::z(Everywhere)
+  WRITES: WeylScal4::Psi0i(Interior)
+  WRITES: WeylScal4::Psi0r(Interior)
+  WRITES: WeylScal4::Psi1i(Interior)
+  WRITES: WeylScal4::Psi1r(Interior)
+  WRITES: WeylScal4::Psi2i(Interior)
+  WRITES: WeylScal4::Psi2r(Interior)
+  WRITES: WeylScal4::Psi3i(Interior)
+  WRITES: WeylScal4::Psi3r(Interior)
+  WRITES: WeylScal4::Psi4i(Interior)
+  WRITES: WeylScal4::Psi4r(Interior)
+} "WeylScal4_psis_calc_2nd"
+
+schedule WeylScal4_psis_calc_2nd_SelectBCs in WeylScal4_psis_calc_2nd_bc_group
+{
+  LANG: C
+  OPTIONS: level
+  SYNC: Psi0i_group
+  SYNC: Psi0r_group
+  SYNC: Psi1i_group
+  SYNC: Psi1r_group
+  SYNC: Psi2i_group
+  SYNC: Psi2r_group
+  SYNC: Psi3i_group
+  SYNC: Psi3r_group
+  SYNC: Psi4i_group
+  SYNC: Psi4r_group
+} "WeylScal4_psis_calc_2nd_SelectBCs"
+
+schedule group ApplyBCs as WeylScal4_psis_calc_2nd_ApplyBCs in WeylScal4_psis_calc_2nd_bc_group after WeylScal4_psis_calc_2nd_SelectBCs
+{
+} "Apply BCs for groups set in WeylScal4_psis_calc_2nd"
+
+if (CCTK_EQUALS(calc_scalars, "psis"))
+{
+  if (CCTK_EQUALS(fd_order, "2nd"))
+  {
+    schedule group WeylScal4_psis_calc_2nd_bc_group in WeylScal4_psis_calc_2nd_group after WeylScal4_psis_calc_2nd
+    {
+    } "WeylScal4_psis_calc_2nd"
+  }
+}
+
+if (CCTK_EQUALS(calc_scalars, "psis"))
+{
+  if (CCTK_EQUALS(fd_order, "2nd"))
+  {
+    schedule group WeylScal4_psis_calc_2nd_bc_group in MoL_PseudoEvolutionBoundaries after MoL_PostStep
+    {
+    } "WeylScal4_psis_calc_2nd"
+  }
+}
+
+if (CCTK_EQUALS(calc_scalars, "psis"))
+{
+  if (CCTK_EQUALS(fd_order, "4th"))
+  {
+    schedule group WeylScal4_psis_calc_4th_group in MoL_PseudoEvolution after ADMBase_SetADMVars
+    {
+    } "WeylScal4_psis_calc_4th"
+  }
+}
+
+schedule WeylScal4_psis_calc_4th in WeylScal4_psis_calc_4th_group
+{
+  LANG: C
+  READS: admbase::kxx(Everywhere)
+  READS: admbase::kxy(Everywhere)
+  READS: admbase::kxz(Everywhere)
+  READS: admbase::kyy(Everywhere)
+  READS: admbase::kyz(Everywhere)
+  READS: admbase::kzz(Everywhere)
+  READS: admbase::gxx(Everywhere)
+  READS: admbase::gxy(Everywhere)
+  READS: admbase::gxz(Everywhere)
+  READS: admbase::gyy(Everywhere)
+  READS: admbase::gyz(Everywhere)
+  READS: admbase::gzz(Everywhere)
+  READS: grid::x(Everywhere)
+  READS: grid::y(Everywhere)
+  READS: grid::z(Everywhere)
+  WRITES: WeylScal4::Psi0i(Interior)
+  WRITES: WeylScal4::Psi0r(Interior)
+  WRITES: WeylScal4::Psi1i(Interior)
+  WRITES: WeylScal4::Psi1r(Interior)
+  WRITES: WeylScal4::Psi2i(Interior)
+  WRITES: WeylScal4::Psi2r(Interior)
+  WRITES: WeylScal4::Psi3i(Interior)
+  WRITES: WeylScal4::Psi3r(Interior)
+  WRITES: WeylScal4::Psi4i(Interior)
+  WRITES: WeylScal4::Psi4r(Interior)
+} "WeylScal4_psis_calc_4th"
+
+schedule WeylScal4_psis_calc_4th_SelectBCs in WeylScal4_psis_calc_4th_bc_group
+{
+  LANG: C
+  OPTIONS: level
+  SYNC: Psi0i_group
+  SYNC: Psi0r_group
+  SYNC: Psi1i_group
+  SYNC: Psi1r_group
+  SYNC: Psi2i_group
+  SYNC: Psi2r_group
+  SYNC: Psi3i_group
+  SYNC: Psi3r_group
+  SYNC: Psi4i_group
+  SYNC: Psi4r_group
+} "WeylScal4_psis_calc_4th_SelectBCs"
+
+schedule group ApplyBCs as WeylScal4_psis_calc_4th_ApplyBCs in WeylScal4_psis_calc_4th_bc_group after WeylScal4_psis_calc_4th_SelectBCs
+{
+} "Apply BCs for groups set in WeylScal4_psis_calc_4th"
+
+if (CCTK_EQUALS(calc_scalars, "psis"))
+{
+  if (CCTK_EQUALS(fd_order, "4th"))
+  {
+    schedule group WeylScal4_psis_calc_4th_bc_group in WeylScal4_psis_calc_4th_group after WeylScal4_psis_calc_4th
+    {
+    } "WeylScal4_psis_calc_4th"
+  }
+}
+
+if (CCTK_EQUALS(calc_scalars, "psis"))
+{
+  if (CCTK_EQUALS(fd_order, "4th"))
+  {
+    schedule group WeylScal4_psis_calc_4th_bc_group in MoL_PseudoEvolutionBoundaries after MoL_PostStep
+    {
+    } "WeylScal4_psis_calc_4th"
+  }
+}
+
+if (CCTK_EQUALS(calc_invariants, "always"))
+{
+  if (CCTK_EQUALS(calc_scalars, "psis"))
+  {
+    if (CCTK_EQUALS(fd_order, "Nth"))
+    {
+      schedule group WeylScal4_invars_calc_Nth_group in MoL_PseudoEvolution after WeylScal4_psis_calc_Nth_group
+      {
+      } "WeylScal4_invars_calc_Nth"
+    }
+  }
+}
+
+schedule WeylScal4_invars_calc_Nth in WeylScal4_invars_calc_Nth_group
+{
+  LANG: C
+  READS: WeylScal4::Psi0i(Everywhere)
+  READS: WeylScal4::Psi0r(Everywhere)
+  READS: WeylScal4::Psi1i(Everywhere)
+  READS: WeylScal4::Psi1r(Everywhere)
+  READS: WeylScal4::Psi2i(Everywhere)
+  READS: WeylScal4::Psi2r(Everywhere)
+  READS: WeylScal4::Psi3i(Everywhere)
+  READS: WeylScal4::Psi3r(Everywhere)
+  READS: WeylScal4::Psi4i(Everywhere)
+  READS: WeylScal4::Psi4r(Everywhere)
+  WRITES: WeylScal4::curvIi(Interior)
+  WRITES: WeylScal4::curvIr(Interior)
+  WRITES: WeylScal4::curvJ1(Interior)
+  WRITES: WeylScal4::curvJ2(Interior)
+  WRITES: WeylScal4::curvJ3(Interior)
+  WRITES: WeylScal4::curvJ4(Interior)
+  WRITES: WeylScal4::curvJi(Interior)
+  WRITES: WeylScal4::curvJr(Interior)
+} "WeylScal4_invars_calc_Nth"
+
+if (CCTK_EQUALS(calc_invariants, "always"))
+{
+  if (CCTK_EQUALS(calc_scalars, "psis"))
+  {
+    if (CCTK_EQUALS(fd_order, "2nd"))
+    {
+      schedule group WeylScal4_invars_calc_2nd_group in MoL_PseudoEvolution after WeylScal4_psis_calc_2nd_group
+      {
+      } "WeylScal4_invars_calc_2nd"
+    }
+  }
+}
+
+schedule WeylScal4_invars_calc_2nd in WeylScal4_invars_calc_2nd_group
+{
+  LANG: C
+  READS: WeylScal4::Psi0i(Everywhere)
+  READS: WeylScal4::Psi0r(Everywhere)
+  READS: WeylScal4::Psi1i(Everywhere)
+  READS: WeylScal4::Psi1r(Everywhere)
+  READS: WeylScal4::Psi2i(Everywhere)
+  READS: WeylScal4::Psi2r(Everywhere)
+  READS: WeylScal4::Psi3i(Everywhere)
+  READS: WeylScal4::Psi3r(Everywhere)
+  READS: WeylScal4::Psi4i(Everywhere)
+  READS: WeylScal4::Psi4r(Everywhere)
+  WRITES: WeylScal4::curvIi(Interior)
+  WRITES: WeylScal4::curvIr(Interior)
+  WRITES: WeylScal4::curvJ1(Interior)
+  WRITES: WeylScal4::curvJ2(Interior)
+  WRITES: WeylScal4::curvJ3(Interior)
+  WRITES: WeylScal4::curvJ4(Interior)
+  WRITES: WeylScal4::curvJi(Interior)
+  WRITES: WeylScal4::curvJr(Interior)
+} "WeylScal4_invars_calc_2nd"
+
+if (CCTK_EQUALS(calc_invariants, "always"))
+{
+  if (CCTK_EQUALS(calc_scalars, "psis"))
+  {
+    if (CCTK_EQUALS(fd_order, "4th"))
+    {
+      schedule group WeylScal4_invars_calc_4th_group in MoL_PseudoEvolution after WeylScal4_psis_calc_4th_group
+      {
+      } "WeylScal4_invars_calc_4th"
+    }
+  }
+}
+
+schedule WeylScal4_invars_calc_4th in WeylScal4_invars_calc_4th_group
+{
+  LANG: C
+  READS: WeylScal4::Psi0i(Everywhere)
+  READS: WeylScal4::Psi0r(Everywhere)
+  READS: WeylScal4::Psi1i(Everywhere)
+  READS: WeylScal4::Psi1r(Everywhere)
+  READS: WeylScal4::Psi2i(Everywhere)
+  READS: WeylScal4::Psi2r(Everywhere)
+  READS: WeylScal4::Psi3i(Everywhere)
+  READS: WeylScal4::Psi3r(Everywhere)
+  READS: WeylScal4::Psi4i(Everywhere)
+  READS: WeylScal4::Psi4r(Everywhere)
+  WRITES: WeylScal4::curvIi(Interior)
+  WRITES: WeylScal4::curvIr(Interior)
+  WRITES: WeylScal4::curvJ1(Interior)
+  WRITES: WeylScal4::curvJ2(Interior)
+  WRITES: WeylScal4::curvJ3(Interior)
+  WRITES: WeylScal4::curvJ4(Interior)
+  WRITES: WeylScal4::curvJi(Interior)
+  WRITES: WeylScal4::curvJr(Interior)
+} "WeylScal4_invars_calc_4th"
+
+schedule WeylScal4_SelectBoundConds in MoL_PostStep
+{
+  LANG: C
+  OPTIONS: level
+} "select boundary conditions"
+
+schedule WeylScal4_CheckBoundaries at BASEGRID
+{
+  LANG: C
+  OPTIONS: meta
+} "check boundaries treatment"
+
+schedule WeylScal4_RegisterVars in MoL_Register
+{
+  LANG: C
+  OPTIONS: meta
+} "Register Variables for MoL"
+schedule group ApplyBCs as WeylScal4_ApplyBCs in MoL_PostStep after WeylScal4_SelectBoundConds
+{
+} "Apply boundary conditions controlled by thorn Boundary"

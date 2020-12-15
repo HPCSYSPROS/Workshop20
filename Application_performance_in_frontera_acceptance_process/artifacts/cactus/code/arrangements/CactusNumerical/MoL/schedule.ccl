@@ -1,0 +1,585 @@
+# Schedule definitions for thorn MoL
+# $Header$
+
+##########################################################
+###  Always require storage for the counters and time  ###
+##########################################################
+
+STORAGE: MoL_Counters, MoL_Original_Time
+
+
+############################################################
+###  If using the generic Runge-Kutta solver, switch on  ###
+###  storage for the coefficient arrays                  ###
+############################################################
+
+if (CCTK_Equals(ODE_Method,"Generic"))
+{
+  STORAGE: RKAlphaCoefficients
+  STORAGE: RKBetaCoefficients
+}
+
+#############################
+###  The actual routines  ###
+#############################
+
+########################
+###  Startup banner  ###
+########################
+
+schedule MoL_Startup AT Startup
+{
+  LANG: C
+} "Startup banner"
+
+#####################################
+###  Parameter checking routine.  ###
+#####################################
+
+schedule MoL_ParamCheck AT ParamCheck
+{
+  LANG: C
+} "Basic parameter checking"
+
+#################################################
+###  Allocate the arrays for the GF indexes.  ###
+#################################################
+
+schedule MoL_SetupIndexArrays AT Wragh
+{
+  LANG: C
+} "Set up the MoL bookkeeping index arrays"
+
+################################################
+###  Initialize the coefficients for the RK  ###
+###  arrays if required                      ###
+################################################
+
+if (CCTK_Equals(ODE_Method,"Generic"))
+{
+  schedule MoL_SetupRKCoefficients AT Wragh
+  {
+    LANG: C
+    OPTIONS: GLOBAL
+    STORAGE: RKAlphaCoefficients
+    STORAGE: RKBetaCoefficients
+  } "Initialize the generic Runge-Kutta coefficients"
+}
+
+#################################################
+###  The group where physics thorns call the  ###
+###  registration functions                   ###
+#################################################
+
+schedule MoL_SetScheduleStatus AT Wragh AFTER MoL_SetupIndexArrays
+{
+  LANG: C
+  OPTIONS: GLOBAL
+} "Set the flag so it is ok to register with MoL"
+
+schedule GROUP MoL_Register AT Wragh AFTER MoL_SetScheduleStatus
+{
+} "The group where physics thorns register variables with MoL"
+
+schedule MoL_ReportNumberVariables AT Wragh AFTER MoL_Register
+{
+  LANG:C
+  OPTIONS:META
+} "Report how many of each type of variable there are"
+
+if (initial_data_is_crap)
+{
+  if (copy_ID_after_MoL_PostStep)
+  {
+    schedule MoL_FillAllLevels AT PostInitial AFTER MoL_PostStep
+    {
+      LANG:C
+    } "A bad routine. Fills all previous timelevels with data copied from the current."
+  }
+  else
+  {
+    schedule MoL_FillAllLevels AT PostInitial BEFORE MoL_PostStep
+    {
+      LANG:C
+    } "A bad routine. Fills all previous timelevels with data copied from the current."
+  }
+}
+
+##########################################
+###  Initialise the step size control  ###
+##########################################
+
+schedule MoL_StartLoop AT Evol BEFORE MoL_Evolution
+{
+  LANG: C
+  OPTIONS: LEVEL
+} "Initialise the step size control"
+
+schedule MoL_StartLoop AT Initial
+{
+  LANG: C
+  OPTIONS: LEVEL
+} "Initialise the step size control"
+
+######################################################
+###  The evolution step. This is almost a self     ###
+###  contained EVOL step with PRE and POST steps   ###
+###  to allow changing the type of the variables,  ###
+###  boundary enforcement and so on.               ###
+######################################################
+
+schedule GROUP MoL_Evolution AT Evol WHILE MoL::MoL_Stepsize_Bad
+{
+} "A single Cactus evolution step using MoL"
+    
+######################################################
+###  StartStep contains the routines that just do  ###
+###  internal MoL stuff; setting the counter, and  ###
+###  changing the time and timestep if required.   ###
+######################################################
+
+schedule GROUP MoL_StartStep IN MoL_Evolution
+{
+} "MoL internal setup for the evolution step"
+
+schedule MoL_SetCounter IN MoL_StartStep 
+{
+  LANG: C
+  OPTIONS: LEVEL
+} "Set the counter for the ODE method to loop over"
+
+########################################################
+###  Note that the option LEVEL here is to ensure    ###
+###  that the time is set once per refinement level  ###
+###  and not once overall.                           ###
+########################################################
+
+schedule MoL_SetTime IN MoL_StartStep 
+{
+  LANG: C
+  OPTIONS: LEVEL
+} "Ensure the correct time and timestep are used"
+
+schedule MoL_AllocateScratchSpace IN MoL_StartStep 
+{
+  LANG: C
+  OPTIONS: LEVEL
+} "Allocate storage for scratch levels"
+
+#################################################################
+###  PreStep is where physics thorns can do their own setup.  ###
+###  This would include scheduling the function calls to      ###
+###  change the type of variable.                             ###
+#################################################################
+
+schedule GROUP MoL_PreStep IN MoL_Evolution AFTER MoL_StartStep BEFORE MoL_Step
+{
+} "Physics thorns can schedule preloop setup routines in here"
+
+#######################################################################
+###  Check to see if any type changing functions have been called,  ###
+###  and if so do the necessary bookkeeping.                        ###
+###  Right now, I think this is unnecessary, now that we don't      ###
+###  reallocate any scratch space.                                  ###
+#######################################################################
+
+#schedule MoL_CheckVariableType IN MoL_Evolution AFTER MoL_PreStep BEFORE MoL_Step
+#{
+#  LANG: C
+#} "If a physics thorn wants to change the type of a variable, do the bookkeeping"
+
+#################################################################
+###  Copy (ouch) the data into the correct timelevel so that  ###
+###  the physics thorn knows where to find it.                ###
+#################################################################
+
+if (!skip_initial_copy)
+{
+  schedule MoL_InitialCopy IN MoL_Evolution AFTER MoL_PreStep BEFORE MoL_Step
+  {
+    LANG: C
+  } "Ensure the data is in the correct timelevel"
+}
+
+#################################################
+###  The actual loop which updates the data.  ###
+#################################################
+
+schedule GROUP MoL_Step WHILE MoL::MoL_Intermediate_Step IN MoL_Evolution AFTER MoL_PreStep
+{
+} "The loop over the intermediate steps for the ODE integrator"
+
+####################################################
+###  The time integrator prepares the time step  ###
+####################################################
+
+if (CCTK_Equals(ODE_Method,"ICN-avg")) 
+{
+  schedule MoL_ICNAverage AS MoL_Prepare IN MoL_Step BEFORE MoL_CalcRHS
+  {
+    LANG: C
+  } "Averages the time levels for the averaging ICN method"
+}
+
+##############################################
+###  The time step is initialised to zero  ###
+##############################################
+
+if (init_RHS_zero)
+{
+  schedule MoL_InitRHS IN MoL_Step BEFORE MoL_CalcRHS
+  {
+    LANG: C
+  } "Initialise the RHS functions"
+}
+
+#####################################################
+###  The group where all the physics takes place  ###
+#####################################################
+
+schedule GROUP MoL_CalcRHS IN MoL_Step
+{
+} "Physics thorns schedule the calculation of the discrete spatial operator in here"
+
+#############################################################
+###  Any modification of the RHS done by external thorns  ###
+###  (dissipation etc.) should be done in MoL_PostRHS     ###
+#############################################################
+
+schedule GROUP MoL_PostRHS IN MoL_Step AFTER MoL_CalcRHS BEFORE (MoL_NaNCheck MoL_Add) 
+{
+} "Modify RHS functions"
+
+###############################################################
+###  Certain operations, specifically boundary conditions   ###
+###  applied to the RHS must be performed after all other   ###
+###  operations. These can be scheduled in this bin, under  ###
+###  the assumption that things like dissipation are        ###
+###  scheduled in the MoL_PostRHS bin. It is the users      ###
+###  problem to ensure that this is really done.            ###
+###############################################################
+
+schedule GROUP MoL_RHSBoundaries IN MoL_Step AFTER MoL_PostRHS BEFORE (MoL_NaNCheck MoL_Add)
+{
+} "Any 'final' modifications to the RHS functions (boundaries etc.)"
+
+#####################################################
+###  If required, check for any NaNs in the RHSs  ###
+#####################################################
+
+if (MoL_NaN_Check)
+{
+  schedule MoL_NaNCheck IN MoL_Step AFTER MoL_CalcRHS BEFORE MoL_Add
+  {
+    LANG: C
+  } "Check the RHS GFs for NaNs"
+}
+
+######################################################
+###  The time integrator performs the update here  ###
+######################################################
+
+if (CCTK_Equals(ODE_Method,"Generic"))
+{
+  schedule MoL_GenericRKAdd AS MoL_Add IN MoL_Step AFTER MoL_CalcRHS BEFORE (MoL_PostStep MoL_PostStepModify)
+  {
+    LANG: C
+  } "Updates calculated with a generic method"
+}
+else if (CCTK_Equals(ODE_Method,"Euler")) 
+{
+  schedule MoL_EulerAdd AS MoL_Add IN MoL_Step AFTER MoL_CalcRHS BEFORE MoL_PostStep
+  {
+    LANG: C
+  } "Updates calculated with the Euler method"
+}
+else if (CCTK_Equals(ODE_Method,"RK2")) 
+{
+  schedule MoL_RK2Add AS MoL_Add IN MoL_Step AFTER MoL_CalcRHS BEFORE MoL_PostStep
+  {
+    LANG: C
+  } "Updates calculated with the efficient Runge-Kutta 2 method"
+}
+else if (CCTK_Equals(ODE_Method,"RK2-central")) 
+{
+  schedule MoL_RK2CentralAdd AS MoL_Add IN MoL_Step AFTER MoL_CalcRHS BEFORE MoL_PostStep
+  {
+    LANG: C
+  } "Updates calculated with the central Runge-Kutta 2 method"
+}
+else if (CCTK_Equals(ODE_Method,"RK3")) 
+{
+  schedule MoL_RK3Add AS MoL_Add IN MoL_Step AFTER MoL_CalcRHS BEFORE MoL_PostStep
+  {
+    LANG: C
+  } "Updates calculated with the efficient Runge-Kutta 3 method"
+}
+else if (CCTK_Equals(ODE_Method,"RK4"))
+{
+  schedule MoL_RK4Add AS MoL_Add IN MoL_Step AFTER MoL_CalcRHS BEFORE MoL_PostStep
+  {
+    LANG: C
+  } "Updates calculated with the efficient Runge-Kutta 4 method"
+}
+else if (CCTK_Equals(ODE_Method,"RK45") || CCTK_Equals(ODE_Method,"RK45CK"))
+{
+  STORAGE: ErrorScalars
+
+  schedule MoL_RK45Add AS MoL_Add IN MoL_Step AFTER MoL_CalcRHS BEFORE MoL_PostStep
+  {
+    LANG: C
+  } "Updates calculated with the Runge-Kutta 45 method"
+}
+else if (CCTK_Equals(ODE_Method,"RK65")) 
+{
+  STORAGE: ErrorScalars
+
+  schedule MoL_RK65Add AS MoL_Add IN MoL_Step AFTER MoL_CalcRHS BEFORE MoL_PostStep
+  {
+    LANG: C
+  } "Updates calculated with the Runge-Kutta 65 method"
+}
+else if (CCTK_Equals(ODE_Method,"RK87")) 
+{
+  STORAGE: ErrorScalars
+
+  schedule MoL_RK87Add AS MoL_Add IN MoL_Step AFTER MoL_CalcRHS BEFORE MoL_PostStep
+  {
+    LANG: C
+  } "Updates calculated with the Runge-Kutta 87 method"
+}
+else if (CCTK_Equals(ODE_Method,"ICN"))
+{
+  schedule MoL_ICNAdd AS MoL_Add IN MoL_Step AFTER MoL_CalcRHS BEFORE MoL_PostStep
+  {
+    LANG: C
+  } "Updates calculated with the efficient ICN method"
+}
+else if (CCTK_Equals(ODE_Method,"ICN-avg"))
+{
+  schedule MoL_ICNAdd AS MoL_Add IN MoL_Step AFTER MoL_CalcRHS BEFORE MoL_PostStep
+  {
+    LANG: C
+  } "Updates calculated with the averaging ICN method"
+}
+else if (CCTK_Equals(ODE_Method,"AB"))
+{
+  schedule MoL_ABAdd AS MoL_Add IN MoL_Step AFTER MoL_CalcRHS BEFORE MoL_PostStep
+  {
+    LANG: C
+  } "Updates calculated with the Adams-Bashforth"
+}
+else if (CCTK_Equals(ODE_Method,"RK2-MR-2:1")) 
+{
+  schedule MoL_RK2_MR_2_1_Add AS MoL_Add IN MoL_Step AFTER MoL_CalcRHS BEFORE MoL_PostStep
+  {
+    LANG: C
+  } "Updates calculated with the multirate Runge-Kutta 2 method"
+}
+else if (CCTK_Equals(ODE_Method,"RK4-MR-2:1")) 
+{
+  schedule MoL_RK4_MR_2_1_Add AS MoL_Add IN MoL_Step AFTER MoL_CalcRHS BEFORE MoL_PostStep
+  {
+    LANG: C
+  } "Updates calculated with the multirate Runge-Kutta 4 method"
+}
+else if (CCTK_Equals(ODE_Method,"RK4-RK2")) 
+{
+  schedule MoL_RK4_RK2_Add AS MoL_Add IN MoL_Step AFTER MoL_CalcRHS BEFORE MoL_PostStep
+  {
+    LANG: C
+  } "Updates calculated with the multirate RK4/RK2 method"
+}
+
+
+##################################################
+###  Physics thorns can apply boundaries and   ###
+###  recalculate constrained variables and so  ###
+###  on in PostStep                            ###
+##################################################
+
+schedule GROUP MoL_PostStep IN MoL_Step AFTER MoL_Add
+{
+} "The group for physics thorns to schedule boundary calls etc."
+
+if (set_ID_boundaries)
+{
+  schedule GROUP MoL_PostStep AT PostInitial
+  {
+  } "Ensure that everything is correct after the initial data have been set up"
+}
+
+##################################################################
+###  Schedule the PostStep parts in the Carpet 'PostRegrid'    ###
+###  bin so that symmetries are automatically done correctly.  ###
+###  We may want to change this later as it could be           ###
+###  expensive, but it's simplest for the moment.              ###
+##################################################################
+
+schedule GROUP MoL_PostStep AT PostRegrid
+{
+} "Ensure that everything is correct after regridding"
+
+##################################################################
+###  Schedule the PostStep parts in the Carpet 'PostRestrict'  ###
+###  bin so that symmetries are automatically done correctly.  ###
+###  We may want to change this later as it could be           ###
+###  expensive, but it's simplest for the moment.              ###
+##################################################################
+
+if (set_ID_boundaries)
+{
+  schedule GROUP MoL_PostStep AT PostRestrictInitial
+  {
+  } "Ensure that everything is correct after restriction"
+}
+
+schedule GROUP MoL_PostStep AT PostRestrict
+{
+} "Ensure that everything is correct after restriction"
+
+##############################################################
+###  Schedule the PostStep parts after recovery            ###
+###  so that symmetries are automatically done correctly.  ###
+###  We may want to change this later as it could be       ###
+###  expensive, but it's simplest for the moment.          ###
+##############################################################
+
+if(run_MoL_PostStep_in_Post_Recover_Variables) {
+schedule GROUP MoL_PostStep AT Post_Recover_Variables
+{
+} "Ensure that everything is correct after recovery"
+}
+
+#########################################################################
+###  Physics thorns can enforce constraints in PostStepModify.        ###
+###  The difference between PostStep and PostStepModify is that       ###
+###  PostStep is scheduled at many other occasions, whereas the       ###
+###  PostStepModify is only scheduled during evolution.               ###
+#########################################################################
+
+schedule GROUP MoL_PostStepModify IN MoL_Step AFTER MoL_Add BEFORE MoL_PostStep
+{
+} "The group for physics thorns to schedule enforcing constraints"
+
+schedule GROUP MoL_PostStepModify At PostInitial BEFORE MoL_PostStep
+{
+} "The group for physics thorns to schedule enforcing constraints"
+
+##########################################################################
+###  Schedule a pseudo-evolution group to handle variables which are   ###
+###  not evolved, but which should be calculated at every time step.   ###
+##########################################################################
+
+schedule GROUP MoL_PseudoEvolution AT PostInitial AFTER MoL_PostStep
+{
+} "Calculate pseudo-evolved quantities"
+
+schedule GROUP MoL_PseudoEvolution AT Evol AFTER MoL_Evolution
+{
+} "Calculate pseudo-evolved quantities"
+
+schedule GROUP MoL_PseudoEvolutionBoundaries AT PostRegridInitial AFTER MoL_PostStep
+{
+} "Apply boundary conditions to pseudo-evolved quantities"
+
+schedule GROUP MoL_PseudoEvolutionBoundaries AT PostRegrid AFTER MoL_PostStep
+{
+} "Apply boundary conditions to pseudo-evolved quantities"
+
+schedule GROUP MoL_PseudoEvolutionBoundaries AT PostRestrictInitial AFTER MoL_PostStep
+{
+} "Apply boundary conditions to pseudo-evolved quantities"
+
+schedule GROUP MoL_PseudoEvolutionBoundaries AT PostRestrict AFTER MoL_PostStep
+{
+} "Apply boundary conditions to pseudo-evolved quantities"
+
+#################################################
+###  Final internal MoL stuff; decrement the  ###
+###  counter, change time and timestep        ###
+#################################################
+
+schedule MoL_DecrementCounter IN MoL_Step AFTER MoL_Add BEFORE (MoL_PostStep MoL_PostStepModify)
+{
+  LANG: C
+  OPTIONS: LEVEL
+} "Alter the counter number"
+
+schedule MoL_ResetTime IN MoL_Step AFTER MoL_DecrementCounter BEFORE (MoL_PostStep MoL_PostStepModify)
+{
+  LANG: C
+  OPTIONS: LEVEL
+} "If necessary, change the time"
+
+schedule MoL_ResetDeltaTime IN MoL_Step AFTER (MoL_PostStep MoL_PostStepModify)
+{
+  LANG: C
+  OPTIONS: LEVEL
+} "If necessary, change the timestep"
+
+##################################################
+###  Finally, restore any SaveAndRestore type  ###
+###  variables to their original state.        ###
+##################################################
+
+schedule MoL_RestoreSandR IN MoL_Evolution AFTER (MoL_ReduceAdaptiveError MoL_FinishLoop)
+{
+  LANG: C
+} "Restoring the Save and Restore variables to the original state"
+
+schedule MoL_FreeScratchSpace IN MoL_Evolution AFTER MoL_RestoreSandR
+{
+  LANG: C
+  OPTIONS: LEVEL
+} "Free storage for scratch levels"
+
+
+###################################################
+###  Loop until the step size was small enough  ###
+###################################################
+
+if (adaptive_stepsize)
+{
+  # Adaptive step size control
+  schedule MoL_InitAdaptiveError IN MoL_Evolution AFTER MoL_PostStep
+  {
+    LANG: C
+    OPTIONS: LEVEL
+  } "Control the step size: initialize error check variables"
+  
+  schedule MoL_FindAdaptiveError IN MoL_Evolution AFTER MoL_InitAdaptiveError
+  {
+    LANG: C
+  } "Control the step size: compute error check variables"
+  
+  schedule MoL_ReduceAdaptiveError IN MoL_Evolution AFTER MoL_FindAdaptiveError
+  {
+    LANG: C
+    OPTIONS: LEVEL
+  } "Control the step size: reduce error check variables"
+
+  schedule MoL_SetEstimatedDt AT POSTSTEP 
+  {
+    LANG: C
+    OPTIONS: LEVEL
+  } "Control the step size: set the new timestep"
+}
+else
+{
+  schedule MoL_FinishLoop IN MoL_Evolution AFTER MoL_Step
+  {
+    LANG: C
+    OPTIONS: LEVEL
+  } "Control the step size"
+}
+
+################################################################
+###  At the end (but before driver terminate to avoid those  ###
+###  irritating segfaults) free the index arrays.            ###
+################################################################
+
+schedule MoL_FreeIndexArrays AT Terminate BEFORE Driver_Terminate
+{
+  LANG: C
+} "Free the MoL bookkeeping index arrays"

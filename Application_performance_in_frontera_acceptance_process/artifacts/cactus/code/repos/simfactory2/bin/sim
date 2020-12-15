@@ -1,0 +1,23 @@
+#! /bin/bash
+
+# Shell wrapper around the SimFactory, so that we can locate the
+# "Python" executable
+
+# Look for SimFactory's Python executable
+file="sim.py"
+
+dirs=". ../lib ./simfactory/lib ../simfactory/lib"
+for dir in $dirs; do
+    cmd=$(dirname "$0")"/$dir/$file"
+    if [ -f "$cmd" ]; then
+        break
+    fi
+    unset cmd
+done
+if [ -z "$cmd" ]; then
+    echo "Could not find sim.py"
+    exit 1
+fi
+
+# Forward the call
+exec python "$cmd" "$@"

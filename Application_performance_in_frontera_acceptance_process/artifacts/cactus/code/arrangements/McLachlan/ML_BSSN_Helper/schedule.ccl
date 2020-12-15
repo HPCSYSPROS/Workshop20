@@ -1,0 +1,107 @@
+# ML_BSSN_Helper
+
+if (CCTK_EQUALS(evolution_method, "ML_BSSN")) {
+  
+  # ADMBase variables are pseudo-evolved:
+  # They are set in MoL_PostStep, can be prolongated,
+  # and need to be checkpointed
+  # TODO: Use other_timelevels instead of timelevels.
+  # TODO: Do not allocate these timelevels;
+  # instead, require the user to do so in the parameter file.
+  STORAGE: ADMBase::metric[timelevels]
+  STORAGE: ADMBase::curv[timelevels]
+  STORAGE: ADMBase::lapse[timelevels]
+  STORAGE: ADMBase::shift[timelevels]
+  STORAGE: ADMBase::dtlapse[timelevels]
+  STORAGE: ADMBase::dtshift[timelevels]
+  
+  
+  
+  SCHEDULE ML_BSSN_RegisterSlicing AT startup
+  {
+    LANG: C
+    OPTIONS: meta
+  } "Register slicing"
+  
+  SCHEDULE ML_BSSN_SetGroupTags AT startup BEFORE Driver_Startup
+  {
+    LANG: C
+    OPTIONS: meta
+  } "Set checkpointing and prolongation group tags"
+  
+  SCHEDULE ML_BSSN_ParamCompat AT wragh
+  {
+    LANG: C
+    OPTIONS: meta
+  } "Handle parameter backward compatibility"
+  
+  SCHEDULE ML_BSSN_ParamCheck AT paramcheck
+  {
+    LANG: C
+    OPTIONS: meta
+  } "Check parameters"
+  
+  SCHEDULE ML_BSSN_RegisterConstrained IN MoL_Register
+  {
+    LANG: C
+    OPTIONS: meta
+  } "Register ADMBase variables as constrained"
+  
+  
+  
+  SCHEDULE GROUP ML_BSSN_EvolutionAnalysis AT analysis
+  {
+    # TODO: Correct list of group names
+    TRIGGERS: ML_log_confacrhs
+    TRIGGERS: ML_metricrhs
+    TRIGGERS: ML_Gammarhs
+    TRIGGERS: ML_trace_curvrhs
+    TRIGGERS: ML_curvrhs
+    # TRIGGERS: ML_Thetarhs
+    TRIGGERS: ML_lapserhs
+    TRIGGERS: ML_dtlapserhs
+    TRIGGERS: ML_shiftrhs
+    TRIGGERS: ML_dtshiftrhs
+  } "Calculate RHS at analysis"
+  
+  # May override initial_boundary_condition for compatibility
+  if (CCTK_EQUALS(initial_boundary_condition, "extrapolate-gammas") ||
+      CCTK_EQUALS(my_initial_boundary_condition, "extrapolate-gammas"))
+  {
+    SCHEDULE ML_BSSN_ExtrapolateGammas AT initial AFTER ML_BSSN_InitialADMBase2Interior
+    {
+      LANG: C
+      # No need to sync here -- the evolution boundary condition will sync
+    } "Extrapolate Gammas and time derivatives of lapse and shift"
+  }
+  
+  # May override rhs_boundary_condition for compatibility
+  if (CCTK_EQUALS(rhs_boundary_condition, "NewRad") ||
+      CCTK_EQUALS(my_rhs_boundary_condition, "NewRad"))
+  {
+    SCHEDULE ML_BSSN_NewRad IN MoL_CalcRHS AFTER ML_BSSN_EvolutionInterior
+    {
+      LANG: C
+      # No need to sync here -- the RHS variables are never synced
+    } "Apply NewRad boundary conditions to RHS"
+    
+    SCHEDULE ML_BSSN_NewRad IN ML_BSSN_EvolutionAnalysis AFTER ML_BSSN_EvolutionAnalysisInterior
+    {
+      LANG: C
+      # No need to sync here -- the RHS variables are never synced
+    } "Apply NewRad boundary conditions to RHS"
+  }
+  
+  # TODO COMPATIBILITY:
+  # Do not apply boundary conditions to Everywhere ADMBase variables
+  SCHEDULE ML_BSSN_ADMBase_SelectBCs IN MoL_PostStep AFTER ML_BSSN_ADMBaseEverywhere AFTER ML_BSSN_ADMBaseInterior AFTER ML_BSSN_ADMBaseBoundaryScalar
+  {
+    LANG: C
+    OPTIONS: level
+  } "Select boundary conditions for ADMBase variables"
+  
+  SCHEDULE GROUP ApplyBCs AS ML_BSSN_ADMBase_ApplyBCs IN MoL_PostStep AFTER ML_BSSN_ADMBase_SelectBCs BEFORE ADMBase_SetADMVars
+  {
+  } "Apply boundary conditions to ADMBase variables"
+  
+}

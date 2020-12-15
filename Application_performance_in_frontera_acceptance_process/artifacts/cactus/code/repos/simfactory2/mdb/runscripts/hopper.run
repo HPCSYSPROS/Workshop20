@@ -1,0 +1,97 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+module list
+
+echo "Checking:"
+pwd
+hostname
+date
+cat ${PBS_NODES} > SIMFACTORY/NODES
+
+echo "Environment:"
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export GMON_OUT_PREFIX=gmon.out
+export IPM_LOGDIR=@RUNDIR@-active
+export IPM_REPORT=full
+# Choose IPM PAPI counters. (Some examples below; other combinations
+# may be possible. However, the hardware severely limits possible
+# combinations.)
+# Group 0: Summary with instructions metrics
+export IPM_HPM=PAPI_TOT_INS,PAPI_FP_OPS,PAPI_L1_DCA,PAPI_L1_DCM
+## Group 2: L1 and L2 Metrics
+#export IPM_HPM=PAPI_L1_DCA,DATA_CACHE_REFILLS:L2_MODIFIED:L2_OWNED:L2_EXCLUSIVE:L2_SHARED,DATA_CACHE_REFILLS_FROM_SYSTEM:ALL,REQUESTS_TO_L2:DATA
+## Group 3: Bandwidth information
+#export IPM_HPM=DATA_CACHE_REFILLS:L2_MODIFIED:L2_OWNED:L2_EXCLUSIVE:L2_SHARED,DATA_CACHE_REFILLS_FROM_SYSTEM:ALL,DATA_CACHE_LINES_EVICTED:ALL,QUADWORDS_WRITTEN_TO_SYSTEM:ALL
+## Group 9: Instruction cache
+#export IPM_HPM=PAPI_L1_ICA,INSTRUCTION_CACHE_MISSES,PAPI_L2_ICM,INSTRUCTION_CACHE_REFILLS_FROM_L2
+## Group 10: Cache Hierarchy
+#export IPM_HPM=PAPI_L1_DCA,PAPI_L2_DCA,PAPI_L2_DCM,PAPI_L3_TCM
+
+# Tell the Intel compiler to not (try to) set thread affinities; we
+# use numa_node for this. This also disables OpenMP KMP_AFFINITY
+# warnings.
+export KMP_AFFINITY=disabled
+export OMP_NUM_THREADS=@NUM_THREADS@
+# This was used for Franklin, but doesn't seem relevant for Hopper
+#export MPICH_PTL_UNEX_EVENTS=204800
+env | sort > SIMFACTORY/ENVIRONMENT
+
+# NOTE: Hopper II has 2 sockets per node with 12 cores each
+# aprun options:
+#    -n    Number of MPI tasks
+#    -N	   (Optional) Number of tasks per Hopper Node. Default is 24.
+#    -d    (Optional) Depth, or number of threads, per MPI task. Use
+#          this very important option in addition to OMP_NUM_THREADS
+#          for OpenMP. Values can be 1-24. The default is 1. For
+#          OpenMP values of 2-6 are recommended.
+#    -S    (Optional) Number of tasks per NUMA node. Values can be
+#          1-6; default 6
+#    -sn   (Optional) Number of NUMA nodes to use per Hopper node.
+#          Values can be 1-4; default 4
+#    -ss   (Optional) Demands strict memory containment per NUMA node.
+#          The default is the opposite - to allow remote NUMA node
+#          memory access.
+#    -cc   (Optional) Controls how tasks are bound to cores and NUMA
+#          nodes. The recommend setting for most codes is -cc cpu
+#          which restricts each task to run on a specific core.
+#    -m    (Optional) Memory required per task. Three ways to use it:
+#           -m size to request size bytes of memory; -m sizeh to
+#           request huge pages of size size; and -m sizehs to require
+#           huge pages of size size. See the large pages section below
+#           for more details.
+
+# Specify the number of MPI processes per node explicitly, but only if
+# -N <= -n.
+export NODE_PROCS='@(@PPN_USED@ / @NUM_THREADS@ <= @NUM_PROCS@ ? "-N @(@PPN_USED@ / @NUM_THREADS@)@" : "")@'
+# Also specify the number of MPI processes per socket if this makes sense.
+#export SOCKET_PROCS='@(@PPN_USED@ % (2 * @NUM_THREADS@) == 0 ? "-S @(@PPN_USED@ / (2 * @NUM_THREADS@))@" : "")@'
+
+if true; then
+    
+    echo "Starting:"
+    export CACTUS_STARTTIME=$(date +%s)
+    aprun -cc numa_node -n @NUM_PROCS@ -d @NUM_THREADS@ ${NODE_PROCS} ${SOCKET_PROCS} @EXECUTABLE@ -L 3 @PARFILE@
+    echo "Stopping:"
+    date
+    
+else
+    
+    # Could also use $procs and $exe instead of @NUM_PROCS@ and
+    # @EXECUTABLE@
+    export CCTK_TESTSUITE_RUN_COMMAND="aprun -cc numa_node -n @NUM_PROCS@ -d @NUM_THREADS@ ${NODE_PROCS} ${SOCKET_PROCS} @EXECUTABLE@ -L 3 \$parfile"
+    cd @SOURCEDIR@
+    configuration=$(echo @EXECUTABLE@ | sed -e 's|cactus_([^/]+)$|\1|')
+    make ${configuration}-testsuite PROMPT=no
+    
+fi
+
+ipm_parse -full ${IPM_LOGDIR}/${USER}.*.ipm.xml || true
+
+echo "Done."

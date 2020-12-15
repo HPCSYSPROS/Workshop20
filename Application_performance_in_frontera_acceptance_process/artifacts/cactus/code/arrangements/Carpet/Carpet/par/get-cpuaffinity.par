@@ -1,0 +1,5 @@
+ActiveThorns = "Carpet CarpetLib CartGrid3D CoordBase IOUtil InitBase"
+
+Cactus::cctk_itlast		    = 10
+InitBase::initial_data_setup_method = "init_all_levels"
+Carpet::max_refinement_levels	    = 2

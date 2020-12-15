@@ -1,0 +1,15 @@
+Directory holding EOS tables for the cold tabulated
++ Gamma-law EOS implemented in EOS_Omni. See Thorn
+documentation for format details.
+
+SLy_Tabulated.dat:
+
+Sly EOS of [1], generated via the fitting formula given
+in [2,3]. Credit: Matt Duez, Washington State University
+
+
+References:
+
+[1] Douchin & Haensel 2001, Astron. Astrophys. 380, 151 
+[2] Haensel & Pothekin 2004, Astron. Astrophys. 428, 191
+[3] Shibata, Taniguchi, Uryu 2005, Phys.Rev.D 71 084021

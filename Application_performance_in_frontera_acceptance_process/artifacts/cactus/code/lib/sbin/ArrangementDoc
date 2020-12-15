@@ -1,0 +1,42 @@
+#! /bin/sh
+# Create all arrangement documentations
+# (C) 2003-07-21 Erik Schnetter <schnetter@uni-tuebingen.de>
+# $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/sbin/ArrangementDoc,v 1.7 2009-11-11 22:32:53 schnetter Exp $
+
+echo "Creating arrangement documentations..."
+
+# Selected arrangement; process all arrangements if this is empty
+selection="$1"
+
+abspath=$PWD
+
+for arr in `cd arrangements; echo *`; do
+    if test -d arrangements/$arr; then
+        if test -z "$selection" || test "$arr" = "$selection"; then
+            if test -e arrangements/$arr/doc/documentation.tex; then
+                echo "  Processing arrangement $arr..."
+                
+                mkdir -p doc/ArrangementDoc
+                mkdir -p doc/ArrangementDoc/$arr
+                (
+                    cd doc/ArrangementDoc/$arr
+                    rm -f documentation.tex documentation.pdf
+                    path=$abspath/arrangements/$arr/doc
+                    < $path/documentation.tex sed -e 's+\(\\includegraphics.*\){ *\(.*\) *}+\1{'"$path"'/\2}+g' |
+                    sed -e 's+\(\\input *\)\(.*\)+\1'"$path"'/\2+g' > documentation.tex
+                    
+                    {
+                        pdflatex documentation < /dev/null > LATEX_MESSAGES 2>&1
+                        pdflatex documentation < /dev/null > LATEX_MESSAGES 2>&1
+                        pdflatex documentation < /dev/null > LATEX_MESSAGES 2>&1
+                    } ||
+                    echo "    ERROR: Could not create documentation (check for latex errors)"
+                )
+                
+            fi                  # if arrangement has documentation
+        fi                      # if arrangement is enabled
+    fi
+done                            # for arrangements
+
+echo "  Created arrangement documentations in doc/ArrangementDoc directory."
+echo "  Done."

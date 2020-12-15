@@ -1,0 +1,30 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+module OptPmeMgr {
+
+  extern module PmeFFTLib;
+  message OptPmeSubComputeMsg;
+
+  group OptPmeMgr {
+
+    entry OptPmeMgr(void);
+
+    entry void initialize(CkQdMsg *);
+    entry void initialize_pencils(CkQdMsg *);
+    entry void activate_pencils(CkQdMsg *);
+    entry void recvUngrid(OptPmeGridMsg *);
+    entry void ungridCalc(OptPmeDummyMsg *msg);
+    entry void ungridCalc_subcompute(OptPmeSubComputeMsg *msg);
+    entry void ungridCalc_subcompute_done(OptPmeSubComputeMsg *msg);
+    entry void recvEvir (CkReductionMsg *msg);
+    entry void doWorkOnPeer(OptPmeSubComputeMsg *msg);
+ 
+    entry void recvArrays(
+		CProxy_OptPmeXPencil, CProxy_OptPmeYPencil, CProxy_OptPmeZPencil);
+  };
+
+}

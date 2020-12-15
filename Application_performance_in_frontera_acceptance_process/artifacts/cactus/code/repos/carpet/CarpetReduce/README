@@ -1,0 +1,30 @@
+Cactus Code Thorn CarpetReduce
+Author(s)    : Erik Schnetter <schnetter@cct.lsu.edu>
+Maintainer(s): Erik Schnetter <schnetter@cct.lsu.edu>
+Licence      : GPLv2+
+--------------------------------------------------------------------------
+
+1. Purpose
+
+This thorn provides parallel reduction operators for Carpet.
+
+
+
+This thorn now uses a weight function.  This makes it possible to
+perform physically meaningful spatial reduction operations.  The
+weight is 1 for all "normal" grid points.
+
+The weight is set to 0 on symmetry and possible the outer boundary,
+and it might be set to 1/2 on the edge of the boundary.  Setting this
+depends on the coordinate thorn, and currently works only when the
+coordinates are defined via CoordBase.
+
+The weight is also reduced or set to 0 on coarser grids that are
+overlaid by finer grid.
+
+The weight should also be reduced or set to 0 near and in excised
+regions.  This should happen in conjunction with an excision boundary
+thorn.
+
+This weigth function should probably be extracted into its own thorn
+MaskBase, so that many thorns can easily operate on it.

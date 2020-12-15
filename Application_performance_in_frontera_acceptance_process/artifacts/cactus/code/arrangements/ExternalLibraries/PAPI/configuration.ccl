@@ -1,0 +1,10 @@
+# Configuration definitions for thorn PAPI
+
+PROVIDES PAPI
+{
+  SCRIPT src/detect.sh
+  LANG bash
+  OPTIONS PAPI_DIR PAPI_INSTALL_DIR
+}
+
+REQUIRES PAPI

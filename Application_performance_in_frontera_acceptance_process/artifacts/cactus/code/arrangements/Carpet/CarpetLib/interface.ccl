@@ -1,0 +1,89 @@
+# Interface definition for thorn CarpetLib
+
+IMPLEMENTS: CarpetLib
+
+includes header: mpi_string.hh in mpi_string.hh
+
+includes header: cacheinfo.hh in cacheinfo.hh
+includes header: defs.hh in defs.hh
+includes header: dist.hh in dist.hh
+includes header: typecase.hh in typecase.hh
+includes header: typeprops.hh in typeprops.hh
+
+includes header: balance.hh in balance.hh
+includes header: bbox.hh in bbox.hh
+includes header: bboxset.hh in bboxset.hh
+includes header: fulltree.hh in fulltree.hh
+includes header: region.hh in region.hh
+includes header: vect.hh in vect.hh
+
+includes header: commstate.hh in commstate.hh
+includes header: mem.hh in mem.hh
+includes header: timestat.hh in timestat.hh
+
+includes header: operator_prototypes_3d.hh in operator_prototypes_3d.hh
+
+includes header: data.hh in data.hh
+includes header: gdata.hh in gdata.hh
+
+includes header: dh.hh in dh.hh
+includes header: gf.hh in gf.hh
+includes header: ggf.hh in ggf.hh
+includes header: gh.hh in gh.hh
+includes header: th.hh in th.hh
+
+includes header: operators.hh in operators.hh
+
+uses include header: nompi.h
+
+uses include header: Timer.hh
+uses include header: cycleclock.h
+uses include header: loopcontrol.h
+uses include header: vectors.h
+
+# DGFE
+uses include header: hrscc.hh
+
+
+
+# Return a pointer to an unmodifiable C string
+# which contains a unique ID for this build
+CCTK_POINTER_TO_CONST \
+FUNCTION UniqueBuildID (CCTK_POINTER_TO_CONST IN  cctkGH)
+USES FUNCTION UniqueBuildID
+
+# Return a pointer to an unmodifiable C string
+# which contains a unique ID for this simulation
+CCTK_POINTER_TO_CONST \
+FUNCTION UniqueSimulationID (CCTK_POINTER_TO_CONST IN  cctkGH)
+USES FUNCTION UniqueSimulationID
+
+
+
+# Check whether existing output files should be truncated
+CCTK_INT \
+FUNCTION IO_TruncateOutputFiles (CCTK_POINTER_TO_CONST IN cctkGH)
+REQUIRES FUNCTION IO_TruncateOutputFiles
+
+
+
+# The location of the boundary points
+CCTK_INT FUNCTION GetBoundarySpecification \
+  (CCTK_INT IN size, \
+   CCTK_INT OUT ARRAY nboundaryzones, \
+   CCTK_INT OUT ARRAY is_internal, \
+   CCTK_INT OUT ARRAY is_staggered, \
+   CCTK_INT OUT ARRAY shiftout)
+USES FUNCTION GetBoundarySpecification
+
+
+
+CCTK_INT FUNCTION GetCacheInfo1                            \
+    (CCTK_POINTER_TO_CONST ARRAY OUT names,                \
+     CCTK_INT              ARRAY OUT types,                \
+     CCTK_POINTER_TO_CONST ARRAY OUT sizes,                \
+     CCTK_INT              ARRAY OUT linesizes,            \
+     CCTK_INT              ARRAY OUT strides,              \
+     CCTK_INT              ARRAY OUT num_puss,             \
+     CCTK_INT                    IN  max_num_cache_levels)
+USES FUNCTION GetCacheInfo1

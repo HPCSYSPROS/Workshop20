@@ -1,0 +1,75 @@
+# Schedule definitions for thorn ZelmaniAnalysis
+# $Header:$
+
+STORAGE: proper_mass, proper_mass_local[3]
+STORAGE: gravitational_mass, gravitational_mass_local[3]
+STORAGE: kinetic_energy, kinetic_energy_local[3]
+STORAGE: total_kinetic_energy, total_kinetic_energy_local[3]
+STORAGE: angular_momentum, angular_momentum_local[3]
+STORAGE: T_over_W, W, baryonic_mass, baryonic_mass_local[3]
+STORAGE: gravitational_mass_in1e12,baryonic_mass_in1e12
+STORAGE: gravitational_mass_local_in1e12[3], baryonic_mass_local_in1e12[3]
+STORAGE: Madm_red, Jadm_z_red
+
+if(number_of_spheres>0) {
+STORAGE: baryonic_mass_interior
+STORAGE: baryonic_mass_interior_local[3]
+STORAGE: adm_mass_volume
+STORAGE: adm_mass_volume_local[3]
+if(do_enu_interior) {
+STORAGE: enu_interior
+STORAGE: enu_interior_local[3]
+}
+}
+
+if(do_omega_3D) {
+  STORAGE: angular_velocity[3]
+}
+
+if(do_ic_analysis) {
+  STORAGE: inner_core_local[3],inner_core_global
+}
+
+schedule group ZelmaniAnalysis_local IN MoL_PseudoEvolution
+{
+} "Perform local operations"
+
+schedule ZelmaniAnalysis_Init IN ZelmaniAnalysis_local
+{
+  LANG: C
+} "Initial variables"
+
+#  schedule ZelmaniAnalysis_ADMMass_Volume in ZelmaniAnalysis_local AFTER ZelmaniAnalysis_Init
+#  {
+#    LANG: C
+#  } "Compute ADM Mass: local operations"
+
+
+schedule ZelmaniAnalysis_Hydro_Local IN ZelmaniAnalysis_local AFTER ZelmaniAnalysis_Init
+{
+  LANG: C
+} "Compute Hydro Variables: local operations"
+
+#schedule ZelmaniAnalysis_ADMMass_Volume_Global in CCTK_ANALYSIS
+#{
+#  LANG: C
+#  OPTIONS: global
+#} "Compute ADM Mass: Reduction"
+
+
+schedule ZelmaniAnalysis_Hydro_Global AT CCTK_ANALYSIS
+{
+  LANG: C
+  OPTIONS: global
+} "Volume integrals of hydro quantities"
+
+if(do_entropy_update) {
+  schedule ZelmaniAnalysis_UpdateEntropy AT CCTK_ANALYSIS
+  {
+    LANG: Fortran
+    OPTIONS: local
+    TRIGGERS: hydrobase::entropy
+  } "If we want entropy output, compute the entropy"
+}
+
+

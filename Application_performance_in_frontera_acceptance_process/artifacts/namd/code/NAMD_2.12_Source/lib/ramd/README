@@ -1,0 +1,123 @@
+#***********************************************************************************                                                                                  *
+# Random Acceleration Molecular Dynamics (RAMD)                                    *
+# Implementation for NAMD v2.7                                                     *
+# March 2010                                                                       *
+#                                                                                  *
+# Copyright (c) 2009, EML Research gGmbH, Heidelberg, Germany                      * 
+# Author:  Vlad Cojocaru                                                           *
+# Email: vlad.cojocaru@eml-r.villa-bosch.de                                        *
+#***********************************************************************************
+
+Random Acceleration Molecular Dynamics
+RAMD 4.1 implementation in NAMD 2.6, 2.7b2 and above
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+NOTE: It requires NAMD to be compiled against tcl 8.3 or 8.4
+NOTE: Further testing is required for the compatibility with tcl 8.5
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Scripts (in the './scripts' directory):
+   ramd-4.1.tcl        - 'wrapper' script that is sourced in the NAMD configuration file
+   ramd-4.1_script.tcl - script that performs the calculations
+   vectors.tcl         - script that defines vector procedures borrowed from VMD
+   
+Simulation methods:
+   Pure RAMD Simulations (RAMD) 
+   Combined RAMD and Standard MD simulations (RAMD-MD)
+   
+Reference describing the original method (pure RAMD simulations):
+* Luedemann, S.K., Lounnas, V. and R. C. Wade. How do Substrates Enter and Products Exit the Buried Active Site of Cytochrome P450cam ? 1. Random Expulsion Molecular Dynamics Investigation of Ligand Access Channels and Mechanisms. J Mol Biol, 303:797-811 (2000) 
+(additional references may be found at 'http://projects.eml.org/mcm/software/ramd'
+
+Notes on the current implementation:
+(see examples of NAMD configuration files in the ../examples directory for description of input parameters)
+
+*** version 4.1 fixes the following bugs (the implementation and usage is the same as described for version 4.0):
+	- the scripts are now also compatible with tcl 8.3 (version 4.0 was only compatible with tcl 8.4)
+	- the exit of NAMD is error free if a ligand exit event occurred
+
+*** version 4.0 is the first released version
+
+*** acceleration is applied on the ligand center of mass ( kcal/mol*A*amu );
+    ensures compatibility between parameters used for simulations in AMBER 8 and NAMD
+
+*** in pure RAMD simulations the acceleration 'a' is applied throughout the simulation;
+
+    1 RAMD block = 'ramdSteps' (input parameter) steps of RAMD simulation
+    threshold for the distance traveled by the ligand in 1 RAMD block is 'rRamdMin' (input parameter)
+
+    the distance traveled by the ligand in 1 RAMD block is 'dr';
+    the vector direction of 'a' is changed between 2 RAMD blocks if 'dr' < 'rRamdMin'
+    the vector direction of 'a' is changed if 'dr' < 'rRamdMin'
+
+
+*** in combined RAMD-MD simulations, RAMD blocks alternate with standard MD blocks 
+    ('ramdSteps' and 'mdSteps' input parameters);
+    
+    1 RAMD block = 'ramdSteps' (input parameter) steps of RAMD simulation
+    1 MD block = 'mdSteps' (input parameter) steps of standard MD simulation
+    threshold for the distance traveled by the ligand in 1 RAMD block is 'rRamdMin' (input parameter)
+    threshold for the distance traveled by the ligand in 1 MD block is 'rMdMin' (input parameter)
+
+    the distance between the protein and ligand centers of mass is 'd'
+    the distance traveled by the ligand in 1 RAMD block is 'dr';
+    the distance traveled by the ligand in 1 MD block is 'dm'
+
+    switch from RAMD to MD
+       if 'dr' > 'rRamdMin'
+       no switch if 'dr' < 'rRamdMin'
+    switch from MD to RAMD
+       if 'dm' < 'rMdMin' and 'd' > 0 (acceleration direction kept from previous RAMD block) 
+       if 'dm' < 'rMdMin' and 'd' < 0 (acceleration direction changed) 
+       if 'dm' > 'rMdMin' and 'd' < 0 (acceleration direction changed)
+       no switch id 'dm' > 'rMdMin' and 'd' > 0 
+
+*** combined RAMD-MD simulation may be started either with RAMD or with standard MD
+    (see the 'mdStart' input parameter )
+
+*** forces acting on the ligand (total and external) are recorded and printed
+    (see input parameter 'forceOutFreq')
+    
+    the format of the printing is vectorial {Fx Fy Fz} with the length of vector in brackets 
+    the corresponding position (x, y, z) of the ligand COM is printed 
+    
+    input parameters 'mdSteps' and 'ramdSteps' have to be multiples of 'forceOutFreq' 
+    (namd exits with error otherwise)
+    
+    the forces acting on the ligand due to the simulation system can be obtain by substracting
+    the external forces from the total forces (this feature will be implemented in a future release; 
+    in the meantime scripts can be written to process the detailed output of this version and 
+    get exactly this information)
+     
+    in combined RAMD-MD simulation
+    NAMD exits with an error if external forces are found during the standard MD steps
+    
+    the forces are written in the default NAMD configuration file; the output is labeled with 'FORCE'
+    
+*** the output of RAMD and RAMD-MD simulations is dumped in the default NAMD log file
+    and is labeled with  "RAMD" or "MD" depending whether it is written in a RAMD or MD step
+    
+*** debugging option implemented
+    (see input parameter 'debugLevel')
+    
+    this parameter is strictly recommended for short test runs
+    the output is very rich in information and for a long run is confusing. 
+    
+    following information is printed:
+       comparison of the added external force with the external force printed by 'loadforces' for each atom
+          (they should have equal values)   
+       counting of the timestep, md steps and ramd steps per block (to make sure it does it correclty)
+    
+    the output is labeled with 'RAMD DEBUG' or 'MD DEBUG'
+    
+*** Simulations stop when a maximum distance between the ligand and protein COMs
+    is reached ('maxDist' input parameter)    
+
+Examples runs for testing are provided in the './examples' directory
+   File './examples/example_ramd.namdin' is an example of NAMD configuration file for pure RAMD simulation 
+   File './examples/example_ramd-md.namdin' is an example of NAMD configuration file for combined RAMD-MD simulation 
+
+IMPORTANT NOTE
+There is a significant diffrence between ligand exit times depending on whether Langevin dynamics or
+the weak coupling algorithm of Berendsen are used for temperature control. Users are encouraged to run
+test runs using both methods and decide what is appropriate for their specific simulation system and setup

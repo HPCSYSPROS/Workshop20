@@ -1,0 +1,106 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                          %
+%              (C) Copyright 1995 The Board of Trustees of the             %
+%                          University of Illinois                          %
+%                           All Rights Reserved                            %
+%								  	   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\DOCTITLE} {User's Guide}
+\newcommand{\DOCDESC} {%
+The \NAMD\ {\em\DOCTITLE\/} describes how to run and use the 
+various features of the molecular dynamics program \NAMD.  
+This guide includes the capabilities of the program, how 
+to use these capabilities, the necessary input files and 
+formats, and how to run the program both on uniprocessor 
+machines and in parallel.}
+\newcommand{\PG}{\NAMD\ {\it Programmer's Guide\/}}
+\newcommand{\UG}{\NAMD\ {\it User's Guide\/}}
+\newcommand{\prettypar}{
+
+\smallskip
+
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% GENERAL STUFF
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\eg}{{\it e.g.\/}}
+\newcommand{\ie}{{\it i.e.\/}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FORMULAE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\gradx}{\mbox{\boldmath$\nabla_{\!\!x}\,$}}
+\newcommand{\vx}{{\mbox{\boldmath{$x$}}}}
+\newcommand{\bm}[1]{{\mbox{\boldmath{$#1$}}}}
+
+
+\newcommand{\KEY}[1]{{\tt #1}}
+\newcommand{\IKEY}[1]{{\tt #1\index{#1 psfgen command}}}
+\newcommand{\OKEY}[1]{$[${\tt #1}$]$}
+\newcommand{\ARG}[1]{$<${\em #1}$>$}
+\newcommand{\OARG}[1]{$[${\em #1}$]$}
+\newcommand{\ARGDEF}[2]{$<${\em #1}$>$: #2}
+\newcommand{\KEYDEF}[2]{{\tt #1}: #2}
+\newcommand{\COMMAND}[4]{%
+  #1 \\ {\bf Purpose:} #2 \\ {\bf Arguments:} #3 \\ {\bf Context:} #4 }
+
+\newcommand{\icommand}[1]{#1\index{#1 command}}
+
+\newcommand{\iparam}[1]{#1\index{#1 parameter}}
+
+\newcommand{\NAMDCONF}[4]{%
+%  \addcontentsline{toc}{subparagraph}{#1}%
+  {\bf \tt #1 } $<$ {#2} $>$ \index{#1 parameter} \\%
+  {\bf Acceptable Values: } {#3} \\%
+  {\bf Description: } {#4}%
+}
+
+\newcommand{\NAMDCONFWDEF}[5]{%
+%  \addcontentsline{toc}{subparagraph}{#1}%
+  {\bf \tt #1 } $<$ {#2} $>$ \index{#1 parameter} \\%
+  {\bf Acceptable Values: } {#3} \\%
+  {\bf Default Value: } {#4} \\%
+  {\bf Description: } {#5}%
+}
+
+\newcommand{\NAMDCOLVARCONF}[5]{%
+%  \addcontentsline{toc}{subparagraph}{#1}%
+  {\bf \tt #1 } $<$ {#3} $>$ \index{#1 colvars #2 keyword} \\%
+  {\bf Context: } {#2} \\%
+  {\bf Acceptable Values: } {#4} \\%
+  {\bf Description: } {#5}%
+}
+
+\newcommand{\NAMDCOLVARCONFWDEF}[6]{%
+%  \addcontentsline{toc}{subparagraph}{#1}%
+  {\bf \tt #1 } $<$ {#3} $>$ \index{#1 colvars #2 keyword} \\%
+  {\bf Context: } {#2} \\%
+  {\bf Acceptable Values: } {#4} \\%
+  {\bf Default Value: } {#5} \\%
+  {\bf Description: } {#6}%
+}
+
+\newcommand{\NAMDCONFTAG}[4]{%
+%  \addcontentsline{toc}{subparagraph}{#1}%
+  {\bf \tt #1 } $<$ tag $>$ $<$ {#2} $>$ \index{#1 parameter} \\%
+  {\bf Acceptable Values: } {#3} \\%
+  {\bf Description: } {#4}%
+}
+
+\newcommand{\NAMDCONFTAGWDEF}[5]{%
+%  \addcontentsline{toc}{subparagraph}{#1}%
+  {\bf \tt #1 }  $<$ tag $>$ $<$ {#2} $>$ \index{#1 parameter} \\%
+  {\bf Acceptable Values: } {#3} \\%
+  {\bf Default Value: } {#4} \\%
+  {\bf Description: } {#5}%
+}
+\newcommand{\XNCOMP}[3]{%
+  {\bf \NAMD\ Parameter: \tt #1 } \\%
+  {\bf X-PLOR Parameter: \tt #2 } \\%
+  {#3}%
+}
+

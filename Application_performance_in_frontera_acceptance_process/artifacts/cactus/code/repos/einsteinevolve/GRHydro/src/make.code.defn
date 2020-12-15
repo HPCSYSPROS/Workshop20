@@ -1,0 +1,101 @@
+# Main make.code.defn file for thorn GRHydro
+
+# Source files in this directory
+
+SRCS = 	Utils.F90 \
+	GRHydro_Analysis.F90 \
+	GRHydro_Boundaries.F90 \
+	GRHydro_CalcBcom.F90 \
+	GRHydro_CalcUpdate.F90 \
+	GRHydro_Con2Prim.F90 \
+	GRHydro_Con2PrimHot.F90 \
+        GRHydro_DivergenceClean.F90 \
+	GRHydro_Eigenproblem.F90 \
+	GRHydro_Eigenproblem_Marquina.F90 \
+	GRHydro_ENOReconstruct.F90 \
+	GRHydro_ENOScalars.F90 \
+	GRHydro_EOS.c \
+	GRHydro_Flux.F90 \
+	GRHydro_FluxSplit.F90 \
+	GRHydro_HLLE.F90 \
+	GRHydro_HLLC.F90 \
+	GRHydro_Loop.F90 \
+	GRHydro_Minima.F90 \
+	GRHydro_Minima.cc \
+	GRHydro_PPM.F90 \
+	GRHydro_ParamCheck.F90 \
+	GRHydro_Particle.F90 \
+	GRHydro_PreLoop.F90 \
+	GRHydro_Prim2Con.F90 \
+	GRHydro_Reconstruct.F90 \
+	GRHydro_Reconstruct.cc \
+	GRHydro_ReconstructPoly.F90 \
+	GRHydro_RegisterMask.c \
+	GRHydro_RegisterVars.cc \
+	GRHydro_RiemannSolve.F90 \
+	GRHydro_RoeAverage.F90 \
+	GRHydro_RoeSolver.F90 \
+	GRHydro_Scalars.F90 \
+	GRHydro_Shift.F90 \
+	GRHydro_Startup.F90 \
+	GRHydro_TVDReconstruct.F90 \
+	GRHydro_Marquina.F90 \
+	GRHydro_UpdateMask.F90 \
+	GRHydro_Set_TP_GF.c  \
+	GRHydro_Differences.F90 \
+	GRHydro_EoSChangeGamma.F90 \
+	GRHydro_Tmunu.F90 \
+	GRHydro_Con2PrimM.F90 \
+	GRHydro_Con2PrimM_pt_EOSOmniold.c \
+	GRHydro_Con2PrimM_pt_EOSOmni.c \
+	GRHydro_Con2PrimM_pt.c \
+	GRHydro_Con2PrimM_ptee.c \
+	GRHydro_Con2PrimM_polytype_pt.c \
+	GRHydro_EigenproblemM.F90 \
+	GRHydro_FluxM.F90 \
+	GRHydro_HLLEM.F90 \
+        GRHydro_PPMM.F90 \
+	GRHydro_Prim2ConM.F90 \
+	GRHydro_RiemannSolveM.F90 \
+	GRHydro_SourceM.F90 \
+	GRHydro_TmunuM.F90 \
+	GRHydro_UpdateMaskM.F90 \
+	GRHydro_UtilsM.F90 \
+        GRHydro_BvecfromAvec.F90 \
+	GRHydro_RiemannSolveAM.F90 \
+	GRHydro_HLLE_AM.F90 \
+	GRHydro_Con2PrimAM.F90 \
+	GRHydro_Prim2ConAM.F90 \
+	GRHydro_SourceAM.F90 \
+	GRHydro_TransformTensorBasis.c \
+	GRHydro_Jacobian_state.c \
+	GRHydro_PPMMReconstruct_drv.F90\
+	GRHydro_ENOReconstruct_drv.F90\
+	GRHydro_PPMReconstruct_drv.F90\
+	GRHydro_WENOReconstruct_drv.F90\
+	GRHydro_MP5Reconstruct_drv.F90\
+	GRHydro_LastMoLPostStep.c\
+	GRHydro_TVDReconstruct_drv.F90\
+	GRHydro_EvolutionMask.F90\
+	GRHydro_WENOReconstruct.F90\
+	GRHydro_WENOScalars.F90 \
+	GRHydro_MP5Reconstruct.F90 \
+        Con2Prim_fortran_interfaces.F90 \
+        Con2PrimM_fortran_interfaces.F90 \
+        GRHydro_Prim2Con.cc \
+	GRHydro_PPM.cc \
+	GRHydro_ePPM.cc \
+        GRHydro_PPMReconstruct_drv_opt.cc \
+        GRHydro_WENOReconstruct.cc \
+        GRHydro_TVDReconstruct.cc \
+        GRHydro_TrivialReconstruct.cc \
+        GRHydro_MP5Reconstruct.cc \
+        GRHydro_Wrappers.F90 \
+	GRHydro_HLLE.cc \
+	GRHydro_Source.cc \
+	GRHydro_Source.F90
+
+
+# Subdirectories containing source files
+SUBDIRS = 
+

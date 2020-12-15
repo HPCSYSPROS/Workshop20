@@ -1,0 +1,4 @@
+SRCS = readtable.cc nuc_eos_short.cc nuc_eos_press_cs2.cc \
+     nuc_eos_press.cc nuc_eos_full.cc nuc_eos_dpdrhoe_dpderho.cc \
+     readtable_cactus_wrapper.cc dumpASCIItable.cc
+SUBDIRS = 

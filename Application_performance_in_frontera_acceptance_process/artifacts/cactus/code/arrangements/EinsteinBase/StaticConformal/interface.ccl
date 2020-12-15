@@ -1,0 +1,62 @@
+# Interface definition for thorn StaticConformal
+# $Header$
+
+implements: StaticConformal
+inherits: grid
+
+public:
+
+INT conformal_state type = SCALAR
+
+REAL confac TYPE = GF timelevels = 1 tags='tensortypealias="Scalar" Prolongation="None" InterpNumTimelevels=1'
+{
+  psi
+} "Conformal factor"
+
+REAL confac_1derivs TYPE = GF timelevels = 1  tags='tensortypealias="U" Prolongation="None" InterpNumTimelevels=1'
+{
+  psix, psiy, psiz
+} "First spatial derivatives of conformal factor divided by psi"
+
+# Will be changed to.
+#REAL confac_1derivs TYPE = GF
+#{
+#  psi_1, psi_2, psi_3
+#} "First spatial derivatives of conformal factor divided by psi"
+
+REAL confac_2derivs TYPE = GF timelevels = 1  tags='tensortypealias="dd_sym" Prolongation="None" InterpNumTimelevels=1'
+{
+  psixx, psixy, psixz, psiyy, psiyz, psizz
+} "Second spatial derivatives of conformal factor divided by psi"
+
+# Will be changed to.
+#REAL confac_2derivs TYPE = GF
+#{
+#  psi_11, psi_12, psi_13, psi_22, psi_23, psi_33
+#} "Second spatial derivatives of conformal factor divided by psi"
+
+
+
+void FUNCTION ConfToPhysInPlace (CCTK_INT IN nx,            \
+                                 CCTK_INT IN ny,            \
+                                 CCTK_INT IN nz,            \
+                                 CCTK_REAL ARRAY IN psi,    \
+                                 CCTK_REAL ARRAY INOUT gxx, \
+                                 CCTK_REAL ARRAY INOUT gxy, \
+                                 CCTK_REAL ARRAY INOUT gxz, \
+                                 CCTK_REAL ARRAY INOUT gyy, \
+                                 CCTK_REAL ARRAY INOUT gyz, \
+                                 CCTK_REAL ARRAY INOUT gzz)
+PROVIDES FUNCTION ConfToPhysInPlace WITH StaticConf_ConfToPhysInPlace LANGUAGE C
+
+void FUNCTION PhysToConfInPlace (CCTK_INT IN nx,            \
+                                 CCTK_INT IN ny,            \
+                                 CCTK_INT IN nz,            \
+                                 CCTK_REAL ARRAY IN psi,    \
+                                 CCTK_REAL ARRAY INOUT gxx, \
+                                 CCTK_REAL ARRAY INOUT gxy, \
+                                 CCTK_REAL ARRAY INOUT gxz, \
+                                 CCTK_REAL ARRAY INOUT gyy, \
+                                 CCTK_REAL ARRAY INOUT gyz, \
+                                 CCTK_REAL ARRAY INOUT gzz)
+PROVIDES FUNCTION PhysToConfInPlace WITH StaticConf_PhysToConfInPlace LANGUAGE C

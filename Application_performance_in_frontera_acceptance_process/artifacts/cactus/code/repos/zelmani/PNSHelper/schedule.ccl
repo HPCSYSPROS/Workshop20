@@ -1,0 +1,157 @@
+# Schedule definitions for thorn PNSHelper
+
+if (CCTK_EQUALS(collect, "interpolate")) {
+  STORAGE: PNSHelper_interpolated_variables
+}
+if (CCTK_EQUALS(collect, "distribute")) {
+  STORAGE: PNSHelper_distributed_variables
+}
+STORAGE: PNSHelper_grvars
+STORAGE: PNSHelper_avprof	
+STORAGE: PNSHelper_scalars
+STORAGE: rad,phi,theta,have_interp_data,force_interp
+STORAGE: PNSHelper_metricdata, pns_mgrav_store
+STORAGE: metric_times
+
+
+#ADMBase storage
+Storage: ADMBase::metric[3]
+Storage: ADMBase::curv[3]
+Storage: ADMBase::shift[3]
+Storage: ADMBase::lapse[3]
+
+
+schedule PNSinterp_set_origin_init AT CCTK_INITIAL BEFORE PNSinterp_setup
+ {
+  LANG: C
+  OPTION: global
+ } "Initialize origin"
+
+schedule PNSinterp_set_origin_init AT POST_RECOVER_VARIABLES BEFORE PNSinterp_setup
+ {
+  LANG: C
+  OPTION: global
+ } "Initialize origin"
+
+schedule PNSHelper_MoLRegister IN MoL_Register
+ {
+  LANG: C
+  OPTION: global
+ } "Register variables"
+
+
+schedule PNSinterp_setup AT CCTK_INITIAL 
+ {
+   LANG: C
+   OPTION: global
+ } "Set up drad,dtheta,dphi"
+
+
+schedule PNSinterp_setup AT POST_RECOVER_VARIABLES
+ {
+   LANG: C
+   OPTION: global
+ } "Set up drad,dtheta,dphi"
+
+#schedule group PNSHelper_Group AT CCTK_EVOL AFTER (MoL_Evolution,MoL_PseudoEvolution,ZLtau_get_rays)
+schedule group PNSHelper_Group AT CCTK_POSTSTEP
+{
+} "PNS Helper Group"
+
+
+if(solve_after_recovery) {
+  schedule group PNSHelper_Group AT POST_RECOVER_VARIABLES AFTER PNSinterp_setup
+  {
+  } "PNS Helper Group"
+}
+
+###schedule group PNSHelper_Group AT CCTK_POSTPOSTINITIAL BEFORE Con2Prim
+###{
+###} "PNS Helper Group"
+
+if (CCTK_EQUALS(collect, "interpolate")) {
+  schedule PNSinterp_get_rays IN PNSHelper_Group
+    {
+     LANG: C
+     OPTION: global-early
+    } "Get rays for GR calculation"
+  
+  
+  schedule PNSHelper_AverageProfiles in PNSHelper_Group AFTER PNSinterp_get_rays
+    {
+     LANG: C
+     OPTION: global-early
+    } "Get rays for GR calculation"
+  
+  schedule PNSHelper_SolveMetric in PNSHelper_Group AFTER PNSHelper_AverageProfiles
+    {
+     LANG: C
+     OPTION: global-early
+    } "Solve for 1D metric and lapse"
+
+} /* if interpolate */
+
+if (CCTK_EQUALS(collect, "distribute")) {
+  schedule PNSdistribute_init IN PNSHelper_Group
+    {
+      LANG: C
+      OPTIONS: global-early
+    } "Initialise 1d arrays"
+
+  schedule PNSdistribute_local in PNSHelper_Group AFTER PNSdistribute_init
+    {
+      LANG: C
+      OPTIONS: global-early loop-local
+    } "Distribute data into 1d arrays"
+
+  schedule PNSdistribute_combine in PNSHelper_Group AFTER PNSdistribute_local
+    {
+      LANG: C
+      OPTIONS: global-early
+    } "Combine all process-local 1d arrays"
+
+  schedule PNSdistribute_transform in PNSHelper_Group AFTER PNSdistribute_combine
+    {
+      LANG: C
+      OPTIONS: global-early
+    } "Convert 1d arrays from extensive to intensive quantities (e.g. mass to density)"
+
+  schedule PNSHelper_SolveMetric in PNSHelper_Group AFTER PNSdistribute_transform
+    {
+     LANG: C
+     OPTION: global-early
+    } "Solve for 1D metric and lapse"
+
+} /* if distribute */
+
+###schedule PNSHelper_MapSpacetime in PNSHelper_Group AFTER PNSHelper_SolveMetric
+###  {
+###   LANG: C
+###   OPTION: global-late loop-local
+###  } "Map metric and lapse onto 3D grid"
+
+schedule PNSHelper_MapSpacetime in MoL_PostStep BEFORE ADMBase_SetADMVars
+  {
+   LANG: C
+   OPTION: local
+  } "Map metric and lapse onto 3D grid"
+
+schedule PNSHelper_MapSpacetime AT CCTK_POSTSTEP 
+  {
+   LANG: C
+   OPTION: local
+  } "Map metric and lapse onto 3D grid"
+
+###schedule PNSHelper_MapSpacetime AT CCTK_POSTPOSTINITIAL AFTER PNSHelper_Group BEFORE Con2Prim
+###  {
+###   LANG: C
+###   OPTION: local
+###  } "Map metric and lapse onto 3D grid"
+
+
+schedule PNSHelper_ChangeStatus AT CCTK_POSTSTEP
+  {
+   LANG: C
+   OPTION: global
+  } "reset have_interp_data"
+

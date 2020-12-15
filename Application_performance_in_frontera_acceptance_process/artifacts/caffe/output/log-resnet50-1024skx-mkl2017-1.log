@@ -1,0 +1,94 @@
+TACC:  Starting up job 385509 
+TACC:  Starting parallel tasks... 
+sh: /opt/apps/xalt/1.7/libexec/xalt_run_submission: No such file or directory
+I1101 19:56:04.079919 46273 caffe.cpp:279] Use CPU.
+I1101 19:56:04.090634 61546 caffe.cpp:279] Use CPU.
+I1101 19:56:04.081434 67933 caffe.cpp:279] Use CPU.
+I1101 19:56:04.080423 65863 caffe.cpp:279] Use CPU.
+I1101 19:56:04.080279 61632 caffe.cpp:279] Use CPU.
+I1101 19:56:04.086484 130656 caffe.cpp:279] Use CPU.
+I1101 19:56:04.081025 59496 caffe.cpp:279] Use CPU.
+I1101 19:56:04.087738 63848 caffe.cpp:279] Use CPU.
+I1101 19:56:04.080576 52607 caffe.cpp:279] Use CPU.
+I1101 19:56:04.078498 58434 caffe.cpp:279] Use CPU.
+I1101 19:56:04.080811 54298 caffe.cpp:279] Use CPU.
+I1101 19:56:04.078214 60279 caffe.cpp:279] Use CPU.
+I1101 19:56:04.080284 54463 caffe.cpp:279] Use CPU.
+I1101 19:56:04.079217 53369 caffe.cpp:279] Use CPU.
+I1101 19:56:04.077888 44689 caffe.cpp:279] Use CPU.
+I1101 19:56:04.082005 53085 caffe.cpp:279] Use CPU.
+I1101 19:56:04.082567 63347 caffe.cpp:279] Use CPU.
+I1101 19:56:04.086730 67096 caffe.cpp:279] Use CPU.
+I1101 19:56:04.080643 46273 solver.cpp:107] Initializing solver from parameters: 
+test_iter: 100
+test_interval: 10000
+base_lr: 0.1
+display: 40
+max_iter: 2000
+lr_policy: "step"
+gamma: 0.96
+momentum: 0.9
+weight_decay: 0.0001
+stepsize: 320000
+snapshot: 50000
+snapshot_prefix: "models/default_resnet_50/default_resnet_50"
+solver_mode: CPU
+net: "models/default_resnet_50/train_val_small.prototxt"
+train_state {
+  level: 0
+  stage: ""
+}
+test_initialization: false
+average_loss: 40
+engine: "MKL2017"
+I1101 19:56:04.081225 58921 caffe.cpp:279] Use CPU.
+I1101 19:56:04.082686 55575 caffe.cpp:279] Use CPU.
+I1101 19:56:04.091331 61546 solver.cpp:107] Initializing solver from parameters: 
+test_iter: 100
+test_interval: 10000
+base_lr: 0.1
+display: 40
+max_iter: 2000
+lr_policy: "step"
+gamma: 0.96
+momentum: 0.9
+weight_decay: 0.0001
+stepsize: 320000
+snapshot: 50000
+snapshot_prefix: "models/default_resnet_50/default_resnet_50"
+solver_mode: CPU
+net: "models/default_resnet_50/train_val_small.prototxt"
+train_state {
+  level: 0
+  stage: ""
+}
+I1101 20:14:40.684475 66788 caffe.cpp:332] Optimization Done.
+I1101 20:14:40.684312 66615 solver.cpp:593] Iteration 2000, loss = 0.0152794
+I1101 20:14:40.681669 46372 solver.cpp:593] Iteration 2000, loss = 0.0148501
+I1101 20:14:40.684414 66615 solver.cpp:600] Optimization Done.
+I1101 20:14:40.681772 46372 solver.cpp:600] Optimization Done.
+I1101 20:14:40.684734 66615 caffe.cpp:332] Optimization Done.
+I1101 20:14:40.682130 46372 caffe.cpp:332] Optimization Done.
+I1101 20:14:40.683255 55507 solver.cpp:593] Iteration 2000, loss = 0.0163876
+I1101 20:14:40.683351 55507 solver.cpp:600] Optimization Done.
+I1101 20:14:40.683666 55507 caffe.cpp:332] Optimization Done.
+I1101 20:14:40.686803 65756 solver.cpp:593] Iteration 2000, loss = 0.0121635
+I1101 20:14:40.686915 65756 solver.cpp:600] Optimization Done.
+I1101 20:14:40.687250 65756 caffe.cpp:332] Optimization Done.
+I1101 20:14:40.693337 57863 solver.cpp:593] Iteration 2000, loss = 0.0135537
+I1101 20:14:40.693444 57863 solver.cpp:600] Optimization Done.
+I1101 20:14:40.693867 57863 caffe.cpp:332] Optimization Done.
+I1101 20:14:40.689292 45633 solver.cpp:593] Iteration 2000, loss = 0.0142897
+I1101 20:14:40.689393 45633 solver.cpp:600] Optimization Done.
+I1101 20:14:40.685978 46837 solver.cpp:593] Iteration 2000, loss = 0.0162589
+I1101 20:14:40.686080 46837 solver.cpp:600] Optimization Done.
+I1101 20:14:40.689712 45633 caffe.cpp:332] Optimization Done.
+I1101 20:14:40.686434 46837 caffe.cpp:332] Optimization Done.
+I1101 20:14:40.691723 235577 sgd_solver.cpp:447] Snapshotting solver state to binary proto file models/default_resnet_50/default_resnet_50_iter_2000.solverstate
+I1101 20:14:40.696729 52908 solver.cpp:593] Iteration 2000, loss = 0.0138156
+I1101 20:14:40.696835 52908 solver.cpp:600] Optimization Done.
+I1101 20:14:40.697185 52908 caffe.cpp:332] Optimization Done.
+I1101 20:14:41.043232 235577 solver.cpp:593] Iteration 2000, loss = 0.0210975
+I1101 20:14:41.043279 235577 solver.cpp:600] Optimization Done.
+I1101 20:14:41.043579 235577 caffe.cpp:332] Optimization Done.
+TACC:  Shutdown complete. Exiting. 

@@ -1,0 +1,84 @@
+# Interface definition for thorn PNSMapper
+
+implements: PNSMapper
+
+inherits: GRHydro, ADMBase, HydroBase
+
+USES INCLUDE: ZelmaniM1.hh
+
+#######################################################
+### Functions provided by the Omni EOS interface    ###
+#######################################################
+
+CCTK_INT FUNCTION EOS_Omni_GetHandle(CCTK_STRING IN name)
+USES FUNCTION EOS_Omni_GetHandle
+
+void FUNCTION EOS_Omni_short(CCTK_INT IN eoskey,                \
+                             CCTK_INT IN havetemp,              \
+                             CCTK_REAL IN rf_precision,         \
+                             CCTK_INT IN npoints,               \
+                             CCTK_REAL IN ARRAY rho,            \
+                             CCTK_REAL INOUT ARRAY eps,         \
+                             CCTK_REAL INOUT ARRAY temp,        \
+                             CCTK_REAL IN ARRAY ye,             \
+                             CCTK_REAL OUT ARRAY press,         \
+                             CCTK_REAL INOUT ARRAY entropy,     \
+                             CCTK_REAL OUT ARRAY cs2,           \
+                             CCTK_REAL OUT ARRAY dedt,          \
+                             CCTK_REAL OUT ARRAY dpderho,       \
+                             CCTK_REAL OUT ARRAY dpdrhoe,       \
+                             CCTK_REAL OUT ARRAY munu,          \
+                             CCTK_INT OUT ARRAY keyerr,         \
+                             CCTK_INT OUT anyerr)
+
+USES FUNCTION EOS_Omni_short
+
+
+void FUNCTION EOS_Omni_press(CCTK_INT IN eoskey,         \
+                             CCTK_INT IN havetemp,       \
+                             CCTK_REAL IN rf_precision,   \
+                             CCTK_INT IN npoints,        \
+                             CCTK_REAL IN ARRAY rho,     \
+                             CCTK_REAL INOUT ARRAY eps,  \
+                             CCTK_REAL INOUT ARRAY temp, \
+                             CCTK_REAL IN ARRAY ye,      \
+                             CCTK_REAL OUT ARRAY press,  \
+                             CCTK_INT OUT ARRAY keyerr,  \
+                             CCTK_INT OUT anyerr)
+
+USES FUNCTION EOS_Omni_press
+
+
+private:
+
+CCTK_INT pnszones TYPE=SCALAR DISTRIB=CONSTANT "number of zones in PNS profile"
+
+CCTK_REAL PNSinput TYPE=ARRAY DIM=1 SIZE=(Num_Max_Radial) DISTRIB=CONSTANT TAGS='checkpoint="no"'
+{
+ pradius
+ prho
+ ptemp
+ pvel
+ pye
+ ppsi
+ palp
+} "input profile data"
+
+
+CCTK_REAL PNSoneD TYPE=ARRAY DIM=1 SIZE=(Num_1D) DISTRIB=CONSTANT TAGS='checkpoint="no"'
+{
+ rad1d
+ rho1d
+ realrhostar1d
+ rhostar1d
+ temp1d
+ press1d
+ eps1d
+ vel1d
+ ye1d
+ psi1d
+ alp1d
+ munu1d
+ wlorentz1d
+} "1d profile data"
+

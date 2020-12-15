@@ -1,0 +1,10 @@
+# Main make.code.deps file for thorn MPI
+
+export MPI_INSTALL_DIR HWLOC_DIR
+
+$(CCTK_TARGET) $(OBJS) $(SRCS:%=%.d): $(SCRATCH_BUILD)/done/$(THORN)
+
+ifneq ($(MPI_BUILD),)
+$(SCRATCH_BUILD)/done/$(THORN): $(SRCDIR)/build.pl
+	+$(PERL) $(SRCDIR)/build.pl
+endif

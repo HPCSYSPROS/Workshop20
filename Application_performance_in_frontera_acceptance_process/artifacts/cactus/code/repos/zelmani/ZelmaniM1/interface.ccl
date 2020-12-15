@@ -1,0 +1,217 @@
+# Interface definition for thorn ZelmaniM1
+
+implements: ZelmaniM1
+
+inherits: TmunuBase HydroBase ADMBase Boundary EOS_Omni GRHydro Coordinates
+
+USES INCLUDE: Boundary.h
+
+INCLUDE HEADER: ZelmaniM1.hh in ZelmaniM1.hh
+
+### From CactusBase/MoL
+
+CCTK_INT FUNCTION MoLRegisterEvolved(CCTK_INT IN EvolvedIndex, \
+                                     CCTK_INT IN RHSIndex)
+CCTK_INT FUNCTION MoLRegisterConstrained(CCTK_INT IN ConstrainedIndex)
+CCTK_INT FUNCTION MoLRegisterConstrainedGroup(CCTK_INT IN ConstrainedIndex)
+CCTK_INT FUNCTION MoLRegisterSaveAndRestore(CCTK_INT IN SandRIndex)
+CCTK_INT FUNCTION MoLRegisterSaveAndRestoreGroup(CCTK_INT IN SandRIndex)
+CCTK_INT FUNCTION MoLChangeToEvolved(CCTK_INT IN EvolvedIndex, \
+                                     CCTK_INT IN RHSIndex)
+CCTK_INT FUNCTION MoLChangeToConstrained(CCTK_INT IN ConstrainedIndex)
+CCTK_INT FUNCTION MoLChangeToSaveAndRestore(CCTK_INT IN SandRIndex)
+CCTK_INT FUNCTION MoLChangeToNone(CCTK_INT IN RemoveIndex)
+
+REQUIRES FUNCTION MoLRegisterEvolved
+REQUIRES FUNCTION MoLRegisterConstrained
+REQUIRES FUNCTION MoLRegisterConstrainedGroup
+REQUIRES FUNCTION MoLRegisterSaveAndRestore
+REQUIRES FUNCTION MoLRegisterSaveAndRestoreGroup
+REQUIRES FUNCTION MoLChangeToEvolved
+REQUIRES FUNCTION MoLChangeToConstrained
+REQUIRES FUNCTION MoLChangeToSaveAndRestore
+REQUIRES FUNCTION MoLChangeToNone
+
+### From CactusBase/Boundary
+
+CCTK_INT FUNCTION Boundary_SelectGroupForBC(CCTK_POINTER_TO_CONST IN GH, \
+  CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, \
+  CCTK_STRING IN group_name, CCTK_STRING IN bc_name)
+
+CCTK_INT FUNCTION Boundary_SelectVarForBC(CCTK_POINTER_TO_CONST IN GH, \
+  CCTK_INT IN faces, CCTK_INT IN boundary_width, CCTK_INT IN table_handle, \
+  CCTK_STRING IN group_name, CCTK_STRING IN bc_name)
+
+REQUIRES FUNCTION Boundary_SelectGroupForBC
+REQUIRES FUNCTION Boundary_SelectVarForBC
+
+### Stuff for turning on and off prolongation
+CCTK_INT FUNCTION EnableProlongating(CCTK_INT IN flag)
+REQUIRES FUNCTION EnableProlongating
+
+### EOS function
+void FUNCTION EOS_Omni_short(CCTK_INT IN eoskey,                \
+			     CCTK_INT IN havetemp,              \
+			     CCTK_REAL IN rf_precision,         \
+                             CCTK_INT IN npoints,               \
+			     CCTK_REAL IN ARRAY rho,     	\
+			     CCTK_REAL INOUT ARRAY eps,  	\
+			     CCTK_REAL INOUT ARRAY temp, 	\
+			     CCTK_REAL IN ARRAY ye,      	\
+			     CCTK_REAL OUT ARRAY press,		\
+			     CCTK_REAL INOUT ARRAY entropy,	\
+			     CCTK_REAL OUT ARRAY cs2,  		\
+			     CCTK_REAL OUT ARRAY dedt, 		\
+			     CCTK_REAL OUT ARRAY dpderho,	\
+			     CCTK_REAL OUT ARRAY dpdrhoe,	\
+			     CCTK_REAL OUT ARRAY munu,  	\
+			     CCTK_INT OUT ARRAY keyerr,   	\
+                             CCTK_INT OUT anyerr)
+
+USES FUNCTION EOS_Omni_short
+
+void FUNCTION EOS_Omni_pressOMP(CCTK_INT IN eoskey,         \
+                             CCTK_INT IN havetemp,       \
+                             CCTK_REAL IN rf_precision,   \
+                             CCTK_INT IN npoints,        \
+                             CCTK_REAL IN ARRAY rho,     \
+                             CCTK_REAL INOUT ARRAY eps,  \
+                             CCTK_REAL INOUT ARRAY temp, \
+                             CCTK_REAL IN ARRAY ye,      \
+                             CCTK_REAL OUT ARRAY press,  \
+                             CCTK_INT OUT ARRAY keyerr,  \
+                             CCTK_INT OUT anyerr)
+
+USES FUNCTION EOS_Omni_pressOMP
+
+
+
+# We are treating the opacity GFs in a non-standard way.
+# This means that they will not be accessible from Fortran,
+# because we use a non-Cactus way of storing the data
+# the fastest varying index will be the last index,
+# running from 0 to ngroups*nspecies.
+   
+CCTK_REAL opacs[ngroups*nspecies] type=GF Timelevels=1 tags='Prolongation="None" checkpoint="no"'
+{
+  absorb, emis, scat
+} "opacity variables"
+
+CCTK_REAL xi[ngroups*nspecies] type=GF Timelevels=1 tags='Prolongation="None" checkpoint="yes"'
+{
+  xioldxL, xioldxR, xioldyL, xioldyR, xioldzL, xioldzR
+} "closure variables"
+
+CCTK_REAL pnu type=GF Timelevels=3 tags='ProlongationParameter="Hydrobase::prolongation_type" tensortypealias="Scalar"' "neutrino pressure"
+
+# contribution of the neutrinos to the stress energy tensor
+REAL stress_energy_scalar_nu TYPE=gf TIMELEVELS=3 TAGS='tensortypealias="Scalar" ProlongationParameter="TmunuBase::prolongation_type"'
+{
+  eTnutt
+} "Stress-energy tensor, 3-scalar part T_00"
+
+REAL stress_energy_vector_nu TYPE=gf TIMELEVELS=3 TAGS='tensortypealias="D" ProlongationParameter="TmunuBase::prolongation_type"'
+{
+  eTnutx eTnuty eTnutz
+} "Stress-energy tensor, 3-vector part T_0i"
+
+REAL stress_energy_tensor_nu TYPE=gf TIMELEVELS=3 TAGS='tensortypealias="DD_sym" ProlongationParameter="TmunuBase::prolongation_type"'
+{
+  eTnuxx eTnuxy eTnuxz eTnuyy eTnuyz eTnuzz
+} "Stress-energy tensor, 3-tensor part T_ij"
+
+CCTK_REAL enu[ngroups*nspecies] type=GF Timelevels=3 tags='ProlongationParameter="ZelmaniM1::prolongation_type" tensortypealias="Scalar"' "mean intensity"
+
+CCTK_REAL nnu[ngroups*nspecies] type=GF Timelevels=3 tags='ProlongationParameter="ZelmaniM1::prolongation_type" tensortypealias="Scalar"' "number density times average energy"
+
+CCTK_REAL fnumag[ngroups*nspecies] type=GF Timelevels=1 tags='Prolongation="none" tensortypealias="Scalar"' "flux magnitude"
+
+CCTK_REAL fnu[ngroups*nspecies] type=GF Timelevels=3 tags='ProlongationParameter="ZelmaniM1::prolongation_type" tensortypealias="D"'
+{
+ fnux, fnuy, fnuz
+} "fluxes"
+
+# net heating, net cooling, and heating-cooling rates
+CCTK_REAL heatcoolanalysis type=GF Timelevels=3 tags='ProlongationParameter="HydroBase::prolongation_type" tensortypealias="Scalar"'
+{
+  netheat, netcool, heatcool
+} "analysis GFs"
+
+CCTK_REAL dtautmp type=GF Timelevels=1 tags='checkpoint="no" Prolongation="none" tensortypealias="Scalar"' "helper GF in CalcUpdate"
+
+CCTK_INT ZelmaniM1_scalars type = SCALAR tags='checkpoint="no"'
+{
+  zm1_flux_direction, zm1_xoffset, zm1_yoffset, zm1_zoffset, zm1_RKstep, zm1_RKstep_half, zm1_RKstep_full
+} "Which direction are we taking the fluxes in, the offsets, and the current RK step"
+
+
+############# variables for states at the interfaces
+
+CCTK_REAL enupm[ngroups*nspecies] type=GF Timelevels=1 tags='Prolongation="none" checkpoint="no"' 
+{
+ enuplus, enuminus
+} "mean intensity at interfaces"
+
+CCTK_REAL nnupm[ngroups*nspecies] type=GF Timelevels=1 tags='Prolongation="none" checkpoint="no"' 
+{
+ nnuplus, nnuminus
+} "number density at interfaces"
+
+CCTK_REAL fnupm[ngroups*nspecies] type=GF Timelevels=1 tags='Prolongation="none" checkpoint="no"'
+{
+ fnuxp, fnuyp, fnuzp
+ fnuxm, fnuym, fnuzm
+} "fluxes at interfaces"
+
+CCTK_REAL velpm type=GF Timelevels=1 tags='Prolongation="none" checkpoint="no"'
+{
+  velxp, velyp, velzp
+  velxm, velym, velzm
+} "3-velocity at interfaces"
+
+CCTK_REAL velp[3] type=GF Timelevels=1 tags='Prolongation="none" checkpoint="no"'
+
+CCTK_REAL velm[3] type=GF Timelevels=1 tags='Prolongation="none" checkpoint="no"'
+
+############# Riemann flux variables for evolved variables
+CCTK_REAL enuflux[ngroups*nspecies] type=GF Timelevels=1 tags='Prolongation="none" checkpoint="no"' "flux of mean intensity at interfaces"
+
+CCTK_REAL nnuflux[ngroups*nspecies] type=GF Timelevels=1 tags='Prolongation="none" checkpoint="no"' "flux of number density at interfaces"
+
+CCTK_REAL fnuflux[ngroups*nspecies] type=GF Timelevels=1 tags='Prolongation="none" checkpoint="no"'
+{
+ fnuxflux, fnuyflux, fnuzflux
+} "flux of fluxes at interfaces"
+
+
+######### Variables for RK2 half step
+CCTK_REAL enuh[ngroups*nspecies] type=GF Timelevels=1 tags='Prolongation="none" tensortypealias="Scalar" checkpoint="no"' "mean intensity after RK2 half step"
+
+CCTK_REAL nnuh[ngroups*nspecies] type=GF Timelevels=1 tags='Prolongation="none" tensortypealias="Scalar" checkpoint="no"' "number density after RK2 half step"
+
+CCTK_REAL fnuh[ngroups*nspecies] type=GF Timelevels=1 tags='Prolongation="none" tensortypealias="D" checkpoint="no"'
+{
+ fnuxh, fnuyh, fnuzh
+} "fluxes after RK2 half step"
+
+CCTK_REAL register_fine_h[4*3*ngroups*nspecies] type=GF Timelevels=1 tags='Prolongation="none"' "fine grid flux registers for refluxing"
+CCTK_REAL register_coarse_h[4*3*ngroups*nspecies] type=GF Timelevels=1 tags='Prolongation="none"' "coarse grid flux registers for refluxing"
+
+############# RHS variables 
+
+CCTK_REAL enurhs[ngroups*nspecies] type=GF Timelevels=1 tags='Prolongation="none" tensortypealias="Scalar" checkpoint="no"'  "RHS for mean intensity"
+
+CCTK_REAL nnurhs[ngroups*nspecies] type=GF Timelevels=1 tags='Prolongation="none" tensortypealias="Scalar" checkpoint="no"'  "RHS for mean intensity"
+
+CCTK_REAL fnurhs[ngroups*nspecies] type=GF Timelevels=1 tags='Prolongation="none" tensortypealias="D" checkpoint="no"'
+{
+ fnuxrhs, fnuyrhs, fnuzrhs
+} "RHS for fluxes"
+
+
+########### Variables for calculating luminosity
+ 
+CCTK_REAL rad   TYPE=array DIM=1 size=nrad  DISTRIB=constant TAGS='checkpoint="yes"'
+CCTK_REAL tot_vol TYPE=array DIM=1 size=nrad  DISTRIB=constant TAGS='checkpoint="yes"'
+CCTK_REAL Luminosity TYPE=array DIM=1 size=nrad*ngroups*nspecies DISTRIB=constant TAGS='Checkpoint="no"' "Summed luminosity"
+

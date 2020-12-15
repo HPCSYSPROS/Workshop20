@@ -1,0 +1,40 @@
+# Main make.configuration.deps file for thorn CarpetIOASCII
+
+CARPETIOASCII_BUILD_DIR = $(BUILD_DIR)/CarpetIOASCII
+CARPETIOASCII_SRC_DIR   = $(PACKAGE_DIR)/Carpet/CarpetIOASCII/src/util
+
+CARPETIOASCII_CFLAGS  = -DCCODE $(CFLAGS)
+CARPETIOASCII_LDFLAGS = $(DEBUG_LD) $(LDFLAGS) $(CXXFLAGS) $(EXTRAFLAGS) $(GENERAL_LIBRARIES)
+
+# add includes
+CARPETIOASCII_CFLAGS += -I$(CONFIG) -I$(BINDINGS_DIR)/include -I$(FLESH_DIR)/include
+
+
+
+# Compile
+$(CARPETIOASCII_BUILD_DIR)/%.o: $(CARPETIOASCII_SRC_DIR)/%.c
+	@echo "Compiling $<"
+	-$(MKDIR) $(MKDIRFLAGS) $(CARPETIOASCII_BUILD_DIR) 2> /dev/null
+	$(CC) $< $(CARPETIOASCII_CFLAGS) -c -o $@
+
+# Link
+$(UTIL_DIR)/%: $(CARPETIOASCII_BUILD_DIR)/%.o
+	@echo "Creating $* in $(UTIL_DIR) from $<"
+	-$(MKDIR) $(MKDIRFLAGS) $(UTIL_DIR) 2> /dev/null
+	$(LD) $< $(CARPETIOASCII_LDFLAGS) -o $@
+
+
+
+# Special versions for carpet2sdf:
+
+# Compile
+$(CARPETIOASCII_BUILD_DIR)/carpet2sdf.o: $(CARPETIOASCII_SRC_DIR)/carpet2sdf.c
+	@echo "Compiling carpet2sdf"
+	-$(MKDIR) $(MKDIRFLAGS) $(CARPETIOASCII_BUILD_DIR) 2> /dev/null
+	$(CC) $< $(CARPETIOASCII_CFLAGS) $(INC_DIRS:%=-I%) -c -o $@
+
+# Link
+$(UTIL_DIR)/carpet2sdf: $(CARPETIOASCII_BUILD_DIR)/carpet2sdf.o
+	@echo "Creating $* in $(UTIL_DIR) from $<"
+	-$(MKDIR) $(MKDIRFLAGS) $(UTIL_DIR) 2> /dev/null
+	$(LD) $< $(CARPETIOASCII_LDFLAGS) $(GENERAL_LIBRARIES) -o $@

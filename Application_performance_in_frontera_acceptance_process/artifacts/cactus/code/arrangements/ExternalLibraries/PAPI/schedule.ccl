@@ -1,0 +1,31 @@
+# Schedule definitions for thorn PAPI
+
+SCHEDULE PAPI_init AT wragh
+{
+  LANG: C
+  OPTIONS: meta
+} "Initialise PAPI"
+
+SCHEDULE PAPI_register_clock AT wragh AFTER PAPI_init
+{
+  LANG: C
+  OPTIONS: meta
+} "Set up Cactus clock for PAPI"
+
+SCHEDULE PAPI_dgemm AT basegrid
+{
+  LANG: C
+  OPTIONS: meta
+} "Run a DGEMM benchmark to test PAPI"
+
+SCHEDULE PAPI_output_stats_analysis AT analysis
+{
+  LANG: C
+  OPTIONS: meta
+} "Output PAPI statistics"
+
+SCHEDULE PAPI_output_stats_terminate AT terminate
+{
+  LANG: C
+  OPTIONS: meta
+} "Output PAPI statistics"

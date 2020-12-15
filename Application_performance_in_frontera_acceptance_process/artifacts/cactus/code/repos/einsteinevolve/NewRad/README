@@ -1,0 +1,10 @@
+Cactus Code Thorn NewRad
+Author(s)    : Erik Schnetter <schnetter@cct.lsu.edu>
+Maintainer(s): Erik Schnetter <schnetter@cct.lsu.edu>
+Licence      : GPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Implement the "NewRad" radiative boundary conditions known from
+BSSN_MoL.

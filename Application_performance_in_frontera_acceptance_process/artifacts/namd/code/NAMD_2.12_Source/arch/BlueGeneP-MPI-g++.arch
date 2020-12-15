@@ -1,0 +1,16 @@
+NAMD_ARCH = BlueGeneP
+CHARMARCH = mpi-bluegenep
+
+BGP_INC=${BGP_FLOOR}/gnu-linux/include
+BGP_LIB=${BGP_FLOOR}/gnu-linux/lib
+BGP_BIN=${BGP_FLOOR}/gnu-linux/bin
+
+BGP_CFLAGS=-I$(BGP_INC) 
+
+CXX = $(BGP_BIN)/powerpc-bgp-linux-g++ $(BGP_CFLAGS) -DNO_SOCKET  -DDUMMY_VMDSOCK -DNOHOSTNAME -DNO_GETPWUID -DUSE_TOPOMAP=1
+
+#-O3 is unstable with NAMD
+CXXOPTS = -O1 
+CC = $(BGP_BIN)/powerpc-bgp-linux-gcc $(BGP_CFLAGS)
+COPTS = -O4 
+

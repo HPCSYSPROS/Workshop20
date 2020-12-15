@@ -1,0 +1,32 @@
+Cactus Code Thorn InitBase
+Author(s)    : Erik Schnetter
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Thorn InitBase specifies how initial data are to be set up.  It does
+not set up any initial data by itself, nor does it contain any
+routines which are to be called.  It is merely a convenient repository
+remembering how initial data are to be set up, so that other thorns
+can check their actions against this thorn.
+
+There are several possibilities:
+
+1. The initial data thorn sets up data on one time level, while other
+   time levels are scratch space.  The time evolution method must
+   start up from a single time level.  (This is the default.)
+
+2. The initial data thorn sets up data on exactly one time level, and
+   is called once for each active time level.  (This means that the
+   initial data thorn can only access the current time level.)
+
+3. The initial data thorn sets up data on exactly two time levels, and
+   is called once for each active time level.  (This means that the
+   initial data thorn can only access the current and the first past
+   time level.)
+
+4. The initial data thorn sets up data on all active time levels.
+   (This makes it necessary that the initial data thorn checks the
+   number of active time levels.)

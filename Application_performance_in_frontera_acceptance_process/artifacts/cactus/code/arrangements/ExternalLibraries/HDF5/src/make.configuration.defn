@@ -1,0 +1,16 @@
+# make.configuration.defn file for thorn HDF5
+
+# Define standard HDF5 utilities and install those that we could build/that are
+# present in the system
+STD_HDF5_UTILS = gif2h5 h52gif h5copy h5debug h5diff h5dump h5import h5jam h5ls h5mkgrp h5perf_serial h5redeploy h5repack h5repart h5stat h5unjam
+ALL_UTILS += $(shell cd $(HDF5_DIR)/bin 2>/dev/null && ls $(STD_HDF5_UTILS:%=%*) 2>/dev/null)
+
+# Install h5check only if it exists
+ALL_UTILS += $(shell cd $(HDF5_DIR)/bin 2>/dev/null && ls h5check* 2>/dev/null)
+
+# Ignore some of the utilities that we don't use, e.g. the compiler
+# wrappers:
+# h5c++ h5cc h5fc
+
+# Define this thorn's utilities
+ALL_UTILS += hdf5_merge hdf5_extract hdf5_double_to_single

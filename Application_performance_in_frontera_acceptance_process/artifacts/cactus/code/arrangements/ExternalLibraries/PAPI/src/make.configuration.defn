@@ -1,0 +1,6 @@
+# make.configuration.defn file for thorn PAPI
+
+# Define standard PAPI utilities and install those that we could build
+# and/or that are present in the system
+STD_PAPI_UTILS = papi_avail papi_clockres papi_command_line papi_component_avail papi_cost papi_decode papi_error_codes papi_event_chooser papi_mem_info papi_multiplex_cost papi_native_avail papi_version papi_xml_event_info
+ALL_UTILS += $(filter $(STD_PAPI_UTILS), $(notdir $(wildcard $(PAPI_DIR)/bin/*)))

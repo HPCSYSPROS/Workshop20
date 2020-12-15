@@ -1,0 +1,26 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+module ComputeExtMgr {
+
+  message ExtCoordMsg {
+    ComputeExtAtom coord[];
+  };
+  message ExtForceMsg {
+    ExtForce force[];
+  };
+
+  group ComputeExtMgr {
+
+    entry ComputeExtMgr(void);
+
+    entry void recvCoord(ExtCoordMsg *);
+    entry void recvForce(ExtForceMsg *);
+
+  };
+
+}
+

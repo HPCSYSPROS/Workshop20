@@ -1,0 +1,72 @@
+# Interface definition for thorn PNSHelper
+
+implements: PNSHelper
+
+inherits: TmunuBase HydroBase ADMBase grid
+
+### From CactusBase/MoL
+
+CCTK_INT FUNCTION MoLRegisterEvolved(CCTK_INT IN EvolvedIndex, \
+                                     CCTK_INT IN RHSIndex)
+CCTK_INT FUNCTION MoLRegisterConstrained(CCTK_INT IN ConstrainedIndex)
+CCTK_INT FUNCTION MoLRegisterSaveAndRestore(CCTK_INT IN SandRIndex)
+CCTK_INT FUNCTION MoLChangeToEvolved(CCTK_INT IN EvolvedIndex, \
+                                     CCTK_INT IN RHSIndex)
+CCTK_INT FUNCTION MoLChangeToConstrained(CCTK_INT IN ConstrainedIndex)
+CCTK_INT FUNCTION MoLChangeToSaveAndRestore(CCTK_INT IN SandRIndex)
+CCTK_INT FUNCTION MoLChangeToNone(CCTK_INT IN RemoveIndex)
+
+REQUIRES FUNCTION MoLRegisterEvolved
+REQUIRES FUNCTION MoLRegisterConstrained
+REQUIRES FUNCTION MoLRegisterSaveAndRestore
+REQUIRES FUNCTION MoLChangeToEvolved
+REQUIRES FUNCTION MoLChangeToConstrained
+REQUIRES FUNCTION MoLChangeToSaveAndRestore
+REQUIRES FUNCTION MoLChangeToNone
+
+
+# Interpolated stuff
+# Note: This array is replicated on all processes.
+# It is also calculated on all processes.
+# This probably needs to be parallelised.
+CCTK_REAL PNSHelper_interpolated_variables TYPE=array DIM=3 size=nrad+nrad_outer,ntheta,nphi DISTRIB=constant TAGS='Checkpoint="no"'
+{
+  pns_x pns_y pns_z
+  pns_rho pns_press pns_eps pns_temp pns_ye pns_w_lorentz pns_old_gxx pns_old_alp
+} "Interpolated variables for calculating lapse and metric"
+
+CCTK_REAL PNSHelper_distributed_variables TYPE=array DIM=1 size=nrad+nrad_outer DISTRIB=constant TAGS='Checkpoint="no"'
+{
+  pns_vol pns_mass pns_rho_psi pns_rho_alp 
+} "Distributed variables for calculating lapse and metric"
+
+CCTK_REAL PNSHelper_grvars TYPE=array DIM=1 size=nrad+nrad_outer DISTRIB=constant TAGS='Checkpoint="yes"'
+{
+  pns_alp pns_psi pns_rho_star pns_real_rho_star 
+} "Interpolated variables for calculating lapse and metric"
+
+
+CCTK_REAL PNSHelper_avprof TYPE=array DIM=1 size=nrad+nrad_outer DISTRIB=constant TAGS='Checkpoint="no"'
+{
+  pns_av_rho pns_av_eps pns_av_press pns_av_temp pns_av_ye pns_av_w_lorentz pns_av_gxx pns_av_alp
+} "averaged profiles"
+
+CCTK_REAL PNSHelper_metricdata TYPE=ARRAY DIM=2 size=nrad+nrad_outer,3 DISTRIB=constant TAGS='Checkpoint="yes"'
+{
+  pns_psi_store pns_alp_store
+}
+
+CCTK_REAL PNSHelper_scalars TYPE=scalar TAGS='Checkpoint="yes"'
+{
+  x0, y0, z0, drad, dtheta, dphi, pns_mgrav, pns_mgrav_old
+} "Origin of interpolation calculation"
+
+CCTK_REAL rad   TYPE=array DIM=1 size=nrad+nrad_outer  DISTRIB=constant TAGS='checkpoint="yes"'
+CCTK_REAL phi   TYPE=array DIM=1 size=nphi  DISTRIB=constant TAGS='checkpoint="yes"'
+CCTK_REAL theta TYPE=array DIM=1 size=ntheta DISTRIB=constant TAGS='checkpoint="yes"'
+
+CCTK_REAL metric_times TYPE=array DIM=1 size=3 DISTRIB=constant TAGS='checkpoint="yes"'
+CCTK_REAL pns_mgrav_store TYPE=array DIM=1 size=3 DISTRIB=constant TAGS='checkpoint="yes"'
+
+CCTK_INT have_interp_data TYPE=scalar TAGS='checkpoint="no"'
+CCTK_INT force_interp TYPE=scalar TAGS='checkpoint="no"'

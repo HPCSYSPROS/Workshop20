@@ -1,0 +1,840 @@
+# Parameter definitions for thorn GRHydro
+# $Header$
+
+shares:ADMBase
+
+USES int initial_shift ""
+{
+}
+
+USES KEYWORD metric_type ""
+{
+}
+ 
+EXTENDS KEYWORD shift_evolution_method ""
+{
+  "Comoving" :: "Set the shift so the matter is approximately comoving"
+}
+
+
+#########################################
+###  PARAMETRES SHARED FROM HydroBase ###
+#########################################
+
+shares: HydroBase
+
+USES CCTK_INT timelevels
+USES KEYWORD prolongation_type
+USES INT hydro_excision
+EXTENDS KEYWORD evolution_method ""
+{
+  "GRHydro" :: "Use GRHydro to evolve the hydro variables"
+}
+EXTENDS KEYWORD Bvec_evolution_method ""
+{
+  "GRHydro"      :: "Use GRHydro to evolve the MHD variables, evolving the Magnetic Field"
+  "GRHydro_Avec" :: "Use GRHydro to evolve the MHD variables, evolving the Vector Potential - Avec is staggered"
+  "GRHydro_Avec_centered" :: "Use GRHydro to evolve the MHD variables, evolving the Vector Potential - Avec is centered"
+}
+EXTENDS KEYWORD Y_e_evolution_method ""
+{
+  "GRHydro" :: "Use GRHydro to evolve Y_e"
+}
+EXTENDS KEYWORD temperature_evolution_method ""
+{
+  "GRHydro" :: "Use GRHydro to evolve temperature"
+}
+EXTENDS KEYWORD entropy_evolution_method ""
+{
+  "GRHydro" :: "Use GRHydro to evolve entropy"
+}
+EXTENDS KEYWORD initial_Bvec ""
+{
+  "Bvec_from_Avec" :: "Calculate B^i for an initially specified A_i"
+}
+
+#########################################
+###  PARAMETRES SHARED FROM MoL       ###
+#########################################
+
+shares: MethodOfLines
+
+USES CCTK_INT MoL_Num_Evolved_Vars
+USES CCTK_INT MoL_Num_Evolved_Vars_Slow
+USES CCTK_INT MoL_Num_Constrained_Vars
+USES CCTK_INT MoL_Num_SaveAndRestore_Vars
+USES CCTK_INT MoL_Max_Evolved_Array_Size 
+USES CCTK_INT MoL_Num_ArrayEvolved_Vars
+
+shares:SpaceMask
+
+USES boolean use_mask
+
+shares: ADMMacros
+
+USES INT spatial_order
+
+#########################################
+###  PARAMETRES SHARED FROM EOS_Omni  ###
+#########################################
+
+SHARES: EOS_Omni
+
+USES STRING nuceos_table_name
+
+USES REAL poly_k
+
+restricted:
+
+KEYWORD use_evolution_mask "Set this to 'always' to skip validity tests in regions where CarpetEvolutionMask::evolution_mask vanishes." STEERABLE=ALWAYS
+{
+  "always" :: "use the mask"
+  "auto"   :: "check if CarpetEvolutionMask is active, then use the mask"
+  "never"  :: "do not use the mask"
+} "never"
+
+BOOLEAN GRHydro_disable_hydro_update "Do not actually update anything" STEERABLE=ALWAYS
+{
+} "No"
+
+BOOLEAN GRHydro_enable_internal_excision "Set this to 'false' to disable the thorn-internal excision." STEERABLE=ALWAYS
+{
+} "yes"
+
+CCTK_INT GRHydro_hydro_excision "Turns excision automatically on in HydroBase" ACCUMULATOR-BASE=HydroBase::hydro_excision
+{
+  1:1 :: "Only '1' allowed"
+} 1
+
+CCTK_INT GRHydro_MaxNumEvolvedVars "The maximum number of evolved variables used by GRHydro" ACCUMULATOR-BASE=MethodofLines::MoL_Num_Evolved_Vars
+{
+  0             :: "when using multirate"
+  5:12		:: "dens scon[3] tau (B/A)vec[3] psidc ye entropy Aphi"
+} 5
+
+CCTK_INT GRHydro_MaxNumEvolvedVarsSlow "The maximum number of evolved variables used by GRHydro" ACCUMULATOR-BASE=MethodofLines::MoL_Num_Evolved_Vars_Slow
+{
+  0             :: "do not use multirate"
+  5:12		:: "dens scon[3] tau (B/A)vec[3] psidc ye entropy Aphi"
+} 0
+
+#  7  primitives (rho,press,eps,w_lorentz,vel)
+# 10  Tmunu
+#  3  Bvec
+#  1  tau (polytype EOS)
+#  1  Y_e
+#  1  temperature
+#  1  entropy
+#  3  comoving shift
+#  3  lvel
+#  3  local_shift
+#  6  local_metric
+#  6  local_extrinsic_curvature
+#  3  lBvec
+CCTK_INT GRHydro_MaxNumConstrainedVars "The maximum number of constrained variables used by GRHydro" ACCUMULATOR-BASE=MethodofLines::MoL_Num_Constrained_Vars
+{
+  7:48		:: "A small range, depending on testing or not"
+} 37
+ 
+CCTK_INT GRHydro_MaxNumSandRVars "The maximum number of save and restore variables used by GRHydro" ACCUMULATOR-BASE=MethodofLines::MoL_Num_SaveAndRestore_Vars
+{
+  0:16		:: "A small range, depending on testing or not"
+} 16
+
+keyword recon_method "Which reconstruction method to use" STEERABLE=RECOVER
+{
+  "tvd"	   :: "Slope limited TVD"
+  "ppm"    :: "PPM reconstruction"
+  "eno"    :: "ENO reconstruction"
+  "weno"   :: "WENO reconstruction"
+  "weno-z" :: "WENO-Z reconstruction"
+  "mp5"    :: "MP5 reconstruction"
+} "tvd"
+
+keyword method_type "Which type of method to use"
+{
+  "RSA FV"        :: "Reconstruct-Solve-Average finite volume method"
+  "Flux Split FD" :: "Finite difference using Lax-Friedrichs flux splitting"
+} "RSA FV"
+
+
+boolean check_for_trivial_rp "Do check for trivial Riemann Problem"
+{
+} "yes"
+
+keyword recon_vars "Which type of variables to reconstruct"
+{
+  "primitive" 		:: "Reconstruct the primitive variables"
+  "conservative" 	:: "Reconstruct the conserved variables"
+} "primitive"
+
+keyword tvd_limiter "Which slope limiter to use"
+{
+  "minmod" 	:: "Minmod"
+  "vanleerMC2"	:: "Van Leer MC - Luca"
+  "Superbee"	:: "Superbee"
+} "minmod"
+
+real myfloor "A minimum number for the TVD reconstruction routine"
+{
+  0.0:		:: "Must be positive"
+} 1.e-10
+
+boolean use_optimized_ppm "use C++ templated version of PPM. Experimental"
+{
+} "no"
+
+boolean ppm_detect "Should the PPM solver use shock detection?"
+{
+} "no"
+
+keyword ppm_flatten "Which flattening procedure should the PPM solver use?"
+{
+  "stencil_3"   :: "our flattening procedure, which requires only stencil 3 and which may work"
+  "stencil_4"   :: "original C&W flattening procedure, which requires stencil 4"
+} "stencil_3"
+
+real ppm_epsilon "Epsilon for PPM zone flattening"
+{
+  0.0: 		:: "Must be positive. Default is from Colella & Woodward"
+} 0.33
+
+real ppm_omega1 "Omega1 for PPM zone flattening"
+{
+  : 		:: "Anything goes. Default is from Colella & Woodward"
+} 0.75
+
+real ppm_omega2 "Omega2 for PPM zone flattening"
+{
+  :		:: "Anything goes. Default is from Colella & Woodward"
+} 10.0
+
+real ppm_omega_tracer "Omega for tracer PPM zone flattening"
+{
+  :		:: "Anything goes. Default is from Plewa & Mueller"
+} 0.50
+
+real ppm_epsilon_shock "Epsilon for PPM shock detection"
+{
+  :		:: "Anything goes. Default is from Colella & Woodward"
+} 0.01
+
+real ppm_eta1 "Eta1 for PPM shock detection"
+{
+  :		:: "Anything goes. Default is from Colella & Woodward"
+} 20.0
+
+real ppm_eta2 "Eta2 for PPM shock detection"
+{
+  :		:: "Anything goes. Default is from Colella & Woodward"
+} 0.05
+
+real ppm_k0 "K0 for PPM shock detection"
+{
+  :		:: "Anything goes. Default suggested by Colella & Woodward is: (polytropic constant)/10.0"
+} 0.2
+
+real ppm_small "A floor used by PPM shock detection"
+{
+  0.0:1.0	:: "In [0,1]"
+} 1.e-7
+
+int ppm_mppm "Use modified (enhanced) ppm scheme"
+{
+  0:1 :: "0 (off, default) or 1 (on)" 
+} 0
+
+int ppm_mppm_debug_eigenvalues "write eigenvalues into debug grid variables"
+{
+  0:1 :: "0 (off, default) or 1 (on)" 
+} 0
+
+real mp5_alpha "alpha parameter for MP5 reconstruction"
+{
+  0:* :: "positive"
+} 4.0
+
+real mp5_eps "epsilon parameter for MP5 reconstruction"
+{
+  0:* :: "0.0 or very small and positive. 1e-10 is suggested by Suresh&Huynh. TOV star requires 0.0"
+} 0.0
+
+boolean mp5_adaptive_eps "Same as WENO adaptive epsilon: adaptively reduce mp5_eps according to norm of stencil. Original algorithm does not use this."
+{
+} no
+
+boolean use_enhanced_ppm "Use the enhanced ppm reconstruction method proposed by Colella & Sekora 2008 and McCorquodale & Colella 2011" STEERABLE=RECOVER
+{
+} no
+
+int GRHydro_oppm_reflevel "Ref level where oPPM is used instead of ePPM (used with use_enhaced_ppm=yes)."
+{
+  -1:10 :: "0-10 (the reflevel number) or -1 (off)" 
+} -1
+
+real enhanced_ppm_C2 "Parameter for enhancecd ppm limiter. Default from McCorquodale & Colella 2011" STEERABLE=ALWAYS
+{
+   *:* :: "must be greater than 1. According to Colella&Sekora 2008, enhanced ppm is insensitive to C in [1.25,5]"
+} 1.25
+
+real enhanced_ppm_C3 "Parameter for enhancecd ppm limiter. Default from McCorquodale & Colella 2011" STEERABLE=ALWAYS
+{
+   0:* :: "must be greater than 0."
+} 0.1
+
+boolean reconstruct_Wv "Reconstruct the primitive velocity W_Lorentz*vel, rather than just vel." STEERABLE=ALWAYS
+{
+} no
+
+boolean reconstruct_pressure "Reconstruct the pressure rather than internal energy or temperature" STEERABLE=ALWAYS
+{
+} no
+
+int eno_order "The order of accuracy of the ENO reconstruction"
+{
+  1:*		:: "Anything above 1, but above 5 is pointless"
+} 2
+
+int WENO_order "The order of accuracy of the WENO reconstruction"
+{
+  5  :: "Fifth-order"
+} 5
+
+real weno_eps "WENO epsilon parameter. For WENO-z, 1e-40 is recommended" STEERABLE=ALWAYS
+{
+  0:*  :: "small and positive"
+} 1e-26
+
+boolean weno_adaptive_epsilon "use modified smoothness indicators that take into account scale of solution (adaptive epsilon)"
+{
+} yes
+
+keyword riemann_solver "Which Riemann solver to use" STEERABLE=always
+{
+  "Roe"		:: "Standard Roe solver"
+  "Marquina"	:: "Marquina flux"
+  "HLLE"	:: "HLLE"
+  "HLLC"	:: "HLLC"
+  "LLF"	:: "Local Lax-Friedrichs (MHD only at the moment)"
+} "HLLE"
+
+
+keyword HLLE_type "Which HLLE type to use"
+{
+  "Standard"	:: "Standard HLLE solver"
+  "Tadmor"	:: "Tadmor's simplification of HLLE"
+} "Standard"
+
+
+real riemann_wavespeed_factor "Decrease/Increase min/max eigenvalues by this factor for HLLE Riemann solver to introduce some dissipation."
+{
+  0:* :: "Anything positive; zero results in original HLLE"
+} 0.0
+
+
+keyword left_eigenvectors "How to compute the left eigenvectors"
+{
+  "analytical"	:: "Analytical left eigenvectors"
+  "numerical"	:: "Numerical left eigenvectors"
+} "analytical"
+
+keyword numerical_viscosity "How to compute the numerical viscosity"
+{
+  "fast"	:: "Fast numerical viscosity"
+  "normal"	:: "Normal numerical viscosity"
+} "fast"
+
+boolean apply_H_viscosity "H viscosity is useful to fix the carbuncle instability seen at strong shocks"
+{
+} no
+
+keyword bound "Which boundary condition to use - FIXME"
+{
+  "flat"	:: "Zero order extrapolation"
+  "none"	:: "None"
+  "static"	:: "Static, no longer supported"
+  "scalar"	:: "Constant"
+} "none"
+
+int GRHydro_stencil "Width of the stencil"
+{
+  0:		:: "Must be positive"
+} 2
+
+keyword GRHydro_eos_type "Type of Equation of State"
+{
+  "Polytype"	:: "P = P(rho) or P = P(eps)"
+  "General"	:: "P = P(rho, eps)"
+} "General"
+
+string GRHydro_eos_table "Name for the Equation of State"
+{
+  .*		:: "Can be anything"
+} "Ideal_Fluid"
+
+
+real GRHydro_eos_rf_prec "Precision to which root finding should be carried out" STEERABLE=ALWAYS
+{
+   (0.0:*       :: "anything larger than 0 goes"
+} 1.0e-8
+
+# cott@tapir.caltech.edu:
+# The below parameter controls the handling of EOS_Omni keyerr=667
+# failures. In these failures, no new temperature can be found for the
+# eps it was called with. This may happen, for example, when a strong
+# shock appears for the first time. Code checking this parameter will,
+# if it is set to true, locally inject heat to fix the problem.
+# This normally happens only very rarely, but one must monitor total energy
+# conservation to check that this does ruin energy conservation.
+boolean GRHydro_eos_hot_eps_fix "Activate quasi-failsafe mode for hot EOSs" STEERABLE=ALWAYS
+{
+} "no"
+
+boolean GRHydro_eos_hot_prim2con_warn "Warn about temperature workaround in prim2con" STEERABLE=ALWAYS
+{
+} "yes"
+
+boolean GRHydro_c2p_reset_eps_tau_hot_eos "As a last resort, reset tau" STEERABLE=ALWAYS
+{
+} "no"
+
+boolean reconstruct_temper "if set to true, temperature will be reconstructed" STEERABLE=ALWAYS
+{
+} "no"
+ 
+REAL GRHydro_hot_atmo_temp "Temperature of the hot atmosphere in MeV" STEERABLE=ALWAYS
+{
+ (0.0:*   :: "Larger than 0 MeV"
+} 0.1e0
+
+REAL GRHydro_max_temp "maximum temperature we allow" STEERABLE=ALWAYS
+{
+ (0.0:*   :: "Larger than 0 MeV"
+} 90.0e0
+
+REAL GRHydro_hot_atmo_Y_e "Y_e of the hot atmosphere" STEERABLE=ALWAYS
+{
+ 0.0:*   :: "Larger than 0"
+} 0.5e0
+
+REAL GRHydro_Y_e_min "minimum allowed Y_e" STEERABLE=ALWAYS
+{
+ 0.0:*   :: "Larger than or equal to zero"
+} 0.0
+
+REAL GRHydro_Y_e_max "maximum allowed Y_e" STEERABLE=ALWAYS
+{
+ 0.0:*   :: "Larger than or equal to zero; 1 is default"
+} 1.0
+
+
+####################### Other Parameters ##############################
+
+#Parameters controlling conservative <-> primitive change.
+int GRHydro_c2p_warnlevel "Warnlevel for Con2Prim warnings" STEERABLE=ALWAYS
+{
+  0:1           :: "Either 0 or 1"
+} 0
+
+keyword GRHydro_c2p_failed_action "what to do when we detect a c2p failure"
+{
+  "abort"     :: "abort with error"
+  "terminate" :: "request termination"
+} "abort"
+
+REAL sqrtdet_thr "Threshold to apply cons rescalings deep inside the horizon" STEERABLE=ALWAYS
+{
+ 1.0:    :: "Larger values guarantees this sort of rescaling only deep inside the horizon"
+ -1.0    :: "Do not apply limit"
+} -1.0
+
+REAL max_magnetic_to_gas_pressure_ratio "consider pressure to be magnetically dominated if magnetic pressure to gas pressure ratio is higher than this" STEERABLE=ALWAYS
+{
+  (0:*  :: "any positive value, eg. 100."
+  -1.0  :: "disable"
+} -1.0
+
+boolean c2p_reset_pressure "If the pressure guess is unphysical should we recompute it?"
+{
+} "no"
+
+real c2p_reset_pressure_to_value "The value to which the pressure is reset to when a failure occurrs in C2P"
+{
+  0: :: "greater than zero"
+} 1.e-20
+
+boolean c2p_resort_to_bisection "If the pressure guess is unphysical, should we try with bisection (slower, but more robust)" STEERABLE=ALWAYS
+{
+} no
+
+boolean c2p_enforce_v2 "Enforce that reconstructed velocity stays below the speed of light" STEERABLE=ALWAYS
+{
+} no
+
+real GRHydro_eps_min "Minimum value of specific internal energy - this is now only used in GRHydro_InitData's GRHydro_Only_Atmo routine"
+{
+ 0: :: "Positive"
+} 1.e-10
+
+real GRHydro_perc_ptol "Tolerance for primitive variable solve (percent)" STEERABLE=ALWAYS
+{
+ 0: :: "Do we really want both tolerances?"
+} 1.e-8
+
+real GRHydro_del_ptol "Tolerance for primitive variable solve (absolute)" STEERABLE=ALWAYS
+{
+  0: :: "Do we really want both tolerances?"
+} 1.e-18
+
+int GRHydro_countmax "Maximum number of iterations for Con2Prim solve"
+{
+  1:*		:: "Must be positive"
+} 100
+
+int GRHydro_countmin "Minimum number of iterations for Con2Prim solve"
+{
+  0:*		:: "Must be non negative"
+} 1
+
+int GRHydro_polish "Number of extra iterations after root found"
+{
+  0:*		:: "Must be non negative"
+} 0
+
+###Parameters for compact fluid objects
+
+REAL GRHydro_rho_central "Central Density for Star"
+{
+  : :: ""
+} 1.e-5
+
+##Parameters for the atmosphere.
+
+REAL tau_rel_min "A minimum relative tau (taumin = maxtau(t=0) * tau_rel_min) below which tau is reschaled"
+{
+  0: :: ""
+} 1.e-10
+
+REAL rho_abs_min "A minimum rho below which evolution is turned off (atmosphere). If negative, the relative minimum will be used instead." STEERABLE=recover
+{
+  -1.0: :: ""
+} -1.0
+
+REAL rho_rel_min "A minimum relative rho (rhomin = centden * rho_rel_min) below which evolution is turned off (atmosphere). Only used if rho_abs_min < 0.0" STEERABLE=recover
+{
+  0: :: ""
+} 1.e-9
+
+REAL initial_rho_abs_min "An absolute value for rho in the atmosphere. To be used by initial data routines only. Unused if negative."
+{
+  -1.0: :: ""
+} -1.0
+
+REAL initial_rho_rel_min "A relative (to the central density) value for rho in the atmosphere. To be used by initial data routines only. Unused if negative."
+{
+  -1.0: :: ""
+} -1.0
+
+REAL initial_atmosphere_factor "A relative (to the initial atmosphere) value for rho in the atmosphere. This is used at initial time only. Unused if negative."
+{
+  -1.0: :: ""
+} -1.0
+
+REAL rho_abs_min_after_recovery "A new absolute value for rho in the atmosphere. To be used after recovering. Unused if negative." STEERABLE=ALWAYS
+{
+  -1.0: :: ""
+} -1.0
+
+REAL GRHydro_atmo_tolerance "A point is set to atmosphere in the Con2Prim's if its rho < GRHydro_rho_min *(1+GRHydro_atmo_tolerance). This avoids occasional spurious oscillations in carpet buffer zones lying in the atmosphere (because prolongation happens on conserved variables)" STEERABLE=ALWAYS
+{
+   0.0: :: "Zero or larger. A useful value could be 0.0001"
+}  0.0
+
+REAL atmo_falloff_radius "The radius for which the atmosphere starts to falloff as (atmo_falloff_radius/r)**atmo_falloff_power"
+{
+  0:* :: "Anything positive"
+} 50.0
+
+REAL atmo_falloff_power "The power at which the atmosphere level falls off as (atmo_falloof_radius/r)**atmo_falloff_power"
+{
+  0:* :: "Anything positive"
+} 0.0
+
+REAL atmo_tolerance_radius "The radius for which the atmosphere tolerance starts to increase as (r/atmo_tolerance_radius)**atmo_tolerance_power"
+{
+  0:* :: "Anything positive"
+} 50.0
+
+REAL atmo_tolerance_power "The power at which the atmosphere tolerance increases as (r/atmo_tolerance_radius)**atmo_tolerance_power"
+{
+  0:* :: "Anything positive"
+} 0.0
+
+BOOLEAN wk_atmosphere "Use some of Wolfgang Kastauns atmosphere tricks"
+{
+} "no"
+
+BOOLEAN Check_Rho_Minimum "Should a check on rho < GRHydro_rho_min be performed and written as WARNING level 2?"
+{
+} "no"
+
+boolean EoS_Change "Recalculate fluid quantities if changing the EoS"
+{
+} "no"
+
+keyword EoS_Change_type "Change polytropic K or Gamma?"
+{
+  "K"     :: "Change the K"
+  "Gamma" :: "Change the Gamma"
+  "GammaKS"  :: "Change K and Gamma, Shibata et al. 2004 3-D GR Core Collapse style"
+} "Gamma"
+
+real initial_Gamma "If changing Gamma, what was the value used in the initial data routine?"
+{
+  (0.0: :: "Positive"
+} 1.3333
+
+real initial_k "If changing K, what was the value used in the initial data routine?"
+{
+  (0.0: :: "Positive"
+} 100.0
+
+#If you want to use FishEye, you need the weighted fluxes
+
+BOOLEAN use_weighted_fluxes "Weight the flux terms by the cell surface areas"
+{
+} "no"
+
+#For the comoving shift 
+  
+real comoving_factor "Factor multiplying the velocity for the comoving shift"
+{
+  0.0:2.0 :: "[0,2] is allowed, but [0,1] is probably reasonable"
+} 0.0
+
+keyword comoving_attenuate "Which attenuation method for the comoving shift"
+{
+  "sqrt" :: "Multiply by sqrt(rho/rho_max)"
+  "tanh" :: "Multiply by 1/2*(1+tanh(factor*(rho/rho_max - offset)))"
+} "tanh"
+
+keyword comoving_v_method "Which method for getting the radial velocity"
+{
+  "projected" :: "vr = x_i . v^i / r"
+  "components" :: "vr = sqrt(v_i v^i)"
+} "projected"
+
+real comoving_tanh_factor "The factor in the above tanh attenuation"
+{
+  (0.0:* :: "Any positive number"
+} 10.0
+
+real comoving_tanh_offset "The offset in the above tanh attenuation"
+{
+  0.0:1.0 :: "Only makes sense in [0,1]"
+} 0.05
+
+int set_trivial_rp_grid_function "set gf for triv. rp (only for debugging)"
+{
+  0:1 :: "0 for no (default), 1 for yes"
+} 0
+
+#Advect a tracer?
+
+boolean evolve_tracer "Should we advect tracers?"
+{
+} "no"
+
+int number_of_tracers "Number of tracer variables to be advected"
+{
+  0:* :: "positive or zero"
+} 0
+
+boolean use_min_tracer "Should there be a floor on the tracer?"
+{
+} "no"
+
+real min_tracer "The floor placed on the tracer"
+{
+  *:* :: "Anything"
+} 0.0
+
+#Track particles?
+int number_of_particles "Number of particles to track" ACCUMULATOR-BASE=MethodOfLines::MoL_Max_Evolved_Array_Size
+{
+  0:* :: "0 switches off particle tracking"
+} 0
+
+int number_of_arrays "Number of arrays to evolve" ACCUMULATOR-BASE=MethodOfLines::MoL_Num_ArrayEvolved_Vars
+{
+  0:3           :: "Either zero or three, depending on the particles"
+} 0
+
+STRING particle_interpolator "What interpolator should be used for the particles"
+{
+  ".+"          :: "A valid interpolator name"
+} "Lagrange polynomial interpolation"
+
+CCTK_INT particle_interpolation_order "What order should be used for the particle interpolation"
+{
+  1:*           :: "A valid positive interpolation order"
+} 2
+
+#Finding the local gradient
+
+keyword gradient_method "Which method is used to set GRHydro::DiffRho?"
+{
+  "First diff"    :: "Standard first differences"
+  "Curvature"     :: "Curvature based method of Paramesh / FLASH"
+  "Rho weighted"  :: "Based on the size of rho"
+} "First diff"
+
+
+# NaN detection level
+
+INT GRHydro_NaN_verbose "The warning level for NaNs occuring within GRHydro" STEERABLE=always
+{
+  0:* :: "The warning level"
+} 2
+
+CCTK_REAL GRHydro_lorentz_overshoot_cutoff "Set the Lorentz factor to this value in case it overshoots (1/0)"
+{
+  0:* :: "Some big value"
+} 1.e100
+
+boolean clean_divergence "Use hyperbolic divergence cleaning"
+{
+} "no"
+
+boolean divergence_flux "formulate divergence cleaning as flux terms"
+{
+} "yes"
+
+CCTK_REAL kap_dc "The kap parameter for divergence cleaning"
+{
+  0:* :: "Any non-negative value, but 1.0 to 10.0 seems preferred"
+} 10.0
+
+KEYWORD psidcspeed "Which speed to set for psidc"
+{
+  "char speed"  :: "Based on the characteristic speeds"
+  "light speed" :: "Set the characteristic speeds to speed of light"
+  "set speed"   :: "Manually set the characteristic speeds: [setcharmin,setcharmax]"
+} "light speed"
+
+CCTK_REAL setcharmax "Maximum characteristic speed for psidc if psidcspeed is set"
+{
+  0:1 :: "Any value smaller than speed of light"
+} 1.0
+
+CCTK_REAL setcharmin "Minimum characteristic speed for psidc if psidcspeed is set"
+{
+  -1:0 :: "Any value smaller than speed of light - sign should be negative"
+} -1.0
+
+BOOLEAN decouple_normal_Bfield "when using divergence cleaning properly decouple Bx,psidc subsystem"
+{
+} yes
+
+boolean track_divB "Track the magnetic field constraint violations"
+{
+} "no"
+
+boolean transport_constraints "Use constraint transport for magnetic field"
+{
+} "no"
+
+boolean calculate_bcom  "Calculate the comoving contravariant magnetic 4-vector b^a?"
+{
+} "no"
+
+############### Parameters for Avec evolution ###########################################
+
+KEYWORD Avec_gauge "Which gauge condition to use when evolving the vector potential" 
+{
+  "algebraic"  :: "Algebraic gauge"
+  "lorenz"     :: "Lorenz gauge"
+} "lorenz"
+
+############### Parameters for Tmunu damping (useful in atmosphere) #####################
+
+CCTK_REAL Tmunu_damping_radius_min "damping radius at which we start to damp with a tanh function"
+{
+   -1  :: "damping switched off"
+   0:* :: "damping radius at which we start to damp"
+} -1
+
+
+CCTK_REAL Tmunu_damping_radius_max "damping radius at which Tmunu becomes 0"
+{
+   -1  :: "damping switched off"
+   0:* :: "greater than minimum radius above"
+} -1
+
+
+############### temporary parameters to be removed once connected issues are fixed.
+
+boolean con2prim_oct_hack "Disregard c2p failures in oct/rotsym90 boundary cells with xyz < 0" STEERABLE=ALWAYS
+{
+} "no"
+
+boolean con2prim_bitant_hack "Disregard c2p failures in bitant boundary cells with z < 0" STEERABLE=ALWAYS
+{
+} "no"
+
+int GRHydro_c2p_warn_from_reflevel "Start warning on given refinement level and on higher levels" STEERABLE=ALWAYS
+{
+  0:           :: "Greater or equal to 0"
+} 0
+
+
+
+############### Optimization options ###################################################
+
+
+
+# This can improve the performance on many cores, but may be dangerous 
+# (it seems to work in simple testcases, but morde complicated settings may fail)
+# If you encounter strange behavior, switch this OFF
+BOOLEAN sync_conserved_only "Only sync evolved conserved quantities during evolution." STEERABLE = recover
+{
+} no
+
+
+restricted:
+# This uses the slow sector of MoL multirate methods.
+# Since the CFL requirements for hydro are less demanding,
+# it is possible to get a significant speed up by
+# using a lower order time integration such as RK2, while the spacetime
+# is still integrated with an RK4
+BOOLEAN use_MoL_slow_multirate_sector "Whether to make use of MoL's slow multirate sector"
+{
+} no
+private:
+
+
+
+BOOLEAN verbose "Some debug output" STEERABLE = always
+{
+} no
+
+
+
+
+
+############### Testing options ###################################################
+
+
+# This constrains the flux velicity vectors to spherical symmetry.
+# Only the radial contribution to the velocity vectors is considered.
+# This is due to Kotake et al 2012.
+BOOLEAN constrain_to_1D "Set fluid velocities to zero for non-radial motion"
+{
+} no
+
+
+
+# use_cxx_code is used in schedule.ccl so cannot be STEERABLE=ALWAYS
+BOOLEAN use_cxx_code "Use experimental C++ code?" STEERABLE=RECOVER
+{
+} no

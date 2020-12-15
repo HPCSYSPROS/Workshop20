@@ -1,0 +1,4 @@
+# Configuration definition for thorn TmunuBase
+
+# Thorn ADMMacros must be compiled in and activated at run time
+REQUIRES THORNS: ADMMacros

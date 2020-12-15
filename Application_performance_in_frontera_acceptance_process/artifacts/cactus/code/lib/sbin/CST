@@ -1,0 +1,772 @@
+#! /usr/bin/perl -s
+#/*@@
+#  @file      CST
+#  @date      Sep 1998
+#  @author    Tom Goodale
+#  @desc
+#             Parses the the configuration files for thorns.
+#  @enddesc
+#  @version   $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/sbin/CST,v 1.81 2009-09-11 22:15:48 knarf Exp $
+#@@*/
+
+# Global parameter to track the number of errors from the CST
+# The file make.thornlist is only created if the number of errors is zero.
+
+$CST_errors = 0;
+$error_string = '';
+
+#$debug_configuration = 1;
+#$debug_interface     = 1;
+#$debug_parameters    = 1;
+#$debug_schedule      = 1;
+
+##########################################################################
+# Parse the command line
+
+$thornlist = shift(@ARGV);
+
+if (! $thornlist)
+{
+  printf 'Usage: CST [-top=<TOP>] [-config_dir=<config directory>] [-cctk_home=<CCTK home dir>] -bindings_dir=<CCTK bindings directory> ThornList';
+  exit;
+}
+
+$top = `pwd` if (! $top);
+$config_dir = "$top/config-data" if (! $config_dir);
+$system_database{"CONFIG_DIR"} = $config_dir;
+
+# Set up the CCTK home directory
+if(! $cctk_home)
+{
+  $cctk_home = $ENV{'CCTK_HOME'} || "$ENV{HOME}/CCTK";
+  $cctk_home =~ s:/$::g;
+}
+$system_database{'CCTK_HOME'} = $cctk_home;
+
+$bindings_dir = "$top/bindings" if (! $bindings_dir);
+$system_database{'BINDINGS_DIR'} = $bindings_dir;
+
+# Stop the make process if there were any errors
+sub CheckCSTErrors
+{
+  my $comment1, $comment2;
+  if ($CST_errors)
+  {
+    if ($CST_errors == 1)
+    {
+      $comment1 = 'was 1 error';
+      $comment2 = 'This';
+    }
+    else
+    {
+      $comment1 = "were $CST_errors errors";
+      $comment2 = 'These';
+    }
+    print "\n\n------------------------------------------------------\n";
+    print "There $comment1 during execution of the CST\n";
+    print "$comment2 must be corrected before compilation can proceed\n";
+    print "------------------------------------------------------\n\n";
+    &CST_PrintErrors;
+    exit(1);
+  }
+  else
+  {
+    &CST_PrintErrors;
+  }
+}
+
+########################################################################
+# Require certain arrangements
+
+
+$sbin_dir = "$cctk_home/lib/sbin";
+
+die "Unable to find CCTK sbin directory - tried $sbin_dir\n"
+  if (! -e "$sbin_dir/parameter_parser.pl");
+
+require "$sbin_dir/parameter_parser.pl";
+require "$sbin_dir/interface_parser.pl";
+require "$sbin_dir/ScheduleParser.pl";
+require "$sbin_dir/ConfigurationParser.pl";
+require "$sbin_dir/ProcessConfiguration.pl";
+require "$sbin_dir/create_c_stuff.pl";
+require "$sbin_dir/create_fortran_stuff.pl";
+require "$sbin_dir/GridFuncStuff.pl";
+require "$sbin_dir/ImpParamConsistency.pl";
+require "$sbin_dir/CSTUtils.pl";
+require "$sbin_dir/MakeUtils.pl";
+require "$sbin_dir/CreateParameterBindings.pl";
+require "$sbin_dir/CreateImplementationBindings.pl";
+require "$sbin_dir/CreateScheduleBindings.pl";
+require "$sbin_dir/CreateFunctionBindings.pl";
+require "$sbin_dir/BuildHeaders.pl";
+require "$sbin_dir/CreateConfigurationBindings.pl";
+require "$sbin_dir/ConfigScriptParser.pl";
+require "$sbin_dir/Logger.pl";
+
+#######################################################################
+#
+#                     Main Program
+#
+######################################################################
+
+# Find out which thorns we have and the location of the ccl files.
+print "Reading ThornList...\n";
+%thorns = &CreateThornList($cctk_home, $thornlist);
+
+# Parse the configuration.ccl files
+print "Parsing configuration files...\n";
+$configuration_database = &CreateConfigurationDatabase($config_dir, %thorns);
+
+&print_database("configuration", $configuration_database) if($debug_configuration);
+&save_database("configuration", $configuration_database) if($debug_configuration);
+
+# Restrict the rest of this to thorns with source
+
+&SplitThorns($configuration_database, \%thorns, \%source_thorns, \%nosource_thorns);
+
+# Parse the interface.ccl files
+print "Parsing interface files...\n";
+%interface_database = &create_interface_database(scalar(keys %system_database), %system_database, %source_thorns);
+
+&print_database("interface", \%interface_database) if($debug_interface);
+&save_database("interface", \%interface_database) if($debug_interface);
+
+# Parse the parameter.ccl files
+print "Parsing parameter files...\n";
+%parameter_database = &create_parameter_database(%source_thorns);
+
+# Parse the schedule.ccl files
+print "Parsing schedule files...\n";
+%schedule_database = &create_schedule_database(%source_thorns);
+
+&CheckCSTErrors();
+
+# Run any configuration scripts.
+print "Running any thorn-provided configuration scripts...\n";
+
+&ProcessConfiguration($config_dir, $configuration_database,\%thorns,"$top/config-info");
+
+print "Checking consistency...\n";
+&check_schedule_database(\%schedule_database, %source_thorns);
+
+%parameter_database = &CheckImpParamConsistency(scalar(keys %interface_database), %interface_database, %parameter_database);
+
+$err_msg = &CheckCrossConsistency(\%interface_database,\%parameter_database);
+
+&print_database("interface", \%interface_database) if($debug_interface);
+
+&print_database("parameter", \%parameter_database ) if($debug_parameters);
+&save_database("parameter", \%parameter_database) if($debug_parameters);
+
+&print_database("schedule", \%schedule_database) if($debug_schedule);
+
+# Create all the bindings
+print "Creating Thorn-Flesh bindings...\n";
+&CreateBindings($bindings_dir, \%parameter_database, \%interface_database, \%schedule_database, $configuration_database);
+&CreateConfigurationBindings($bindings_dir, $configuration_database,\%thorns);
+
+# Create header files of compiled thorns for the code
+($thornsheader, $definethornsheader, $definethisthornheader) =
+&CreateThornsHeaders(%source_thorns);
+&WriteFile("$bindings_dir/include/thornlist.h", \$thornsheader);
+&WriteFile("$bindings_dir/include/cctk_DefineThorn.h", \$definethornsheader);
+for my $header (@$definethisthornheader) {
+  my $thorn = $header->{thorn};
+  my $body = $header->{body};
+  &WriteFile("$bindings_dir/include/$thorn/definethisthorn.h", \$body);
+}
+
+# Create the header files used by the thorns
+&BuildHeaders($cctk_home,$bindings_dir,%interface_database);
+
+# Wrie configuration scripts messages/errors to log file
+&CreateLogFile($config_dir, $configuration_database,\%thorns);
+
+# Finally (must be last), create the make.thornlist file.
+$make_thornlist = &CreateMakeThornlist(\%thorns, \%interface_database, $configuration_database);
+
+# Stop the make process if there were any errors
+&CheckCSTErrors();
+
+&WriteFile("$config_dir/make.thornlist", \$make_thornlist);
+
+print "CST finished.\n";
+exit;
+
+
+#############################################################################
+#
+#                      Subroutines
+#
+#############################################################################
+
+#/*@@
+#  @routine CreateThornList
+#  @date    Thu Jan 28 15:18:45 1999
+#  @author  Tom Goodale
+#  @desc
+#           Parses the ThornList file and extracts the thorn names.
+#  @enddesc
+#@@*/
+sub CreateThornList
+{
+  my($cctk_home, $thornlist) = @_;
+  my(%thornlist);
+  my($thorn, $package, $thorn_name);
+
+  open(THORNLIST, "<$thornlist") || die "Cannot open ThornList file $thornlist !";
+
+  # Put a reference to the main cctk sources in.
+  $thornlist{'Cactus'} = "$cctk_home/src";
+
+  # Loop through the lines of the file.
+  while(<THORNLIST>)
+  {
+    #Ignore comments.
+    s/\#(.*)$//g;
+    s/!(.*)$//g;
+    s/\n//g;                # Different from chop...
+
+    #Ignore blank lines
+    next if (m:^\s*$:);
+
+    foreach $thorn (split(' '))
+    {
+      $thorn =~ m:(.*)[/\\](.*):;
+
+      $package = $1;
+      $thorn_name = $2;
+
+      # Check valid arrangement name
+      if (!TestName(1,$package))
+      {
+        &CST_error(0, "Arrangement name $package is not valid",
+                   'Arrangement names must begin with a letter, can only contain ' .
+                   'letters, numbers and underscores, and must contain at most 27 ' .
+                   'characters', __LINE__, __FILE__);
+      }
+
+      # Check valid thornname
+      if (!TestName(1,$thorn_name))
+      {
+        &CST_error(0, "Thorn name $thorn_name is not valid",
+                   'Thorn names must begin with a letter, can only contain ' .
+                   'letters, numbers and underscores, and must contain at most 27 ' .
+                   'characters', __LINE__, __FILE__);
+      }
+
+      if( -d "$cctk_home/arrangements/$thorn")
+      {
+        if( -r "$cctk_home/arrangements/$thorn/param.ccl" &&
+            -r "$cctk_home/arrangements/$thorn/interface.ccl" &&
+            -r "$cctk_home/arrangements/$thorn/schedule.ccl")
+        {
+          if($thornlist{$thorn_name})
+          {
+            $thornlist{$thorn_name} =~ m:.*/(.*)/[^/]*$:;
+            if ($package ne $1)
+            {
+              &CST_error(0, "Duplicate thornname $thorn_name in $1 and $package",
+                         '', __LINE__, __FILE__);
+            }
+            else
+            {
+              &CST_error(1, "Ignoring duplicate thorn $package/$thorn_name",
+                         '', __LINE__, __FILE__);
+            }
+          }
+          else
+          {
+            $thornlist{$thorn_name} = "$cctk_home/arrangements/$thorn";
+          }
+        }
+        else
+        {
+          &CST_error(0, "$thorn - missing ccl file(s)", '', __LINE__, __FILE__);
+        }
+      }
+      else
+      {
+         &CST_error(0, "Missing thorn $thorn", '', __LINE__, __FILE__);
+      }
+    }
+  }
+  close THORNLIST;
+
+  return %thornlist;
+}
+
+
+
+#/*@@
+#  @routine    get_global_parameters
+#  @date       Thu Jan 28 15:21:52 1999
+#  @author     Tom Goodale
+#  @desc
+#  Gets a list of all global parameters and the thorns they are in.
+#  @enddesc
+#@@*/
+
+sub get_global_parameters
+{
+  my($rhparameter_db) = @_;
+  my(%global_parameters);
+  my($param);
+
+  foreach $param (split(/ /,$rhparameter_db->{"GLOBAL PARAMETERS"}))
+  {
+    if($param =~ m/(.*)::(.*)/)
+    {
+      $global_parameters{"$2"} = $1;
+    }
+  }
+
+  return %global_parameters;
+}
+
+
+
+#/*@@
+#  @routine    CreateMakeThornlist
+#  @date       Thu Jan 28 15:22:31 1999
+#  @author     Tom Goodale
+#  @desc
+#  Creates the lines which should be placed in the make.thornlist file.
+#  @enddesc
+#@@*/
+
+sub CreateMakeThornlist
+{
+  my($thorns ,$interface, $config) = @_;
+  my($thorn);
+  my($thornlist);
+  my($thorn_linklist);
+  my($config_thornlist);
+  my($thorn_dependencies);
+
+  $thornlist        = 'THORNS         =';
+  $thorn_linklist   = 'THORN_LINKLIST =';
+  $config_thornlist = 'CONFIG_THORNS  =';
+
+  foreach $thorn (sort keys %$thorns)
+  {
+    next if $thorn eq 'Cactus';
+
+    if ($config->{"\U$thorn\E OPTIONS"} ne 'NO_SOURCE')
+    {
+      $thorns->{$thorn} =~ m:.*/(.*/.*):;
+      $thornlist .= " $1";
+    }
+
+    if (-r "$thorns->{$thorn}/configuration.ccl")
+    {
+      $thorns->{$thorn} =~ m:.*/(.*/.*):;
+      $config_thornlist .= " $1";
+    }
+  }
+  $thorn_linklist .= ' ' . &TopoSort($thorns, $interface, $config);
+
+  $thorn_dependencies = join ("\n", &CreateThornDependencyList($thorns, $config));
+  return ($thornlist . "\n" . $thorn_linklist . "\n" . $config_thornlist . "\n" . $thorn_dependencies . "\n");
+}
+
+
+#/*@@
+#  @routine    CreateThornLinkList
+#  @date       Wed 22 July 2001
+#  @author     Thomas Radke
+#  @desc
+#  Creates the list of all thorns' libraries to link with Cactus
+#  @enddesc
+#@@*/
+sub CreateThornLinkList
+{
+  my($thorns, $config) = @_;
+  my($i, $j, $thorn);
+  my(@liblist);
+
+  @liblist = ();
+  foreach $thorn (sort keys %$thorns)
+  {
+    next if ($config->{"\U$thorn OPTIONS\E"} eq 'NO_SOURCE' ||
+             "\U$thorn\E" eq "\UCactus\E");
+
+    # add this thorn to the thorn liblist
+    # as well as any other thorns it requires (directly or indirectly)
+    push (@liblist, $thorn, RequiredThorns ($thorn, $thorn, $config));
+  }
+
+  # remove duplicate entries from the list, only keeping the rightmost
+  for ($i = 0; $i <= $#liblist; $i++)
+  {
+    for ($j = 0; $j < $i; $j++)
+    {
+      if ($liblist[$i] eq $liblist[$j])
+      {
+        splice (@liblist, $j, 1);
+        $i--; $j--;
+      }
+    }
+  }
+
+  return (join (' ', @liblist));
+}
+
+
+#/*@@
+#  @routine    CreateThornDependencyList
+#  @date       Fri 26 Dec 2004
+#  @author     Erik Schnetter
+#  @desc
+#  Create the list of the thorns' make dependencies
+#  @enddesc
+#@@*/
+sub CreateThornDependencyList
+{
+  my (@varlist, @deplist);
+
+  # Find list of all thorns
+  foreach my $thorn (sort keys %thorns) {
+    next if $configuration_database->{"\U$thorn OPTIONS\E"} eq 'NO_SOURCE';
+
+    # Add the thorn and the thorn's requirements
+    # (The thorn name has to be lower case,
+    # because the Makefile cannot convert its library names to upper case)
+
+    my $line = "USESTHORNS_$thorn =";
+    foreach my $dep (sort (split (' ', $configuration_database->{"\U$thorn\E USES THORNS"})))
+    {
+      $line .= " $dep" if ($dep ne $thorn);
+    }
+    push (@varlist, $line);
+    push (@deplist, "\$(CCTK_LIBDIR)/\$(LIBNAME_PREFIX)\$(CCTK_LIBNAME_PREFIX)$thorn\$(LIBNAME_SUFFIX): \$(USESTHORNS_$thorn:%=\$(CCTK_LIBDIR)/\$(LIBNAME_PREFIX)\$(CCTK_LIBNAME_PREFIX)%\$(LIBNAME_SUFFIX))");
+  }
+
+  return (@varlist, @deplist);
+}
+
+
+#/*@@
+#  @routine    RequiredThorns
+#  @date       Tue 18 November 2003
+#  @author     Thomas Radke
+#  @desc
+#  Returns the complete list of all thorns that thorn '$top' requires.
+#
+#  The routine is called recursively on all required thorns.
+#  The recursion stops when there are no more required thorns anymore.
+#  If a cross dependency is detected (ie. thorn '$top' requires some thorn
+#  which in turn requires thorn '$top') the code will stop with an error
+#  message. We should deal with this case if it is becoming an issue.
+#  @enddesc
+#@@*/
+sub RequiredThorns
+{
+  my($top, $thorn, $config) = @_;
+  my($i);
+  my(@requires, @result);
+
+  @result = ();
+  foreach $i (sort (split (' ', $config->{"\U$thorn\E USES THORNS"})))
+  {
+    if ($i eq $top)
+    {
+      CST_error (0, "Cross dependency detected between thorns '$thorn' and " .
+                    "'$top'. This is not supported by Cactus. Please contact " .
+                    "cactusmaint\@cactuscode.org !");
+      return (@result);
+    }
+
+    push (@result, $i, RequiredThorns ($top, $i, $config));
+  }
+
+  return (@result);
+}
+
+
+#/*@@
+#  @routine CreateThornsHeaders
+#  @date    Wed Feb 17 16:06:20 1999
+#  @author  Gabrielle Allen
+#  @desc
+#           Creates the lines which should be placed in the header files
+#           "thornlist.h", "definethorn.h", and "definthisthorn.h"
+#  @enddesc
+#@@*/
+sub CreateThornsHeaders
+{
+  my(%thorns) = @_;
+  my($header1,$header2,@header3,$thorn,$nthorns);
+
+  $header1 = "\/* List of compiled thorns in the code. *\/\n\n";
+  $header1 .= "static char const *const thorn_name[] = {\n";
+  $header2 = "\/* Defines for compiled thorns in the code. *\/\n\n";
+
+  my @thorns = keys %thorns;
+
+  $nthorns = 0;
+  foreach $thorn (sort @thorns)
+  {
+    # Only place package_name/thorn_name in the file.
+    $thorns{$thorn} =~ m:.*/(.*)/(.*):;
+    my ($arr,$th) = ($1,$2);
+
+    push @header3, {thorn => $thorn, body=>
+                "\/* Defines for thorn this file is part of *\/\n\n".
+                "#ifndef DEFINE_THIS_THORN_H\n".
+                "#define DEFINE_THIS_THORN_H 1\n".
+                "#define THORN_IS_$thorn 1\n".
+                "#define CCTK_THORN $th\n" .
+                "#define CCTK_THORNSTRING \"$th\"\n" .
+                "#define CCTK_ARRANGEMENT $arr\n" .
+                "#define CCTK_ARRANGEMENTSTRING \"$arr\"\n".
+                "#endif\n\n"};
+
+    # Ignore the main sources for the other headers - they may confuse
+    next if ($thorn eq 'Cactus');
+
+    $header1 .= "\"${arr}/${th}\",\n";
+    $header2 .= "#define \U${arr}_${th}\E\n";
+
+    $nthorns++;
+  }
+
+  $header1 .= "\"\"};\n\n";
+  $header1 .= "static const int nthorns = $nthorns;\n\n";
+  push @header3, {thorn=>"CactusBindings", body=>"#define THORN_IS_CactusBindings\n\n"};
+
+  return ($header1, $header2, \@header3);
+}
+
+
+#/*@@
+#  @routine    CreateBindings
+#  @date       Thu Jan 28 15:24:53 1999
+#  @author     Tom Goodale
+#  @desc
+#  All the perl generated stuff is finally placed into the bindings 'thorn'.
+#  @enddesc
+#@@*/
+
+sub CreateBindings
+{
+  my($bindings_dir, $rhparameter_db, $rhinterface_db, $rhschedule_db, $configuration_db) = @_;
+
+  # Create the bindings directory if it doesn't exist.
+  if(! -d $bindings_dir)
+  {
+    mkdir("$bindings_dir", 0755) || die "Unable to create $bindings_dir";
+  }
+
+  # Create the bindings for the subsystems.
+  print "   Creating implementation bindings...\n";
+  &CreateImplementationBindings($bindings_dir, $rhparameter_db, $rhinterface_db, $configuration_db);
+  print "   Creating parameter bindings...\n";
+  &CreateParameterBindings($bindings_dir, $rhparameter_db, $rhinterface_db);
+  print "   Creating variable bindings...\n";
+  &CreateVariableBindings($bindings_dir, $rhinterface_db, $rhparameter_db);
+  print "   Creating schedule bindings...\n";
+  &CreateScheduleBindings($bindings_dir, $rhinterface_db, $rhschedule_db);
+  print "   Creating function bindings...\n";
+  &CreateFunctionBindings($bindings_dir, $rhinterface_db);
+
+  # Place an appropriate make.code.defn in the bindings directory.
+  $data = 'SUBDIRS = Functions Implementations Parameters Variables Schedule';
+  &WriteFile("$bindings_dir/make.code.defn", \$data);
+}
+
+#/*@@
+#  @routine    TopoSort
+#  @date       2015-08-19
+#  @author     Erik Schnetter
+#  @desc
+#  Sort thorns topologically.
+#  Original implementation by Thomas Radke, with this comment:
+#  Algorithm stolen from Jon Bentley (More Programming Pearls, pp.
+#  20-23), who, in turn, stole it from Don Knuth (Art of Computer
+#  Programming, volume 1: Fundamental Algorithms, Section 2.2.3)
+#  @enddesc
+#@@*/
+sub TopoSort
+{
+    my ($thorns, $interface, $cfg) = @_;
+
+    my %children;            # set of thorns that a thorn requires
+
+    # Inheritance
+    foreach my $thorn (keys %thorns) {
+        foreach $ancestor_impl (split ' ',
+                                $interface->{"\U$thorn INHERITS\E"}) {
+            my $ancestor_thorns =
+                $interface->{"IMPLEMENTATION \U$ancestor_impl\E THORNS"};
+            foreach my $thorn2 (split ' ', $ancestor_thorns) {
+                ${$children{$thorn}}{$thorn2} = 1 if $thorn2 ne $thorn;
+            }
+        }
+    }
+
+    # Capabilities
+    my %providers;              # thorns providing a capability
+    foreach my $thorn (keys %thorns) {
+        foreach my $cap (split ' ', $cfg->{"\U$thorn PROVIDES\E"}) {
+            push @{$providers{$cap}}, $thorn;
+        }
+    }
+    foreach my $thorn (keys %thorns) {
+        foreach my $cap (split ' ', $cfg->{"\U$thorn REQUIRES\E"}) {
+            foreach my $thorn2 (@{$providers{$cap}}) {
+                ${$children{$thorn}}{$thorn2} = 1 if $thorn2 ne $thorn;
+            }
+        }
+    }
+
+    # Direct requres and uses declarations
+    foreach my $thorn (keys %thorns) {
+        foreach my $thorn2 (split ' ', $cfg->{"\U$thorn\E REQURES THORNS"}) {
+            push @{$requires{$thorn}}, $thorn2;
+        }
+        foreach my $thorn2 (split ' ', $cfg->{"\U$thorn\E USES THORNS"}) {
+            ${$children{$thorn}}{$thorn2} = 1 if $thorn2 ne $thorn;
+        }
+    }
+
+    # Count parents
+    my %nparents;
+    foreach my $thorn (keys %thorns) {
+        $nparents{$thorn} += 0;
+        foreach my $child (keys %{$children{$thorn}}) {
+            ++$nparents{$child};
+        }
+    }
+
+    # Sort topologically
+    my @data;
+    my @todo = sort grep {!$nparents{$_}} keys %thorns;
+    while (@todo) {
+        my $thorn = pop @todo;
+        push @data, $thorn;
+        foreach my $child (sort keys %{$children{$thorn}}) {
+            if (!--$nparents{$child}) {
+                push @todo, $child;
+            }
+        }
+    }
+
+    # Convert to string
+    return join ' ', @data;
+}
+
+
+#/*@@
+#  @routine    CheckCrossConsistency
+#  @date       
+#  @author     Yaakoub Y El Khamra
+#  @desc
+#  Check for consistency of restricted parameters of thorns providing 
+#  the same implementation
+#  @enddesc
+#@@*/
+sub  CheckCrossConsistency
+{
+  my($interfaceDB, $parameterDB) = @_;
+  my($implementation, $thorn, $flag, $restricted, $temp);
+
+  foreach $implementation  (split(' ', $interfaceDB->{'IMPLEMENTATIONS'}))
+  {
+    $flag = 0;
+    foreach $thorn (split(' ', $interfaceDB->{"IMPLEMENTATION \U$implementation\E THORNS"}))
+    {
+      if ( $flag==0 )
+      {
+        $restricted = join(' ',sort(split(' ', $parameterDB->{"\U$thorn\E RESTRICTED variables"})));
+        $thorn0 = $thorn;
+        $flag =1;
+      }
+
+      if ( $flag==1 )
+      {
+        $temp = join(' ',sort(split(' ', $parameterDB->{"\U$thorn\E RESTRICTED variables"})));
+        if ( $temp ne $restricted )
+        {
+          CST_error (0, "Thorns: " . $interfaceDB->{"IMPLEMENTATION \U$implementation\E THORNS"} . "provide the same implementation but have different restricted parameters" );          
+        }
+        $vflag = 0;
+        $variables = "";
+        foreach $variable (split(' ', $restricted))
+        {
+          if ( !&CompareValues($parameterDB, $thorn0, $thorn, $variable) )
+          {
+            $vflag = 1;
+            $variables .= ($variables ? ", " : "") . $variable;
+          }
+        }
+        if ( $vflag==1 )
+        {
+          CST_error (0, "Thorns: " . $interfaceDB->{"IMPLEMENTATION \U$implementation\E THORNS"} . "provide the same implementation but have different default values for restricted parameters $variables" );
+        }
+      }
+    }
+  }
+  return "";
+}
+ 
+#/*@@
+#  @routine    CompareValues
+#  @date       
+#  @author     Roland Haas
+#  @desc
+#  Compare two Parameter values taking Cactus' interpration of strings into
+#  account 
+#  @enddesc
+#@@*/
+sub  CompareValues
+{
+  my($parameter_db, $thorn1, $thorn2, $variable) = @_;
+  my($retval) = 1;
+
+  # we check that types and values aggree between the thorns
+  # this assumes that the values are valid for their type
+  $retval = $parameter_db->{"\U$thorn1 $variable\E type"} == $parameter_db->{"\U$thorn2 $variable\E type"};
+
+  if ( $retval )
+  {
+    $default1 = $parameter_db->{"\U$thorn1 $variable\E default"};
+    $default2 = $parameter_db->{"\U$thorn2 $variable\E default"};
+
+    # canonicalize default values
+    if ($parameter_db->{"\U$thorn1 $variable\E type"} =~ /BOOLEAN/)
+    {
+      $default1 = $default1 =~ m:^yes|y|1|t|true$:i;
+      $default2 = $default2 =~ m:^yes|y|1|t|true$:i;
+    }
+    elsif ($parameter_db->{"\U$thorn1 $variable\E type"} =~ /KEYWORD/)
+    {
+      $default1 = lc ( $default1 );
+      $default2 = lc ( $default2 );
+    }
+    elsif ($parameter_db->{"\U$thorn1 $variable\E type"} =~ /STRING/)
+    {
+      $default1 = lc ( $default1 );
+      $default2 = lc ( $default2 );
+    }
+    elsif ($parameter_db->{"\U$thorn1 $variable\E type"} =~ /INT/)
+    {
+      $default1 = int ( $default1 );
+      $default2 = int ( $default2 );
+    }
+    elsif ($parameter_db->{"\U$thorn1 $variable\E type"} =~ /REAL/)
+    {
+      $default1 = $default1 + 0.;
+      $default2 = $default2 + 0.;
+    }
+    else
+    {
+      &CST_error(0, "Unknown parameter type " . $parameter_db->{"\U$thorn1 $variable\E type"} . " in thorn $thorn1");
+    }
+    
+    $retval = $default1 == $default2;
+  }
+
+  return $retval;
+}

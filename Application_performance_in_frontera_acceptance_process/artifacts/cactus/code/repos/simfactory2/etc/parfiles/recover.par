@@ -1,0 +1,234 @@
+Cactus::cctk_run_title = "Minkowski"
+
+Cactus::cctk_full_warnings         = yes
+Cactus::highlight_warning_messages = no
+
+Cactus::terminate = "never"
+
+
+
+ActiveThorns = "TerminationTrigger"
+
+TerminationTrigger::max_walltime          =  0.25   # [hours]
+TerminationTrigger::on_remaining_walltime = 10.0    # [minutes]
+
+TerminationTrigger::termination_from_file   = yes
+TerminationTrigger::create_termination_file = yes
+TerminationTrigger::termination_file        = "../TERMINATE"
+
+
+
+ActiveThorns = "IOUtil"
+
+IO::out_dir = $parfile
+
+
+
+ActiveThorns = "Fortran"
+
+ActiveThorns = "GSL"
+
+ActiveThorns = "GenericFD"
+
+ActiveThorns = "HDF5"
+
+ActiveThorns = "LoopControl"
+
+ActiveThorns = "SystemTopology"
+
+
+
+ActiveThorns = "InitBase"
+
+
+
+ActiveThorns = "Carpet CarpetLib CarpetReduce"
+
+Carpet::domain_from_coordbase = yes
+Carpet::max_refinement_levels = 10
+
+driver::ghost_size       = 3
+Carpet::use_buffer_zones = yes
+
+Carpet::prolongation_order_space = 5
+Carpet::prolongation_order_time  = 2
+
+Carpet::init_fill_timelevels = yes
+
+Carpet::poison_new_timelevels = yes
+CarpetLib::poison_new_memory  = yes
+
+
+
+ActiveThorns = "NaNChecker"
+
+NaNChecker::check_every     = 512
+NaNChecker::action_if_found = "terminate"
+NaNChecker::check_vars      = "
+        ML_BSSN::ML_log_confac
+        ML_BSSN::ML_metric
+        ML_BSSN::ML_trace_curv
+        ML_BSSN::ML_curv
+        ML_BSSN::ML_Gamma
+        ML_BSSN::ML_lapse
+        ML_BSSN::ML_shift
+        ML_BSSN::ML_dtlapse
+        ML_BSSN::ML_dtshift
+        ADMBase::metric
+        ADMBase::curv
+        ADMBase::lapse
+        ADMBase::shift
+        ADMBase::dtlapse
+        ADMBase::dtshift
+"
+
+
+
+ActiveThorns = "Boundary CartGrid3D CoordBase SymBase"
+
+CoordBase::domainsize = "minmax"
+
+CoordBase::xmin = -1.0
+CoordBase::ymin = -1.0
+CoordBase::zmin = -1.0
+CoordBase::xmax = +1.0
+CoordBase::ymax = +1.0
+CoordBase::zmax = +1.0
+CoordBase::dx   =  0.1
+CoordBase::dy   =  0.1
+CoordBase::dz   =  0.1
+
+CoordBase::boundary_size_x_lower = 3
+CoordBase::boundary_size_y_lower = 3
+CoordBase::boundary_size_z_lower = 3
+CoordBase::boundary_size_x_upper = 3
+CoordBase::boundary_size_y_upper = 3
+CoordBase::boundary_size_z_upper = 3
+
+CartGrid3D::type = "coordbase"
+
+
+
+ActiveThorns = "MoL Time"
+
+MoL::ODE_Method             = "RK4"
+MoL::MoL_Intermediate_Steps = 4
+MoL::MoL_Num_Scratch_Levels = 1
+#MoL::ODE_Method             = "Generic"
+#MoL::Generic_Type           = "RK"
+#MoL::MoL_Intermediate_Steps = 1
+
+Time::dtfac = 0.40
+
+
+
+ActiveThorns = "ADMBase ADMCoupling ADMMacros CoordGauge SpaceMask StaticConformal TmunuBase"
+
+ADMBase::initial_data    = "Cartesian Minkowski"
+ADMBase::initial_lapse   = "one"
+ADMBase::initial_shift   = "zero"
+ADMBase::initial_dtlapse = "zero"
+ADMBase::initial_dtshift = "zero"
+
+
+
+ActiveThorns = "ML_BSSN ML_BSSN_Helper NewRad"
+
+ADMBase::evolution_method         = "ML_BSSN"
+ADMBase::lapse_evolution_method   = "ML_BSSN"
+ADMBase::shift_evolution_method   = "ML_BSSN"
+ADMBase::dtlapse_evolution_method = "ML_BSSN"
+ADMBase::dtshift_evolution_method = "ML_BSSN"
+
+ML_BSSN::timelevels = 3
+
+ML_BSSN::harmonicN           = 1      # 1+log
+ML_BSSN::harmonicF           = 2.0    # 1+log
+ML_BSSN::ShiftGammaCoeff     = 0.75
+ML_BSSN::AlphaDriver         = 1.0
+ML_BSSN::BetaDriver          = 1.0
+ML_BSSN::LapseAdvectionCoeff = 0.0
+ML_BSSN::ShiftAdvectionCoeff = 0.0
+
+ML_BSSN::EpsDiss = 0.2
+
+ML_BSSN::my_initial_boundary_condition = "extrapolate-gammas"
+ML_BSSN::my_rhs_boundary_condition     = "NewRad"
+Boundary::radpower                     = 2
+
+ML_BSSN::MinimumLapse = 1.0e-8
+
+ML_BSSN::dt_lapse_shift_method = "noLapseShiftAdvection"
+
+ML_BSSN::ML_log_confac_bound     = "none"
+ML_BSSN::ML_metric_bound     = "none"
+ML_BSSN::ML_Gamma_bound      = "none"
+ML_BSSN::ML_trace_curv_bound = "none"
+ML_BSSN::ML_curv_bound       = "none"
+ML_BSSN::ML_lapse_bound      = "none"
+ML_BSSN::ML_dtlapse_bound    = "none"
+ML_BSSN::ML_shift_bound      = "none"
+ML_BSSN::ML_dtshift_bound    = "none"
+
+
+
+ActiveThorns = "CarpetIOBasic"
+
+IOBasic::outInfo_every      = 512
+IOBasic::outInfo_reductions = "norm2"
+IOBasic::outInfo_vars       = "
+        Carpet::physical_time_per_hour
+        ML_BSSN::ML_lapse
+        ML_BSSN::ML_trace_curv
+"
+
+
+
+ActiveThorns = "CarpetIOScalar"
+
+IOScalar::one_file_per_group = yes
+
+IOScalar::outScalar_every = 5120
+IOScalar::outScalar_vars  = "
+        ML_BSSN::ML_lapse
+        ML_BSSN::ML_trace_curv
+"
+
+
+
+ActiveThorns = "CarpetIOASCII"
+
+IOASCII::one_file_per_group = yes
+IOASCII::output_all_timelevels = yes
+
+IOASCII::out1D_every = 5120
+IOASCII::out1D_vars  = "
+        ML_BSSN::ML_lapse
+        ML_BSSN::ML_trace_curv
+"
+
+
+
+Activethorns = "CarpetIOHDF5"
+
+IOHDF5::compression_level = 1
+IOHDF5::use_checksums     = yes
+
+IOHDF5::checkpoint          = yes
+IO::checkpoint_dir          = $parfile
+IO::checkpoint_on_terminate = yes
+
+IO::recover     = "autoprobe"
+IO::recover_dir = $parfile
+
+
+
+ActiveThorns = "Formaline"
+
+
+
+ActiveThorns = "TimerReport"
+
+TimerReport::out_every              = 5120
+TimerReport::output_schedule_timers = no
+TimerReport::n_top_timers           = 20

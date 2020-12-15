@@ -1,0 +1,12 @@
+Cactus Code Thorn TerminationTrigger
+Author(s)    : Christian D. Ott
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+This thorn watches the elapsed walltime.  If only n minutes are left
+before the some limit set by the user, it triggers termination of the
+simulation.  Termination is also triggered if a special file with a
+special content exists.

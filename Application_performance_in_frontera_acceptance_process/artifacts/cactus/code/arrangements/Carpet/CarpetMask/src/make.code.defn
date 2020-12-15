@@ -1,0 +1,7 @@
+# Main make.code.defn file for thorn CarpetMask
+
+# Source files in this directory
+SRCS = mask_excluded.cc mask_surface.cc
+
+# Subdirectories containing source files
+SUBDIRS = 

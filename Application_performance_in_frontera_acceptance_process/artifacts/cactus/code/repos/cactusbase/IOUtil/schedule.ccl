@@ -1,0 +1,34 @@
+# Schedule definitions for thorn IOUtil
+# $Header$
+
+schedule IOUtil_Startup at STARTUP after Driver_Startup
+{
+  LANG:C
+} "Startup routine"
+
+if (! CCTK_Equals (recover, "no"))
+{
+  schedule IOUtil_RecoverGH at RECOVER_VARIABLES
+  {
+    LANG:C
+    OPTIONS: level
+  } "Checkpoint recovery routine"
+}
+
+if (*filereader_ID_files && *filereader_ID_vars)
+{
+  schedule IOUtil_RecoverIDFromDatafiles at INITIAL
+  {
+    LANG:C
+    OPTIONS: level
+  } "Initial data recovery routine"
+}
+
+if (! CCTK_Equals (parfile_write, "no") && parfile_update_every)
+{
+  schedule IOUtil_UpdateParFile at POSTSTEP
+  {
+    LANG:C
+    OPTIONS: meta
+  } "Append steered parameters to parameter file"
+}

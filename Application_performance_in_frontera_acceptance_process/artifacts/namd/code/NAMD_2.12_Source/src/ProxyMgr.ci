@@ -1,0 +1,115 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+module ProxyMgr {
+  // Handles Message to Proxy(s)
+
+  message RegisterProxyMsg;
+  message UnregisterProxyMsg;
+
+  message [packed] ProxyResultMsg;
+  message [packed] ProxySpanningTreeMsg;
+  
+  //It is a message that is based on the RawMsg
+  message ProxyCombinedResultMsg;
+  message ProxyCombinedResultRawMsg{
+	NodeID nodes[];
+	char isForceNonZero[];
+	Force forceArr[];
+  };
+
+  message ProxyDataMsg{
+    //Make sure positionList is the first varsize type declaration
+    //in this message type as it needs alignment
+    CompAtom positionList[];
+    CompAtom avgPositionList[];
+    // BEGIN LA
+    CompAtom velocityList[];
+    // END LA
+    // begin gbis
+    Real intRadList[];
+    // end gbis
+    // LCPO
+    int lcpoTypeList[];
+
+    CompAtomExt positionExtList[];
+    CudaAtom cudaAtomList[];
+  };
+
+  // begin gbis
+  message ProxyGBISP1ResultMsg {
+    GBReal psiSum[];
+  };
+  message ProxyGBISP2DataMsg {
+    float bornRad[];
+  };
+  message ProxyGBISP2ResultMsg {
+    GBReal dEdaSum[];
+  };
+  message ProxyGBISP3DataMsg {
+    float dHdrPrefix[];
+  };
+  // end gbis
+
+  message ProxyResultVarsizeMsg{
+    //Make sure forceArr is the first varsize type declaration
+    //in this message type as it needs alignment
+    Force forceArr[];    
+    char isZero[];    
+  };
+
+  message ProxyNodeAwareSpanningTreeMsg{
+    int numPesOfNode[];
+    int allPes[];
+  };
+
+  message PatchProxyListMsg{
+    int patchIDs[];
+	int proxyListLen[];
+	int proxyPEs[];
+  };
+
+  group ProxyMgr
+  {
+    entry ProxyMgr(void);
+    entry void recvRegisterProxy(RegisterProxyMsg *);
+    entry void recvUnregisterProxy(UnregisterProxyMsg *);
+    entry void recvProxyData(ProxyDataMsg *);
+    entry void recvImmediateProxyData(ProxyDataMsg *);
+    entry void recvProxyAll(ProxyDataMsg *);
+    entry void recvImmediateProxyAll(ProxyDataMsg *);
+    entry void recvResults(ProxyResultVarsizeMsg *);       
+    entry void recvResults(ProxyResultMsg *);
+    entry void recvResults(ProxyCombinedResultRawMsg *);
+    entry void recvImmediateResults(ProxyCombinedResultRawMsg *);
+    entry void recvSpanningTreeOnHomePatch(int, int tree[n], int n);
+    entry void recvNodeAwareSpanningTreeOnHomePatch(ProxyNodeAwareSpanningTreeMsg *);
+    entry void recvSpanningTree(ProxySpanningTreeMsg *);
+    entry void recvNodeAwareSpanningTree(ProxyNodeAwareSpanningTreeMsg *);
+    entry void recvNodeAwareSTParent(int, int);
+    entry void buildProxySpanningTree2();
+    entry void recvProxies(int pid, int list[n], int n);
+	entry void recvPatchProxyInfo(PatchProxyListMsg *msg);
+
+    entry void sendResult(ProxyGBISP1ResultMsg *);
+    entry void recvResult(ProxyGBISP1ResultMsg *);
+    entry void recvData(  ProxyGBISP2DataMsg *);
+    entry void sendResult(ProxyGBISP2ResultMsg *);
+    entry void recvResult(ProxyGBISP2ResultMsg *);
+    entry void recvData(  ProxyGBISP3DataMsg *);
+  };
+  
+  nodegroup NodeProxyMgr{
+    entry NodeProxyMgr();    
+    entry void createProxyInfo(int);   
+    entry [expedited] void recvImmediateProxyData(ProxyDataMsg *);
+    entry [expedited] void recvImmediateProxyAll(ProxyDataMsg *);
+    entry [expedited] void recvImmediateResults(ProxyCombinedResultRawMsg *);
+
+	entry void sendProxyListInfo(PatchProxyListMsg *);
+  };
+}
+

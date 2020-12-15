@@ -1,0 +1,11 @@
+# Schedule definitions for thorn Vectors
+
+schedule Vectors_Startup at CCTK_STARTUP
+{
+  LANG: C
+} "Print startup message"
+
+schedule Vectors_Test at CCTK_PARAMCHECK
+{
+  LANG: C
+} "Run correctness tests."

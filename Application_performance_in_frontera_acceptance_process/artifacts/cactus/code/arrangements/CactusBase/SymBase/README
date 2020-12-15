@@ -1,0 +1,9 @@
+Cactus Code Thorn SymBase
+Author(s)    : Erik Schnetter
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Provide generic handling of symmetries for grids and grid arrays.

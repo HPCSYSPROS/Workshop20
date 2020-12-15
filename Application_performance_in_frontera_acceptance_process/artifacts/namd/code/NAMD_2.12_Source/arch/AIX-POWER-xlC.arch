@@ -1,0 +1,11 @@
+NAMD_ARCH = AIX-POWER
+CHARMARCH = mpi-sp-mpcc64
+
+# need to define MEMUSAGE_USE_SBRK because mallinfo appears to cause crashes
+CXX = xlC_r -q64 -qtls=local-exec -w -qstaticinline -DMEMUSAGE_USE_SBRK -DPOWERPC_TANINT
+CXXOPTS = -O -qnohot -qstrict -qaggrcopy=nooverlap -qalias=ansi -qarch=auto -qtune=auto -qfloat=rsqrt:fltint -DARCH_POWERPC
+CXXNOALIASOPTS = -O3 -qaggrcopy=nooverlap -qalias=noallptrs -qarch=auto -qtune=auto -qfloat=rsqrt:fltint -DARCH_POWERPC
+CXXTHREADOPTS = -O -qstrict -qaggrcopy=nooverlap -qalias=ansi -qarch=auto -qtune=auto -qfloat=rsqrt:fltint -DARCH_POWERPC
+CC = xlc_r -q64 -qcpluscmt -w
+COPTS = -O4 -qinlglue -qarch=auto -qtune=auto
+

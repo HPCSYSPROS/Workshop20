@@ -1,0 +1,36 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+echo "Checking:"
+pwd
+hostname
+date
+echo "${LSB_MCPU_HOSTS}" > SIMFACTORY/NODES
+
+echo "Environment:"
+export MPI_HOSTFILE=mpi_hostfile
+export MPI_HOSTS=mpi_hosts
+export OMP_NUM_THREADS=@NUM_THREADS@
+env | sort > SIMFACTORY/ENVIRONMENT
+
+echo "Starting:"
+for host in ${LSB_HOSTS}; do
+    echo ${host}
+done > ${MPI_HOSTS}
+for node in $(uniq ${MPI_HOSTS}); do
+    for ((proc=0; $proc<@(@PPN_USED@/@NUM_THREADS@)@; proc=$proc+1)); do
+        echo ${node}
+    done
+done > ${MPI_HOSTFILE}
+export CACTUS_STARTTIME=$(date +%s)
+time /opt/hpmpi/bin/mpirun -np @NUM_PROCS@ -hostfile ${MPI_HOSTFILE} @EXECUTABLE@ -L 3 @PARFILE@
+
+echo "Stopping:"
+date
+
+echo "Done."

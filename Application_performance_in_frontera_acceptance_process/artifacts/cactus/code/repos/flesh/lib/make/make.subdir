@@ -1,0 +1,59 @@
+# /*@@
+#   @file      make.subdir
+#   @date      Mon Jan 18 19:12:31 1999
+#   @author    Tom Goodale
+#   @desc 
+#   Makes the object files in a subdirectory
+#   @enddesc 
+#   @version $Id$
+# @@*/
+
+# Include the main make definitions for this configuration
+include $(CONFIG)/make.config.defn
+
+BINDINGS_DIR=$(TOP)/bindings
+
+# Include the configuration make.THORN_NAME.defn for the thorn
+# if it is not Cactus or CactusBindings
+# (Note: This adds to INC_DIRS which is not necessary -- 
+#  should we empty and completely re-set INC_DIRS here,
+#  instead of exporting it from make.thornlib?)
+ifneq ($(THORN), CactusBindings)
+ifneq ($(THORN), Cactus)
+-include $(BINDINGS_DIR)/Configuration/Thorns/make.$(THORN).defn
+endif
+endif
+
+# Add appropriate include lines
+INC_DIRS   += $(SRCDIR) $(wildcard $(SRCDIR)/include)  $(BINDINGS_DIR)/include/$(THORN)
+INC_DIRS_F += $(SRCDIR) $(wildcard $(SRCDIR)/include)  $(BINDINGS_DIR)/include/$(THORN)
+
+# Include the subdirectory's local include data
+-include $(SRCDIR)/make.code.defn
+
+# Include the bindings configuration make.code.defn for the thorn
+-include $(TOP)/bindings/Configuration/$(THORN)/make.configuration.defn
+
+# Turn source file names into object file names
+OBJS = $(SRCS:%=%.o)
+
+# Build all the object files
+
+# Some file systems only update the file modifcation date if something is
+# actually written, so "true >$@" won't work.
+$(CCTK_TARGET): $(OBJS) $(SRCDIR)/make.code.defn
+	echo "" > make.checked
+
+# Rules to make the object files
+include $(CONFIG)/make.config.rules
+
+# Extra subdir-specific dependencies
+# This file isn't strictly necessary, so use -include to prevent 
+# warnings if it is missing.
+-include $(SRCDIR)/make.code.deps
+
+# Dependency stuff
+
+ifneq ($(strip $(SRCS)),)
+-include $(SRCS:%=%.d)
+endif

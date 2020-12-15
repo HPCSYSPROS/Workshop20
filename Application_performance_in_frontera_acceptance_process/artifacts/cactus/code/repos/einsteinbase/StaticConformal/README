@@ -1,0 +1,19 @@
+Cactus Code Thorn StaticConformal
+Author(s)    : Tom Goodale
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+This thorn provides the variables defining a static conformal factor
+which is used to transform the physical metric.  If this thorn is
+active and the ADMBase::metric_type parameter is set to
+`static conformal' then the ADMBase::g... variables are the
+conformal values as opposed to the physical values.
+
+The transformation is
+
+$$ g_{ij}^{\mbox{physical}} = \psi^4 g_{ij}^{\mbox{conformal}} $$
+
+The extrinsic curvature is not transformed.

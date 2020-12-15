@@ -1,0 +1,134 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+module ComputeGridForceMgr {
+  message GridAckMsg;
+  message GridDepositMsg;
+  message GridSegmentMsg;
+  message SubReqMsg;
+  
+  message GridRequestMsg {
+    int gridStartIndex[];
+    int gridIndexList[];
+  };
+  
+  message GridValuesMsg {
+    int gridStartIndex[];
+    GridVal gridVals[];
+  };
+  
+  group ComputeGridForceMgr {
+    entry ComputeGridForceMgr(void);
+    entry void finishWork();
+  };
+  
+  nodegroup ComputeGridForceNodeMgr {
+    entry ComputeGridForceNodeMgr(void);
+    entry [exclusive] void depositInitialGrid(GridDepositMsg *);
+    entry [exclusive] void requestInitialGridData();
+    entry [exclusive] void submitRequest(SubReqMsg *);
+    entry [exclusive] void fetchGridValues(GridRequestMsg *);
+    entry [exclusive] void recvGridValues(GridValuesMsg *);
+
+    entry [exclusive] void ack(GridAckMsg *);
+    entry [exclusive] void recv(GridSegmentMsg *);
+
+    entry [exclusive] void broadcastInitialGridData() {
+      if ( ! myNode ) {  // root
+        atomic {
+          CkPrintf("Info: Distributing grid forces grids...");
+          CProxy_ComputeGridForceNodeMgr myproxy(thisgroup);
+          if ( 2*myNode+1 < numNodes ) { 
+            myproxy[2*myNode+1].broadcastInitialGridData();
+          }
+          if ( 2*myNode+2 < numNodes ) { 
+            myproxy[2*myNode+2].broadcastInitialGridData();
+          }
+          cur_grid = 0;
+        }
+        while ( cur_grid < num_grids ) {
+          if ( 2*myNode+1 < numNodes ) {
+            when ack(GridAckMsg *am) { atomic { delete am; } }
+          }
+          if ( 2*myNode+2 < numNodes ) {
+            when ack(GridAckMsg *am) { atomic { delete am; } }
+          }
+          atomic {
+            CkPrintf(".");
+            GridSegmentMsg *msg = new GridSegmentMsg;
+            while ( cur_grid < num_grids ) {
+              msg->gridnum = cur_grid;
+              grids[cur_grid]->
+                    init3(msg->grid,&(msg->start_index),&(msg->count));
+              if (msg->count > 0) {
+                CProxy_ComputeGridForceNodeMgr myproxy(thisgroup);
+                if ( 2*myNode+2 < numNodes ) { 
+                  GridSegmentMsg *msg2 =
+                         (GridSegmentMsg *)CkCopyMsg((void **)&msg);
+                  myproxy[2*myNode+2].recv(msg2);
+                }
+                receiveInitialGridData(msg);
+                if ( 2*myNode+1 < numNodes ) { 
+                  myproxy[2*myNode+1].recv(msg);
+                } else {
+                  delete msg;
+                }
+                break;
+              }
+              ++cur_grid;
+            }
+            if (cur_grid == num_grids) delete msg;
+          }
+        }
+        atomic { CkPrintf("done.\n"); }
+      } else {
+        atomic {
+          CProxy_ComputeGridForceNodeMgr myproxy(thisgroup);
+          if ( 2*myNode+1 < numNodes ) { 
+            myproxy[2*myNode+1].broadcastInitialGridData();
+          }
+          if ( 2*myNode+2 < numNodes ) { 
+            myproxy[2*myNode+2].broadcastInitialGridData();
+          }
+        }
+        if ( 2*myNode+1 < numNodes ) {
+          when ack(GridAckMsg *am) { atomic { delete am; } }
+        }
+        if ( 2*myNode+2 < numNodes ) {
+          when ack(GridAckMsg *am) { atomic { delete am; } }
+        }
+        atomic {
+          CProxy_ComputeGridForceNodeMgr myproxy(thisgroup);
+          myproxy[(myNode-1)/2].ack(new GridAckMsg);
+        }
+        while ( 1 ) {
+          when recv(GridSegmentMsg *msg) { atomic {
+            CProxy_ComputeGridForceNodeMgr myproxy(thisgroup);
+            myproxy[(myNode-1)/2].ack(new GridAckMsg);
+            if ( 2*myNode+2 < numNodes ) { 
+              GridSegmentMsg *msg2 =
+                     (GridSegmentMsg *)CkCopyMsg((void **)&msg);
+              myproxy[2*myNode+2].recv(msg2);
+            }
+            receiveInitialGridData(msg);
+            if ( 2*myNode+1 < numNodes ) { 
+              myproxy[2*myNode+1].recv(msg);
+            } else {
+              delete msg;
+            }
+          } }
+          if ( 2*myNode+1 < numNodes ) {
+            when ack(GridAckMsg *am) { atomic { delete am; } }
+          }
+          if ( 2*myNode+2 < numNodes ) {
+            when ack(GridAckMsg *am) { atomic { delete am; } }
+          }
+        }
+      }
+    };
+  };
+}
+

@@ -1,0 +1,8 @@
+# Main make.code.defn file for thorn TensorTypes
+# $Header$
+
+# Source files in this directory
+SRCS = check.c info.c tensortypes.c
+
+# Subdirectories containing source files
+SUBDIRS = 

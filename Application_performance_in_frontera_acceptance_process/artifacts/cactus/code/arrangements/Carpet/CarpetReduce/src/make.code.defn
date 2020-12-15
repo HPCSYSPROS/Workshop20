@@ -1,0 +1,7 @@
+# Main make.code.defn file for thorn CarpetReduce
+
+# Source files in this directory
+SRCS = mask_allocate.cc mask_init.cc mask_set.cc mask_test.cc mask_carpet.cc mask_coords.cc reduce.cc
+
+# Subdirectories containing source files
+SUBDIRS =

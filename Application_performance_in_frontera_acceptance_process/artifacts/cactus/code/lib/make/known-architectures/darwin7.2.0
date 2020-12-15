@@ -1,0 +1,13 @@
+#! /bin/sh
+# /*@@
+#   @file    darwin7.2.0
+#   @date    Mon 6 Oct 2003
+#   @author  John Shalf
+#   @desc
+#            Known architecture stuff for MacOS X (Darwin) release 7.2.0
+#   @enddesc
+#   @version $Header$
+# @@*/
+
+. $srcdir/known-architectures/darwin
+

@@ -1,0 +1,21 @@
+# Interface definition for thorn NewRad
+
+IMPLEMENTS: NewRad
+
+USES INCLUDE HEADER: GenericFD.h
+
+CCTK_INT FUNCTION                         \
+    ExtrapolateGammas                     \
+        (CCTK_POINTER_TO_CONST IN cctkGH, \
+         CCTK_REAL ARRAY INOUT var)
+PROVIDES FUNCTION ExtrapolateGammas WITH ExtrapolateGammas1 LANGUAGE C
+
+CCTK_INT FUNCTION                         \
+    NewRad_Apply                          \
+        (CCTK_POINTER_TO_CONST IN cctkGH, \
+         CCTK_REAL ARRAY IN var,          \
+         CCTK_REAL ARRAY INOUT rhs,       \
+         CCTK_REAL IN var0,               \
+         CCTK_REAL IN v0,                 \
+         CCTK_INT IN radpower)
+PROVIDES FUNCTION NewRad_Apply WITH NewRad_Apply1 LANGUAGE C

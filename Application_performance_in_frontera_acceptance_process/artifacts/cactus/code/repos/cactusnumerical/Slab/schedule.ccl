@@ -1,0 +1,18 @@
+# Schedule definitions for thorn Slab
+
+SCHEDULE Slab_InitMPIDatatypes AT startup after Driver_Startup
+{
+  LANG: C
+} "Create MPI datatypes for complex variables in C"
+
+SCHEDULE Slab_InitTimers AT wragh
+{
+  LANG: C
+} "Initialise timers"
+
+if (timer_output) {
+  SCHEDULE Slab_PrintTimers AT shutdown
+  {
+    LANG: C
+  } "Print timers"
+}

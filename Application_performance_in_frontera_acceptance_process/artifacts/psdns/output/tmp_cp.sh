@@ -1,0 +1,12 @@
+/bin/cp   ../../dir_runs64/*.o385532  ./
+/bin/cp   ../../dir_runs64/*.o385891  ./
+/bin/cp   ../../dir_runs64/*.o386564  ./
+/bin/cp   ../../dir_runs128/*.o386570  ./
+/bin/cp   ../../dir_runs128/*.o386572  ./
+/bin/cp   ../../dir_runs128/*.o386573  ./
+/bin/cp   ../../dir_runs256/*.o385457  ./
+/bin/cp   ../../dir_runs256/*.o385526  ./
+/bin/cp   ../../dir_runs256/*.o385885  ./
+/bin/cp   ../../dir_runs8192_32x512/*.o387694  ./
+/bin/cp   ../../dir_runs8192_32x1024/*.o386563  ./
+/bin/cp   ../../dir_runs8192/*.o392095  ./

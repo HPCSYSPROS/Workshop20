@@ -1,0 +1,11 @@
+# Schedule definitions for thorn Timers
+
+SCHEDULE Timer_Startup AT startup BEFORE Driver_Startup
+{
+  LANG: C
+} "Prepare hierarchical timers"
+
+SCHEDULE Timer_Shutdown AT shutdown AFTER Driver_Shutdown
+{
+  LANG: C
+} "Prepare hierarchical timers"

@@ -1,0 +1,7 @@
+# Main make.code.defn file for thorn Timers
+
+# Source files in this directory
+SRCS = CactusTimer.cc CactusTimerSet.cc Timer.cc TimerTree.cc
+
+# Subdirectories containing source files
+SUBDIRS = 

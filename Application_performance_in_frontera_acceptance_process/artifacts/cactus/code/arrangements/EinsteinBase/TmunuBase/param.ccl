@@ -1,0 +1,29 @@
+# Parameter definitions for thorn TmunuBase
+
+BOOLEAN stress_energy_storage "Should the stress-energy tensor have storage?"
+{
+} no
+
+RESTRICTED:
+
+BOOLEAN stress_energy_at_RHS "Should the stress-energy tensor be calculated for the RHS evaluation?"
+{
+} no
+
+BOOLEAN support_old_CalcTmunu_mechanism "Should the old CalcTmunu.inc mechanism be supported? This is deprecated."
+{
+} no
+
+PRIVATE:
+
+INT timelevels "Number of time levels" STEERABLE=recover
+{
+  0:3 :: ""
+} 1
+
+STRING prolongation_type "The kind of boundary prolongation for the stress-energy tensor"
+{
+  "^Lagrange$" :: "standard prolongation (requires several time levels)"
+  "^none$"     :: "no prolongation (use this if you do not have enough time levels active)"
+  ""           :: "any other supported prolongation type"
+} "Lagrange"

@@ -1,0 +1,26 @@
+Output from the slurm batch jobs are included in this directory. 
+
+Output files from the batch jobs are too big to be moved.  They are stored in the output directories for the small and large runs in:
+/scratch/projects/tacc/spp/cazes/psdns/new/
+Small
+ dir_runs64/output_psdns_core_inst_43nodes_32x64_1t_385532/
+ dir_runs64/output_psdns_core_inst_43nodes_32x64_1t_385891/
+ dir_runs64/output_psdns_core_inst_43nodes_32x64_1t_386564/
+ dir_runs128/output_psdns_avx2_86nodes_32x128_1t_386570/
+ dir_runs128/output_psdns_avx2_86nodes_32x128_1t_386572/
+ dir_runs128/output_psdns_avx2_86nodes_32x128_1t_386573/
+ dir_runs256/output_psdns_core_inst_172nodes_32x256_1t_385457/
+ dir_runs256/output_psdns_core_inst_172nodes_32x256_1t_385526/
+ dir_runs256/output_psdns_core_inst_172nodes_32x256_1t_385885/
+
+Large
+ dir_runs8192_32x512/output_psdns_core_inst_820nodes_32x512_1t_387694/
+ dir_runs8192_32x1024/output_psdns_core_inst_820nodes_32x1024_1t_386563/
+ dir_runs8192/output_psdns_core_inst_1640nodes_32x2048_1t_392095/
+
+The file "log" in each output directory is parsed using this command from the output directory:
+
+csh ../step_time.csh
+
+This provides the runtime for the execution.
+

@@ -1,0 +1,7 @@
+# Main make.configuration.defn file for thorn CarpetIOASCII
+
+ALL_UTILS += carpet2xgraph
+
+ifneq ($(strip $(HAVE_SDF)), )
+  ALL_UTILS += carpet2sdf
+endif

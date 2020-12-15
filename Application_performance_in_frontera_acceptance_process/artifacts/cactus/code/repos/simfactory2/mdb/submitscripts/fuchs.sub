@@ -1,0 +1,14 @@
+#!/bin/sh
+#SBATCH --partition=parallel
+#SBATCH --constraint=dual
+#SBATCH --time=@WALLTIME@
+#SBATCH --ntasks=@NUM_PROCS@
+#SBATCH --cpus-per-task=@NUM_THREADS@
+#SBATCH @("@CHAINED_JOB_ID@" != "" ? "-d afterok:@CHAINED_JOB_ID@" : "")@
+#SBATCH --job-name=@SHORT_SIMULATION_NAME@
+#SBATCH --mem-per-cpu=2600
+#SBATCH --mail-type=ALL
+#SBATCH --output=@RUNDIR@/@SIMULATION_NAME@.out
+#SBATCH --error=@RUNDIR@/@SIMULATION_NAME@.err
+cd @SOURCEDIR@
+@SIMFACTORY@ run @SIMULATION_NAME@ --basedir=@BASEDIR@  --machine=@MACHINE@ --restart-id=@RESTART_ID@ @FROM_RESTART_COMMAND@

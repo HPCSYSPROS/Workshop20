@@ -1,0 +1,79 @@
+# arrangement/thorn                # implements (inherits) [friend] {shares}
+#
+CactusBase/Boundary                # boundary ( ) [ ] { }
+CactusBase/CartGrid3D              # grid (coordbase) [ ] {driver}
+CactusBase/CoordBase               # CoordBase ( ) [ ] { }
+CactusBase/Fortran                 # Fortran ( ) [ ] { }
+CactusBase/IOUtil                  # IO ( ) [ ] { }
+CactusBase/InitBase                # InitBase ( ) [ ] { }
+CactusBase/SymBase                 # SymBase ( ) [ ] { }
+CactusBase/Time                    # time ( ) [ ] {cactus}
+CactusNumerical/Dissipation        # Dissipation (grid,SphericalSurface,SpaceMask) [ ] {SpaceMask}
+CactusNumerical/LocalInterp        # LocalInterp ( ) [ ] { }
+CactusNumerical/LocalInterp2       # LocalInterp ( ) [ ] { }
+CactusNumerical/MoL                # MethodOfLines ( ) [ ] {Cactus}
+CactusNumerical/Slab               # Slab ( ) [ ] { }
+CactusNumerical/SpaceMask          # SpaceMask (grid) [ ] { }
+CactusNumerical/SphericalSurface   # SphericalSurface (grid) [ ] { }
+CactusNumerical/SummationByParts   # SummationByParts ( ) [ ] { }
+CactusNumerical/TensorTypes        # TensorTypes ( ) [ ] { }
+CactusUtils/SystemStatistics       # SystemStatistics ( ) [ ] { }
+CactusUtils/SystemTopology         # SystemTopology ( ) [ ] { }
+CactusUtils/TerminationTrigger     # TerminationTrigger ( ) [ ] {IO}
+CactusUtils/TimerReport            # timerreport ( ) [ ] {IO}
+CactusUtils/Vectors                # Vectors ( ) [ ] { }
+Carpet/Carpet                      # Driver ( ) [ ] {Cactus,InitBase,IO,CarpetLib}
+Carpet/CarpetIOASCII               # IOASCII ( ) [ ] {IO}
+Carpet/CarpetIOBasic               # IOBasic (IO) [ ] {IO}
+Carpet/CarpetIOHDF5                # IOHDF5 ( ) [ ] {IO,Cactus}
+Carpet/CarpetIOScalar              # IOScalar ( ) [ ] {IO}
+Carpet/CarpetInterp                # interp ( ) [ ] { }
+Carpet/CarpetInterp2               # interp2 ( ) [ ] { }
+Carpet/CarpetLib                   # CarpetLib ( ) [ ] {IO}
+Carpet/CarpetMask                  # CarpetMask (grid,SphericalSurface) [ ] {SphericalSurface}
+Carpet/CarpetReduce                # reduce ( ) [ ] { }
+Carpet/CarpetRegrid2               # CarpetRegrid2 ( ) [ ] { }
+Carpet/CarpetSlab                  # Hyperslab ( ) [ ] { }
+Carpet/CycleClock                  # CycleClock ( ) [ ] { }
+Carpet/LoopControl                 # LoopControl (CycleClock) [ ] {IO}
+Carpet/Timers                      # Timers ( ) [ ] {IO}
+EinsteinAnalysis/Multipole         # multipole (Grid) [ ] {IO}
+EinsteinAnalysis/QuasiLocalMeasures # QuasiLocalMeasures (ADMBase,SphericalSurface,TmunuBase) [ ] {ADMBase,SphericalSurface}
+EinsteinAnalysis/WeylScal4         # WeylScal4 (admbase,Boundary,GenericFD,Grid,methodoflines) [ ] {GenericFD,MethodOfLines}
+EinsteinBase/ADMBase               # ADMBase (grid) [ ] { }
+EinsteinBase/ADMCoupling           # ADMCoupling ( ) [ ] { }
+EinsteinBase/ADMMacros             # ADMMacros ( ) [ ] { }
+EinsteinBase/Constants             # Constants ( ) [ ] { }
+EinsteinBase/CoordGauge            # CoordGauge ( ) [ ] {ADMBase}
+EinsteinBase/HydroBase             # HydroBase (InitBase) [ ] {InitBase,IO}
+EinsteinBase/StaticConformal       # StaticConformal (grid) [ ] {ADMBase}
+EinsteinBase/TmunuBase             # TmunuBase (ADMBase,StaticConformal) [ADMCoupling] { }
+EinsteinEvolve/NewRad              # NewRad ( ) [ ] { }
+EinsteinUtils/SetMask_SphericalSurface # SetMask_SphericalSurface (HydroBase,SphericalSurface) [ ] {SphericalSurface}
+EinsteinUtils/TGRtensor            # TGRtensor ( ) [ ] { }
+ExternalLibraries/GSL              # GSL ( ) [ ] { }
+ExternalLibraries/HDF5             # HDF5 ( ) [ ] { }
+ExternalLibraries/MPI              # MPI ( ) [ ] { }
+ExternalLibraries/OpenBLAS         # OpenBLAS ( ) [ ] { }
+ExternalLibraries/PAPI             # PAPI ( ) [ ] { }
+ExternalLibraries/hwloc            # hwloc ( ) [ ] { }
+ExternalLibraries/pthreads         # PTHREADS ( ) [ ] { }
+ExternalLibraries/zlib             # zlib ( ) [ ] { }
+KrancNumericalTools/GenericFD      # GenericFD ( ) [ ] { }
+McLachlan/ML_BSSN                  # ML_BSSN (ADMBase,Boundary,GenericFD,Grid,TmunuBase) [ ] {ADMBase,GenericFD,MethodOfLines}
+McLachlan/ML_BSSN_Helper           # ML_BSSN_Helper (ADMBase,CoordGauge,ML_BSSN) [ ] {Boundary,MethodofLines,ADMBase,GenericFD,ML_BSSN}
+Numerical/AEILocalInterp           # AEILocalInterp ( ) [ ] { }
+Zelmani/CCCCGlobalModes            # CCCCGlobalModes (grhydro,Grid,CoreCollapseControl,Coordinates) [ ] {IO}
+Zelmani/CartesianCoordinates       # Coordinates (Grid) [ ] { }
+Zelmani/CoreCollapseControl        # CoreCollapseControl (CarpetRegrid2,HydroBase,grid,SphericalSurface) [ ] { }
+Zelmani/DriftCorrectCoM            # DriftCorrectCoM (ADMBase,ZelmaniCoMShift) [ ] {ADMBase}
+Zelmani/EOS_Omni                   # EOS_Omni ( ) [ ] {IO}
+Zelmani/GRHydro                    # GRHydro (ADMBase,Boundary,SpaceMask,ADMMacros,Tmunubase,HydroBase) [ ] {ADMBase,HydroBase,MethodOfLines,SpaceMask,ADMMacros,EOS_Omni}
+Zelmani/PNSHelper                  # PNSHelper (TmunuBase,HydroBase,ADMBase,grid) [ ] {ADMBase,MethodOfLines}
+Zelmani/PNSMapper                  # PNSMapper (GRHydro,ADMBase,HydroBase) [ ] {ADMBase,HydroBase,GRHydro,ZelmaniM1}
+Zelmani/TriggerTerminationManual   # TriggerTerminationManual ( ) [ ] {IO}
+Zelmani/ZelmaniAnalysis            # ZelmaniAnalysis (GRHydro,ADMBase,TGRtensor,Coordinates,EOS_Omni) [GRHydro] { }
+Zelmani/ZelmaniCoMShift            # ZelmaniCoMShift (GRHydro,Grid,ADMBase) [GRHydro] {IO,grid}
+Zelmani/ZelmaniQuadWaveExtract     # ZelmaniQuadWaveExtract (HydroBase,Reduce,Grid,Driver,ADMBase,Coordinates) [ ] {IO,grid}
+Zelmani/ZelmaniShockTracker2       # ZelmaniShockTracker2 (HydroBase,CarpetRegrid2,CoreCollapseControl) [ ] { }
+exp/ZelmaniM1                      # ZelmaniM1 (TmunuBase,HydroBase,ADMBase,Boundary,EOS_Omni,GRHydro,Coordinates) [ ] {GRHydro,MethodOfLines,IO,GRHydro}

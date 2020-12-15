@@ -1,0 +1,6 @@
+# Configuration definition for thorn TimerReport
+# $Header$
+
+OPTIONAL MPI
+{
+}

@@ -1,0 +1,43 @@
+# Parameter definitions for thorn TerminationTrigger
+
+PRIVATE:
+
+REAL on_remaining_walltime "When to trigger termination in MINUTES" STEERABLE = ALWAYS
+{
+  0.0    :: "Don't trigger termination"
+  (0.0:* :: "So many minutes before your job walltime is over"
+} 0.0
+
+REAL max_walltime "Walltime in HOURS allocated for this job" STEERABLE = ALWAYS
+{
+  0.0    :: "Don't trigger termination"
+  (0.0:* :: "Should be positive, right"
+} 0.0
+
+BOOLEAN termination_from_file "Use termination file; specified by termination_filename" STEERABLE = ALWAYS
+{
+} "no"
+
+BOOLEAN create_termination_file "Create an empty termination file at startup" STEERABLE = RECOVER
+{
+} "no"
+
+STRING termination_file "Termination file name (either full path or relative to IO::out_dir)" STEERABLE = ALWAYS
+{
+  "" ::  "Termination file"
+} "/tmp/cactus_terminate"
+
+INT check_file_every "Check termination file every n timesteps" STEERABLE = ALWAYS
+{
+  1:* :: ""
+} 1
+
+REAL output_remtime_every_minutes "Output remaining wall time every n minutes" STEERABLE = ALWAYS
+{
+  0.0    :: "No output"
+  (0.0:* :: "Output"
+} 60.0
+
+SHARES: IO
+
+USES STRING out_dir

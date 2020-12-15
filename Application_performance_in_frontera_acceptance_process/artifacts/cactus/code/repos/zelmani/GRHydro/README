@@ -1,0 +1,29 @@
+Cactus Code Thorn GRHydro
+Author(s)    : Luca Baiotti
+               Ian Hawke
+               Pedro Montero
+               Sebastiano Bernuzzi
+               Giovanni Corvino
+               Toni Font
+               Joachim Frieben
+               Roberto De Pietri
+               Thorsten Kellermann
+               Frank Löffler
+               Christian D. Ott
+               Luciano Rezzolla
+               Nikolaos Stergioulas
+               Aaryn Tonita
+               many others
+Maintainer(s): CIGR developers team
+Licence      : GPLv2+
+--------------------------------------------------------------------------
+
+1. Purpose
+
+GRHydro is the evolution code for a general-purpose 3D relativistic
+hydrodynamics code. To work it requires Einstein, MoL (the method of
+lines thorn), CactusEOS (the general equation of state interface).
+In theory any (suitably written) spacetime evolution thorn should work,
+but for the moment the MoL version of BSSN will be the tested version.
+
+For more information see the documentation in the ThornGuide.

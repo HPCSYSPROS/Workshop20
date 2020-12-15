@@ -1,0 +1,180 @@
+\section{Sample configuration files}
+\label{section:sample}
+This section contains some simple example \NAMD\ configuration files to serve
+as templates.
+\prettypar
+This file shows a simple configuration file for alanin.  
+It performs basic dynamics
+with no output files or special features.
+
+\begin{verbatim}
+# protocol params
+numsteps        1000
+
+# initial config
+coordinates     alanin.pdb
+temperature     300K
+seed            12345
+
+# output params
+outputname      /tmp/alanin
+binaryoutput    no
+
+# integrator params
+timestep        1.0
+
+# force field params
+structure       alanin.psf
+parameters      alanin.params
+exclude         scaled1-4
+1-4scaling      1.0
+switching       on
+switchdist      8.0
+cutoff          12.0
+pairlistdist    13.5
+stepspercycle   20
+\end{verbatim}
+
+\newpage
+This file is again for alanin, 
+but shows a slightly more complicated configuration.  
+The system is periodic, a coordinate trajectory file
+and a set of restart files are produced.
+
+\begin{verbatim}
+# protocol params
+numsteps        1000
+
+# initial config
+coordinates     alanin.pdb
+temperature     300K
+seed            12345
+
+# periodic cell
+cellBasisVector1   33.0 0 0
+cellBasisVector2   0 32.0 0
+cellBasisVector3   0 0 32.5
+
+# output params
+outputname      /tmp/alanin
+binaryoutput    no
+DCDfreq         10
+restartfreq     100
+
+# integrator params
+timestep        1.0
+
+# force field params
+structure       alanin.psf
+parameters      alanin.params
+exclude         scaled1-4
+1-4scaling      1.0
+switching       on
+switchdist      8.0
+cutoff          12.0
+pairlistdist    13.5
+stepspercycle   20
+\end{verbatim}
+
+\newpage
+This file shows another simple configuration file for alanin, 
+but this time with full electrostatics using PME and 
+multiple timestepping.
+
+\begin{verbatim}
+# protocol params
+numsteps        1000
+
+# initial config
+coordinates     alanin.pdb
+temperature     300K
+seed            12345
+
+# periodic cell
+cellBasisVector1   33.0 0 0
+cellBasisVector2   0 32.0 0
+cellBasisVector3   0 0 32.5
+
+# output params
+outputname      /tmp/alanin
+binaryoutput    no
+DCDfreq         10
+restartfreq     100
+
+# integrator params
+timestep        1.0
+fullElectFrequency  4
+
+# force field params
+structure       alanin.psf
+parameters      alanin.params
+exclude         scaled1-4
+1-4scaling      1.0
+switching       on
+switchdist      8.0
+cutoff          12.0
+pairlistdist    13.5
+stepspercycle   20
+
+# full electrostatics
+PME             on
+PMEGridSizeX    32
+PMEGridSizeY    32
+PMEGridSizeZ    32
+\end{verbatim}
+\newpage
+
+This file demonstrates the analysis of a DCD trajectory file using NAMD.
+The file {\tt pair.pdb} contains the definition of pair interaction groups;
+NAMD will compute the interaction energy and force between these groups
+for each frame in the DCD file.  It is assumed that coordinate frames were
+written every 1000 timesteps.  See Sec.~\ref{section:pairinteraction} for
+more about pair interaction calculations.
+
+\begin{verbatim}
+
+
+# initial config
+coordinates     alanin.pdb
+temperature     0
+
+# output params
+outputname      /tmp/alanin-analyze
+binaryoutput    no
+
+# integrator params
+timestep        1.0
+
+# force field params
+structure       alanin.psf
+parameters      alanin.params
+exclude         scaled1-4
+1-4scaling      1.0
+switching       on
+switchdist      8.0
+cutoff          12.0
+pairlistdist    13.5
+stepspercycle   20
+ 
+# Atoms in group 1 have a 1 in the B column; group 2 has a 2.
+pairInteraction		on
+pairInteractionFile	pair.pdb
+pairInteractionCol	B
+pairInteractionGroup1	1
+pairInteractionGroup2	2
+
+# First frame saved was frame 1000.
+set ts 1000
+
+coorfile open dcd /tmp/alanin.dcd
+
+# Read all frames until nonzero is returned.
+while { ![coorfile read] } {
+  # Set firstTimestep so our energy output has the correct TS.
+  firstTimestep $ts
+  # Compute energies and forces, but don't try to move the atoms.
+  run 0
+  incr ts 1000
+}
+coorfile close
+\end{verbatim}

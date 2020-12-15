@@ -1,0 +1,111 @@
+# Parameter definitions for thorn CCCCGlobalModes
+# $Header: /home/cvs/cccc/CCCCThorns/CCCCGlobalModes/param.ccl,v 1.4 2006/06/10 17:49:10 cott Exp $
+
+
+
+CCTK_INT compute_every "Perform Reductions every n-th timestep" STEERABLE=ALWAYS
+{
+  1:* :: "Better be equal or greater than 1"
+ -1 :: "Never"
+} 1
+
+CCTK_REAL start_time "Start at time [ms]" STEERABLE=ALWAYS
+{
+	0.0:: "Greater then or equal to 0.0, I guess"
+} 0.0
+
+BOOLEAN do_shibata "Perform Shibata-Like Mode Analysis"
+{
+} "no"
+
+BOOLEAN do_CoM "Perform Center of Mass computation" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN do_CoM_abort "Abort if CoM conservation violated" STEERABLE=ALWAYS
+{
+} "no"
+
+CCTK_REAL do_CoM_abort_threshold "what should be the threshold for aborting?" STEERABLE=ALWAYS
+{
+	1.0e-14:: "Greater then or equal to 1.0e-14, I guess"
+} 10.0
+
+BOOLEAN do_P "Perform total Momentum computation" STEERABLE=RECOVER
+{
+} "no"
+
+
+BOOLEAN do_saijo "Perform Saijo-Like Mode Analysis" 
+{
+} "no"
+
+BOOLEAN do_qlm "Perform multipole moment analysis"
+{
+} "no"
+
+
+KEYWORD cut_method "Select a method for a cut-off point of the mode analysis"
+{
+  "abs density" :: "cut in absolute density"
+  "rel density" :: "cut in relative density"
+  "radius"      :: "cut in radius"
+  "none"        :: "no cut at all; entire grid"
+} "none"
+
+KEYWORD domain "What kind of domain do we have"
+{
+  "bitant" :: "bitant"
+  "full" :: "no symmetry"
+} "full"
+
+
+CCTK_REAL density_cut_factor "Density cut factor "
+{
+ 1.0:* :: "Greater than or equal to one"
+} 100.0
+
+CCTK_REAL density_cut "Density cut [cgs]; Has priority over density_rel_cut"
+{
+ 0.0:*  :: "Better be greater than zero"
+} 1.0e9
+
+CCTK_REAL radius_cut "Radius out to which to carry out CoM calculation" STEERABLE=ALWAYS
+{
+ 0.0:*  :: "Better be greater than zero"
+} 1.0e9
+
+BOOLEAN use_CoM_radius "use individual CoM cut radius" STEERABLE=ALWAYS
+{
+} "yes"
+
+CCTK_REAL CoM_radius "Carry CoM integration out to this radius" STEERABLE=ALWAYS
+{
+  (0.0:* :: "Better be greater than zero"
+} 500.0e0
+
+
+CCTK_INT qlm_l "l mode for qlm decomp"
+{
+   0:* :: "Bratz das Vieh"
+} 2
+
+CCTK_INT qlm_m "m mode for qlm decomp"
+{
+   *:* :: "Buddy haut den Lukas"
+} 0
+
+CCTK_INT NaN_Warnlevel "when detecting NaNs, warn at this level"
+{
+   0 :: "Abort run"
+   1 :: "alert level"
+   * :: "any number CCTK_Warn accepts"
+} 0
+
+
+
+
+shares: IO
+
+USES STRING out_dir
+

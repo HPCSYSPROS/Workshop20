@@ -1,0 +1,190 @@
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+\title{ADMBase}
+\author{Tom Goodale}
+\date{$ $Date$ $}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+\begin{abstract}
+Provides the basic ADM variables used in the $3+1$ formalism
+\end{abstract}
+
+\section{Purpose}
+
+Thorn {\tt ADMBase} provides core infrastructure for thorns
+implementing general relativity on a 3D grid in the $3+1$
+formalism. It provides the basic variables (3-metric, extrinsic
+curvature, lapse and shift vector) for the $3+1$ formalism, in
+addition to a set of parameters to regulate the methods used for their
+evolution. These variables are used to communicate between thorns
+providing initial data, evolution methods and analysis routines for
+the $3+1$ formalism. In addition, the variables can be used as a
+mechanism to interact with alternative formalisms, as long as routines
+can be written to transform alternative variables into these $3+1$
+variables.
+
+
+\section{Using ADMBase}
+
+\subsection{3+1 Variables}
+
+The variables provided by {\tt ADMBase} are:
+
+\begin{itemize}
+\item
+The 3-metric tensor, $g_{ij}$
+
+ {\tt gxx}, {\tt gxy}, {\tt gxz},{\tt gyy}, {\tt gyz},{\tt gzz}
+
+\item The extrinsic curvature tensor, $K_{ij}$ 
+
+{\tt kxx}, {\tt kxy}, {\tt kxz},{\tt kyy},{\tt kyz},{\tt kzz}
+
+\item The lapse function, $\alpha$
+
+ {\tt alp}
+
+\item The (optional) shift vector $\beta^i$ 
+
+{\tt betax}, {\tt betay},{\tt betaz}
+
+\end{itemize}
+
+By default the metric and extrinsic curvature tensors are assumed to
+be {\it physical}, however these semantics can be changed by use of
+the {\tt metric\_type} parameter. {\tt  ADMBase} provides the default value
+of {\tt physical}, however another thorn can extend this parameter, 
+for example to specify that the variables {\tt gxx} etc actually refer
+to the {\it conformal} 3-metric.
+
+
+\subsection{Initial Data}
+
+Initial data for the $3+1$ variables is specified by the {\tt
+initial\_data} (3-metric and extrinsic curvature), {\tt
+initial\_lapse} (lapse), and {\tt initial\_shift} (shift) parameters.
+By default, {\tt ADMBase} initialises the 3-metric and extrinsic
+curvature to Minkowski and the lapse to one. Initial data thorns
+override these defaults by extending the parameters. To see which
+initial data sets are available in your executable run for example
+
+{\tt
+\begin{verbatim}
+./cactus_<config> -o admbase::initial_data | grep Range
+\end{verbatim}
+}
+
+The CactusEinstein arrangement includes thorns providing initial data
+for various black hole combinations, perturbed black holes and linear
+gravitational waves.
+
+\subsection{Evolution Methods}
+
+Analogous to specifying initial data, evolution methods are chosen by
+the {\tt evolution\_method} (3-metric and extrinsic curvature), {\tt
+lapse\_evolution\_method} (lapse), and {\tt shift\_evolution\_method}
+(shift) parameters.  By default, {\tt ADMBase} does not evolve the
+3-metric or extrinsic curvature, and holds the lapse and shift static.
+
+
+
+\section{Programming With ADMBase}
+
+\subsection{3+1 Variables}
+
+It is highly recommended that all thorns which inherit from ADMBase
+check the value of the {\tt metric\_type} parameter in a routine
+scheduled at {\tt CCTK\_PARAMCHECK} and signal an error if the metric
+type is not recognised. (See the source file {\tt ParamCheck.c} in any
+of the thorns in the {\tt CactusEinstein} arrangement for examples of
+this, and note that the {\tt PARAMCHECK} time bin is a good place to 
+check for illegal/bad combinations of parameters, and also to inform
+the user of any relevent details of the parameters she has chosen).
+
+ADMBase allocates one timelevel of memory for all variables, except
+the shift, which is only allocated if the {\tt initial\_shift}
+parameter is set to a value other than `none'.  (`none' is the
+default.)  The state of the shift storage is indicated by the {\tt
+shift\_state} grid scalar.  This is 1 if there is storage for the
+shift, and 0 otherwise.
+
+The thorn provides, on request, initial data to set the metric and
+extrinsic curvature to flat space in cartesian coordinates, to set the
+initial lapse to one and the initial shift to zero.
+
+
+\subsection{Initial Data} 
+
+To include your initial data sets for the 3-metric, extrinsic
+curvature, lapse and shift in the {\tt ADMBase} infrastructure, extend
+the keyword parameters {\tt initial\_data}, {\tt initial\_lapse} and
+{\tt initial\_shift}. For example, in the {\tt param.ccl} file of {\tt CactusEinstein/IDAnalyticBH},
+
+{\tt
+\begin{verbatim}
+shares: ADMBase
+
+EXTENDS KEYWORD initial_data 
+{
+  "schwarzschild"      :: "One Schwarzshild black hole"
+  "bl_bh"              :: "Brill Lindquist black holes"
+  "misner_bh"          :: "Misner black holes"
+  "multiple_misner_bh" :: "Multiple Misner black holes"
+  "kerr"	       :: "One Kerr black hole"	
+} 
+\end{verbatim}
+}
+
+{\tt ADMBase} also schedules two groups {\tt ADMBase\_InitialData} and
+{\tt ADMBase\_InitialGauge} in this order at {\tt CCTK\_INITIAL}.
+Initial data and initial gauge thorns should schedule their routines
+to run in this group, for example
+
+{\tt
+\begin{verbatim}
+if (CCTK_Equals(initial_data,"schwarzschild")) 
+{ 	
+   schedule Schwarzschild in ADMBase_InitialData
+   {
+     LANG: C
+   } "Construct initial data for a single Schwarzschild black hole"
+}
+\end{verbatim}
+}
+
+{\tt ADMBase} also schedules a group {\tt ADMBase\_PostInitial} at
+{\tt CCTK\_INITIAL} after both {\tt ADMBase\_InitialData} and {\tt
+  ADMBase\_InitialGauge}.  This group is meant for thorns that modify
+the initial data, such as e.g.\ adding noise to an exact solution.
+
+
+
+\section{Shift Vector}
+
+It is only relatively recently that numerical relativists have started
+to use a shift vector in 3D calculations, and previously, to save
+space, storage for the shift vector was not allocated. If the parameter
+{\tt initial\_shift} is set to {\tt none}, {\tt ADMBase} does not allocate
+storage for {\tt betax}, {\tt betay}, {\tt betaz} and sets the grid scalar
+{\tt shift\_state} to 0. In all other cases the {\tt shift\_state} parameter
+is set to 1. 
+
+Thorns using the shift should always check that storage for the shift is
+allocated before using it.
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

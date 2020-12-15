@@ -1,0 +1,12 @@
+#! /bin/bash
+#BSUB -q @QUEUE@
+#BSUB -W @WALLTIME_HH@:@WALLTIME_MM@
+#BSUB -n @PROCS_REQUESTED@
+#BSUB -R span[ptile=@PPN@]
+#BSUB @("@CHAINED_JOB_ID@" != "" ? "-w 'ended(@CHAINED_JOB_ID@)'" : "")@
+#BSUB -J @SIMULATION_NAME@
+#BSUB -N
+#BSUB -o @RUNDIR@/@SIMULATION_NAME@.out
+#BSUB -e @RUNDIR@/@SIMULATION_NAME@.err
+cd @SOURCEDIR@
+@SIMFACTORY@ run @SIMULATION_NAME@ --machine=marenostrum --restart-id=@RESTART_ID@ @FROM_RESTART_COMMAND@

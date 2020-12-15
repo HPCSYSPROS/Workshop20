@@ -1,0 +1,18 @@
+# Configuration definitions for thorn HDF5
+
+PROVIDES HDF5
+{
+  SCRIPT src/detect.sh
+  LANG bash
+  OPTIONS HDF5 HDF5_DIR HDF5_INSTALL_DIR HDF5_ENABLE_CXX HDF5_ENABLE_FORTRAN ZLIB_DIR LIBSZ_DIR LIBZ_DIR HDF5_INC_DIRS HDF5_LIB_DIRS HDF5_LIBS
+}
+
+# Pass configuration options to build script
+REQUIRES HDF5
+
+REQUIRES zlib
+
+# HDF5 might require MPI
+OPTIONAL MPI
+{
+}

@@ -1,0 +1,281 @@
+# Parameter definitions for thorn CoreCollapseControl
+
+######################## Output Control #########################
+
+# used in schedule.ccl
+boolean output_control "control output" STEERABLE=RECOVER
+{
+} "no"
+
+boolean force_postbounce "force core collapse control to think we are after bounce" STEERABLE=ALWAYS
+{
+} "no"
+
+real forced_bounce_time "forced core boucne time" STEERABLE=ALWAYS
+{
+0.0e0:*  ::"anything positive or 0"
+} 0.0
+
+
+# --- changing output frequency near bounce
+# densities given in g/cm^3
+# entropy given in k_B
+# assumes G=c=M_sun = 1
+
+real prebounce_rho "rho threshold for prebounce phase" STEERABLE=ALWAYS
+{
+  (0:*  ::"anything larger than 0"
+} 1.0e12
+
+real bounce_rho "rho threshold for bounce phase" STEERABLE=ALWAYS
+{
+  (0:*  :: "anything larger than 0"
+} 1.0e14
+
+real bounce_entropy "entropy threshold for bounce phase" STEERABLE=ALWAYS
+{
+  (0:* :: "anything positive"
+} 3.0
+
+# used in schedule.ccl
+KEYWORD bounce_criterion "bounce criterion" STEERABLE=RECOVER
+{
+  "entropy" :: "use entropy as bounce criterion (requires a hot evolution)"
+  "density" :: "use the density as bounce criterion"
+} "density"
+
+real postbounce_dt "switch to postbounce phase dt milliseconds after bounce" STEERABLE=ALWAYS
+{
+  (0:*  :: "anything larger than 0"
+} 10.0e0
+
+real preb_out1D_dt "pre-bounce 1D output dt in ms" STEERABLE=ALWAYS
+{
+  (0:*  :: "anything larger or equal to zero"
+} 0.1e0
+
+int preb_out2D_every "pre-bounce 2D output every (using divisor)" STEERABLE=ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+ -1:0  :: "turned off"
+ -2    :: "dont change"
+} -2
+
+
+int preb_out1D_every "pre-bounce 1D output every (using divisor)" STEERABLE=ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+ -1:0  :: "turned off"
+ -2    :: "dont change"
+} -2
+
+int preb_outscalar_every "pre-bounce scalar output every (using divisor)" STEERABLE=ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+ -1:0  :: "turned off"
+ -2    :: "dont change"
+} -2
+
+int preb_out0D_every "pre-bounce 0D output every (using divisor)" STEERABLE=ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+ -1:0  :: "turned off"
+ -2    :: "dont change"
+} -2
+
+
+int preb_out3Dhdf5_every "pre-bounce 3D HDF5 output every (using divisor)" STEERABLE=ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+ -1:0  :: "turned off"
+ -2    :: "dont change"
+} -2
+
+int preb_out2Dhdf5_every "pre-bounce 2D HDF5 output every (using divisor)" STEERABLE=ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+ -1:0  :: "turned off"
+ -2    :: "dont change"
+} -2
+
+int preb_checkpoint_every "pre-bounce checkpoint every (using divisor)" STEERABLE=ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+ -1:0  :: "turned off"
+ -2    :: "dont change"
+} -2
+
+int preb_waves_every "pre-bounce setting for Psi4, Zerilli, ZelmaniQuadWaveExtract" STEERABLE=ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+ -1:0  :: "turned off"
+ -2    :: "dont change"
+} -2
+
+boolean toggle_grhydro_eos_hot_eps_fix "activate GRHydro::GRHydro_eos_hot_eps_fix upon bounce" STEERABLE=ALWAYS
+{
+} "no"
+
+# --- changing output frequency near BH formation
+
+real preBH_alpA "lapse threshold for pre-BH phase" STEERABLE=ALWAYS
+{
+0.0e0:  ::"anything larger than 0"
+} 0.3
+
+real preBH_alpB "lapse threshold for pre-BH phase" STEERABLE=ALWAYS
+{
+0.0e0:  ::"anything larger than 0"
+} 0.3
+
+int preBH_AH_every "pre-bounce AH every" STEERABLE=ALWAYS
+{
+  1:*  :: "anything larger or equal to zero"
+ -1:0   :: "turned off"
+ -2    :: "dont change"
+} -2
+
+int preBH_out3Dhdf5_every "pre-bounce 3D output every (using divisor)" STEERABLE=ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+ -1:0  :: "turned off"
+ -2    :: "dont change"
+} -2
+
+boolean preBH_force_cooling_off "turn off cooling as we get close to BH formation?" STEERABLE=ALWAYS
+{
+} "no"
+
+
+######################## PMR parameters #########################
+# used in schedule.ccl
+boolean handle_PMR "Manage progressive mesh refinement" STEERABLE=RECOVER
+{
+} no
+
+CCTK_INT max_levels "Maximum number of refinement levels we want to be active" \
+STEERABLE=ALWAYS
+{
+  1: :: "Greater or equal to one"
+} 9999
+
+# values smaller than 1e-10 csuse the corresponding entry to be ignored
+CCTK_REAL rho_max_list[99] "List of densities at which to refine" STEERABLE=ALWAYS
+{
+ 0.0e0:   :: "Anything larger 0"
+} 0.0e0
+
+KEYWORD get_rho_max_from  "Where we get our max density measure from"
+{
+  "global rho max"     :: "Default choice. Just checks global max(rho)."
+  "fragments"   :: "Get local max(rho) for the various fragments"
+} "global rho max"
+
+CCTK_INT check_every "Check rho max every n iterations" STEERABLE=ALWAYS
+{
+ 0:  :: "Anything larger or equal to"
+} 128
+
+CCTK_INT check_every_prebounce "Check rho max every n iterations" STEERABLE=ALWAYS
+{
+ 0:  :: "Anything larger or equal to"
+} 128
+
+CCTK_INT rho_max_every "Check rho max every n iterations" STEERABLE=ALWAYS
+{
+ 0:  :: "Anything larger or equal to"
+} 16
+
+
+BOOLEAN switch_off_refinement "Allow removal of fine levels after some time?" STEERABLE=ALWAYS
+{
+} no
+
+CCTK_REAL switch_off_refinement_after_time "The time after which we switch off all fine levels" STEERABLE=ALWAYS
+{
+  *:* :: "some time"
+} 12000
+
+
+##################### Density tracking parameters ######################################
+
+BOOLEAN verbose "Blabla?"
+{
+} no
+
+BOOLEAN find_fragments "Whether we shall locate fragments (find local density maxima)"  STEERABLE=ALWAYS
+{
+} no
+
+
+CCTK_INT N_rho_maxima "The number of fragments to find"  STEERABLE=ALWAYS
+{
+  1:10  :: "1 up to 10"
+} 1
+
+CCTK_REAL rho_max_threshold "Minimum threshold value for locating desnity maxima"  STEERABLE=ALWAYS
+{
+  0:*  :: "positive"
+} 0.0
+
+CCTK_REAL min_separation_between_maxima "The minimum distance the density maxima should be seperated. This is necessary to obtain points from the same local high density region"  STEERABLE=ALWAYS
+{
+   0:* :: "positive"
+} 10.0
+
+CCTK_INT min_reflevel_to_search "We search for density maxima only at reflevels larger than or equal to this number"  STEERABLE=ALWAYS
+{
+  0:* :: "positive"
+} 0
+
+CCTK_INT max_reflevel_to_search "We search for density maxima only at reflevels smaller than or equal to this number"  STEERABLE=ALWAYS
+{
+  0:* :: "positive"
+} 0
+
+CCTK_REAL search_radius_around_old_maximum "Look only within this radius to a previously found maximum. This is useful for initial guesses."
+{
+  0:*  :: "anything positive"
+} 100000000
+
+
+BOOLEAN find_fragments_only_once "Find fragments only once and then use some other means of keeping track of density maxima"  STEERABLE=ALWAYS
+{
+} yes
+
+CCTK_REAL find_fragments_after_time "Find fragments after this simulation time"  STEERABLE=ALWAYS
+{
+  0:*  :: "some time"
+} 0
+
+CCTK_INT find_fragments_every "Find fragments every so many iterations"  STEERABLE=ALWAYS
+{
+  1:* :: "positive and larger than 1"
+} 1
+
+BOOLEAN track_fragments "Shall we track the fragments (write result to SphericalSurface)"  STEERABLE=ALWAYS
+{
+} no
+
+CCTK_INT which_surface_to_store_fragment_info[10] "The index of a spherical surface where we store fragment info"  STEERABLE=ALWAYS
+{
+  0:*  :: "0 or positive"
+ -1:   :: "don't store"
+} -1
+
+CCTK_INT PMR_ref_center_to_handle[10] "Which refinement centers should be handled with PMR for a given fragment / global rho max?" STEERABLE=ALWAYS
+{
+  0:*  :: "positive"
+} 0
+
+BOOLEAN ignore_z_tracking[10] "Don't set sf centroid position in z direction (leave at zero)" STEERABLE=ALWAYS
+{
+} no
+
+BOOLEAN force_symmetric_tracking "Only for two fragments. Tracking position is obtained from an average of both fragment positions" STEERABLE=ALWAYS
+{
+} no
+
+
+
+

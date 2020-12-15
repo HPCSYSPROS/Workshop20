@@ -1,0 +1,24 @@
+# Interface definition for thorn CoordGauge
+# $Header$
+
+implements: CoordGauge
+
+public:
+
+INT slicing_flags TYPE = SCALAR
+{
+  active_slicing_handle
+} "Slicing and shift stuff"
+
+# Will be changed to.
+#INT selected_slicing_handles TYPE = SCALAR
+#{
+#  selected_lapse
+#  selected_shift
+#} "Slicing Handles"
+
+
+# FIXME: This will be removed when new slicing stuff is there
+
+INCLUDE HEADER: Slicing.h in Slicing.h
+

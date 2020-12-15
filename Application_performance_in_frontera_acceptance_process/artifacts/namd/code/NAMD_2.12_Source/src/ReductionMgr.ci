@@ -1,0 +1,23 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+module ReductionMgr {
+  // ReductionMgr on each node
+
+  message ReductionRegisterMsg;
+  message ReductionSubmitMsg {
+    BigReal data[];
+  };
+
+  group ReductionMgr
+  {
+    entry ReductionMgr(void);
+    entry void remoteRegister(ReductionRegisterMsg *);
+    entry void remoteUnregister(ReductionRegisterMsg *);
+    entry void remoteSubmit(ReductionSubmitMsg *);
+  };
+}
+

@@ -1,0 +1,37 @@
+IMPLEMENTS: DriftCorrectCoM
+
+INHERITS: ADMBase ZelmaniCoMShift
+
+INT dc4_state TYPE=scalar
+{
+  dc4_calc_error dc4_calc_error_p dc4_calc_error_p_p
+} "Status -- is the information from that time valid?"
+
+REAL dc4_current_time TYPE=scalar
+{
+  dc4_time dc4_time_p dc4_time_p_p
+} "Pphysical time"
+
+REAL dc4_size TYPE=scalar
+{
+  dc4_delta_size dc4_delta_size_p dc4_delta_size_p_p
+  dc4_delta_size_dot
+  dc4_delta_size_dot2
+} "Information about size drift correction"
+
+REAL dc4_position TYPE=scalar
+{
+  dc4_delta_posx dc4_delta_posx_p dc4_delta_posx_p_p
+  dc4_delta_posx_dot
+  dc4_delta_posx_dot2
+  dc4_delta_posy dc4_delta_posy_p dc4_delta_posy_p_p
+  dc4_delta_posy_dot
+  dc4_delta_posy_dot2
+  dc4_delta_posz dc4_delta_posz_p dc4_delta_posz_p_p
+  dc4_delta_posz_dot
+  dc4_delta_posz_dot2
+} "Information about position drift correction"
+
+
+CCTK_INT FUNCTION MoLQueryEvolvedRHS (CCTK_INT IN EvolvedIndex)
+REQUIRES FUNCTION MoLQueryEvolvedRHS

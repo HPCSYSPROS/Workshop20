@@ -1,0 +1,11 @@
+input:
+  CCTK_INT input_array_time_levels[N_input_arrays];
+
+"internal" (?):
+  CCTK_POINTER per_point_status;
+        pointing to CCTK_INT[N_interp_points]
+  CCTK_INT     error_point_status;
+        minus number of points with non-zero per_point_status
+
+output:
+  CCTK_INT local_interpolator_status;

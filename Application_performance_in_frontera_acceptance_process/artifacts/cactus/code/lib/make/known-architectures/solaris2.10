@@ -1,0 +1,12 @@
+#! /bin/sh
+#  /*@@
+#    @file      solaris2.10
+#    @date      June 11, 2007
+#    @author    Ankush Gupta <ankush.gupta@sun.com>
+#    @desc 
+#   
+#    @enddesc
+#    @version $Header$
+#  @@*/
+
+. $srcdir/known-architectures/solaris

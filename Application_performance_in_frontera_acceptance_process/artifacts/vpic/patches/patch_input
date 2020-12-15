@@ -1,0 +1,11 @@
+--- input_files/test_147456.cxx	2017-10-22 11:08:16.000000000 -0500
++++ input_files/test_73728.cxx	2017-11-14 14:41:10.000000000 -0600
+@@ -111,7 +111,7 @@
+ 
+   double topology_x = 48;  // Number of domains in x, y, and z
+   double topology_y = 48;
+-  double topology_z = 64;
++  double topology_z = 32;
+ 
+   double nx = 1536;
+   double ny = 1536;

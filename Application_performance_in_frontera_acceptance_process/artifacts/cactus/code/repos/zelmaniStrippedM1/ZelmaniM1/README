@@ -1,0 +1,19 @@
+Cactus Code Thorn ZelmaniM1
+Author(s)    : Christian D. Ott <cott@tapir.caltech.edu>
+             : Evan O'Connor <evanoc@tapir.caltech.edu>
+Maintainer(s): Christian D. Ott <cott@tapir.caltech.edu>
+             : Evan O'Connor <evanoc@tapir.caltech.edu>
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Solve two moment radiative transfer equations.  Currently incomplete.
+
+2. TODO List:
+	+ Write asymptotic flux calculation routines
+	+ Include relativistic source terms 
+	+ Set up boundary conditions 
+ 	+ Include red-shifting terms
+	+ Build in more tests (including radiation advection, radiating shocks, etc.)
+

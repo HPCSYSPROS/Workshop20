@@ -1,0 +1,4 @@
+#!/bin/bash
+
+diff -u openbabel-2.3.2/include/openbabel/shared_ptr.h.orig openbabel-2.3.2/include/openbabel/shared_ptr.h > patches/shared_ptr.patch
+diff -u openbabel-2.3.2/CMakeLists.txt.orig openbabel-2.3.2/CMakeLists.txt                                 > patches/CMakeLists.patch

@@ -1,0 +1,35 @@
+#! /usr/bin/env bash
+#
+# Create build system using GNU autotools
+#
+
+cwd=`pwd`
+
+# create include dir with links
+(cd src ; rm -rf include ; mkdir include ; cd include; \
+	for file in `cat ../../config/vpic_header_list` ; do \
+		link=`echo $file | sed 's,src,..,g'`
+		ln -s $link .
+	done
+)
+
+echo "calling SPE bootstrap"
+(cd cell/spe; config/bootstrap $cwd)
+echo
+
+echo "calling PPE bootstrap"
+(cd cell/ppe; config/bootstrap $cwd)
+echo
+
+echo "generating Makefile.am for VPIC library"
+[ ! -d lib ] && mkdir lib
+config/create_lib_am > lib/Makefile.am
+
+echo "calling libtoolize..."
+libtoolize -f --automake
+echo "calling aclocal -I $cwd/m4"
+aclocal -I $cwd/m4 > /dev/null 2>&1
+echo "automake -af --foreign"
+automake -af --foreign
+echo "autoconf"
+autoconf

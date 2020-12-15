@@ -1,0 +1,19 @@
+# Configuration definitions for thorn CarpetLib
+
+PROVIDES CarpetLib
+{
+  SCRIPT
+  LANG
+}
+
+# TODO: make Vectors optional
+REQUIRES MPI Vectors
+
+OPTIONAL Boost CycleClock LoopControl
+{
+}
+
+# DGFE
+OPTIONAL HRSCCore
+{
+}

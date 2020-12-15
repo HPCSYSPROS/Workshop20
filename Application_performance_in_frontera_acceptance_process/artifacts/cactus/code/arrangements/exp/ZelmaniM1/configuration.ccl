@@ -1,0 +1,8 @@
+# Configuration definitions for thorn ZelmaniM1
+
+REQUIRES Carpet
+REQUIRES HDF5 GSL
+
+OPTIONAL MPI
+{
+}

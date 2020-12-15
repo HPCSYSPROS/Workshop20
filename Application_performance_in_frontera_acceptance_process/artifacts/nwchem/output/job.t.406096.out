@@ -1,0 +1,1684 @@
+TACC:  Starting up job 406096 
+TACC:  Starting parallel tasks... 
+ argument  1 = flops.nw.t
+                                         
+                                         
+ 
+ 
+              Northwest Computational Chemistry Package (NWChem) 6.6
+              ------------------------------------------------------
+ 
+ 
+                    Environmental Molecular Sciences Laboratory
+                       Pacific Northwest National Laboratory
+                                Richland, WA 99352
+ 
+                              Copyright (c) 1994-2015
+                       Pacific Northwest National Laboratory
+                            Battelle Memorial Institute
+ 
+             NWChem is an open-source computational chemistry package
+                        distributed under the terms of the
+                      Educational Community License (ECL) 2.0
+             A copy of the license is included with this distribution
+                              in the LICENSE.TXT file
+ 
+                                  ACKNOWLEDGMENT
+                                  --------------
+
+            This software and its documentation were developed at the
+            EMSL at Pacific Northwest National Laboratory, a multiprogram
+            national laboratory, operated for the U.S. Department of Energy
+            by Battelle under Contract Number DE-AC05-76RL01830. Support
+            for this work was provided by the Department of Energy Office
+            of Biological and Environmental Research, Office of Basic
+            Energy Sciences, and the Office of Advanced Scientific Computing.
+
+
+           Job information
+           ---------------
+
+    hostname        = c477-111.stampede2.tacc.utexas.edu
+    program         = /scratch/01032/hliu/works/nwchem_blue/nwchem-src-common512/bin/LINUX64/nwchem
+    date            = Wed Nov  8 04:49:40 2017
+
+    compiled        = Fri_Sep_22_14:11:08_2017
+    source          = /scratch/01032/hliu/works/nwchem_blue/nwchem-src
+    nwchem branch   = Development
+    nwchem revision = 27746
+    ga revision     = 10594
+    input           = flops.nw.t
+    prefix          = gg-stack.
+    data base       = ./gg-stack.db
+    status          = restart
+    nproc           =    23552
+    time left       =     -1s
+
+
+
+           Memory information
+           ------------------
+
+    heap     =   26214400 doubles =    200.0 Mbytes
+    stack    =  262143997 doubles =   2000.0 Mbytes
+    global   =  196608000 doubles =   1500.0 Mbytes (distinct from heap & stack)
+    total    =  484966397 doubles =   3700.0 Mbytes
+    verify   = no 
+    hardfail = no 
+
+
+           Directory information
+           ---------------------
+ 
+  0 permanent = .
+  0 scratch   = .
+ 
+ 
+           Previous task information
+           -------------------------
+
+    Theory    = ccsd                            
+    Operation = energy                        
+    Status    = ok                            
+    Qmmm      = F
+    Ignore    = F
+
+ 
+           Geometries in the database
+           --------------------------
+ 
+       Name                              Natoms  Last Modified
+       --------------------------------  ------  ------------------------
+    1  geometry                              32  Wed Nov  8 02:15:05 2017  
+ 
+  The geometry named "geometry" is the default for restart
+ 
+ 
+ 
+           Basis sets in the database
+           --------------------------
+ 
+       Name                              Natoms  Last Modified
+        --------------------------------  ------  ------------------------
+    1  ao basis                               0  Wed Nov  8 02:15:05 2017  
+ 
+  The basis set named "ao basis" is the default AO basis for restart
+ 
+ 
+ 
+ 
+                                NWChem Input Module
+                                -------------------
+ 
+ 
+                                     GG stack
+                                     --------
+  library name resolved from: environment
+  library file name is: <
+ /scratch/01032/hliu/works/nwchem_blue/nwchem-src-common512/src/basis/libraries/
+ >
+  
+                                 NWChem SCF Module
+                                 -----------------
+ 
+ 
+                                     GG stack
+ 
+ 
+
+  ao basis        = "ao basis"
+  functions       =  1242
+  atoms           =    32
+  closed shells   =    78
+  open shells     =     0
+  charge          =   0.00
+  wavefunction    = RHF 
+  input vectors   = ./gg-stack.movecs
+  output vectors  = ./gg-stack.movecs
+  use symmetry    = F
+  symmetry adapt  = F
+
+
+ Summary of "ao basis" -> "ao basis" (spherical)
+ ------------------------------------------------------------------------------
+       Tag                 Description            Shells   Functions and Types
+ ---------------- ------------------------------  ------  ---------------------
+ H                        aug-cc-pvtz                9       23   4s3p2d
+ N                        aug-cc-pvtz               14       46   5s4p3d2f
+ C                        aug-cc-pvtz               14       46   5s4p3d2f
+ O                        aug-cc-pvtz               14       46   5s4p3d2f
+
+
+
+ Forming initial guess at      12.7s
+
+
+ !! The overlap matrix has  22 vectors deemed linearly dependent with
+    eigenvalues:
+ 5.92D-07 6.97D-07 1.18D-06 1.46D-06 1.59D-06 1.66D-06 1.99D-06 2.41D-06
+ 2.75D-06 3.18D-06 3.61D-06 3.76D-06 4.57D-06 5.12D-06 5.64D-06 6.32D-06
+ 6.92D-06 7.67D-06 8.15D-06 8.48D-06 9.36D-06 9.79D-06
+ 
+
+ Loading old vectors from job with title :
+
+GG stack
+
+
+ Starting SCF solution at      14.0s
+
+
+
+ ----------------------------------------------
+         Quadratically convergent ROHF
+
+ Convergence threshold     :          1.000E-06
+ Maximum no. of iterations :          100
+ Final Fock-matrix accuracy:          1.000E-10
+ ----------------------------------------------
+
+
+              iter       energy          gnorm     gmax       time
+             ----- ------------------- --------- --------- --------
+                 1    -1079.1147982784  6.79D-08  5.37D-09     20.0
+
+
+       Final RHF  results 
+       ------------------ 
+
+         Total SCF energy =  -1079.114798278397
+      One-electron energy =  -5267.894316266980
+      Two-electron energy =   2280.969280398926
+ Nuclear repulsion energy =   1907.810237589657
+
+        Time for solution =      7.6s
+
+
+             Final eigenvalues
+             -----------------
+
+              1      
+    1  -20.4999
+    2  -20.4946
+    3  -15.6369
+    4  -15.6362
+    5  -15.6275
+    6  -15.6200
+    7  -15.6199
+    8  -15.6084
+    9  -15.5691
+   10  -15.5562
+   11  -15.5503
+   12  -15.5398
+   13  -11.4053
+   14  -11.3865
+   15  -11.3520
+   16  -11.3460
+   17  -11.3214
+   18  -11.3121
+   19  -11.3103
+   20  -11.2917
+   21  -11.2394
+   22  -11.2262
+   23   -1.3940
+   24   -1.3849
+   25   -1.3470
+   26   -1.3303
+   27   -1.3284
+   28   -1.3263
+   29   -1.2314
+   30   -1.2301
+   31   -1.2155
+   32   -1.2010
+   33   -1.1648
+   34   -1.1437
+   35   -1.0328
+   36   -1.0167
+   37   -0.9103
+   38   -0.9043
+   39   -0.8993
+   40   -0.8930
+   41   -0.8313
+   42   -0.8105
+   43   -0.8027
+   44   -0.7918
+   45   -0.7662
+   46   -0.7524
+   47   -0.7449
+   48   -0.7374
+   49   -0.7065
+   50   -0.6914
+   51   -0.6738
+   52   -0.6723
+   53   -0.6555
+   54   -0.6452
+   55   -0.6331
+   56   -0.6146
+   57   -0.6076
+   58   -0.5920
+   59   -0.5872
+   60   -0.5831
+   61   -0.5801
+   62   -0.5794
+   63   -0.5482
+   64   -0.5271
+   65   -0.4941
+   66   -0.4795
+   67   -0.4528
+   68   -0.4394
+   69   -0.4333
+   70   -0.4302
+   71   -0.4187
+   72   -0.4169
+   73   -0.4139
+   74   -0.4060
+   75   -0.4012
+   76   -0.3835
+   77   -0.2932
+   78   -0.2776
+   79    0.0030
+   80    0.0161
+   81    0.0223
+   82    0.0275
+   83    0.0346
+   84    0.0390
+   85    0.0485
+   86    0.0515
+   87    0.0567
+   88    0.0624
+
+ center of mass
+ --------------
+ x =  -0.00574069 y =   0.04099647 z =   0.04877831
+
+ moments of inertia (a.u.)
+ ------------------
+        5908.724513717324          -0.000000000000          -0.000000000000
+          -0.000000000000        4347.904367270642          -0.000000000000
+          -0.000000000000          -0.000000000000        6891.143597130693
+ 
+  Mulliken analysis of the total density
+  --------------------------------------
+
+    Atom       Charge   Shell Charges
+ -----------   ------   -------------------------------------------------------
+    1 H    1     0.93   0.22  0.44  0.14 -0.00  0.01  0.04  0.05  0.00  0.02
+    2 N    7     7.02   1.95  0.90  0.19  0.45 -0.15  1.00  1.94  0.67  0.01  0.01  0.07 -0.02  0.01  0.00
+    3 C    6     6.27   1.96  0.82  0.16  0.60 -0.06  0.78  1.41  0.35  0.02  0.04  0.16 -0.03  0.02  0.04
+    4 N    7     7.70   1.95  0.95  0.20  0.70  0.11  0.94  1.80  0.86  0.09  0.01  0.08  0.01  0.00  0.00
+    5 C    6     5.50   1.96  0.81  0.16  0.09 -0.02  0.83  1.52  0.22 -0.04  0.03 -0.00  0.02  0.02 -0.09
+    6 C    6     5.25   1.96  0.82  0.17  0.15 -0.05  0.75  1.30  0.10 -0.06  0.05  0.13 -0.08  0.02 -0.02
+    7 O    8     9.08   1.95  1.02  0.23  0.73  0.18  1.23  2.14  1.41  0.13  0.00  0.03  0.02  0.00  0.00
+    8 N    7     6.82   1.95  0.90  0.19  0.46 -0.09  1.03  1.95  0.51 -0.04  0.01  0.05 -0.09  0.00 -0.00
+    9 C    6     5.26   1.96  0.82  0.17  0.33  0.00  0.78  1.32 -0.12 -0.03  0.06  0.15 -0.22  0.02  0.01
+   10 N    7     7.65   1.95  0.89  0.19  0.62  0.06  1.05  1.93  0.93  0.01  0.01  0.03 -0.02  0.00  0.00
+   11 N    7     7.71   1.95  0.93  0.20  0.63  0.23  0.97  1.86  0.81  0.07  0.01  0.06 -0.03  0.00 -0.01
+   12 C    6     5.52   1.96  0.82  0.17  0.14 -0.00  0.78  1.44  0.12  0.01  0.04  0.11 -0.06  0.02 -0.03
+   13 H    1     0.92   0.23  0.44  0.14  0.00  0.01  0.04  0.04  0.00  0.02
+   14 N    7     7.20   1.95  0.90  0.19  0.52 -0.06  1.00  1.93  0.67  0.02  0.01  0.07 -0.01  0.01 -0.00
+   15 C    6     6.17   1.96  0.82  0.16  0.56 -0.10  0.78  1.41  0.34  0.01  0.04  0.16 -0.04  0.02  0.04
+   16 N    7     7.60   1.95  0.95  0.20  0.64  0.08  0.94  1.81  0.87  0.07  0.01  0.08 -0.00  0.00  0.00
+   17 C    6     5.64   1.96  0.81  0.16  0.07  0.02  0.84  1.52  0.26  0.01  0.03 -0.01  0.05  0.02 -0.10
+   18 C    6     5.22   1.96  0.82  0.17  0.21 -0.01  0.75  1.30  0.05 -0.09  0.05  0.12 -0.12  0.02 -0.02
+   19 O    8     9.04   1.95  1.02  0.24  0.73  0.14  1.23  2.13  1.42  0.12  0.00  0.03  0.02  0.00  0.00
+   20 N    7     6.81   1.95  0.90  0.19  0.45 -0.02  1.03  1.96  0.44 -0.06  0.01  0.05 -0.09  0.00 -0.00
+   21 C    6     5.40   1.96  0.81  0.17  0.46  0.01  0.76  1.32 -0.10 -0.01  0.05  0.17 -0.25  0.02  0.02
+   22 N    7     7.71   1.95  0.89  0.19  0.66  0.10  1.04  1.92  0.93  0.00  0.01  0.03 -0.01  0.00  0.00
+   23 N    7     7.66   1.95  0.93  0.20  0.63  0.19  0.97  1.86  0.80  0.06  0.01  0.06 -0.00  0.00 -0.01
+   24 C    6     5.37   1.96  0.82  0.17  0.15 -0.02  0.78  1.45  0.03 -0.04  0.04  0.11 -0.08  0.02 -0.03
+   25 H    1     0.96   0.26  0.44  0.14  0.01  0.02  0.05  0.02  0.00  0.02
+   26 H    1     0.95   0.26  0.46  0.12 -0.00  0.02  0.05  0.02  0.01  0.02
+   27 H    1     0.50   0.26  0.33 -0.10  0.01  0.01  0.00 -0.01  0.00 -0.01
+   28 H    1     0.90   0.26  0.49  0.03  0.01  0.02  0.06  0.01  0.01  0.03
+   29 H    1     0.92   0.26  0.45  0.10 -0.00  0.02  0.05  0.01  0.01  0.02
+   30 H    1     0.91   0.26  0.44  0.10  0.00  0.02  0.05  0.02  0.00  0.02
+   31 H    1     0.92   0.26  0.48  0.04  0.01  0.02  0.06  0.02  0.01  0.03
+   32 H    1     0.49   0.26  0.34 -0.11  0.00  0.01  0.00 -0.01  0.00 -0.01
+ 
+       Multipole analysis of the density wrt the origin
+       ------------------------------------------------
+ 
+     L   x y z        total         open         nuclear
+     -   - - -        -----         ----         -------
+     0   0 0 0     -0.000000      0.000000    156.000000
+ 
+     1   1 0 0     -0.238640      0.000000      0.000000
+     1   0 1 0     -3.381195      0.000000      0.000000
+     1   0 0 1     -4.323027      0.000000      0.000000
+ 
+     2   2 0 0    -75.788348      0.000000   1438.652767
+     2   1 1 0    -22.811072      0.000000    -54.397267
+     2   1 0 1     -0.675283      0.000000     -0.000601
+     2   0 2 0    -83.929611      0.000000   2233.492866
+     2   0 1 1     -7.186266      0.000000      7.472150
+     2   0 0 2   -100.284891      0.000000    892.092986
+ 
+ 
+ 
+                   Four-Index Transformation
+                   -------------------------
+          Number of basis functions:           1242
+          Number of shells:                     398
+          Number of occupied orbitals:           78
+          Number of occ. correlated orbitals:    56
+          Block length:                          16
+          Superscript MO index range:     23 -   78
+          Subscript MO index range:       23 - 1220
+          MO coefficients read from:  ./gg-stack.movecs        
+          Number of operator matrices in core: 3192
+          Half-transformed integrals produced
+ 
+     Pass:    1     Index range:   23  -   78     Time:    399.07
+ ------------------------------------------
+ MP2 Energy (coupled cluster initial guess)
+ ------------------------------------------
+ Reference energy:          -1079.114798278397075
+ MP2 Corr. energy:             -4.106930922569221
+ Total MP2 energy:          -1083.221729200966365
+
+
+ ****************************************************************************
+              the segmented parallel ccsd program:23552 nodes
+ ****************************************************************************
+
+
+
+
+ level of theory    ccsd(t)
+ number of core        22
+ number of occupied    56
+ number of virtual   1142
+ number of deleted      0
+ total functions     1242
+ number of shells     398
+ basis label          566
+
+
+
+   ***** ccsd parameters *****
+   iprt   =     0
+   convi  =  0.100E+04
+   maxit  =    20
+   mxvec  =     5
+ memory             286787444
+  Restarting from old vector in ./gg-stack.t2
+ CCSD is already converged
+ -----------
+ CCSD Energy
+ -----------
+ Reference energy:           -1079.114798278397075
+ CCSD corr. energy:             -4.087536176139623
+ Total CCSD energy:          -1083.202334454536640
+
+
+ --------------------------------
+ Spin Component Scaled (SCS) CCSD
+ --------------------------------
+ Same spin contribution:                 -4.087536176139623
+ Same spin scaling factor:                1.130000000000000
+ Opposite spin contribution:              0.000000000000000
+ Opposite spin scaling fact.:             1.270000000000000
+ SCS-CCSD correlation energy:            -4.618915879037774
+ Total SCS-CCSD energy:               -1083.733714157434861
+ memory             286787444
+
+
+*********triples calculation*********
+
+nkpass=    1; nvpass=    1; memdrv=      262224898; memtrn=       74559159; memavail=      286723468
+ memory available/node                      286723468
+ total number of virtual orbitals      1142
+ number of virtuals per integral pass  1142
+ number of integral evaluations           1
+ number of occupied per triples pass     56
+ number of triples passes                 1
+
+ commencing integral evaluation        1 at         465.63
+  symmetry use  F
+ commencing triples evaluation - blocking       1
+ ccsd(t): done        1 out of     1142 progress:    0.1%
+ ccsd(t): done        2 out of     1142 progress:    0.2%
+ ccsd(t): done        3 out of     1142 progress:    0.3%
+ ccsd(t): done        4 out of     1142 progress:    0.4%
+ ccsd(t): done        5 out of     1142 progress:    0.4%
+ ccsd(t): done        6 out of     1142 progress:    0.5%
+ ccsd(t): done        7 out of     1142 progress:    0.6%
+ ccsd(t): done        8 out of     1142 progress:    0.7%
+ ccsd(t): done        9 out of     1142 progress:    0.8%
+ ccsd(t): done       10 out of     1142 progress:    0.9%
+ ccsd(t): done       11 out of     1142 progress:    1.0%
+ ccsd(t): done       12 out of     1142 progress:    1.1%
+ ccsd(t): done       13 out of     1142 progress:    1.1%
+ ccsd(t): done       14 out of     1142 progress:    1.2%
+ ccsd(t): done       15 out of     1142 progress:    1.3%
+ ccsd(t): done       16 out of     1142 progress:    1.4%
+ ccsd(t): done       17 out of     1142 progress:    1.5%
+ ccsd(t): done       18 out of     1142 progress:    1.6%
+ ccsd(t): done       19 out of     1142 progress:    1.7%
+ ccsd(t): done       20 out of     1142 progress:    1.8%
+ ccsd(t): done       21 out of     1142 progress:    1.8%
+ ccsd(t): done       22 out of     1142 progress:    1.9%
+ ccsd(t): done       23 out of     1142 progress:    2.0%
+ ccsd(t): done       24 out of     1142 progress:    2.1%
+ ccsd(t): done       25 out of     1142 progress:    2.2%
+ ccsd(t): done       26 out of     1142 progress:    2.3%
+ ccsd(t): done       27 out of     1142 progress:    2.4%
+ ccsd(t): done       28 out of     1142 progress:    2.5%
+ ccsd(t): done       29 out of     1142 progress:    2.5%
+ ccsd(t): done       30 out of     1142 progress:    2.6%
+ ccsd(t): done       31 out of     1142 progress:    2.7%
+ ccsd(t): done       32 out of     1142 progress:    2.8%
+ ccsd(t): done       33 out of     1142 progress:    2.9%
+ ccsd(t): done       34 out of     1142 progress:    3.0%
+ ccsd(t): done       35 out of     1142 progress:    3.1%
+ ccsd(t): done       36 out of     1142 progress:    3.2%
+ ccsd(t): done       37 out of     1142 progress:    3.2%
+ ccsd(t): done       38 out of     1142 progress:    3.3%
+ ccsd(t): done       39 out of     1142 progress:    3.4%
+ ccsd(t): done       40 out of     1142 progress:    3.5%
+ ccsd(t): done       41 out of     1142 progress:    3.6%
+ ccsd(t): done       42 out of     1142 progress:    3.7%
+ ccsd(t): done       43 out of     1142 progress:    3.8%
+ ccsd(t): done       44 out of     1142 progress:    3.9%
+ ccsd(t): done       45 out of     1142 progress:    3.9%
+ ccsd(t): done       46 out of     1142 progress:    4.0%
+ ccsd(t): done       47 out of     1142 progress:    4.1%
+ ccsd(t): done       48 out of     1142 progress:    4.2%
+ ccsd(t): done       49 out of     1142 progress:    4.3%
+ ccsd(t): done       50 out of     1142 progress:    4.4%
+ ccsd(t): done       51 out of     1142 progress:    4.5%
+ ccsd(t): done       52 out of     1142 progress:    4.6%
+ ccsd(t): done       53 out of     1142 progress:    4.6%
+ ccsd(t): done       54 out of     1142 progress:    4.7%
+ ccsd(t): done       55 out of     1142 progress:    4.8%
+ ccsd(t): done       56 out of     1142 progress:    4.9%
+ ccsd(t): done       57 out of     1142 progress:    5.0%
+ ccsd(t): done       58 out of     1142 progress:    5.1%
+ ccsd(t): done       59 out of     1142 progress:    5.2%
+ ccsd(t): done       60 out of     1142 progress:    5.3%
+ ccsd(t): done       61 out of     1142 progress:    5.3%
+ ccsd(t): done       62 out of     1142 progress:    5.4%
+ ccsd(t): done       63 out of     1142 progress:    5.5%
+ ccsd(t): done       64 out of     1142 progress:    5.6%
+ ccsd(t): done       65 out of     1142 progress:    5.7%
+ ccsd(t): done       66 out of     1142 progress:    5.8%
+ ccsd(t): done       67 out of     1142 progress:    5.9%
+ ccsd(t): done       68 out of     1142 progress:    6.0%
+ ccsd(t): done       69 out of     1142 progress:    6.0%
+ ccsd(t): done       70 out of     1142 progress:    6.1%
+ ccsd(t): done       71 out of     1142 progress:    6.2%
+ ccsd(t): done       72 out of     1142 progress:    6.3%
+ ccsd(t): done       73 out of     1142 progress:    6.4%
+ ccsd(t): done       74 out of     1142 progress:    6.5%
+ ccsd(t): done       75 out of     1142 progress:    6.6%
+ ccsd(t): done       76 out of     1142 progress:    6.7%
+ ccsd(t): done       77 out of     1142 progress:    6.7%
+ ccsd(t): done       78 out of     1142 progress:    6.8%
+ ccsd(t): done       79 out of     1142 progress:    6.9%
+ ccsd(t): done       80 out of     1142 progress:    7.0%
+ ccsd(t): done       81 out of     1142 progress:    7.1%
+ ccsd(t): done       82 out of     1142 progress:    7.2%
+ ccsd(t): done       83 out of     1142 progress:    7.3%
+ ccsd(t): done       84 out of     1142 progress:    7.4%
+ ccsd(t): done       85 out of     1142 progress:    7.4%
+ ccsd(t): done       86 out of     1142 progress:    7.5%
+ ccsd(t): done       87 out of     1142 progress:    7.6%
+ ccsd(t): done       88 out of     1142 progress:    7.7%
+ ccsd(t): done       89 out of     1142 progress:    7.8%
+ ccsd(t): done       90 out of     1142 progress:    7.9%
+ ccsd(t): done       91 out of     1142 progress:    8.0%
+ ccsd(t): done       92 out of     1142 progress:    8.1%
+ ccsd(t): done       93 out of     1142 progress:    8.1%
+ ccsd(t): done       94 out of     1142 progress:    8.2%
+ ccsd(t): done       95 out of     1142 progress:    8.3%
+ ccsd(t): done       96 out of     1142 progress:    8.4%
+ ccsd(t): done       97 out of     1142 progress:    8.5%
+ ccsd(t): done       98 out of     1142 progress:    8.6%
+ ccsd(t): done       99 out of     1142 progress:    8.7%
+ ccsd(t): done      100 out of     1142 progress:    8.8%
+ ccsd(t): done      101 out of     1142 progress:    8.8%
+ ccsd(t): done      102 out of     1142 progress:    8.9%
+ ccsd(t): done      103 out of     1142 progress:    9.0%
+ ccsd(t): done      104 out of     1142 progress:    9.1%
+ ccsd(t): done      105 out of     1142 progress:    9.2%
+ ccsd(t): done      106 out of     1142 progress:    9.3%
+ ccsd(t): done      107 out of     1142 progress:    9.4%
+ ccsd(t): done      108 out of     1142 progress:    9.5%
+ ccsd(t): done      109 out of     1142 progress:    9.5%
+ ccsd(t): done      110 out of     1142 progress:    9.6%
+ ccsd(t): done      111 out of     1142 progress:    9.7%
+ ccsd(t): done      112 out of     1142 progress:    9.8%
+ ccsd(t): done      113 out of     1142 progress:    9.9%
+ ccsd(t): done      114 out of     1142 progress:   10.0%
+ ccsd(t): done      115 out of     1142 progress:   10.1%
+ ccsd(t): done      116 out of     1142 progress:   10.2%
+ ccsd(t): done      117 out of     1142 progress:   10.2%
+ ccsd(t): done      118 out of     1142 progress:   10.3%
+ ccsd(t): done      119 out of     1142 progress:   10.4%
+ ccsd(t): done      120 out of     1142 progress:   10.5%
+ ccsd(t): done      121 out of     1142 progress:   10.6%
+ ccsd(t): done      122 out of     1142 progress:   10.7%
+ ccsd(t): done      123 out of     1142 progress:   10.8%
+ ccsd(t): done      124 out of     1142 progress:   10.9%
+ ccsd(t): done      125 out of     1142 progress:   10.9%
+ ccsd(t): done      126 out of     1142 progress:   11.0%
+ ccsd(t): done      127 out of     1142 progress:   11.1%
+ ccsd(t): done      128 out of     1142 progress:   11.2%
+ ccsd(t): done      129 out of     1142 progress:   11.3%
+ ccsd(t): done      130 out of     1142 progress:   11.4%
+ ccsd(t): done      131 out of     1142 progress:   11.5%
+ ccsd(t): done      132 out of     1142 progress:   11.6%
+ ccsd(t): done      133 out of     1142 progress:   11.6%
+ ccsd(t): done      134 out of     1142 progress:   11.7%
+ ccsd(t): done      135 out of     1142 progress:   11.8%
+ ccsd(t): done      136 out of     1142 progress:   11.9%
+ ccsd(t): done      137 out of     1142 progress:   12.0%
+ ccsd(t): done      138 out of     1142 progress:   12.1%
+ ccsd(t): done      139 out of     1142 progress:   12.2%
+ ccsd(t): done      140 out of     1142 progress:   12.3%
+ ccsd(t): done      141 out of     1142 progress:   12.3%
+ ccsd(t): done      142 out of     1142 progress:   12.4%
+ ccsd(t): done      143 out of     1142 progress:   12.5%
+ ccsd(t): done      144 out of     1142 progress:   12.6%
+ ccsd(t): done      145 out of     1142 progress:   12.7%
+ ccsd(t): done      146 out of     1142 progress:   12.8%
+ ccsd(t): done      147 out of     1142 progress:   12.9%
+ ccsd(t): done      148 out of     1142 progress:   13.0%
+ ccsd(t): done      149 out of     1142 progress:   13.0%
+ ccsd(t): done      150 out of     1142 progress:   13.1%
+ ccsd(t): done      151 out of     1142 progress:   13.2%
+ ccsd(t): done      152 out of     1142 progress:   13.3%
+ ccsd(t): done      153 out of     1142 progress:   13.4%
+ ccsd(t): done      154 out of     1142 progress:   13.5%
+ ccsd(t): done      155 out of     1142 progress:   13.6%
+ ccsd(t): done      156 out of     1142 progress:   13.7%
+ ccsd(t): done      157 out of     1142 progress:   13.7%
+ ccsd(t): done      158 out of     1142 progress:   13.8%
+ ccsd(t): done      159 out of     1142 progress:   13.9%
+ ccsd(t): done      160 out of     1142 progress:   14.0%
+ ccsd(t): done      161 out of     1142 progress:   14.1%
+ ccsd(t): done      162 out of     1142 progress:   14.2%
+ ccsd(t): done      163 out of     1142 progress:   14.3%
+ ccsd(t): done      164 out of     1142 progress:   14.4%
+ ccsd(t): done      165 out of     1142 progress:   14.4%
+ ccsd(t): done      166 out of     1142 progress:   14.5%
+ ccsd(t): done      167 out of     1142 progress:   14.6%
+ ccsd(t): done      168 out of     1142 progress:   14.7%
+ ccsd(t): done      169 out of     1142 progress:   14.8%
+ ccsd(t): done      170 out of     1142 progress:   14.9%
+ ccsd(t): done      171 out of     1142 progress:   15.0%
+ ccsd(t): done      172 out of     1142 progress:   15.1%
+ ccsd(t): done      173 out of     1142 progress:   15.1%
+ ccsd(t): done      174 out of     1142 progress:   15.2%
+ ccsd(t): done      175 out of     1142 progress:   15.3%
+ ccsd(t): done      176 out of     1142 progress:   15.4%
+ ccsd(t): done      177 out of     1142 progress:   15.5%
+ ccsd(t): done      178 out of     1142 progress:   15.6%
+ ccsd(t): done      179 out of     1142 progress:   15.7%
+ ccsd(t): done      180 out of     1142 progress:   15.8%
+ ccsd(t): done      181 out of     1142 progress:   15.8%
+ ccsd(t): done      182 out of     1142 progress:   15.9%
+ ccsd(t): done      183 out of     1142 progress:   16.0%
+ ccsd(t): done      184 out of     1142 progress:   16.1%
+ ccsd(t): done      185 out of     1142 progress:   16.2%
+ ccsd(t): done      186 out of     1142 progress:   16.3%
+ ccsd(t): done      187 out of     1142 progress:   16.4%
+ ccsd(t): done      188 out of     1142 progress:   16.5%
+ ccsd(t): done      189 out of     1142 progress:   16.5%
+ ccsd(t): done      190 out of     1142 progress:   16.6%
+ ccsd(t): done      191 out of     1142 progress:   16.7%
+ ccsd(t): done      192 out of     1142 progress:   16.8%
+ ccsd(t): done      193 out of     1142 progress:   16.9%
+ ccsd(t): done      194 out of     1142 progress:   17.0%
+ ccsd(t): done      195 out of     1142 progress:   17.1%
+ ccsd(t): done      196 out of     1142 progress:   17.2%
+ ccsd(t): done      197 out of     1142 progress:   17.3%
+ ccsd(t): done      198 out of     1142 progress:   17.3%
+ ccsd(t): done      199 out of     1142 progress:   17.4%
+ ccsd(t): done      200 out of     1142 progress:   17.5%
+ ccsd(t): done      201 out of     1142 progress:   17.6%
+ ccsd(t): done      202 out of     1142 progress:   17.7%
+ ccsd(t): done      203 out of     1142 progress:   17.8%
+ ccsd(t): done      204 out of     1142 progress:   17.9%
+ ccsd(t): done      205 out of     1142 progress:   18.0%
+ ccsd(t): done      206 out of     1142 progress:   18.0%
+ ccsd(t): done      207 out of     1142 progress:   18.1%
+ ccsd(t): done      208 out of     1142 progress:   18.2%
+ ccsd(t): done      209 out of     1142 progress:   18.3%
+ ccsd(t): done      210 out of     1142 progress:   18.4%
+ ccsd(t): done      211 out of     1142 progress:   18.5%
+ ccsd(t): done      212 out of     1142 progress:   18.6%
+ ccsd(t): done      213 out of     1142 progress:   18.7%
+ ccsd(t): done      214 out of     1142 progress:   18.7%
+ ccsd(t): done      215 out of     1142 progress:   18.8%
+ ccsd(t): done      216 out of     1142 progress:   18.9%
+ ccsd(t): done      217 out of     1142 progress:   19.0%
+ ccsd(t): done      218 out of     1142 progress:   19.1%
+ ccsd(t): done      219 out of     1142 progress:   19.2%
+ ccsd(t): done      220 out of     1142 progress:   19.3%
+ ccsd(t): done      221 out of     1142 progress:   19.4%
+ ccsd(t): done      222 out of     1142 progress:   19.4%
+ ccsd(t): done      223 out of     1142 progress:   19.5%
+ ccsd(t): done      224 out of     1142 progress:   19.6%
+ ccsd(t): done      225 out of     1142 progress:   19.7%
+ ccsd(t): done      226 out of     1142 progress:   19.8%
+ ccsd(t): done      227 out of     1142 progress:   19.9%
+ ccsd(t): done      228 out of     1142 progress:   20.0%
+ ccsd(t): done      229 out of     1142 progress:   20.1%
+ ccsd(t): done      230 out of     1142 progress:   20.1%
+ ccsd(t): done      231 out of     1142 progress:   20.2%
+ ccsd(t): done      232 out of     1142 progress:   20.3%
+ ccsd(t): done      233 out of     1142 progress:   20.4%
+ ccsd(t): done      234 out of     1142 progress:   20.5%
+ ccsd(t): done      235 out of     1142 progress:   20.6%
+ ccsd(t): done      236 out of     1142 progress:   20.7%
+ ccsd(t): done      237 out of     1142 progress:   20.8%
+ ccsd(t): done      238 out of     1142 progress:   20.8%
+ ccsd(t): done      239 out of     1142 progress:   20.9%
+ ccsd(t): done      240 out of     1142 progress:   21.0%
+ ccsd(t): done      241 out of     1142 progress:   21.1%
+ ccsd(t): done      242 out of     1142 progress:   21.2%
+ ccsd(t): done      243 out of     1142 progress:   21.3%
+ ccsd(t): done      244 out of     1142 progress:   21.4%
+ ccsd(t): done      245 out of     1142 progress:   21.5%
+ ccsd(t): done      246 out of     1142 progress:   21.5%
+ ccsd(t): done      247 out of     1142 progress:   21.6%
+ ccsd(t): done      248 out of     1142 progress:   21.7%
+ ccsd(t): done      249 out of     1142 progress:   21.8%
+ ccsd(t): done      250 out of     1142 progress:   21.9%
+ ccsd(t): done      251 out of     1142 progress:   22.0%
+ ccsd(t): done      252 out of     1142 progress:   22.1%
+ ccsd(t): done      253 out of     1142 progress:   22.2%
+ ccsd(t): done      254 out of     1142 progress:   22.2%
+ ccsd(t): done      255 out of     1142 progress:   22.3%
+ ccsd(t): done      256 out of     1142 progress:   22.4%
+ ccsd(t): done      257 out of     1142 progress:   22.5%
+ ccsd(t): done      258 out of     1142 progress:   22.6%
+ ccsd(t): done      259 out of     1142 progress:   22.7%
+ ccsd(t): done      260 out of     1142 progress:   22.8%
+ ccsd(t): done      261 out of     1142 progress:   22.9%
+ ccsd(t): done      262 out of     1142 progress:   22.9%
+ ccsd(t): done      263 out of     1142 progress:   23.0%
+ ccsd(t): done      264 out of     1142 progress:   23.1%
+ ccsd(t): done      265 out of     1142 progress:   23.2%
+ ccsd(t): done      266 out of     1142 progress:   23.3%
+ ccsd(t): done      267 out of     1142 progress:   23.4%
+ ccsd(t): done      268 out of     1142 progress:   23.5%
+ ccsd(t): done      269 out of     1142 progress:   23.6%
+ ccsd(t): done      270 out of     1142 progress:   23.6%
+ ccsd(t): done      271 out of     1142 progress:   23.7%
+ ccsd(t): done      272 out of     1142 progress:   23.8%
+ ccsd(t): done      273 out of     1142 progress:   23.9%
+ ccsd(t): done      274 out of     1142 progress:   24.0%
+ ccsd(t): done      275 out of     1142 progress:   24.1%
+ ccsd(t): done      276 out of     1142 progress:   24.2%
+ ccsd(t): done      277 out of     1142 progress:   24.3%
+ ccsd(t): done      278 out of     1142 progress:   24.3%
+ ccsd(t): done      279 out of     1142 progress:   24.4%
+ ccsd(t): done      280 out of     1142 progress:   24.5%
+ ccsd(t): done      281 out of     1142 progress:   24.6%
+ ccsd(t): done      282 out of     1142 progress:   24.7%
+ ccsd(t): done      283 out of     1142 progress:   24.8%
+ ccsd(t): done      284 out of     1142 progress:   24.9%
+ ccsd(t): done      285 out of     1142 progress:   25.0%
+ ccsd(t): done      286 out of     1142 progress:   25.0%
+ ccsd(t): done      287 out of     1142 progress:   25.1%
+ ccsd(t): done      288 out of     1142 progress:   25.2%
+ ccsd(t): done      289 out of     1142 progress:   25.3%
+ ccsd(t): done      290 out of     1142 progress:   25.4%
+ ccsd(t): done      291 out of     1142 progress:   25.5%
+ ccsd(t): done      292 out of     1142 progress:   25.6%
+ ccsd(t): done      293 out of     1142 progress:   25.7%
+ ccsd(t): done      294 out of     1142 progress:   25.7%
+ ccsd(t): done      295 out of     1142 progress:   25.8%
+ ccsd(t): done      296 out of     1142 progress:   25.9%
+ ccsd(t): done      297 out of     1142 progress:   26.0%
+ ccsd(t): done      298 out of     1142 progress:   26.1%
+ ccsd(t): done      299 out of     1142 progress:   26.2%
+ ccsd(t): done      300 out of     1142 progress:   26.3%
+ ccsd(t): done      301 out of     1142 progress:   26.4%
+ ccsd(t): done      302 out of     1142 progress:   26.4%
+ ccsd(t): done      303 out of     1142 progress:   26.5%
+ ccsd(t): done      304 out of     1142 progress:   26.6%
+ ccsd(t): done      305 out of     1142 progress:   26.7%
+ ccsd(t): done      306 out of     1142 progress:   26.8%
+ ccsd(t): done      307 out of     1142 progress:   26.9%
+ ccsd(t): done      308 out of     1142 progress:   27.0%
+ ccsd(t): done      309 out of     1142 progress:   27.1%
+ ccsd(t): done      310 out of     1142 progress:   27.1%
+ ccsd(t): done      311 out of     1142 progress:   27.2%
+ ccsd(t): done      312 out of     1142 progress:   27.3%
+ ccsd(t): done      313 out of     1142 progress:   27.4%
+ ccsd(t): done      314 out of     1142 progress:   27.5%
+ ccsd(t): done      315 out of     1142 progress:   27.6%
+ ccsd(t): done      316 out of     1142 progress:   27.7%
+ ccsd(t): done      317 out of     1142 progress:   27.8%
+ ccsd(t): done      318 out of     1142 progress:   27.8%
+ ccsd(t): done      319 out of     1142 progress:   27.9%
+ ccsd(t): done      320 out of     1142 progress:   28.0%
+ ccsd(t): done      321 out of     1142 progress:   28.1%
+ ccsd(t): done      322 out of     1142 progress:   28.2%
+ ccsd(t): done      323 out of     1142 progress:   28.3%
+ ccsd(t): done      324 out of     1142 progress:   28.4%
+ ccsd(t): done      325 out of     1142 progress:   28.5%
+ ccsd(t): done      326 out of     1142 progress:   28.5%
+ ccsd(t): done      327 out of     1142 progress:   28.6%
+ ccsd(t): done      328 out of     1142 progress:   28.7%
+ ccsd(t): done      329 out of     1142 progress:   28.8%
+ ccsd(t): done      330 out of     1142 progress:   28.9%
+ ccsd(t): done      331 out of     1142 progress:   29.0%
+ ccsd(t): done      332 out of     1142 progress:   29.1%
+ ccsd(t): done      333 out of     1142 progress:   29.2%
+ ccsd(t): done      334 out of     1142 progress:   29.2%
+ ccsd(t): done      335 out of     1142 progress:   29.3%
+ ccsd(t): done      336 out of     1142 progress:   29.4%
+ ccsd(t): done      337 out of     1142 progress:   29.5%
+ ccsd(t): done      338 out of     1142 progress:   29.6%
+ ccsd(t): done      339 out of     1142 progress:   29.7%
+ ccsd(t): done      340 out of     1142 progress:   29.8%
+ ccsd(t): done      341 out of     1142 progress:   29.9%
+ ccsd(t): done      342 out of     1142 progress:   29.9%
+ ccsd(t): done      343 out of     1142 progress:   30.0%
+ ccsd(t): done      344 out of     1142 progress:   30.1%
+ ccsd(t): done      345 out of     1142 progress:   30.2%
+ ccsd(t): done      346 out of     1142 progress:   30.3%
+ ccsd(t): done      347 out of     1142 progress:   30.4%
+ ccsd(t): done      348 out of     1142 progress:   30.5%
+ ccsd(t): done      349 out of     1142 progress:   30.6%
+ ccsd(t): done      350 out of     1142 progress:   30.6%
+ ccsd(t): done      351 out of     1142 progress:   30.7%
+ ccsd(t): done      352 out of     1142 progress:   30.8%
+ ccsd(t): done      353 out of     1142 progress:   30.9%
+ ccsd(t): done      354 out of     1142 progress:   31.0%
+ ccsd(t): done      355 out of     1142 progress:   31.1%
+ ccsd(t): done      356 out of     1142 progress:   31.2%
+ ccsd(t): done      357 out of     1142 progress:   31.3%
+ ccsd(t): done      358 out of     1142 progress:   31.3%
+ ccsd(t): done      359 out of     1142 progress:   31.4%
+ ccsd(t): done      360 out of     1142 progress:   31.5%
+ ccsd(t): done      361 out of     1142 progress:   31.6%
+ ccsd(t): done      362 out of     1142 progress:   31.7%
+ ccsd(t): done      363 out of     1142 progress:   31.8%
+ ccsd(t): done      364 out of     1142 progress:   31.9%
+ ccsd(t): done      365 out of     1142 progress:   32.0%
+ ccsd(t): done      366 out of     1142 progress:   32.0%
+ ccsd(t): done      367 out of     1142 progress:   32.1%
+ ccsd(t): done      368 out of     1142 progress:   32.2%
+ ccsd(t): done      369 out of     1142 progress:   32.3%
+ ccsd(t): done      370 out of     1142 progress:   32.4%
+ ccsd(t): done      371 out of     1142 progress:   32.5%
+ ccsd(t): done      372 out of     1142 progress:   32.6%
+ ccsd(t): done      373 out of     1142 progress:   32.7%
+ ccsd(t): done      374 out of     1142 progress:   32.7%
+ ccsd(t): done      375 out of     1142 progress:   32.8%
+ ccsd(t): done      376 out of     1142 progress:   32.9%
+ ccsd(t): done      377 out of     1142 progress:   33.0%
+ ccsd(t): done      378 out of     1142 progress:   33.1%
+ ccsd(t): done      379 out of     1142 progress:   33.2%
+ ccsd(t): done      380 out of     1142 progress:   33.3%
+ ccsd(t): done      381 out of     1142 progress:   33.4%
+ ccsd(t): done      382 out of     1142 progress:   33.5%
+ ccsd(t): done      383 out of     1142 progress:   33.5%
+ ccsd(t): done      384 out of     1142 progress:   33.6%
+ ccsd(t): done      385 out of     1142 progress:   33.7%
+ ccsd(t): done      386 out of     1142 progress:   33.8%
+ ccsd(t): done      387 out of     1142 progress:   33.9%
+ ccsd(t): done      388 out of     1142 progress:   34.0%
+ ccsd(t): done      389 out of     1142 progress:   34.1%
+ ccsd(t): done      390 out of     1142 progress:   34.2%
+ ccsd(t): done      391 out of     1142 progress:   34.2%
+ ccsd(t): done      392 out of     1142 progress:   34.3%
+ ccsd(t): done      393 out of     1142 progress:   34.4%
+ ccsd(t): done      394 out of     1142 progress:   34.5%
+ ccsd(t): done      395 out of     1142 progress:   34.6%
+ ccsd(t): done      396 out of     1142 progress:   34.7%
+ ccsd(t): done      397 out of     1142 progress:   34.8%
+ ccsd(t): done      398 out of     1142 progress:   34.9%
+ ccsd(t): done      399 out of     1142 progress:   34.9%
+ ccsd(t): done      400 out of     1142 progress:   35.0%
+ ccsd(t): done      401 out of     1142 progress:   35.1%
+ ccsd(t): done      402 out of     1142 progress:   35.2%
+ ccsd(t): done      403 out of     1142 progress:   35.3%
+ ccsd(t): done      404 out of     1142 progress:   35.4%
+ ccsd(t): done      405 out of     1142 progress:   35.5%
+ ccsd(t): done      406 out of     1142 progress:   35.6%
+ ccsd(t): done      407 out of     1142 progress:   35.6%
+ ccsd(t): done      408 out of     1142 progress:   35.7%
+ ccsd(t): done      409 out of     1142 progress:   35.8%
+ ccsd(t): done      410 out of     1142 progress:   35.9%
+ ccsd(t): done      411 out of     1142 progress:   36.0%
+ ccsd(t): done      412 out of     1142 progress:   36.1%
+ ccsd(t): done      413 out of     1142 progress:   36.2%
+ ccsd(t): done      414 out of     1142 progress:   36.3%
+ ccsd(t): done      415 out of     1142 progress:   36.3%
+ ccsd(t): done      416 out of     1142 progress:   36.4%
+ ccsd(t): done      417 out of     1142 progress:   36.5%
+ ccsd(t): done      418 out of     1142 progress:   36.6%
+ ccsd(t): done      419 out of     1142 progress:   36.7%
+ ccsd(t): done      420 out of     1142 progress:   36.8%
+ ccsd(t): done      421 out of     1142 progress:   36.9%
+ ccsd(t): done      422 out of     1142 progress:   37.0%
+ ccsd(t): done      423 out of     1142 progress:   37.0%
+ ccsd(t): done      424 out of     1142 progress:   37.1%
+ ccsd(t): done      425 out of     1142 progress:   37.2%
+ ccsd(t): done      426 out of     1142 progress:   37.3%
+ ccsd(t): done      427 out of     1142 progress:   37.4%
+ ccsd(t): done      428 out of     1142 progress:   37.5%
+ ccsd(t): done      429 out of     1142 progress:   37.6%
+ ccsd(t): done      430 out of     1142 progress:   37.7%
+ ccsd(t): done      431 out of     1142 progress:   37.7%
+ ccsd(t): done      432 out of     1142 progress:   37.8%
+ ccsd(t): done      433 out of     1142 progress:   37.9%
+ ccsd(t): done      434 out of     1142 progress:   38.0%
+ ccsd(t): done      435 out of     1142 progress:   38.1%
+ ccsd(t): done      436 out of     1142 progress:   38.2%
+ ccsd(t): done      437 out of     1142 progress:   38.3%
+ ccsd(t): done      438 out of     1142 progress:   38.4%
+ ccsd(t): done      439 out of     1142 progress:   38.4%
+ ccsd(t): done      440 out of     1142 progress:   38.5%
+ ccsd(t): done      441 out of     1142 progress:   38.6%
+ ccsd(t): done      442 out of     1142 progress:   38.7%
+ ccsd(t): done      443 out of     1142 progress:   38.8%
+ ccsd(t): done      444 out of     1142 progress:   38.9%
+ ccsd(t): done      445 out of     1142 progress:   39.0%
+ ccsd(t): done      446 out of     1142 progress:   39.1%
+ ccsd(t): done      447 out of     1142 progress:   39.1%
+ ccsd(t): done      448 out of     1142 progress:   39.2%
+ ccsd(t): done      449 out of     1142 progress:   39.3%
+ ccsd(t): done      450 out of     1142 progress:   39.4%
+ ccsd(t): done      451 out of     1142 progress:   39.5%
+ ccsd(t): done      452 out of     1142 progress:   39.6%
+ ccsd(t): done      453 out of     1142 progress:   39.7%
+ ccsd(t): done      454 out of     1142 progress:   39.8%
+ ccsd(t): done      455 out of     1142 progress:   39.8%
+ ccsd(t): done      456 out of     1142 progress:   39.9%
+ ccsd(t): done      457 out of     1142 progress:   40.0%
+ ccsd(t): done      458 out of     1142 progress:   40.1%
+ ccsd(t): done      459 out of     1142 progress:   40.2%
+ ccsd(t): done      460 out of     1142 progress:   40.3%
+ ccsd(t): done      461 out of     1142 progress:   40.4%
+ ccsd(t): done      462 out of     1142 progress:   40.5%
+ ccsd(t): done      463 out of     1142 progress:   40.5%
+ ccsd(t): done      464 out of     1142 progress:   40.6%
+ ccsd(t): done      465 out of     1142 progress:   40.7%
+ ccsd(t): done      466 out of     1142 progress:   40.8%
+ ccsd(t): done      467 out of     1142 progress:   40.9%
+ ccsd(t): done      468 out of     1142 progress:   41.0%
+ ccsd(t): done      469 out of     1142 progress:   41.1%
+ ccsd(t): done      470 out of     1142 progress:   41.2%
+ ccsd(t): done      471 out of     1142 progress:   41.2%
+ ccsd(t): done      472 out of     1142 progress:   41.3%
+ ccsd(t): done      473 out of     1142 progress:   41.4%
+ ccsd(t): done      474 out of     1142 progress:   41.5%
+ ccsd(t): done      475 out of     1142 progress:   41.6%
+ ccsd(t): done      476 out of     1142 progress:   41.7%
+ ccsd(t): done      477 out of     1142 progress:   41.8%
+ ccsd(t): done      478 out of     1142 progress:   41.9%
+ ccsd(t): done      479 out of     1142 progress:   41.9%
+ ccsd(t): done      480 out of     1142 progress:   42.0%
+ ccsd(t): done      481 out of     1142 progress:   42.1%
+ ccsd(t): done      482 out of     1142 progress:   42.2%
+ ccsd(t): done      483 out of     1142 progress:   42.3%
+ ccsd(t): done      484 out of     1142 progress:   42.4%
+ ccsd(t): done      485 out of     1142 progress:   42.5%
+ ccsd(t): done      486 out of     1142 progress:   42.6%
+ ccsd(t): done      487 out of     1142 progress:   42.6%
+ ccsd(t): done      488 out of     1142 progress:   42.7%
+ ccsd(t): done      489 out of     1142 progress:   42.8%
+ ccsd(t): done      490 out of     1142 progress:   42.9%
+ ccsd(t): done      491 out of     1142 progress:   43.0%
+ ccsd(t): done      492 out of     1142 progress:   43.1%
+ ccsd(t): done      493 out of     1142 progress:   43.2%
+ ccsd(t): done      494 out of     1142 progress:   43.3%
+ ccsd(t): done      495 out of     1142 progress:   43.3%
+ ccsd(t): done      496 out of     1142 progress:   43.4%
+ ccsd(t): done      497 out of     1142 progress:   43.5%
+ ccsd(t): done      498 out of     1142 progress:   43.6%
+ ccsd(t): done      499 out of     1142 progress:   43.7%
+ ccsd(t): done      500 out of     1142 progress:   43.8%
+ ccsd(t): done      501 out of     1142 progress:   43.9%
+ ccsd(t): done      502 out of     1142 progress:   44.0%
+ ccsd(t): done      503 out of     1142 progress:   44.0%
+ ccsd(t): done      504 out of     1142 progress:   44.1%
+ ccsd(t): done      505 out of     1142 progress:   44.2%
+ ccsd(t): done      506 out of     1142 progress:   44.3%
+ ccsd(t): done      507 out of     1142 progress:   44.4%
+ ccsd(t): done      508 out of     1142 progress:   44.5%
+ ccsd(t): done      509 out of     1142 progress:   44.6%
+ ccsd(t): done      510 out of     1142 progress:   44.7%
+ ccsd(t): done      511 out of     1142 progress:   44.7%
+ ccsd(t): done      512 out of     1142 progress:   44.8%
+ ccsd(t): done      513 out of     1142 progress:   44.9%
+ ccsd(t): done      514 out of     1142 progress:   45.0%
+ ccsd(t): done      515 out of     1142 progress:   45.1%
+ ccsd(t): done      516 out of     1142 progress:   45.2%
+ ccsd(t): done      517 out of     1142 progress:   45.3%
+ ccsd(t): done      518 out of     1142 progress:   45.4%
+ ccsd(t): done      519 out of     1142 progress:   45.4%
+ ccsd(t): done      520 out of     1142 progress:   45.5%
+ ccsd(t): done      521 out of     1142 progress:   45.6%
+ ccsd(t): done      522 out of     1142 progress:   45.7%
+ ccsd(t): done      523 out of     1142 progress:   45.8%
+ ccsd(t): done      524 out of     1142 progress:   45.9%
+ ccsd(t): done      525 out of     1142 progress:   46.0%
+ ccsd(t): done      526 out of     1142 progress:   46.1%
+ ccsd(t): done      527 out of     1142 progress:   46.1%
+ ccsd(t): done      528 out of     1142 progress:   46.2%
+ ccsd(t): done      529 out of     1142 progress:   46.3%
+ ccsd(t): done      530 out of     1142 progress:   46.4%
+ ccsd(t): done      531 out of     1142 progress:   46.5%
+ ccsd(t): done      532 out of     1142 progress:   46.6%
+ ccsd(t): done      533 out of     1142 progress:   46.7%
+ ccsd(t): done      534 out of     1142 progress:   46.8%
+ ccsd(t): done      535 out of     1142 progress:   46.8%
+ ccsd(t): done      536 out of     1142 progress:   46.9%
+ ccsd(t): done      537 out of     1142 progress:   47.0%
+ ccsd(t): done      538 out of     1142 progress:   47.1%
+ ccsd(t): done      539 out of     1142 progress:   47.2%
+ ccsd(t): done      540 out of     1142 progress:   47.3%
+ ccsd(t): done      541 out of     1142 progress:   47.4%
+ ccsd(t): done      542 out of     1142 progress:   47.5%
+ ccsd(t): done      543 out of     1142 progress:   47.5%
+ ccsd(t): done      544 out of     1142 progress:   47.6%
+ ccsd(t): done      545 out of     1142 progress:   47.7%
+ ccsd(t): done      546 out of     1142 progress:   47.8%
+ ccsd(t): done      547 out of     1142 progress:   47.9%
+ ccsd(t): done      548 out of     1142 progress:   48.0%
+ ccsd(t): done      549 out of     1142 progress:   48.1%
+ ccsd(t): done      550 out of     1142 progress:   48.2%
+ ccsd(t): done      551 out of     1142 progress:   48.2%
+ ccsd(t): done      552 out of     1142 progress:   48.3%
+ ccsd(t): done      553 out of     1142 progress:   48.4%
+ ccsd(t): done      554 out of     1142 progress:   48.5%
+ ccsd(t): done      555 out of     1142 progress:   48.6%
+ ccsd(t): done      556 out of     1142 progress:   48.7%
+ ccsd(t): done      557 out of     1142 progress:   48.8%
+ ccsd(t): done      558 out of     1142 progress:   48.9%
+ ccsd(t): done      559 out of     1142 progress:   48.9%
+ ccsd(t): done      560 out of     1142 progress:   49.0%
+ ccsd(t): done      561 out of     1142 progress:   49.1%
+ ccsd(t): done      562 out of     1142 progress:   49.2%
+ ccsd(t): done      563 out of     1142 progress:   49.3%
+ ccsd(t): done      564 out of     1142 progress:   49.4%
+ ccsd(t): done      565 out of     1142 progress:   49.5%
+ ccsd(t): done      566 out of     1142 progress:   49.6%
+ ccsd(t): done      567 out of     1142 progress:   49.6%
+ ccsd(t): done      568 out of     1142 progress:   49.7%
+ ccsd(t): done      569 out of     1142 progress:   49.8%
+ ccsd(t): done      570 out of     1142 progress:   49.9%
+ ccsd(t): done      571 out of     1142 progress:   50.0%
+ ccsd(t): done      572 out of     1142 progress:   50.1%
+ ccsd(t): done      573 out of     1142 progress:   50.2%
+ ccsd(t): done      574 out of     1142 progress:   50.3%
+ ccsd(t): done      575 out of     1142 progress:   50.4%
+ ccsd(t): done      576 out of     1142 progress:   50.4%
+ ccsd(t): done      577 out of     1142 progress:   50.5%
+ ccsd(t): done      578 out of     1142 progress:   50.6%
+ ccsd(t): done      579 out of     1142 progress:   50.7%
+ ccsd(t): done      580 out of     1142 progress:   50.8%
+ ccsd(t): done      581 out of     1142 progress:   50.9%
+ ccsd(t): done      582 out of     1142 progress:   51.0%
+ ccsd(t): done      583 out of     1142 progress:   51.1%
+ ccsd(t): done      584 out of     1142 progress:   51.1%
+ ccsd(t): done      585 out of     1142 progress:   51.2%
+ ccsd(t): done      586 out of     1142 progress:   51.3%
+ ccsd(t): done      587 out of     1142 progress:   51.4%
+ ccsd(t): done      588 out of     1142 progress:   51.5%
+ ccsd(t): done      589 out of     1142 progress:   51.6%
+ ccsd(t): done      590 out of     1142 progress:   51.7%
+ ccsd(t): done      591 out of     1142 progress:   51.8%
+ ccsd(t): done      592 out of     1142 progress:   51.8%
+ ccsd(t): done      593 out of     1142 progress:   51.9%
+ ccsd(t): done      594 out of     1142 progress:   52.0%
+ ccsd(t): done      595 out of     1142 progress:   52.1%
+ ccsd(t): done      596 out of     1142 progress:   52.2%
+ ccsd(t): done      597 out of     1142 progress:   52.3%
+ ccsd(t): done      598 out of     1142 progress:   52.4%
+ ccsd(t): done      599 out of     1142 progress:   52.5%
+ ccsd(t): done      600 out of     1142 progress:   52.5%
+ ccsd(t): done      601 out of     1142 progress:   52.6%
+ ccsd(t): done      602 out of     1142 progress:   52.7%
+ ccsd(t): done      603 out of     1142 progress:   52.8%
+ ccsd(t): done      604 out of     1142 progress:   52.9%
+ ccsd(t): done      605 out of     1142 progress:   53.0%
+ ccsd(t): done      606 out of     1142 progress:   53.1%
+ ccsd(t): done      607 out of     1142 progress:   53.2%
+ ccsd(t): done      608 out of     1142 progress:   53.2%
+ ccsd(t): done      609 out of     1142 progress:   53.3%
+ ccsd(t): done      610 out of     1142 progress:   53.4%
+ ccsd(t): done      611 out of     1142 progress:   53.5%
+ ccsd(t): done      612 out of     1142 progress:   53.6%
+ ccsd(t): done      613 out of     1142 progress:   53.7%
+ ccsd(t): done      614 out of     1142 progress:   53.8%
+ ccsd(t): done      615 out of     1142 progress:   53.9%
+ ccsd(t): done      616 out of     1142 progress:   53.9%
+ ccsd(t): done      617 out of     1142 progress:   54.0%
+ ccsd(t): done      618 out of     1142 progress:   54.1%
+ ccsd(t): done      619 out of     1142 progress:   54.2%
+ ccsd(t): done      620 out of     1142 progress:   54.3%
+ ccsd(t): done      621 out of     1142 progress:   54.4%
+ ccsd(t): done      622 out of     1142 progress:   54.5%
+ ccsd(t): done      623 out of     1142 progress:   54.6%
+ ccsd(t): done      624 out of     1142 progress:   54.6%
+ ccsd(t): done      625 out of     1142 progress:   54.7%
+ ccsd(t): done      626 out of     1142 progress:   54.8%
+ ccsd(t): done      627 out of     1142 progress:   54.9%
+ ccsd(t): done      628 out of     1142 progress:   55.0%
+ ccsd(t): done      629 out of     1142 progress:   55.1%
+ ccsd(t): done      630 out of     1142 progress:   55.2%
+ ccsd(t): done      631 out of     1142 progress:   55.3%
+ ccsd(t): done      632 out of     1142 progress:   55.3%
+ ccsd(t): done      633 out of     1142 progress:   55.4%
+ ccsd(t): done      634 out of     1142 progress:   55.5%
+ ccsd(t): done      635 out of     1142 progress:   55.6%
+ ccsd(t): done      636 out of     1142 progress:   55.7%
+ ccsd(t): done      637 out of     1142 progress:   55.8%
+ ccsd(t): done      638 out of     1142 progress:   55.9%
+ ccsd(t): done      639 out of     1142 progress:   56.0%
+ ccsd(t): done      640 out of     1142 progress:   56.0%
+ ccsd(t): done      641 out of     1142 progress:   56.1%
+ ccsd(t): done      642 out of     1142 progress:   56.2%
+ ccsd(t): done      643 out of     1142 progress:   56.3%
+ ccsd(t): done      644 out of     1142 progress:   56.4%
+ ccsd(t): done      645 out of     1142 progress:   56.5%
+ ccsd(t): done      646 out of     1142 progress:   56.6%
+ ccsd(t): done      647 out of     1142 progress:   56.7%
+ ccsd(t): done      648 out of     1142 progress:   56.7%
+ ccsd(t): done      649 out of     1142 progress:   56.8%
+ ccsd(t): done      650 out of     1142 progress:   56.9%
+ ccsd(t): done      651 out of     1142 progress:   57.0%
+ ccsd(t): done      652 out of     1142 progress:   57.1%
+ ccsd(t): done      653 out of     1142 progress:   57.2%
+ ccsd(t): done      654 out of     1142 progress:   57.3%
+ ccsd(t): done      655 out of     1142 progress:   57.4%
+ ccsd(t): done      656 out of     1142 progress:   57.4%
+ ccsd(t): done      657 out of     1142 progress:   57.5%
+ ccsd(t): done      658 out of     1142 progress:   57.6%
+ ccsd(t): done      659 out of     1142 progress:   57.7%
+ ccsd(t): done      660 out of     1142 progress:   57.8%
+ ccsd(t): done      661 out of     1142 progress:   57.9%
+ ccsd(t): done      662 out of     1142 progress:   58.0%
+ ccsd(t): done      663 out of     1142 progress:   58.1%
+ ccsd(t): done      664 out of     1142 progress:   58.1%
+ ccsd(t): done      665 out of     1142 progress:   58.2%
+ ccsd(t): done      666 out of     1142 progress:   58.3%
+ ccsd(t): done      667 out of     1142 progress:   58.4%
+ ccsd(t): done      668 out of     1142 progress:   58.5%
+ ccsd(t): done      669 out of     1142 progress:   58.6%
+ ccsd(t): done      670 out of     1142 progress:   58.7%
+ ccsd(t): done      671 out of     1142 progress:   58.8%
+ ccsd(t): done      672 out of     1142 progress:   58.8%
+ ccsd(t): done      673 out of     1142 progress:   58.9%
+ ccsd(t): done      674 out of     1142 progress:   59.0%
+ ccsd(t): done      675 out of     1142 progress:   59.1%
+ ccsd(t): done      676 out of     1142 progress:   59.2%
+ ccsd(t): done      677 out of     1142 progress:   59.3%
+ ccsd(t): done      678 out of     1142 progress:   59.4%
+ ccsd(t): done      679 out of     1142 progress:   59.5%
+ ccsd(t): done      680 out of     1142 progress:   59.5%
+ ccsd(t): done      681 out of     1142 progress:   59.6%
+ ccsd(t): done      682 out of     1142 progress:   59.7%
+ ccsd(t): done      683 out of     1142 progress:   59.8%
+ ccsd(t): done      684 out of     1142 progress:   59.9%
+ ccsd(t): done      685 out of     1142 progress:   60.0%
+ ccsd(t): done      686 out of     1142 progress:   60.1%
+ ccsd(t): done      687 out of     1142 progress:   60.2%
+ ccsd(t): done      688 out of     1142 progress:   60.2%
+ ccsd(t): done      689 out of     1142 progress:   60.3%
+ ccsd(t): done      690 out of     1142 progress:   60.4%
+ ccsd(t): done      691 out of     1142 progress:   60.5%
+ ccsd(t): done      692 out of     1142 progress:   60.6%
+ ccsd(t): done      693 out of     1142 progress:   60.7%
+ ccsd(t): done      694 out of     1142 progress:   60.8%
+ ccsd(t): done      695 out of     1142 progress:   60.9%
+ ccsd(t): done      696 out of     1142 progress:   60.9%
+ ccsd(t): done      697 out of     1142 progress:   61.0%
+ ccsd(t): done      698 out of     1142 progress:   61.1%
+ ccsd(t): done      699 out of     1142 progress:   61.2%
+ ccsd(t): done      700 out of     1142 progress:   61.3%
+ ccsd(t): done      701 out of     1142 progress:   61.4%
+ ccsd(t): done      702 out of     1142 progress:   61.5%
+ ccsd(t): done      703 out of     1142 progress:   61.6%
+ ccsd(t): done      704 out of     1142 progress:   61.6%
+ ccsd(t): done      705 out of     1142 progress:   61.7%
+ ccsd(t): done      706 out of     1142 progress:   61.8%
+ ccsd(t): done      707 out of     1142 progress:   61.9%
+ ccsd(t): done      708 out of     1142 progress:   62.0%
+ ccsd(t): done      709 out of     1142 progress:   62.1%
+ ccsd(t): done      710 out of     1142 progress:   62.2%
+ ccsd(t): done      711 out of     1142 progress:   62.3%
+ ccsd(t): done      712 out of     1142 progress:   62.3%
+ ccsd(t): done      713 out of     1142 progress:   62.4%
+ ccsd(t): done      714 out of     1142 progress:   62.5%
+ ccsd(t): done      715 out of     1142 progress:   62.6%
+ ccsd(t): done      716 out of     1142 progress:   62.7%
+ ccsd(t): done      717 out of     1142 progress:   62.8%
+ ccsd(t): done      718 out of     1142 progress:   62.9%
+ ccsd(t): done      719 out of     1142 progress:   63.0%
+ ccsd(t): done      720 out of     1142 progress:   63.0%
+ ccsd(t): done      721 out of     1142 progress:   63.1%
+ ccsd(t): done      722 out of     1142 progress:   63.2%
+ ccsd(t): done      723 out of     1142 progress:   63.3%
+ ccsd(t): done      724 out of     1142 progress:   63.4%
+ ccsd(t): done      725 out of     1142 progress:   63.5%
+ ccsd(t): done      726 out of     1142 progress:   63.6%
+ ccsd(t): done      727 out of     1142 progress:   63.7%
+ ccsd(t): done      728 out of     1142 progress:   63.7%
+ ccsd(t): done      729 out of     1142 progress:   63.8%
+ ccsd(t): done      730 out of     1142 progress:   63.9%
+ ccsd(t): done      731 out of     1142 progress:   64.0%
+ ccsd(t): done      732 out of     1142 progress:   64.1%
+ ccsd(t): done      733 out of     1142 progress:   64.2%
+ ccsd(t): done      734 out of     1142 progress:   64.3%
+ ccsd(t): done      735 out of     1142 progress:   64.4%
+ ccsd(t): done      736 out of     1142 progress:   64.4%
+ ccsd(t): done      737 out of     1142 progress:   64.5%
+ ccsd(t): done      738 out of     1142 progress:   64.6%
+ ccsd(t): done      739 out of     1142 progress:   64.7%
+ ccsd(t): done      740 out of     1142 progress:   64.8%
+ ccsd(t): done      741 out of     1142 progress:   64.9%
+ ccsd(t): done      742 out of     1142 progress:   65.0%
+ ccsd(t): done      743 out of     1142 progress:   65.1%
+ ccsd(t): done      744 out of     1142 progress:   65.1%
+ ccsd(t): done      745 out of     1142 progress:   65.2%
+ ccsd(t): done      746 out of     1142 progress:   65.3%
+ ccsd(t): done      747 out of     1142 progress:   65.4%
+ ccsd(t): done      748 out of     1142 progress:   65.5%
+ ccsd(t): done      749 out of     1142 progress:   65.6%
+ ccsd(t): done      750 out of     1142 progress:   65.7%
+ ccsd(t): done      751 out of     1142 progress:   65.8%
+ ccsd(t): done      752 out of     1142 progress:   65.8%
+ ccsd(t): done      753 out of     1142 progress:   65.9%
+ ccsd(t): done      754 out of     1142 progress:   66.0%
+ ccsd(t): done      755 out of     1142 progress:   66.1%
+ ccsd(t): done      756 out of     1142 progress:   66.2%
+ ccsd(t): done      757 out of     1142 progress:   66.3%
+ ccsd(t): done      758 out of     1142 progress:   66.4%
+ ccsd(t): done      759 out of     1142 progress:   66.5%
+ ccsd(t): done      760 out of     1142 progress:   66.5%
+ ccsd(t): done      761 out of     1142 progress:   66.6%
+ ccsd(t): done      762 out of     1142 progress:   66.7%
+ ccsd(t): done      763 out of     1142 progress:   66.8%
+ ccsd(t): done      764 out of     1142 progress:   66.9%
+ ccsd(t): done      765 out of     1142 progress:   67.0%
+ ccsd(t): done      766 out of     1142 progress:   67.1%
+ ccsd(t): done      767 out of     1142 progress:   67.2%
+ ccsd(t): done      768 out of     1142 progress:   67.3%
+ ccsd(t): done      769 out of     1142 progress:   67.3%
+ ccsd(t): done      770 out of     1142 progress:   67.4%
+ ccsd(t): done      771 out of     1142 progress:   67.5%
+ ccsd(t): done      772 out of     1142 progress:   67.6%
+ ccsd(t): done      773 out of     1142 progress:   67.7%
+ ccsd(t): done      774 out of     1142 progress:   67.8%
+ ccsd(t): done      775 out of     1142 progress:   67.9%
+ ccsd(t): done      776 out of     1142 progress:   68.0%
+ ccsd(t): done      777 out of     1142 progress:   68.0%
+ ccsd(t): done      778 out of     1142 progress:   68.1%
+ ccsd(t): done      779 out of     1142 progress:   68.2%
+ ccsd(t): done      780 out of     1142 progress:   68.3%
+ ccsd(t): done      781 out of     1142 progress:   68.4%
+ ccsd(t): done      782 out of     1142 progress:   68.5%
+ ccsd(t): done      783 out of     1142 progress:   68.6%
+ ccsd(t): done      784 out of     1142 progress:   68.7%
+ ccsd(t): done      785 out of     1142 progress:   68.7%
+ ccsd(t): done      786 out of     1142 progress:   68.8%
+ ccsd(t): done      787 out of     1142 progress:   68.9%
+ ccsd(t): done      788 out of     1142 progress:   69.0%
+ ccsd(t): done      789 out of     1142 progress:   69.1%
+ ccsd(t): done      790 out of     1142 progress:   69.2%
+ ccsd(t): done      791 out of     1142 progress:   69.3%
+ ccsd(t): done      792 out of     1142 progress:   69.4%
+ ccsd(t): done      793 out of     1142 progress:   69.4%
+ ccsd(t): done      794 out of     1142 progress:   69.5%
+ ccsd(t): done      795 out of     1142 progress:   69.6%
+ ccsd(t): done      796 out of     1142 progress:   69.7%
+ ccsd(t): done      797 out of     1142 progress:   69.8%
+ ccsd(t): done      798 out of     1142 progress:   69.9%
+ ccsd(t): done      799 out of     1142 progress:   70.0%
+ ccsd(t): done      800 out of     1142 progress:   70.1%
+ ccsd(t): done      801 out of     1142 progress:   70.1%
+ ccsd(t): done      802 out of     1142 progress:   70.2%
+ ccsd(t): done      803 out of     1142 progress:   70.3%
+ ccsd(t): done      804 out of     1142 progress:   70.4%
+ ccsd(t): done      805 out of     1142 progress:   70.5%
+ ccsd(t): done      806 out of     1142 progress:   70.6%
+ ccsd(t): done      807 out of     1142 progress:   70.7%
+ ccsd(t): done      808 out of     1142 progress:   70.8%
+ ccsd(t): done      809 out of     1142 progress:   70.8%
+ ccsd(t): done      810 out of     1142 progress:   70.9%
+ ccsd(t): done      811 out of     1142 progress:   71.0%
+ ccsd(t): done      812 out of     1142 progress:   71.1%
+ ccsd(t): done      813 out of     1142 progress:   71.2%
+ ccsd(t): done      814 out of     1142 progress:   71.3%
+ ccsd(t): done      815 out of     1142 progress:   71.4%
+ ccsd(t): done      816 out of     1142 progress:   71.5%
+ ccsd(t): done      817 out of     1142 progress:   71.5%
+ ccsd(t): done      818 out of     1142 progress:   71.6%
+ ccsd(t): done      819 out of     1142 progress:   71.7%
+ ccsd(t): done      820 out of     1142 progress:   71.8%
+ ccsd(t): done      821 out of     1142 progress:   71.9%
+ ccsd(t): done      822 out of     1142 progress:   72.0%
+ ccsd(t): done      823 out of     1142 progress:   72.1%
+ ccsd(t): done      824 out of     1142 progress:   72.2%
+ ccsd(t): done      825 out of     1142 progress:   72.2%
+ ccsd(t): done      826 out of     1142 progress:   72.3%
+ ccsd(t): done      827 out of     1142 progress:   72.4%
+ ccsd(t): done      828 out of     1142 progress:   72.5%
+ ccsd(t): done      829 out of     1142 progress:   72.6%
+ ccsd(t): done      830 out of     1142 progress:   72.7%
+ ccsd(t): done      831 out of     1142 progress:   72.8%
+ ccsd(t): done      832 out of     1142 progress:   72.9%
+ ccsd(t): done      833 out of     1142 progress:   72.9%
+ ccsd(t): done      834 out of     1142 progress:   73.0%
+ ccsd(t): done      835 out of     1142 progress:   73.1%
+ ccsd(t): done      836 out of     1142 progress:   73.2%
+ ccsd(t): done      837 out of     1142 progress:   73.3%
+ ccsd(t): done      838 out of     1142 progress:   73.4%
+ ccsd(t): done      839 out of     1142 progress:   73.5%
+ ccsd(t): done      840 out of     1142 progress:   73.6%
+ ccsd(t): done      841 out of     1142 progress:   73.6%
+ ccsd(t): done      842 out of     1142 progress:   73.7%
+ ccsd(t): done      843 out of     1142 progress:   73.8%
+ ccsd(t): done      844 out of     1142 progress:   73.9%
+ ccsd(t): done      845 out of     1142 progress:   74.0%
+ ccsd(t): done      846 out of     1142 progress:   74.1%
+ ccsd(t): done      847 out of     1142 progress:   74.2%
+ ccsd(t): done      848 out of     1142 progress:   74.3%
+ ccsd(t): done      849 out of     1142 progress:   74.3%
+ ccsd(t): done      850 out of     1142 progress:   74.4%
+ ccsd(t): done      851 out of     1142 progress:   74.5%
+ ccsd(t): done      852 out of     1142 progress:   74.6%
+ ccsd(t): done      853 out of     1142 progress:   74.7%
+ ccsd(t): done      854 out of     1142 progress:   74.8%
+ ccsd(t): done      855 out of     1142 progress:   74.9%
+ ccsd(t): done      856 out of     1142 progress:   75.0%
+ ccsd(t): done      857 out of     1142 progress:   75.0%
+ ccsd(t): done      858 out of     1142 progress:   75.1%
+ ccsd(t): done      859 out of     1142 progress:   75.2%
+ ccsd(t): done      860 out of     1142 progress:   75.3%
+ ccsd(t): done      861 out of     1142 progress:   75.4%
+ ccsd(t): done      862 out of     1142 progress:   75.5%
+ ccsd(t): done      863 out of     1142 progress:   75.6%
+ ccsd(t): done      864 out of     1142 progress:   75.7%
+ ccsd(t): done      865 out of     1142 progress:   75.7%
+ ccsd(t): done      866 out of     1142 progress:   75.8%
+ ccsd(t): done      867 out of     1142 progress:   75.9%
+ ccsd(t): done      868 out of     1142 progress:   76.0%
+ ccsd(t): done      869 out of     1142 progress:   76.1%
+ ccsd(t): done      870 out of     1142 progress:   76.2%
+ ccsd(t): done      871 out of     1142 progress:   76.3%
+ ccsd(t): done      872 out of     1142 progress:   76.4%
+ ccsd(t): done      873 out of     1142 progress:   76.4%
+ ccsd(t): done      874 out of     1142 progress:   76.5%
+ ccsd(t): done      875 out of     1142 progress:   76.6%
+ ccsd(t): done      876 out of     1142 progress:   76.7%
+ ccsd(t): done      877 out of     1142 progress:   76.8%
+ ccsd(t): done      878 out of     1142 progress:   76.9%
+ ccsd(t): done      879 out of     1142 progress:   77.0%
+ ccsd(t): done      880 out of     1142 progress:   77.1%
+ ccsd(t): done      881 out of     1142 progress:   77.1%
+ ccsd(t): done      882 out of     1142 progress:   77.2%
+ ccsd(t): done      883 out of     1142 progress:   77.3%
+ ccsd(t): done      884 out of     1142 progress:   77.4%
+ ccsd(t): done      885 out of     1142 progress:   77.5%
+ ccsd(t): done      886 out of     1142 progress:   77.6%
+ ccsd(t): done      887 out of     1142 progress:   77.7%
+ ccsd(t): done      888 out of     1142 progress:   77.8%
+ ccsd(t): done      889 out of     1142 progress:   77.8%
+ ccsd(t): done      890 out of     1142 progress:   77.9%
+ ccsd(t): done      891 out of     1142 progress:   78.0%
+ ccsd(t): done      892 out of     1142 progress:   78.1%
+ ccsd(t): done      893 out of     1142 progress:   78.2%
+ ccsd(t): done      894 out of     1142 progress:   78.3%
+ ccsd(t): done      895 out of     1142 progress:   78.4%
+ ccsd(t): done      896 out of     1142 progress:   78.5%
+ ccsd(t): done      897 out of     1142 progress:   78.5%
+ ccsd(t): done      898 out of     1142 progress:   78.6%
+ ccsd(t): done      899 out of     1142 progress:   78.7%
+ ccsd(t): done      900 out of     1142 progress:   78.8%
+ ccsd(t): done      901 out of     1142 progress:   78.9%
+ ccsd(t): done      902 out of     1142 progress:   79.0%
+ ccsd(t): done      903 out of     1142 progress:   79.1%
+ ccsd(t): done      904 out of     1142 progress:   79.2%
+ ccsd(t): done      905 out of     1142 progress:   79.2%
+ ccsd(t): done      906 out of     1142 progress:   79.3%
+ ccsd(t): done      907 out of     1142 progress:   79.4%
+ ccsd(t): done      908 out of     1142 progress:   79.5%
+ ccsd(t): done      909 out of     1142 progress:   79.6%
+ ccsd(t): done      910 out of     1142 progress:   79.7%
+ ccsd(t): done      911 out of     1142 progress:   79.8%
+ ccsd(t): done      912 out of     1142 progress:   79.9%
+ ccsd(t): done      913 out of     1142 progress:   79.9%
+ ccsd(t): done      914 out of     1142 progress:   80.0%
+ ccsd(t): done      915 out of     1142 progress:   80.1%
+ ccsd(t): done      916 out of     1142 progress:   80.2%
+ ccsd(t): done      917 out of     1142 progress:   80.3%
+ ccsd(t): done      918 out of     1142 progress:   80.4%
+ ccsd(t): done      919 out of     1142 progress:   80.5%
+ ccsd(t): done      920 out of     1142 progress:   80.6%
+ ccsd(t): done      921 out of     1142 progress:   80.6%
+ ccsd(t): done      922 out of     1142 progress:   80.7%
+ ccsd(t): done      923 out of     1142 progress:   80.8%
+ ccsd(t): done      924 out of     1142 progress:   80.9%
+ ccsd(t): done      925 out of     1142 progress:   81.0%
+ ccsd(t): done      926 out of     1142 progress:   81.1%
+ ccsd(t): done      927 out of     1142 progress:   81.2%
+ ccsd(t): done      928 out of     1142 progress:   81.3%
+ ccsd(t): done      929 out of     1142 progress:   81.3%
+ ccsd(t): done      930 out of     1142 progress:   81.4%
+ ccsd(t): done      931 out of     1142 progress:   81.5%
+ ccsd(t): done      932 out of     1142 progress:   81.6%
+ ccsd(t): done      933 out of     1142 progress:   81.7%
+ ccsd(t): done      934 out of     1142 progress:   81.8%
+ ccsd(t): done      935 out of     1142 progress:   81.9%
+ ccsd(t): done      936 out of     1142 progress:   82.0%
+ ccsd(t): done      937 out of     1142 progress:   82.0%
+ ccsd(t): done      938 out of     1142 progress:   82.1%
+ ccsd(t): done      939 out of     1142 progress:   82.2%
+ ccsd(t): done      940 out of     1142 progress:   82.3%
+ ccsd(t): done      941 out of     1142 progress:   82.4%
+ ccsd(t): done      942 out of     1142 progress:   82.5%
+ ccsd(t): done      943 out of     1142 progress:   82.6%
+ ccsd(t): done      944 out of     1142 progress:   82.7%
+ ccsd(t): done      945 out of     1142 progress:   82.7%
+ ccsd(t): done      946 out of     1142 progress:   82.8%
+ ccsd(t): done      947 out of     1142 progress:   82.9%
+ ccsd(t): done      948 out of     1142 progress:   83.0%
+ ccsd(t): done      949 out of     1142 progress:   83.1%
+ ccsd(t): done      950 out of     1142 progress:   83.2%
+ ccsd(t): done      951 out of     1142 progress:   83.3%
+ ccsd(t): done      952 out of     1142 progress:   83.4%
+ ccsd(t): done      953 out of     1142 progress:   83.5%
+ ccsd(t): done      954 out of     1142 progress:   83.5%
+ ccsd(t): done      955 out of     1142 progress:   83.6%
+ ccsd(t): done      956 out of     1142 progress:   83.7%
+ ccsd(t): done      957 out of     1142 progress:   83.8%
+ ccsd(t): done      958 out of     1142 progress:   83.9%
+ ccsd(t): done      959 out of     1142 progress:   84.0%
+ ccsd(t): done      960 out of     1142 progress:   84.1%
+ ccsd(t): done      961 out of     1142 progress:   84.2%
+ ccsd(t): done      962 out of     1142 progress:   84.2%
+ ccsd(t): done      963 out of     1142 progress:   84.3%
+ ccsd(t): done      964 out of     1142 progress:   84.4%
+ ccsd(t): done      965 out of     1142 progress:   84.5%
+ ccsd(t): done      966 out of     1142 progress:   84.6%
+ ccsd(t): done      967 out of     1142 progress:   84.7%
+ ccsd(t): done      968 out of     1142 progress:   84.8%
+ ccsd(t): done      969 out of     1142 progress:   84.9%
+ ccsd(t): done      970 out of     1142 progress:   84.9%
+ ccsd(t): done      971 out of     1142 progress:   85.0%
+ ccsd(t): done      972 out of     1142 progress:   85.1%
+ ccsd(t): done      973 out of     1142 progress:   85.2%
+ ccsd(t): done      974 out of     1142 progress:   85.3%
+ ccsd(t): done      975 out of     1142 progress:   85.4%
+ ccsd(t): done      976 out of     1142 progress:   85.5%
+ ccsd(t): done      977 out of     1142 progress:   85.6%
+ ccsd(t): done      978 out of     1142 progress:   85.6%
+ ccsd(t): done      979 out of     1142 progress:   85.7%
+ ccsd(t): done      980 out of     1142 progress:   85.8%
+ ccsd(t): done      981 out of     1142 progress:   85.9%
+ ccsd(t): done      982 out of     1142 progress:   86.0%
+ ccsd(t): done      983 out of     1142 progress:   86.1%
+ ccsd(t): done      984 out of     1142 progress:   86.2%
+ ccsd(t): done      985 out of     1142 progress:   86.3%
+ ccsd(t): done      986 out of     1142 progress:   86.3%
+ ccsd(t): done      987 out of     1142 progress:   86.4%
+ ccsd(t): done      988 out of     1142 progress:   86.5%
+ ccsd(t): done      989 out of     1142 progress:   86.6%
+ ccsd(t): done      990 out of     1142 progress:   86.7%
+ ccsd(t): done      991 out of     1142 progress:   86.8%
+ ccsd(t): done      992 out of     1142 progress:   86.9%
+ ccsd(t): done      993 out of     1142 progress:   87.0%
+ ccsd(t): done      994 out of     1142 progress:   87.0%
+ ccsd(t): done      995 out of     1142 progress:   87.1%
+ ccsd(t): done      996 out of     1142 progress:   87.2%
+ ccsd(t): done      997 out of     1142 progress:   87.3%
+ ccsd(t): done      998 out of     1142 progress:   87.4%
+ ccsd(t): done      999 out of     1142 progress:   87.5%
+ ccsd(t): done     1000 out of     1142 progress:   87.6%
+ ccsd(t): done     1001 out of     1142 progress:   87.7%
+ ccsd(t): done     1002 out of     1142 progress:   87.7%
+ ccsd(t): done     1003 out of     1142 progress:   87.8%
+ ccsd(t): done     1004 out of     1142 progress:   87.9%
+ ccsd(t): done     1005 out of     1142 progress:   88.0%
+ ccsd(t): done     1006 out of     1142 progress:   88.1%
+ ccsd(t): done     1007 out of     1142 progress:   88.2%
+ ccsd(t): done     1008 out of     1142 progress:   88.3%
+ ccsd(t): done     1009 out of     1142 progress:   88.4%
+ ccsd(t): done     1010 out of     1142 progress:   88.4%
+ ccsd(t): done     1011 out of     1142 progress:   88.5%
+ ccsd(t): done     1012 out of     1142 progress:   88.6%
+ ccsd(t): done     1013 out of     1142 progress:   88.7%
+ ccsd(t): done     1014 out of     1142 progress:   88.8%
+ ccsd(t): done     1015 out of     1142 progress:   88.9%
+ ccsd(t): done     1016 out of     1142 progress:   89.0%
+ ccsd(t): done     1017 out of     1142 progress:   89.1%
+ ccsd(t): done     1018 out of     1142 progress:   89.1%
+ ccsd(t): done     1019 out of     1142 progress:   89.2%
+ ccsd(t): done     1020 out of     1142 progress:   89.3%
+ ccsd(t): done     1021 out of     1142 progress:   89.4%
+ ccsd(t): done     1022 out of     1142 progress:   89.5%
+ ccsd(t): done     1023 out of     1142 progress:   89.6%
+ ccsd(t): done     1024 out of     1142 progress:   89.7%
+ ccsd(t): done     1025 out of     1142 progress:   89.8%
+ ccsd(t): done     1026 out of     1142 progress:   89.8%
+ ccsd(t): done     1027 out of     1142 progress:   89.9%
+ ccsd(t): done     1028 out of     1142 progress:   90.0%
+ ccsd(t): done     1029 out of     1142 progress:   90.1%
+ ccsd(t): done     1030 out of     1142 progress:   90.2%
+ ccsd(t): done     1031 out of     1142 progress:   90.3%
+ ccsd(t): done     1032 out of     1142 progress:   90.4%
+ ccsd(t): done     1033 out of     1142 progress:   90.5%
+ ccsd(t): done     1034 out of     1142 progress:   90.5%
+ ccsd(t): done     1035 out of     1142 progress:   90.6%
+ ccsd(t): done     1036 out of     1142 progress:   90.7%
+ ccsd(t): done     1037 out of     1142 progress:   90.8%
+ ccsd(t): done     1038 out of     1142 progress:   90.9%
+ ccsd(t): done     1039 out of     1142 progress:   91.0%
+ ccsd(t): done     1040 out of     1142 progress:   91.1%
+ ccsd(t): done     1041 out of     1142 progress:   91.2%
+ ccsd(t): done     1042 out of     1142 progress:   91.2%
+ ccsd(t): done     1043 out of     1142 progress:   91.3%
+ ccsd(t): done     1044 out of     1142 progress:   91.4%
+ ccsd(t): done     1045 out of     1142 progress:   91.5%
+ ccsd(t): done     1046 out of     1142 progress:   91.6%
+ ccsd(t): done     1047 out of     1142 progress:   91.7%
+ ccsd(t): done     1048 out of     1142 progress:   91.8%
+ ccsd(t): done     1049 out of     1142 progress:   91.9%
+ ccsd(t): done     1050 out of     1142 progress:   91.9%
+ ccsd(t): done     1051 out of     1142 progress:   92.0%
+ ccsd(t): done     1052 out of     1142 progress:   92.1%
+ ccsd(t): done     1053 out of     1142 progress:   92.2%
+ ccsd(t): done     1054 out of     1142 progress:   92.3%
+ ccsd(t): done     1055 out of     1142 progress:   92.4%
+ ccsd(t): done     1056 out of     1142 progress:   92.5%
+ ccsd(t): done     1057 out of     1142 progress:   92.6%
+ ccsd(t): done     1058 out of     1142 progress:   92.6%
+ ccsd(t): done     1059 out of     1142 progress:   92.7%
+ ccsd(t): done     1060 out of     1142 progress:   92.8%
+ ccsd(t): done     1061 out of     1142 progress:   92.9%
+ ccsd(t): done     1062 out of     1142 progress:   93.0%
+ ccsd(t): done     1063 out of     1142 progress:   93.1%
+ ccsd(t): done     1064 out of     1142 progress:   93.2%
+ ccsd(t): done     1065 out of     1142 progress:   93.3%
+ ccsd(t): done     1066 out of     1142 progress:   93.3%
+ ccsd(t): done     1067 out of     1142 progress:   93.4%
+ ccsd(t): done     1068 out of     1142 progress:   93.5%
+ ccsd(t): done     1069 out of     1142 progress:   93.6%
+ ccsd(t): done     1070 out of     1142 progress:   93.7%
+ ccsd(t): done     1071 out of     1142 progress:   93.8%
+ ccsd(t): done     1072 out of     1142 progress:   93.9%
+ ccsd(t): done     1073 out of     1142 progress:   94.0%
+ ccsd(t): done     1074 out of     1142 progress:   94.0%
+ ccsd(t): done     1075 out of     1142 progress:   94.1%
+ ccsd(t): done     1076 out of     1142 progress:   94.2%
+ ccsd(t): done     1077 out of     1142 progress:   94.3%
+ ccsd(t): done     1078 out of     1142 progress:   94.4%
+ ccsd(t): done     1079 out of     1142 progress:   94.5%
+ ccsd(t): done     1080 out of     1142 progress:   94.6%
+ ccsd(t): done     1081 out of     1142 progress:   94.7%
+ ccsd(t): done     1082 out of     1142 progress:   94.7%
+ ccsd(t): done     1083 out of     1142 progress:   94.8%
+ ccsd(t): done     1084 out of     1142 progress:   94.9%
+ ccsd(t): done     1085 out of     1142 progress:   95.0%
+ ccsd(t): done     1086 out of     1142 progress:   95.1%
+ ccsd(t): done     1087 out of     1142 progress:   95.2%
+ ccsd(t): done     1088 out of     1142 progress:   95.3%
+ ccsd(t): done     1089 out of     1142 progress:   95.4%
+ ccsd(t): done     1090 out of     1142 progress:   95.4%
+ ccsd(t): done     1091 out of     1142 progress:   95.5%
+ ccsd(t): done     1092 out of     1142 progress:   95.6%
+ ccsd(t): done     1093 out of     1142 progress:   95.7%
+ ccsd(t): done     1094 out of     1142 progress:   95.8%
+ ccsd(t): done     1095 out of     1142 progress:   95.9%
+ ccsd(t): done     1096 out of     1142 progress:   96.0%
+ ccsd(t): done     1097 out of     1142 progress:   96.1%
+ ccsd(t): done     1098 out of     1142 progress:   96.1%
+ ccsd(t): done     1099 out of     1142 progress:   96.2%
+ ccsd(t): done     1100 out of     1142 progress:   96.3%
+ ccsd(t): done     1101 out of     1142 progress:   96.4%
+ ccsd(t): done     1102 out of     1142 progress:   96.5%
+ ccsd(t): done     1103 out of     1142 progress:   96.6%
+ ccsd(t): done     1104 out of     1142 progress:   96.7%
+ ccsd(t): done     1105 out of     1142 progress:   96.8%
+ ccsd(t): done     1106 out of     1142 progress:   96.8%
+ ccsd(t): done     1107 out of     1142 progress:   96.9%
+ ccsd(t): done     1108 out of     1142 progress:   97.0%
+ ccsd(t): done     1109 out of     1142 progress:   97.1%
+ ccsd(t): done     1110 out of     1142 progress:   97.2%
+ ccsd(t): done     1111 out of     1142 progress:   97.3%
+ ccsd(t): done     1112 out of     1142 progress:   97.4%
+ ccsd(t): done     1113 out of     1142 progress:   97.5%
+ ccsd(t): done     1114 out of     1142 progress:   97.5%
+ ccsd(t): done     1115 out of     1142 progress:   97.6%
+ ccsd(t): done     1116 out of     1142 progress:   97.7%
+ ccsd(t): done     1117 out of     1142 progress:   97.8%
+ ccsd(t): done     1118 out of     1142 progress:   97.9%
+ ccsd(t): done     1119 out of     1142 progress:   98.0%
+ ccsd(t): done     1120 out of     1142 progress:   98.1%
+ ccsd(t): done     1121 out of     1142 progress:   98.2%
+ ccsd(t): done     1122 out of     1142 progress:   98.2%
+ ccsd(t): done     1123 out of     1142 progress:   98.3%
+ ccsd(t): done     1124 out of     1142 progress:   98.4%
+ ccsd(t): done     1125 out of     1142 progress:   98.5%
+ ccsd(t): done     1126 out of     1142 progress:   98.6%
+ ccsd(t): done     1127 out of     1142 progress:   98.7%
+ ccsd(t): done     1128 out of     1142 progress:   98.8%
+ ccsd(t): done     1129 out of     1142 progress:   98.9%
+ ccsd(t): done     1130 out of     1142 progress:   98.9%
+ ccsd(t): done     1131 out of     1142 progress:   99.0%
+ ccsd(t): done     1132 out of     1142 progress:   99.1%
+ ccsd(t): done     1133 out of     1142 progress:   99.2%
+ ccsd(t): done     1134 out of     1142 progress:   99.3%
+ ccsd(t): done     1135 out of     1142 progress:   99.4%
+ ccsd(t): done     1136 out of     1142 progress:   99.5%
+ ccsd(t): done     1137 out of     1142 progress:   99.6%
+ ccsd(t): done     1138 out of     1142 progress:   99.6%
+ ccsd(t): done     1139 out of     1142 progress:   99.7%
+ ccsd(t): done     1140 out of     1142 progress:   99.8%
+ ccsd(t): done     1141 out of     1142 progress:   99.9%
+ ccsd(t): done     1142 out of     1142 progress:  100.0%
+ Time for integral evaluation pass     1  4544.10
+ Time for triples evaluation pass      1  2313.84
+
+ pseudo-e(mp4)  -0.23324138505257E+00
+ pseudo-e(mp5)   0.88729020198594E-02
+        e(t)    -0.22436848303271E+00
+
+ --------------
+ CCSD(T) Energy
+ --------------
+ Reference energy:                   -1079.114798278397075
+
+ CCSD corr. energy:                     -4.087536176139623
+ T(CCSD) corr. energy:                  -0.233241385052573
+ Total CCSD+T(CCSD) energy:          -1083.435575839589319
+
+ CCSD corr. energy:                     -4.087536176139623
+ (T) corr. energy:                      -0.224368483032714
+ Total CCSD(T) energy:               -1083.426702937569416
+ 
+ routine      calls  cpu(0)   cpu-min  cpu-ave  cpu-max   i/o 
+ aoccsd          1    13.61    13.61    13.61    13.61    0.00
+ iterdrv         1    11.22    11.22    11.22    11.22    0.00
+ triples         1  4547.16  4547.15  4547.17  4547.23    0.00
+ trpdrv          1   135.51   126.67   364.21   891.91    0.00
+ dovvv        9576  1695.64  1109.51  1518.21  1702.83    0.00
+ doooo        9576   169.59   111.18   152.30   171.44    0.00
+ tengy        9408   313.05   200.60   279.05   318.22    0.00
+ Total              6885.77  6885.74  6885.79  6885.85    0.00
+
+ Task  times  cpu:     7217.4s     wall:     7321.4s
+ 
+ 
+                                NWChem Input Module
+                                -------------------
+ 
+ 
+ Summary of allocated global arrays
+-----------------------------------
+  No active global arrays
+
+
+
+                         GA Statistics for process    0
+                         ------------------------------
+
+       create   destroy   get      put      acc     scatter   gather  read&inc
+calls:   57       57     7.25e+04 6.97e+04 8.28e+07    0        0      549     
+number of processes/call 1.75e+00 2.28e+00 1.00e+00 0.00e+00 0.00e+00
+bytes total:             1.23e+10 1.76e+10 9.28e+11 0.00e+00 0.00e+00 4.39e+03
+bytes remote:            1.21e+10 1.75e+10 9.28e+11 0.00e+00 0.00e+00 0.00e+00
+Max memory consumed for GA by this process: 183508936 bytes
+ 
+MA_summarize_allocated_blocks: starting scan ...
+MA_summarize_allocated_blocks: scan completed: 0 heap blocks, 0 stack blocks
+MA usage statistics:
+
+	allocation statistics:
+					      heap	     stack
+					      ----	     -----
+	current number of blocks	         0	         0
+	maximum number of blocks	        16	        30
+	current total bytes		         0	         0
+	maximum total bytes		    205064	2139827592
+	maximum total K-bytes		       206	   2139828
+	maximum total M-bytes		         1	      2140
+ 
+ 
+                                     CITATION
+                                     --------
+                Please cite the following reference when publishing
+                           results obtained with NWChem:
+ 
+                 M. Valiev, E.J. Bylaska, N. Govind, K. Kowalski,
+              T.P. Straatsma, H.J.J. van Dam, D. Wang, J. Nieplocha,
+                        E. Apra, T.L. Windus, W.A. de Jong
+                 "NWChem: a comprehensive and scalable open-source
+                  solution for large scale molecular simulations"
+                      Comput. Phys. Commun. 181, 1477 (2010)
+                           doi:10.1016/j.cpc.2010.04.018
+ 
+                                      AUTHORS
+                                      -------
+          E. Apra, E. J. Bylaska, W. A. de Jong, N. Govind, K. Kowalski,
+       T. P. Straatsma, M. Valiev, H. J. J. van Dam, D. Wang, T. L. Windus,
+        J. Hammond, J. Autschbach, K. Bhaskaran-Nair, J. Brabec, K. Lopata,
+       S. A. Fischer, S. Krishnamoorthy, W. Ma, M. Klemm, O. Villa, Y. Chen,
+    V. Anisimov, F. Aquino, S. Hirata, M. T. Hackler, T. Risthaus, M. Malagoli,
+       A. Marenich, A. Otero-de-la-Roza, J. Mullin, P. Nichols, R. Peverati,
+     J. Pittner, Y. Zhao, P.-D. Fan, A. Fonari, M. Williamson, R. J. Harrison,
+       J. R. Rehr, M. Dupuis, D. Silverstein, D. M. A. Smith, J. Nieplocha,
+        V. Tipparaju, M. Krishnan, B. E. Van Kuiken, A. Vazquez-Mayagoitia,
+        L. Jensen, M. Swart, Q. Wu, T. Van Voorhis, A. A. Auer, M. Nooijen,
+      L. D. Crosby, E. Brown, G. Cisneros, G. I. Fann, H. Fruchtl, J. Garza,
+        K. Hirao, R. A. Kendall, J. A. Nichols, K. Tsemekhman, K. Wolinski,
+     J. Anchell, D. E. Bernholdt, P. Borowski, T. Clark, D. Clerc, H. Dachsel,
+   M. J. O. Deegan, K. Dyall, D. Elwood, E. Glendening, M. Gutowski, A. C. Hess,
+         J. Jaffe, B. G. Johnson, J. Ju, R. Kobayashi, R. Kutteh, Z. Lin,
+   R. Littlefield, X. Long, B. Meng, T. Nakajima, S. Niu, L. Pollack, M. Rosing,
+   K. Glaesemann, G. Sandrone, M. Stave, H. Taylor, G. Thomas, J. H. van Lenthe,
+                               A. T. Wong, Z. Zhang.
+
+ Total times  cpu:     7218.1s     wall:     7324.8s
+TACC:  Shutdown complete. Exiting. 

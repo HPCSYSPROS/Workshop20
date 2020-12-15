@@ -1,0 +1,31 @@
+# Interface definition for thorn ZelmaniShockTracker
+
+implements: ZelmaniShockTracker2
+
+inherits: HydroBase CarpetRegrid2 CoreCollapseControl
+
+USES INCLUDE HEADER: carpet.hh
+USES INCLUDE HEADER: defs.hh
+
+CCTK_INT dostuff TYPE=SCALAR tags='checkpoint="no"'
+CCTK_INT dotrack TYPE=SCALAR tags='checkpoint="no"'
+CCTK_INT dochangeregrid TYPE=SCALAR tags='checkpoint="no"'
+
+CCTK_INT saved_regrid_every TYPE=SCALAR tags='checkpoint="no"'
+
+CCTK_REAL zst_interpolated_variables TYPE=array DIM=3 size=nrad+nrad_outer,ntheta,nphi DISTRIB=constant TAGS='Checkpoint="no"'
+{
+  zst_x zst_y zst_z
+  zst_ent zst_dent zst_vx zst_vy zst_vz zst_vr
+} "Interpolated variables for calculating shock radius"
+
+CCTK_REAL zst_scalars TYPE=scalar TAGS='Checkpoint="no"'
+{
+  x0,y0,z0,drad,dtheta,dphi,shockmax,shockmin,shockav
+} "Origin of tau calculation"
+
+CCTK_REAL shockpos TYPE=array DIM=2 size=ntheta,nphi DISTRIB=constant TAGS='Checkpoint="no"'
+CCTK_REAL rad   TYPE=array DIM=1 size=nrad+nrad_outer  DISTRIB=constant TAGS='checkpoint="no"'
+CCTK_REAL phi   TYPE=array DIM=1 size=nphi  DISTRIB=constant TAGS='checkpoint="no"'
+CCTK_REAL theta TYPE=array DIM=1 size=ntheta DISTRIB=constant TAGS='checkpoint="no"'
+

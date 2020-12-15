@@ -1,0 +1,13 @@
+NAMD_ARCH = Linux-x86
+CHARMARCH = net-linux-iccstatic
+
+FLOATOPTS = -march=pentium4 -mcpu=pentium4 -ip -no-vec
+
+CXX = icpc -std=c++11
+CXXOPTS = -static-intel -O2 $(FLOATOPTS)
+CXXNOALIASOPTS = -O2 -fno-alias $(FLOATOPTS)
+
+CC = icc
+COPTS = -static-intel -O2 $(FLOATOPTS)
+
+

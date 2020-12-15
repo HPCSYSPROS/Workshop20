@@ -1,0 +1,690 @@
+# location of data files
+
+# path to where the data files
+# SFHo.h5
+# SFHo_NuLib_rho82_temp100_ye100_ng12_ns3_version1.0_20160602.h5
+# s15WH07_SFHo_gr1dott_riso_format2_at_time_00.24171.dat
+# can be found. Must end in "/".
+$datadir = $ENV{PBS_O_WORKDIR}+"/data/"
+
+#--- Base and Driver Thorns
+
+ActiveThorns = "time
+		coordbase
+		mol
+		boundary
+		spacemask
+		symbase
+		aeilocalinterp
+		localinterp
+		constants
+		ioutil
+		initbase
+		sphericalsurface
+		carpet
+		carpetlib
+		carpetregrid2
+		carpetreduce
+		cartgrid3d
+		carpetslab
+		carpetinterp
+		carpetmask
+		LoopControl
+		TGRTensor
+		TimerReport
+		HydroBase
+		CartesianCoordinates
+	"	
+#		carpetregridonce
+
+
+
+
+
+
+
+
+
+
+#--- Output related thorns
+
+ActiveThorns	=  "	carpetioascii 
+			carpetioscalar 
+			carpetiohdf5 
+			carpetiobasic
+		   "
+
+#--- Spacetime :-)
+
+ActiveThorns	=  "	admbase 
+			staticconformal 
+			admcoupling 
+			coordgauge 
+			admmacros 
+			TmunuBase
+			dissipation
+			HydroBase
+		   "
+
+# Spacetime evolution (comment out for cowling)
+ActiveThorns = "        ML_BSSN
+                        ML_BSSN_Helper
+                        GenericFD
+                        NewRad
+			CCCCGlobalModes
+				"
+
+
+
+
+
+
+#--- Hydrodynamics
+
+ActiveThorns	=  "    
+			GRHydro
+			ZelmaniAnalysis
+			EOS_Omni
+			ZelmaniQuadWaveExtract
+			ZelmaniShockTracker2
+			CoreCollapseControl
+			pnsmapper
+			zelmanim1
+		"	   
+# Mirror
+#			Refluxing
+
+#			ZelmaniWizard
+#			ZelmaniStarMapper
+
+CartesianCoordinates::store_jacobian = "yes"
+CartesianCoordinates::store_inverse_jacobian = "yes"
+CartesianCoordinates::store_volume_form = "yes"
+LoopControl::settle_after_iteration = 0
+
+#Refluxing::Refluxing_MaxNumEvolvedVarsSlow = 36
+#refluxing::nvars = 6
+#refluxing::nvars_evolved = 6
+
+
+############################## Manually changing the grid structure
+
+###carpetregridonce::change_n_levels = 3
+###carpetregridonce::new_radius[0] = 600.0
+###carpetregridonce::changed_level[0] = 2
+###carpetregridonce::new_radius[1] = 450.0
+###carpetregridonce::changed_level[1] = 3
+###carpetregridonce::new_radius[2] = 200.0
+###carpetregridonce::changed_level[2] = 4
+###carpetregridonce::new_regrid_every = 128
+###carpetregrid2::freeze_unaligned_parent_levels = yes
+###carpetregrid2::freeze_unaligned_levels = yes
+
+pnsmapper::Num_1D = 1200000
+pnsmapper::Rad_1D = 8000.0
+pnsmapper::Profile_File = $datadir+"s15WH07_SFHo_gr1dott_riso_format2_at_time_00.24171.dat"
+pnsmapper::Profile_Type = "GR1Dformat2"
+
+#zelmanim1::spherical_radius = 30000.0
+#zelmanim1::spherical_spread = 200.0
+
+#zelmanim1::spherical_radius = 200.0
+#zelmanim1::spherical_spread = 20.0
+
+zelmanim1::zm1_verbose = no
+zelmanim1::nulib_table_name = $datadir+"SFHo_NuLib_rho82_temp100_ye100_ng12_ns3_version1.0_20160602.h5"
+zelmanim1::read_table_on_single_process = yes
+zelmanim1::ngroups = 12
+zelmanim1::nspecies = 3
+zelmanim1::zm1_MaxNumConstrainedVars = 200
+zelmanim1::do_m1 = yes
+zelmanim1::do_opac = yes
+zelmanim1::do_gray = no
+zelmanim1::do_m1_testing = no
+
+zelmanim1::reconstruction_type = "TVD-minmod"
+zelmanim1::do_m1_RK2 = yes
+zelmanim1::zm1_bound_type = "Robin"
+
+zelmanim1::nrad = 400
+zelmanim1::rad_max = 320.0
+zelmanim1::lum_out_every = 128
+zelmanim1::lum_out_radii[0] = 30.0
+zelmanim1::lum_out_radii[1] = 40.0
+zelmanim1::lum_out_radii[2] = 50.0
+zelmanim1::lum_out_radii[3] = 60.0
+zelmanim1::lum_out_radii[4] = 70.0
+zelmanim1::lum_out_radii[5] = 80.0
+zelmanim1::lum_out_radii[6] = 100.0
+zelmanim1::lum_out_radii[7] = 150.0
+zelmanim1::lum_out_radii[8] = 200.0
+zelmanim1::lum_out_radii[9] = 250.0
+zelmanim1::lum_out_radii[10] = 300.0
+
+zelmanim1::do_m1_eps_backreact  = yes
+zelmanim1::do_m1_ye_backreact   = yes
+zelmanim1::do_m1_scon_backreact = yes
+
+zelmanim1::use_zerov = yes
+zelmanim1::do_m1_GRsource = yes
+zelmanim1::do_m1_redshift = yes
+zelmanim1::do_m1_advect   = yes
+
+zelmanim1::use_nuTmunu = yes
+zelmanim1::set_equilibrium = yes
+zelmanim1::rho_opac_min = 1.d0
+
+
+############################# Flesh Data ##################################
+Cactus::cctk_run_title = "s15WH07_SFHo"
+Cactus::cctk_full_warnings         = yes
+Cactus::highlight_warning_messages = no
+#Cactus::cctk_timer_output          = "full"
+
+
+carpet::verbose = no
+carpet::veryverbose = no
+
+
+############################# Output Related ##################################
+IO::out_dir              = $parfile
+IO::out_single_precision = yes
+io::verbose = "none"
+io::abort_on_io_errors = "yes"
+io::out_mode = "np"
+io::out_proc_every = 4 # one IO proc per node
+
+#--- checkpoint recovery
+io::recover 					= 	"no"
+iohdf5::checkpoint 				= 	no
+carpetiohdf5::one_file_per_group 		= 	"yes"
+carpetiohdf5::one_file_per_proc 		= 	"yes"
+
+
+IOBasic::outInfo_vars			=	"Carpet::physical_time_per_hour hydrobase::rho admbase::alp"
+
+carpetioscalar::outScalar_vars		=	"
+                        ML_BSSN::ML_Ham{reductions='norm2 norm1 norm_inf'}
+                        ML_BSSN::ML_Mom{reductions='norm2 norm1 norm_inf'}
+			hydrobase::rho{reductions='minimum maximum'}
+			admbase::lapse{reductions='minimum maximum'}
+                        grhydro::dens{reductions='minimum maximum sum'}
+                        grhydro::tau{reductions='minimum maximum sum'}
+			hydrobase::temperature{reductions='minimum maximum'}
+			hydrobase::entropy{reductions='minimum maximum'}
+			hydrobase::y_e{reductions='minimum maximum'}
+			zelmanim1::heatcoolanalysis{reductions='sum'}
+			"
+
+
+carpetioascii::out1D_vars               =       "
+                        ML_BSSN::ML_Ham
+			ML_BSSN::ML_Mom
+			hydrobase::rho
+                        hydrobase::press
+                        hydrobase::eps
+                        hydrobase::vel
+                        grhydro::scon
+                        grhydro::dens
+                        grhydro::tau
+			admbase::lapse
+			admbase::metric
+			admbase::shift
+			admbase::curv
+			hydrobase::temperature
+			hydrobase::y_e
+			zelmanim1::heatcoolanalysis
+			"
+
+
+
+
+carpetioascii::out0D_vars               =       "
+			Carpet::physical_time_per_hour 
+			zelmanianalysis::gravitational_mass
+			zelmanianalysis::baryonic_mass
+			zelmanianalysis::gravitational_mass_in1e12
+			zelmanianalysis::baryonic_mass_in1e12
+                        zelmanianalysis::adm_mass_volume
+			hydrobase::temperature
+			hydrobase::y_e
+			hydrobase::entropy
+			zelmanishocktracker2::shockmin
+			zelmanishocktracker2::shockav
+                        zelmanishocktracker2::shockmax
+			"
+
+carpetiohdf5::out3D_vars	=	"
+                        admbase::lapse
+			admbase::metric
+			admbase::shift
+			hydrobase::temperature
+			hydrobase::entropy
+			hydrobase::y_e
+                        hydrobase::rho
+                        hydrobase::vel
+			zelmanim1::heatcoolanalysis
+			zelmanim1::enu
+			zelmanim1::fnu
+			"
+
+carpetiohdf5::out2D_vars               =       "
+			hydrobase::vel
+			hydrobase::rho
+			hydrobase::entropy
+			hydrobase::y_e
+			zelmanim1::heatcoolanalysis
+			"
+#			zelmanim1::radiationanalysis
+
+#			zelmanim1::enu
+
+
+grhydro::grhydro_disable_hydro_update = no
+
+
+
+#--- output frequency
+
+iohdf5::out_criterion 				= 	"divisor"
+iohdf5::out2D_criterion 			= 	"divisor"
+iohdf5::out3D_criterion 			= 	"divisor"
+carpetioascii::out0D_criterion 			= 	"divisor"
+carpetioascii::out1D_criterion 			=	"divisor"
+carpetioascii::out2D_criterion 			= 	"divisor"
+carpetioscalar::outScalar_criterion		=	"divisor"
+carpetioscalar::outScalar_every			=	128
+ioascii::out0D_every				=	-1
+IOASCII::out1D_every	     			= 	-1
+IOASCII::out2D_every				=	-1
+iohdf5::out2D_every				=	-1
+iohdf5::out3D_every				=	128
+iohdf5::compression_level = 5
+iohdf5::output_index = "no"
+
+carpetiobasic::outInfo_every   			=	1
+carpetiobasic::real_min      			= 	1.0e-2
+
+IOASCII::one_file_per_group     = yes
+IOASCII::output_symmetry_points = no
+IOASCII::out1D_d                = no
+
+############################# Driver ##################################
+# Carpet Parameters
+Carpet::domain_from_coordbase = yes
+Carpet::max_refinement_levels = 8
+
+driver::ghost_size       = 3
+Carpet::use_buffer_zones = yes
+
+Carpet::prolongation_order_space = 5
+Carpet::prolongation_order_time  = 2
+
+CarpetLib::use_higher_order_restriction = no
+Carpet::use_overlap_zones = no
+
+Carpet::init_fill_timelevels = yes
+
+Carpet::output_timers_every      = -1
+Carpet::timer_file               = ""
+CarpetLib::print_timestats_every = -1
+CarpetLib::timestat_file         = ""
+CarpetLib::print_memstats_every  = -1
+Carpet::refinement_centering     = vertex
+
+
+############################# Grid ##################################
+
+CoordBase::domainsize = "minmax"
+CoordBase::xmin       = -6400.0
+CoordBase::ymin       = -6400.0
+CoordBase::zmin       = -6400.0
+CoordBase::xmax       = 6400.0
+CoordBase::ymax       = 6400.0
+CoordBase::zmax       = 6400.0
+
+CoordBase::spacing  = "gridspacing"
+CoordBase::dx = 32.0/3.5
+CoordBase::dy = 32.0/3.5
+CoordBase::dz = 32.0/3.5
+
+CartGrid3D::type           = "coordbase"
+CartGrid3D::domain         = "full"
+CartGrid3D::avoid_originx  = no
+CartGrid3D::avoid_originy  = no
+CartGrid3D::avoid_originz  = no
+
+CoordBase::boundary_size_x_lower     = 3
+CoordBase::boundary_size_y_lower     = 3
+CoordBase::boundary_size_z_lower     = 3
+
+CoordBase::boundary_size_x_upper     = 3
+CoordBase::boundary_size_y_upper     = 3
+CoordBase::boundary_size_z_upper     = 3
+
+CoordBase::boundary_shiftout_x_lower = 0
+CoordBase::boundary_shiftout_y_lower = 0
+CoordBase::boundary_shiftout_z_lower = 0
+
+CarpetRegrid2::min_distance          = 4
+CarpetRegrid2::boundary_shiftout     = 0
+CarpetRegrid2::ensure_proper_nesting = yes
+CarpetRegrid2::snap_to_coarse = yes
+
+CarpetRegrid2::num_centres  = 1
+CarpetRegrid2::num_levels_1 = 8
+CarpetRegrid2::position_x_1 = 0
+CarpetRegrid2::position_y_1 = 0
+CarpetRegrid2::position_z_1 = 0
+CarpetRegrid2::radius_1[1]   = 1000.0   # 6.4
+CarpetRegrid2::radius_1[2]   = 500.0    # 3.2
+CarpetRegrid2::radius_1[3]   = 250.0    # 1.6
+CarpetRegrid2::radius_1[4]   = 150.0    # 0.8
+CarpetRegrid2::radius_1[5]   = 100.0    # 0.4
+CarpetRegrid2::radius_1[6]   = 36.0     # 0.2
+CarpetRegrid2::radius_1[7]   = 12.0     # 0.1
+
+corecollapsecontrol::force_postbounce = yes
+corecollapsecontrol::check_every = 128
+corecollapsecontrol::rho_max_every = 128
+CoreCollapseControl::handle_PMR = no
+CoreCollapseControl::output_control = no
+CoreCollapsecontrol::bounce_rho = 2.0e14
+corecollapsecontrol::bounce_criterion = "entropy"
+corecollapsecontrol::bounce_entropy = 3.0e0
+
+
+CarpetRegrid2::regrid_every = -1
+#CarpetRegrid2::movement_threshold_1 = 1.0e0
+CarpetRegrid2::radius_rel_change_threshold_1 = 0.05e0
+
+############################# Time Integration ##################################
+# Time integration parameters
+MoL::ODE_Method             = "RK4"
+MoL::MoL_Intermediate_Steps = 4
+MoL::MoL_Num_Scratch_Levels = 1
+
+Time::dtfac                 = 0.4
+
+GRHydro::use_MoL_slow_multirate_sector = no
+
+############################# Curvature Evolution ##################################
+
+# CactusEinstein parameters
+ADMMacros::spatial_order = 4
+
+ADMBase::evolution_method               = "ML_BSSN"
+ADMBase::lapse_evolution_method = "ML_BSSN"
+ADMBase::shift_evolution_method = "ML_BSSN"
+ADMBase::dtlapse_evolution_method = "ML_BSSN"
+ADMBase::dtshift_evolution_method = "ML_BSSN"
+
+ADMBase::initial_dtlapse = "zero"
+ADMBase::initial_dtshift = "zero"
+
+ML_BSSN::timelevels = 3
+#GenericFD::FDscheme = "4th order centered macro"
+
+ML_BSSN::initial_boundary_condition="extrapolate-gammas"
+ML_BSSN::rhs_boundary_condition = "NewRad"
+Boundary::radpower                 = 2
+
+ML_BSSN::harmonicN           = 1      # 1+log
+ML_BSSN::harmonicF           = 2.0    # 1+log
+ML_BSSN::ShiftGammaCoeff     = 0.75
+ML_BSSN::AlphaDriver         = 0.0
+ML_BSSN::BetaDriver          = 0.5
+ML_BSSN::advectLapse         = 1
+ML_BSSN::advectShift         = 1
+ML_BSSN::evolveA             = 0
+ML_BSSN::evolveB             = 1
+
+ML_BSSN::MinimumLapse = 1.0e-8
+ML_BSSN::ML_log_confac_bound = "none"
+ML_BSSN::ML_metric_bound     = "none"
+ML_BSSN::ML_Gamma_bound      = "none"
+ML_BSSN::ML_trace_curv_bound = "none"
+ML_BSSN::ML_curv_bound       = "none"
+ML_BSSN::ML_lapse_bound      = "none"
+ML_BSSN::ML_dtlapse_bound    = "none"
+ML_BSSN::ML_shift_bound      = "none"
+ML_BSSN::ML_dtshift_bound    = "none"
+
+ML_BSSN::UseSpatialBetaDriver = 1
+#ML_BSSN::UseSpatialBetaDriver = "yes"
+ML_BSSN::SpatialBetaDriverRadius = 50.0e0
+
+Dissipation::epsdis = 0.1
+#Dissipation::epsdis2 = 0.0
+#Dissipation::epsdis_for_level2[6] = 0.1
+####Dissipation::epsdis_for_level2[5] = 0.01
+####Dissipation::epsdis_for_level2[4] = 0.01
+####Dissipation::epsdis_for_level2[3] = 0.01
+####Dissipation::epsdis_for_level2[2] = 0.01
+####Dissipation::epsdis_for_level2[1] = 0.01
+####Dissipation::epsdis_for_level2[0] = 0.01
+Dissipation::order = 5
+Dissipation::vars                       = "
+        ML_BSSN::ML_log_confac
+        ML_BSSN::ML_metric
+        ML_BSSN::ML_trace_curv
+        ML_BSSN::ML_curv
+        ML_BSSN::ML_Gamma
+        ML_BSSN::ML_lapse
+        ML_BSSN::ML_shift
+        ML_BSSN::ML_dtlapse
+        ML_BSSN::ML_dtshift
+"
+
+
+TmunuBase::stress_energy_storage = yes
+TmunuBase::stress_energy_at_RHS  = yes
+TmunuBase::prolongation_type = "none"
+TmunuBase::support_old_CalcTmunu_mechanism = no
+
+
+############################# Hydrodynamics ##################################
+hydrobase::timelevels                           =       3
+hydrobase::evolution_method                     =       "GRHydro"
+hydrobase::prolongation_type                    =       "ENO"
+HydroBase::initial_hydro                        =       "pnsmapper"
+HydroBase::initial_temperature                  =       "pnsmapper"
+HydroBase::initial_entropy                      =       "pnsmapper"
+HydroBase::initial_y_e                          =       "pnsmapper"
+hydrobase::Y_e_evolution_method                 =       "GRHydro"
+hydrobase::temperature_evolution_method         =       "GRHydro"
+
+GRHydro::GRHydro_rho_central                    =       1.61930347e-08
+GRHydro::riemann_solver                         =       "HLLE"
+GRHydro::GRHydro_eos_type                       =       "General"
+GRHydro::GRHydro_eos_table                      =       "nuc_eos"
+GRHydro::recon_method                           =       "ppm"
+GRHydro::use_enhanced_ppm                       =       yes
+GRHydro::GRHydro_oppm_reflevel                  =       5
+#GRHydro::ppm_detect                            =       "yes"
+GRHydro::GRHydro_stencil                        =       3
+GRHydro::ppm_flatten                            =       "stencil_3"
+GRHydro::bound                                  =       "none"
+
+GRHydro::EoS_Change                             =       "no"
+
+GRHydro::GRHydro_c2p_warnlevel                  =       1
+GRHydro::GRHydro_c2p_warn_from_reflevel         =       3
+
+GRHydro::GRHydro_perc_ptol                      =      1.e-11
+grhydro::grhydro_eos_rf_prec                    =      1.0e-11
+grhydro::grhydro_eos_hot_eps_fix                =      yes
+
+grhydro::sync_conserved_only = yes
+
+grhydro::use_cxx_code = yes
+
+#GRHydro::GRHydro_MaxNumEvolvedVarsSlow = 6
+
+GRHydro::Grhydro_MaxNumConstrainedVars          = 33
+GRHydro::GRHydro_MaxNumEvolvedVars              = 10
+grhydro::grhydro_maxnumsandrvars                = 16
+
+
+#------ Atmosphere treatment
+SpaceMask::use_mask                             =       yes
+GRHydro::rho_rel_min                            =       1e-8
+grhydro::rho_abs_min                            =       3.5e-13
+GRHydro::GRHydro_atmo_tolerance                 =       0.001
+
+grhydro::grhydro_hot_atmo_temp                  =       0.17
+grhydro::grhydro_hot_atmo_Y_e                   =       0.50
+
+grhydro::grhydro_y_e_min = 0.05
+grhydro::grhydro_y_e_max = 0.52
+
+GRHydro::Tmunu_damping_radius_min = 3300
+GRHydro::Tmunu_damping_radius_max = 3800
+
+
+
+
+########################### Initial Work ##############################
+admbase::initial_data				=	"pnsmapper"
+admbase::initial_lapse				=	"pnsmapper"
+admbase::initial_shift				=	"pnsmapper"
+
+
+
+
+eos_omni::nuceos_read_table = yes
+eos_omni::nuceos_table_name = $datadir+"SFHo.h5"
+eos_omni::read_table_on_single_process = yes
+eos_omni::do_energy_shift = yes
+
+eos_omni::poly_gamma                            = 5.0
+#eos_omni::poly_gamma_ini                        = 1.333333333333333
+eos_omni::poly_k                                = 0.4640517
+eos_omni::gl_gamma                              = 5.0
+eos_omni::gl_k                                  = 0.4640517
+eos_omni::hybrid_gamma1                         = 5.0
+eos_omni::hybrid_gamma2                         = 2.4
+eos_omni::hybrid_gamma_th                       = 1.333333333333333333
+eos_omni::hybrid_k1                             = 0.4640517
+eos_omni::hybrid_rho_nuc                        = 3.238607e-4
+
+
+# wave extraction
+ZelmaniQuadWaveExtract::compute_every    = 8
+ZelmaniQuadWaveExtract::verbose          = no
+ZelmaniQuadWaveExtract::start_time       = 0.0
+ZelmaniQuadWaveExtract::integrand_type   = "legacy_radius_criterion"
+ZelmaniQuadWaveExtract::outer_radius     = 500.0e0
+ZelmaniQuadWaveExtract::vphys = yes
+
+ZelmaniAnalysis::do_ic_analysis = no
+ZelmaniAnalysis::do_omega_3D = no
+ZelmaniAnalysis::number_of_spheres = 3
+ZelmaniAnalysis::radii[0] = 150.0
+ZelmaniAnalysis::radii[1] = 200.0
+ZelmaniAnalysis::radii[2] = 250.0
+
+ZelmaniShockTracker2::track_n_levels = 1
+ZelmaniShockTracker2::track_levels[0] = 5
+ZelmaniShockTracker2::track_level_type[0] = 0
+ZelmaniShockTracker2::track_level_out_dist[0] = 15.0
+ZelmaniShockTracker2::track_level_dist_fac = 1.4
+
+ZelmaniShockTracker2::ntheta = 21
+ZelmaniShockTracker2::nphi = 40
+ZelmaniShockTracker2::nrad = 800
+ZelmaniShockTracker2::rad_max = 300.0
+ZelmaniShockTracker2::nrad_outer = 200
+ZelmaniShockTracker2::rad_max_outer = 1000.0
+ZelmaniShockTracker2::symm = "full"
+
+ZelmaniShockTracker2::start_time_inner_rad = 0.0
+ZelmaniShockTracker2::inner_min_radius = 40.0
+ZelmaniShockTracker2::verbose = yes
+ZelmaniShockTracker2::compute_every = 64
+ZelmaniShockTracker2::check_tracking_every = 64
+
+ZelmaniShockTracker2::entropy_value = 6.0
+
+
+############################# Infrastructure Related Stuff ##################
+# Timing parameters
+#TimerReport::out_every    = 64
+#TimerReport::out_filename = "TimerReport"
+
+Cactus::terminate                               =       "iteration"
+# 2 coarse steps since there are 8 refinement levels
+Cactus::cctk_itlast                             =       128
+# checkpoints are written once every 12 hours normaly, so they do not matter
+# for runtime since they only take a couple minutes to write at most
+io::checkpoint_on_terminate                     =       "no"
+
+
+SphericalSurface::nsurfaces             = 3
+SphericalSurface::maxntheta             = 69
+SphericalSurface::maxnphi               = 136
+SphericalSurface::verbose               = no
+
+SphericalSurface::ntheta       [0] = 69
+SphericalSurface::nphi         [0] = 136
+SphericalSurface::nghoststheta [0] = 2
+SphericalSurface::nghostsphi   [0] = 2
+SphericalSurface::set_spherical[0] = yes
+SphericalSurface::radius       [0] = 150.e0
+
+SphericalSurface::ntheta       [1] = 69
+SphericalSurface::nphi         [1] = 136
+SphericalSurface::nghoststheta [1] = 2
+SphericalSurface::nghostsphi   [1] = 2
+SphericalSurface::set_spherical[1] = yes
+SphericalSurface::radius       [1] = 200.0e0
+
+SphericalSurface::ntheta       [2] = 69
+SphericalSurface::nphi         [2] = 136
+SphericalSurface::nghoststheta [2] = 2
+SphericalSurface::nghostsphi   [2] = 2
+SphericalSurface::set_spherical[2] = yes
+SphericalSurface::radius       [2] = 250.0e0
+
+ActiveThorns = "ZelmaniCoMShift driftcorrectcom"
+
+ZelmaniCoMShift::use_CoM_radius = yes
+ZelmaniCoMShift::CoM_radius = 500.0
+ZelmaniCoMShift::verbose_level = 1
+ZelmaniCoMShift::do_every = 4
+
+driftcorrectcom::verbose_level = 1
+driftcorrectcom::first_activation_on_recovery = no
+driftcorrectcom::do_position_correction = yes
+driftcorrectcom::position_timescale = 20.0
+driftcorrectcom::position_correction_falloff = 0.0
+
+
+
+###carpetiohdf5::skip_recover_variables            =       "ZelmaniCoMShift::center_of_mass_helpers
+###                                                         ZelmaniCoMShift::center_of_mass
+###                                                         ZelmaniCoMShift::have_good_data
+###                                                         DriftCorrectCoM::dc4_state
+###                                                         DriftCorrectCoM::dc4_current_time
+###                                                         DriftCorrectCoM::dc4_size
+###                                                         DriftCorrectCoM::dc4_position
+###"
+###
+
+#carpetiohdf5::skip_recover_variables            =       "InterpFromSphericalData::run_records"
+carpetiohdf5::skip_recover_variables            =       ""
+
+#ActiveThorns = PAPI
+#TimerReport::output_all_timers_together  = yes
+#TimerReport::all_timers_clock = "P_FP_OPS"
+TimerReport::n_top_timers = 20
+
+###Mirror::use_slab = yes
+###Mirror::verbosity = 2
+###Mirror::check_every = 1
+###Mirror::start_checking_at_iteration = 427528
+###Mirror::stop_checking_after_iteration = 427528
+###Mirror::vars = "
+###        zelmanim1::enu
+###        zelmanim1::fnu
+###"

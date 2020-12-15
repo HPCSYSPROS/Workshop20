@@ -1,0 +1,47 @@
+#!/bin/bash
+
+cp makefile.h.common512 ./nwchem-src/src/config/makefile.h
+
+export NWCHEM_LONG_PATHS=Y
+export NWCHEM_TOP="${PWD}/nwchem-src"
+export NWCHEM_MODULES="nwpw driver stepper mp2_grad rimp2 ccsd property hessian vib"
+export FC=ifort
+export CC=icc
+export MSG_COMMS=MPI
+export TARGET=LINUX64
+export NWCHEM_TARGET=LINUX64
+export ARMCI_NETWORK=MPI-PR
+
+export HAS_BLAS=yes
+export BLAS_OPT=''
+export LIBMPI=''
+export USE_MPI=y
+export USE_MPIF=y
+export USE_MPIF4=y
+export USE_64TO32=y
+export MA_USE_ARMCI_MEM=Y
+export BLAS_SIZE=4
+export LAPACK_SIZE=4
+export SCALAPACK_SIZE=4
+#export SCALAPACK=-lsci_gnu
+#export BLASOPT=-lsci_gnu
+export BLASOPT="-L${MKLROOT}/lib/intel64 -lmkl_scalapack_lp64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_lp64 -lpthread -lm -ldl"
+export SCALAPACK="-L${MKLROOT}/lib/intel64 -lmkl_scalapack_lp64 -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lmkl_blacs_intelmpi_lp64 -lpthread -lm -ldl"
+export GA_DIR=ga-5-4
+export USE_NOFSCHECK=TRUE
+export USE_NOIO=TRUE
+
+cd $NWCHEM_TOP/src
+
+# make 64_to_32 converts BLAS routines to 32-bit indices
+
+# apply it only once to the fresh code; repeated application breaks the code
+
+make 64_to_32   # Cray specific - not needed on full 64-bit platform
+
+make realclean
+
+make nwchem_config
+
+make FC=ifort GA_DIR=ga-5-4
+

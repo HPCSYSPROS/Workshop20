@@ -1,0 +1,3 @@
+# Configuration definitions for thorn CarpetInterp2
+
+REQUIRES Carpet CarpetLib

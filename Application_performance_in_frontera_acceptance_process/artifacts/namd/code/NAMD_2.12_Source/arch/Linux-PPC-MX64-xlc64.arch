@@ -1,0 +1,9 @@
+NAMD_ARCH = Linux-PPC
+CHARMARCH = net-linux-ppc-mx64-xlc64
+
+CXX = xlC -q64 -D_NO_MALLOC_H #-DMEMUSAGE_USE_MSTATS
+CXXOPTS = -O3 -qnohot -DCMK_OPTIMIZE
+CXXTHREADOPTS = 
+CC = xlc -q64 
+COPTS = -O3
+

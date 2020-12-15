@@ -1,0 +1,107 @@
+\documentclass{article}
+
+\usepackage{epsf}
+\topmargin -0.5in
+\textheight 9.9in
+\oddsidemargin -0.3in
+\leftmargin -1in
+\textwidth 7in
+
+
+\begin{document}
+
+\title{Getting Three Timelevels of FMR Initial Data}
+\author{Scott Hawley}
+\date{June 6, 2002}
+\maketitle
+
+For parabolic interpolation in time, one needs three timelevels worth
+of data on the coarse grid in order to provide boundary data on the 
+finer grid.  Here we describe one scheme for obtaining these extra 
+timelevels of data at the initial time.  Essentially, we evolve 
+each grid backwards in time by two steps, but we do so rather carefully.
+
+The following diagram shows the scheme.  We start with initial
+data for all grids being specified at the current time (Step 1, not 
+shown).  We then evolve the coarse grid forward one step (Step 2) by
+the timestep $\Delta t$;
+in so doing we first move the coarse grid storage from the current
+timelevel (denoted by `` '' on the right of the first pane in the
+diagram, because variables at the current time receive no suffix 
+in Cactus) to the previous timelevel (denoted by ``\_p'') before
+evolving.  We then ``flip'' all the timelevels for the coarse grid (l=0), 
+meaning
+that we exchange the data on the `` '' and \_p\_p timelevels, 
+thus turning the picture upside down.
+We then evolve the coarse grid ``backward'' --- which is really
+just forward but with a timestep of $-\Delta t$.  Then we move on
+to the finer grid, evolving and flipping...
+
+Take a look at the diagram.  (We use $\tau$ instead of $t$ to denote
+the time, simply because it was easier to do that in the
+drawing program.) After the diagram we give a
+listing of pseudo-code which implements this scheme.
+\begin{center}
+   \epsfxsize=5.5in
+    \epsffile{threelev_initdata.eps}
+\end{center}
+
+\begin{center}
+   \epsfxsize=5.5in
+    \epsffile{threelev_initdata_2.eps}
+\end{center}
+
+Diagram finished.
+
+\pagebreak
+
+Here's some pseudo-code:
+\begin{verbatim}
+
+  int time_dir = 1; //Positive = forward (+t), Negative = backward (-t)
+  int lev;
+
+  // At this point we assume that we have initial data given on
+  // one timelevel, and we want to get data on the other timelevels
+
+  do lev = 0 to MaxLevels-1
+     // Evolve "forward" (which may be backward for lev=1,3,5,7...)
+     Evolve(lev, time_dir*dt(lev))
+
+     flip_timelevels_on_lev_and_coarser(lev)
+     //    Keep track of which direction (in time) we're integrating
+     time_dir = -time_dir
+
+     // Evolve in the opposite time-direction
+     Evolve(lev, time_dir*dt(lev))
+  end do
+
+  // Make sure we're pointed backwards, in order to get 2 "previous"
+  //   timelevels.  We could change the if statement to 
+  //   "if (mod(MaxLevels,2) == 0)", but I prefer to check time_dir 
+  //   explicitly, because it's easier to follow and I don't have to
+  //   worry about having made a mistake
+  if (time_dir > 0) then
+     flip_timelevels_on_lev_and_coarser(MaxLevels-1)
+     time_dir = -time_dir
+  end if
+
+  // Evolve each level backwards one more timestep
+  do lev = MaxLevels-1 to 0
+     Evolve(lev,-dt(lev))
+     if (lev>0) then
+       Restrict(lev -> lev-1)
+     end if
+  end do
+
+  // Here's where a user can add in extra evolution code if they want 
+  // to be extra-careful ("anal"), but remember that you'll be 
+  // overwriting the t=0 data so you'll need to re-load it if you do
+  // this.   
+
+  // Finally, one last flip to point us forward again
+  flip_all_timelevels()
+  time_dir = -time_dir
+\end{verbatim}
+
+\end{document}

@@ -1,0 +1,10 @@
+(* 4th order restriction for unstaggered points:  get point i+w from i-2,i-1,...,i+2; type coefu[w] to see the coefficients *)
+order=4;
+intF[i_,x_]:=x^(i+1)/(i+1);
+F[i_,x_]:=If[i==0,1,x^i];
+Do[ faw[i]=Sum[ a[j]*(intF[i,j+1/2]-intF[i,j-1/2]),{j,-order/2,order/2} ] - (intF[i,ww+1]-intF[i,ww-1])/2, {i,0,order} ];
+coefu[w_]:=Solve[ {faw[0]==0,faw[1]==0,faw[2]==0,faw[3]==0,faw[4]==0},{a[-2],a[-1],a[0],a[1],a[2]} ]/.ww->w;
+(*  *)
+(* 4th order restriction for staggered points (Lagrangian interpolation): get point i+w from i-2,i-1,...,i+2; type coefs[w] to see the coefficients *)
+Do[ fw[i]=Sum[ a[j]*F[i,j],{j,-order/2,order/2} ] - ww^i, {i,0,order} ];
+coefs[w_]:=Solve[ {fw[0]==0,fw[1]==0,fw[2]==0,fw[3]==0,fw[4]==0},{a[-2],a[-1],a[0],a[1],a[2]} ]/.ww->w;

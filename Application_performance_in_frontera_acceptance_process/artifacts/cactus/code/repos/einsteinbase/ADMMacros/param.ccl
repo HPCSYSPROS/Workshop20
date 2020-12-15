@@ -1,0 +1,10 @@
+# Parameter definitions for thorn ADMMacros
+# $Header$
+
+restricted:
+ 
+INT spatial_order "Order of spatial differencing"
+{
+2 :: "2nd order finite differencing"
+4 :: "4th order finite differencing"
+} 2

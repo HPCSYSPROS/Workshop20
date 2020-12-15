@@ -1,0 +1,181 @@
+# Interface definition for thorn SymBase
+# $Header$
+
+IMPLEMENTS: SymBase
+
+
+
+# Register a symmetry, and query the symmetry name/handle mapping:
+
+CCTK_INT FUNCTION SymmetryRegister (CCTK_STRING IN sym_name)
+PROVIDES FUNCTION SymmetryRegister \
+     WITH SymBase_SymmetryRegister \
+     LANGUAGE C
+
+CCTK_INT FUNCTION SymmetryHandleOfName (CCTK_STRING IN sym_name)
+PROVIDES FUNCTION SymmetryHandleOfName \
+     WITH SymBase_SymmetryHandleOfName \
+     LANGUAGE C
+
+CCTK_POINTER_TO_CONST FUNCTION SymmetryNameOfHandle (CCTK_INT IN sym_handle)
+PROVIDES FUNCTION SymmetryNameOfHandle \
+     WITH SymBase_SymmetryNameOfHandle \
+     LANGUAGE C
+
+
+
+# Register a symmetry condition for a face:
+
+CCTK_INT FUNCTION                                  \
+    SymmetryRegisterGrid                           \
+        (CCTK_POINTER IN cctkGH,                   \
+         CCTK_INT IN sym_handle,                   \
+         CCTK_INT IN ARRAY which_faces,            \
+         CCTK_INT IN ARRAY symmetry_zone_width)     
+PROVIDES FUNCTION SymmetryRegisterGrid \
+     WITH SymBase_SymmetryRegisterGrid \
+     LANGUAGE C
+
+CCTK_INT FUNCTION                                  \
+    SymmetryRegisterGI                             \
+        (CCTK_POINTER IN cctkGH,                   \
+         CCTK_INT IN sym_handle,                   \
+         CCTK_INT IN ARRAY which_faces,            \
+         CCTK_INT IN ARRAY symmetry_zone_width,    \
+         CCTK_INT IN group_index)
+PROVIDES FUNCTION SymmetryRegisterGI \
+     WITH SymBase_SymmetryRegisterGI \
+     LANGUAGE C
+
+CCTK_INT FUNCTION                                  \
+    SymmetryRegisterGN                             \
+        (CCTK_POINTER IN cctkGH,                   \
+         CCTK_INT IN sym_handle,                   \
+         CCTK_INT IN ARRAY which_faces,            \
+         CCTK_INT IN ARRAY symmetry_zone_width,    \
+         CCTK_STRING IN group_name)
+PROVIDES FUNCTION SymmetryRegisterGN \
+     WITH SymBase_SymmetryRegisterGN \
+     LANGUAGE C
+
+
+
+# Register a symmetry interpolator:
+
+CCTK_INT FUNCTION                                           \
+    SymmetryRegisterGridInterpolator                        \
+        (CCTK_POINTER IN cctkGH,                            \
+         CCTK_INT IN sym_handle,                            \
+         CCTK_INT CCTK_FPOINTER IN symmetry_interpolate     \
+             (CCTK_POINTER_TO_CONST IN cctkGH,              \
+              CCTK_INT IN N_dims,                           \
+              CCTK_INT IN local_interp_handle,              \
+              CCTK_INT IN param_table_handle,               \
+              CCTK_INT IN coord_system_handle,              \
+              CCTK_INT IN N_interp_points,                  \
+              CCTK_INT IN interp_coords_type,               \
+              CCTK_POINTER_TO_CONST ARRAY IN interp_coords, \
+              CCTK_INT IN N_input_arrays,                   \
+              CCTK_INT ARRAY IN input_array_indices,        \
+              CCTK_INT IN N_output_arrays,                  \
+              CCTK_INT ARRAY IN output_array_types,         \
+              CCTK_POINTER ARRAY IN output_arrays,          \
+              CCTK_INT IN faces))
+PROVIDES FUNCTION SymmetryRegisterGridInterpolator \
+     WITH SymBase_SymmetryRegisterGridInterpolator \
+     LANGUAGE C
+
+
+
+# Get the symmetry table handle for a grid or grid array:
+
+CCTK_INT FUNCTION \
+    SymmetryTableHandleForGrid (CCTK_POINTER_TO_CONST IN cctkGH)
+PROVIDES FUNCTION SymmetryTableHandleForGrid \
+     WITH SymBase_SymmetryTableHandleForGrid \
+     LANGUAGE C
+
+CCTK_INT FUNCTION                          \
+    SymmetryTableHandleForGI               \
+        (CCTK_POINTER_TO_CONST IN cctkGH,  \
+         CCTK_INT IN group_index)
+PROVIDES FUNCTION SymmetryTableHandleForGI \
+     WITH SymBase_SymmetryTableHandleForGI \
+     LANGUAGE C
+
+CCTK_INT FUNCTION                          \
+    SymmetryTableHandleForGN               \
+        (CCTK_POINTER_TO_CONST IN cctkGH,  \
+         CCTK_STRING IN group_name)
+PROVIDES FUNCTION SymmetryTableHandleForGN \
+     WITH SymBase_SymmetryTableHandleForGN \
+     LANGUAGE C
+
+CCTK_INT FUNCTION                         \
+    GetSymmetryBoundaries                 \
+        (CCTK_POINTER_TO_CONST IN cctkGH, \
+         CCTK_INT IN size,                \
+         CCTK_INT OUT ARRAY symbnd)
+PROVIDES FUNCTION GetSymmetryBoundaries \
+     WITH SymBase_GetSymmetryBoundaries \
+     LANGUAGE C
+
+
+
+# Interpolation
+
+CCTK_INT FUNCTION                                           \
+    SymmetryInterpolate                                     \
+        (CCTK_POINTER_TO_CONST IN cctkGH,                   \
+         CCTK_INT IN N_dims,                                \
+         CCTK_INT IN local_interp_handle,                   \
+         CCTK_INT IN param_table_handle,                    \
+         CCTK_INT IN coord_system_handle,                   \
+         CCTK_INT IN N_interp_points,                       \
+         CCTK_INT IN interp_coords_type,                    \
+         CCTK_POINTER_TO_CONST ARRAY IN interp_coords,      \
+         CCTK_INT IN N_input_arrays,                        \
+         CCTK_INT ARRAY IN input_array_indices,             \
+         CCTK_INT IN N_output_arrays,                       \
+         CCTK_INT ARRAY IN output_array_types,              \
+         CCTK_POINTER ARRAY IN output_arrays)
+PROVIDES FUNCTION SymmetryInterpolate \
+    WITH SymBase_SymmetryInterpolate  \
+    LANGUAGE C
+
+CCTK_INT FUNCTION                                           \
+    SymmetryInterpolateFaces                                \
+        (CCTK_POINTER_TO_CONST IN cctkGH,                   \
+         CCTK_INT IN N_dims,                                \
+         CCTK_INT IN local_interp_handle,                   \
+         CCTK_INT IN param_table_handle,                    \
+         CCTK_INT IN coord_system_handle,                   \
+         CCTK_INT IN N_interp_points,                       \
+         CCTK_INT IN interp_coords_type,                    \
+         CCTK_POINTER_TO_CONST ARRAY IN interp_coords,      \
+         CCTK_INT IN N_input_arrays,                        \
+         CCTK_INT ARRAY IN input_array_indices,             \
+         CCTK_INT IN N_output_arrays,                       \
+         CCTK_INT ARRAY IN output_array_types,              \
+         CCTK_POINTER ARRAY IN output_arrays,               \
+         CCTK_INT IN faces)
+PROVIDES FUNCTION SymmetryInterpolateFaces \
+    WITH SymBase_SymmetryInterpolateFaces  \
+    LANGUAGE C
+
+CCTK_INT FUNCTION                                           \
+    DriverInterpolate                                       \
+        (CCTK_POINTER_TO_CONST IN cctkGH,                   \
+         CCTK_INT IN N_dims,                                \
+         CCTK_INT IN local_interp_handle,                   \
+         CCTK_INT IN param_table_handle,                    \
+         CCTK_INT IN coord_system_handle,                   \
+         CCTK_INT IN N_interp_points,                       \
+         CCTK_INT IN interp_coords_type,                    \
+         CCTK_POINTER_TO_CONST ARRAY IN interp_coords,      \
+         CCTK_INT IN N_input_arrays,                        \
+         CCTK_INT ARRAY IN input_array_indices,             \
+         CCTK_INT IN N_output_arrays,                       \
+         CCTK_INT ARRAY IN output_array_types,              \
+         CCTK_POINTER ARRAY IN output_arrays)
+USES FUNCTION DriverInterpolate

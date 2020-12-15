@@ -1,0 +1,109 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+module ComputeMsmMgr {
+
+//  initnode void registerSumInts(void);
+//  initnode void registerSumFloatGrids(void);
+
+  message MsmInitMsg;
+
+  // variable size message
+  message GridMsg {
+    char gdata[];
+  };
+
+  message MsmBlockProxyMsg;
+  message MsmC1HermiteBlockProxyMsg;
+
+  message MsmGridCutoffProxyMsg;
+  message MsmC1HermiteGridCutoffProxyMsg;
+
+  message MsmGridCutoffInitMsg;
+
+  message MsmGridCutoffSetupMsg;
+  message MsmC1HermiteGridCutoffSetupMsg;
+
+  group ComputeMsmMgr {
+    entry ComputeMsmMgr(void);
+    entry void initialize(MsmInitMsg *);
+    entry void recvMsmBlockProxy(MsmBlockProxyMsg *);
+    entry void recvMsmGridCutoffProxy(MsmGridCutoffProxyMsg *);
+    entry void recvMsmC1HermiteBlockProxy(MsmC1HermiteBlockProxyMsg *);
+    entry void recvMsmC1HermiteGridCutoffProxy(MsmC1HermiteGridCutoffProxyMsg*);
+    entry void update(CkQdMsg *);
+    entry void addPotential(GridMsg *);
+  };
+
+  group MsmBlockMap : CkArrayMap {
+    entry MsmBlockMap(int level);
+  };
+
+  array [3D] MsmBlock {
+    entry MsmBlock(int level);
+    entry void addCharge(GridMsg *);
+    entry void addPotential(GridMsg *);
+    entry void sumReducedPotential(CkReductionMsg *);
+    entry void setupSections(void);
+  };
+
+  array [3D] MsmC1HermiteBlock {
+    entry MsmC1HermiteBlock(int level);
+    entry void addCharge(GridMsg *);
+    entry void addPotential(GridMsg *);
+    entry void sumReducedPotential(CkReductionMsg *);
+    entry void setupSections(void);
+  };
+
+  group MsmGridCutoffMap : CkArrayMap {
+    entry MsmGridCutoffMap(void);
+  };
+
+  // MsmGridCutoff calculates a charge -> potential interaction pair
+  // between blocks.
+  array [1D] MsmGridCutoff {
+    entry MsmGridCutoff(void);
+
+    // setup() passes in the block index and range for potentials
+    entry void setup(MsmGridCutoffInitMsg *);
+
+    // setupSections() called on each section root
+    // passes in the section proxy and the MsmBlock element proxy
+    // purpose is to register the default reduction for each section
+    entry void setupSections(MsmGridCutoffSetupMsg *);
+
+    // compute() passes in the charge block
+    entry void compute(GridMsg *);
+  };
+
+  // MsmC1HermiteGridCutoff calculates a charge -> potential interaction pair
+  // between blocks of grid vector elements.
+  array [1D] MsmC1HermiteGridCutoff {
+    entry MsmC1HermiteGridCutoff(void);
+
+    // setup() passes in the block index and range for potentials
+    entry void setup(MsmGridCutoffInitMsg *);
+
+    // setupSections() called on each section root
+    // passes in the section proxy and the MsmC1HermiteBlock element proxy
+    // purpose is to register the default reduction for each section
+    entry void setupSections(MsmC1HermiteGridCutoffSetupMsg *);
+
+    // compute() passes in the charge block
+    entry void compute(GridMsg *);
+  };
+
+  chare MsmTimer {
+    entry MsmTimer(void);
+    entry [reductiontarget] void done(double tm[n], int n);
+  };
+
+  chare MsmProfiler {
+    entry MsmProfiler(void);
+    entry [reductiontarget] void done(int tm[n], int n);
+  };
+
+};

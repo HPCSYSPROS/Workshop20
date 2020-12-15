@@ -1,0 +1,50 @@
+nx,ny,nz,nc
+   8192,8192,8192,0
+nsteps,iostep,istart,kstop,isave
+   28,7,0,-1,14
+stend,entime,time0
+   0.0,0.0,0.0
+kinit(i)
+   -2,-2,-2
+fninit
+   outpen1
+indir_fn
+   /path/to/checkpoint
+irz
+   1
+viscos
+   0.0028
+a11,a22,a33,shear
+   0.0,0.0,0.0,0.0
+beta1,beta2,beta3,bet12
+   1.0,1.0,1.0,0.0
+cfl,dt
+   3.77,0.0
+dtout, tfout
+   0.0,0.0
+dtsave, tfsave
+   0.0,0.0
+kshift
+   4
+tforce,epsfor,kforce,tfiuo
+   6.199433e-01,1.77063e-03,0.0,0.4
+rrate
+   0.0
+iovor
+   1
+iseed
+   122929298
+rkmethod
+   4
+nxpad,nypad,nzpad
+   8192,8192,8192
+tl_hat,kmaxeta (needed by epfor_param routine)
+   0.15,1.4
+hdf5 input (0 off, 1 pen, 2 row, 3 col), chkpt number
+   0,0
+hdf5 output (0 off, 1 pen, 2 row, 3 col), bwio
+   0,0
+ioaxi (every XX iosteps, if XX is positive, for each wavenumber direction)
+-1, -1, -1
+conductivity (used for MHD runs)
+0.

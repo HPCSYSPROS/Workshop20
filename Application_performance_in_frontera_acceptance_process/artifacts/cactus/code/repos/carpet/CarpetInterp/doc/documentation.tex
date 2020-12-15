@@ -1,0 +1,190 @@
+% *======================================================================*
+%  Cactus Thorn template for ThornGuide documentation
+%  Author: Ian Kelley
+%  Date: Sun Jun 02, 2002
+%
+%  Thorn documentation in the latex file doc/documentation.tex 
+%  will be included in ThornGuides built with the Cactus make system.
+%  The scripts employed by the make system automatically include 
+%  pages about variables, parameters and scheduling parsed from the 
+%  relevent thorn CCL files.
+%  
+%  This template contains guidelines which help to assure that your     
+%  documentation will be correctly added to ThornGuides. More 
+%  information is available in the Cactus UsersGuide.
+%                                                    
+%  Guidelines:
+%   - Do not change anything before the line
+%       % START CACTUS THORNGUIDE",
+%     except for filling in the title, author, date etc. fields.
+%        - Each of these fields should only be on ONE line.
+%        - Author names should be sparated with a \\ or a comma
+%   - You can define your own macros, but they must appear after
+%     the START CACTUS THORNGUIDE line, and must not redefine standard 
+%     latex commands.
+%   - To avoid name clashes with other thorns, 'labels', 'citations', 
+%     'references', and 'image' names should conform to the following 
+%     convention:          
+%       ARRANGEMENT_THORN_LABEL
+%     For example, an image wave.eps in the arrangement CactusWave and 
+%     thorn WaveToyC should be renamed to CactusWave_WaveToyC_wave.eps
+%   - Graphics should only be included using the graphix package. 
+%     More specifically, with the "includegraphics" command. Do
+%     not specify any graphic file extensions in your .tex file. This 
+%     will allow us (later) to create a PDF version of the ThornGuide
+%     via pdflatex. |
+%   - References should be included with the latex "bibitem" command. 
+%   - Use \begin{abstract}...\end{abstract} instead of \abstract{...}
+%   - Do not use \appendix, instead include any appendices you need as 
+%     standard sections. 
+%   - For the benefit of our Perl scripts, and for future extensions, 
+%     please use simple latex.     
+%
+% *======================================================================* 
+% 
+% Example of including a graphic image:
+%    \begin{figure}[ht]
+% 	\begin{center}
+%    	   \includegraphics[width=6cm]{MyArrangement_MyThorn_MyFigure}
+% 	\end{center}
+% 	\caption{Illustration of this and that}
+% 	\label{MyArrangement_MyThorn_MyLabel}
+%    \end{figure}
+%
+% Example of using a label:
+%   \label{MyArrangement_MyThorn_MyLabel}
+%
+% Example of a citation:
+%    \cite{MyArrangement_MyThorn_Author99}
+%
+% Example of including a reference
+%   \bibitem{MyArrangement_MyThorn_Author99}
+%   {J. Author, {\em The Title of the Book, Journal, or periodical}, 1 (1999), 
+%   1--16. {\tt http://www.nowhere.com/}}
+%
+% *======================================================================* 
+
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+% The author of the documentation
+\author{Erik Schnetter \textless schnetter@aei.mpg.de\textgreater\\
+        Thomas Radke \textless tradke@aei.mpg.de\textgreater}
+
+% The title of the document (not necessarily the name of the Thorn)
+\title{CarpetInterp}
+
+% the date your document was last changed, if your document is in CVS, 
+% please use:
+\date{26 August 2005}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+% Add all definitions used in this documentation here 
+%   \def\mydef etc
+
+% Add an abstract for this thorn's documentation
+\begin{abstract}
+
+Thorn {\bf CarpetInterp} provides a parallel interpolator for Carpet.
+
+\end{abstract}
+
+% The following sections are suggestive only.
+% Remove them or add your own.
+
+\section{Introduction}
+
+{\bf CarpetInterp} works similar to {\bf PUGHInterp}, the interpolation
+thorn of the standard unigrid driver in Cactus.
+
+\begin{enumerate}
+  \item Firstly, the points to interpolate at (which can vary from processor
+        to processor) are mapped onto processors.
+        Each processor accumulates the number of coordinates it needs to
+        send to other processors (which own the corresponding points).
+
+  \item In a collective communication step, all processors exchange the
+        coordinates of the interpolation points which are not located locally.
+
+  \item After each processor received the coordinates of (local) points to
+        interpolate at, it maps them onto components (also counting the
+        number of points for each component).
+
+  \item Now all processors do -- in parallel -- the actual interpolation
+        by calling the local interpolator (via {\tt CCTK\_InterpLocalUnform()})
+        on each component.
+
+  \item Finally, the interpolation results are sent back to the requesting
+        processors in another collective communication step.
+\end{enumerate}
+
+
+\section{Using CarpetInterp}
+
+{\bf CarpetInterp} overloads the flesh interpolation C API routine
+\begin{verbatim}
+  int CCTK_InterpGridArrays
+                     (const cGH *GH,
+                      int N_dims,
+                      int local_interp_handle,
+                      int param_table_handle,
+                      int coord_system_handle,
+                      int N_interp_points,
+                        int interp_coords_type,
+                        const void *const interp_coords[],
+                      int N_input_arrays,
+                        const CCTK_INT input_array_indices[],
+                      int N_output_arrays,
+                        const CCTK_INT output_array_types[],
+                        void *const output_arrays[])
+\end{verbatim}
+which is described in detail in the Cactus Reference Manual.
+
+It also provides an equivalent aliased function
+\begin{verbatim}
+  CCTK_INT FUNCTION DriverInterpolate
+                     (CCTK_POINTER_TO_CONST IN cctkGH,
+                      CCTK_INT IN N_dims,
+                      CCTK_INT IN local_interp_handle,
+                      CCTK_INT IN param_table_handle,
+                      CCTK_INT IN coord_system_handle,
+                      CCTK_INT IN N_interp_points,
+                      CCTK_INT IN interp_coords_type,
+                      CCTK_POINTER_TO_CONST ARRAY IN interp_coords,
+                      CCTK_INT IN N_input_arrays,
+                      CCTK_INT ARRAY IN input_array_indices,
+                      CCTK_INT IN N_output_arrays,
+                      CCTK_INT ARRAY IN output_array_types,
+                      CCTK_POINTER ARRAY IN output_arrays)
+\end{verbatim}
+which can be called by symmetry thorns to implement symmetry interpolations
+(see the thorn documentation of {\bf CactusBase/SymBase} for details).
+
+
+\subsection{Limitations}
+
+The current implementation of {\bf CarpetInterp} supports only 3-dimensional
+grid variables as inputs ({\tt N\_dims $==$ 3}).
+
+Interpolation coordinates and output arrays must be of type
+{\tt CCTK\_VARIABLE\_REAL}.
+
+A valid handle for a parameter table must be passed in so that {\bf CarpetInterp}
+can store in it the overall status code of the local interpolator.
+
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

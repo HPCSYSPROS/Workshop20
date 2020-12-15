@@ -1,0 +1,233 @@
+module PmeSolver {
+
+  message PmeSelfEnergyMsg;
+
+  message PmeStartMsg;
+
+  message PmeRunMsg;
+
+  message PmeDoneMsg;
+
+  group PmePencilXYZMap : CkArrayMap {
+    entry PmePencilXYZMap(int pe);
+  };
+
+  group PmePencilXMap : CkArrayMap {
+    entry PmePencilXMap(int ia, int ib, int width, std::vector<int> pes);
+  };
+
+  group PmePencilXYMap : CkArrayMap {
+    entry PmePencilXYMap(std::vector<int> pes);
+  };
+
+  array[1D] PmePencilXYZ {
+    entry PmePencilXYZ();
+    entry void recvSelfEnergy(PmeSelfEnergyMsg *msg) {
+      serial {
+        selfEnergy += msg->energy;
+        delete msg;
+        numSelfEnergyRecv++;
+        if (numSelfEnergyRecv == PatchMap::Object()->numPatches()) {
+          selfEnergyReady();
+        }
+      }
+    };
+    entry void selfEnergyReady();
+    entry void chargeGridReady(PmeRunMsg *msg);
+    entry void skip();
+    entry void start(PmeStartMsg *pmeStartMsg) {
+      serial "initFFT" {
+        initFFT(pmeStartMsg); 
+        delete pmeStartMsg;
+        firstIter = true;
+      }
+      while (true) {
+        when chargeGridReady(PmeRunMsg *msg) serial "forwardFFT" {
+          doEnergy = msg->doEnergy;
+          doVirial = msg->doVirial;
+          lattice = msg->lattice;
+          numStrayAtoms = msg->numStrayAtoms;
+          delete msg;
+          forwardFFT();
+        }
+        serial "forwardDone" { forwardDone(); }
+        serial "backwardFFT" { backwardFFT(); }
+        if (firstIter) {
+          // On the first iteration, wait until self energy has been received
+          when selfEnergyReady() serial "backwardDoneFirst" { firstIter = false; backwardDone(); }
+        } else {
+          serial "backwardDone" { backwardDone(); }
+        }
+      }
+    };
+  };
+
+  message PmeBlockMsg {
+    float2 data[];
+  };
+
+  array[3D] PmePencilXY {
+    entry PmePencilXY();
+    entry void chargeGridReady(PmeRunMsg *msg);
+    entry void recvBlock(PmeBlockMsg *msg);
+    entry void start(PmeStartMsg *pmeStartMsg) {
+      serial "initFFT" {
+        initFFT(pmeStartMsg); 
+        delete pmeStartMsg;
+        start();
+      }
+      while (true) {
+        when chargeGridReady(PmeRunMsg *msg) serial "forwardFFT" {
+          doEnergy = msg->doEnergy;
+          doVirial = msg->doVirial;
+          lattice = msg->lattice;
+          numStrayAtoms = msg->numStrayAtoms;
+          delete msg;
+          forwardFFT();
+          forwardDone();
+        }
+        // ------------------------
+        // Goes into z-pencil here
+        // ------------------------
+        for (imsg=0;imsg < pmeGrid.xBlocks;++imsg) {
+          when recvBlock(PmeBlockMsg *msg) serial "recvDataFromZ" {
+            recvDataFromZ(msg);
+          }
+        }
+        serial "backwardFFT" {
+          backwardFFT();
+          backwardDone();
+        }
+      }
+    };
+  };
+
+  array[3D] PmePencilX {
+    entry PmePencilX();
+    entry void chargeGridReady(PmeRunMsg *msg);
+    entry void recvBlock(PmeBlockMsg *msg);
+    entry void start(PmeStartMsg *pmeStartMsg) {
+      serial "initFFT" {
+        initFFT(pmeStartMsg); 
+        delete pmeStartMsg;
+        start();
+      }
+      while (true) {
+        when chargeGridReady(PmeRunMsg *msg) serial "forwardFFT" {
+          doEnergy = msg->doEnergy;
+          doVirial = msg->doVirial;
+          lattice = msg->lattice;
+          numStrayAtoms = msg->numStrayAtoms;
+          delete msg;
+          forwardFFT();
+          forwardDone();
+        }
+        // ------------------------
+        // Goes into y-pencil here
+        // ------------------------
+        for (imsg=0;imsg < pmeGrid.xBlocks;++imsg) {
+          when recvBlock(PmeBlockMsg *msg) serial "recvDataFromY" {
+            recvDataFromY(msg);
+          }
+        }
+        serial "backwardFFT" {
+          backwardFFT();
+          backwardDone();
+        }
+      }
+    };
+  };
+
+  array[3D] PmePencilY {
+    entry PmePencilY();
+    entry void recvBlock(PmeBlockMsg *msg);
+    entry void start(PmeStartMsg *pmeStartMsg) {
+      serial "initFFT" {
+        initFFT(pmeStartMsg); 
+        delete pmeStartMsg;
+        start();
+      }
+      while (true) {
+        for (imsg=0;imsg < pmeGrid.yBlocks;++imsg) {
+          when recvBlock(PmeBlockMsg *msg) serial "recvDataFromX" {
+            doEnergy = msg->doEnergy;
+            doVirial = msg->doVirial;
+            lattice  = msg->lattice;
+            numStrayAtoms += msg->numStrayAtoms;
+            recvDataFromX(msg);
+          }
+        }
+        serial "forwardFFT" {
+          forwardFFT();
+          forwardDone();
+          numStrayAtoms = 0;
+        }
+        // ------------------------
+        // Goes into z-pencil here
+        // ------------------------
+        for (imsg=0;imsg < pmeGrid.yBlocks;++imsg) {
+          when recvBlock(PmeBlockMsg *msg) serial "recvDataFromZ" {
+            recvDataFromZ(msg);
+          }
+        }
+        serial "backwardFFT" {
+          backwardFFT();
+          backwardDone();
+        }
+      }
+    };
+  };
+
+  array[3D] PmePencilZ {
+    entry PmePencilZ();
+    entry void recvSelfEnergy(PmeSelfEnergyMsg *msg) {
+      serial {
+        if (thisIndex.x != 0 || thisIndex.y != 0 || thisIndex.z != 0)
+          NAMD_bug("PmePencilZ::recvSelfEnergy can only be called on (0,0,0) element");
+        selfEnergy += msg->energy;
+        delete msg;
+        numSelfEnergyRecv++;
+        if (numSelfEnergyRecv == PatchMap::Object()->numPatches()) {
+          selfEnergyReady();
+        }
+      }
+    };
+    entry void selfEnergyReady();
+    entry void recvBlock(PmeBlockMsg *msg);
+    entry void skip();
+    entry void start(PmeStartMsg *pmeStartMsg) {
+      serial "initFFT" {
+        initFFT(pmeStartMsg); 
+        delete pmeStartMsg;
+        start();
+        if (thisIndex.x == 0 && thisIndex.y == 0)
+          firstIter = true;
+        else
+          firstIter = false;
+      }
+      while (true) {
+        for (imsg=0;imsg < pmeGrid.zBlocks;++imsg) {
+          when recvBlock(PmeBlockMsg *msg) serial "recvDataFromY" {
+            doEnergy = msg->doEnergy;
+            doVirial = msg->doVirial;
+            lattice  = msg->lattice;
+            numStrayAtoms += msg->numStrayAtoms;
+            recvDataFromY(msg);
+          }
+        }
+        serial "forwardFFT" {
+          forwardFFT();
+          forwardDone();
+        }
+        serial "backwardFFT" { backwardFFT(); }
+        if (firstIter) {
+          // On the first iteration on the (0,0) element, wait until self energy has been received
+          when selfEnergyReady() serial "backwardDoneFirst" { firstIter = false; backwardDone(); }
+        } else {
+          serial "backwardDone" { backwardDone(); }
+        }
+      }
+    };
+  };
+
+};

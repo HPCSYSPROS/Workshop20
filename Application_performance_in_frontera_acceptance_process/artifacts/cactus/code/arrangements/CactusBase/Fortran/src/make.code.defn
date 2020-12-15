@@ -1,0 +1,48 @@
+# Main make.code.defn file for thorn Fortran
+
+ifneq ($(strip $(F90)),none)
+
+SRCS =	cctk.F90                        \
+        cctk_ActiveThorns.F90           \
+        cctk_Banner.F90                 \
+        cctk_Comm.F90                   \
+        cctk_CommandLine.F90            \
+        cctk_Complex.F90                \
+        cctk_Constants.F90              \
+        cctk_Coord.F90                  \
+        cctk_DebugDefines.F90           \
+        cctk_Faces.F90                  \
+        cctk_File.F90                   \
+        cctk_Flesh.F90                  \
+        cctk_FortranString1.F90         \
+        cctk_FortranWrappers.F90        \
+        cctk_GHExtensions.F90           \
+        cctk_GNU.F90                    \
+        cctk_Groups.F90                 \
+        cctk_GroupsOnGH.F90             \
+        cctk_IO.F90                     \
+        cctk_IOMethods.F90              \
+        cctk_Interp.F90                 \
+        cctk_Main.F90                   \
+        cctk_Malloc1.F90                \
+        cctk_Math.F90	                \
+        cctk_MemAlloc.F90               \
+        cctk_Misc.F90                   \
+        cctk_ParamCheck.F90             \
+        cctk_Parameter.F90              \
+        cctk_Reduction.F90              \
+        cctk_Schedule.F90               \
+        cctk_Sync.F90                   \
+        cctk_Termination.F90            \
+        cctk_Timers.F90                 \
+        cctk_Types.F90                  \
+        cctk_Version.F90                \
+        cctk_WarnLevel.F90              \
+        util_Table.F90                  \
+        paramcheck.F90
+
+else
+
+SRCS =
+
+endif

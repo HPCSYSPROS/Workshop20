@@ -1,0 +1,9 @@
+# Main make.code.defn file for thorn hwloc
+
+CFLAGS += -DHWLOC_UTILPATH='$(CCTK_HOME)/exe/$(notdir $(TOP))'
+
+# Source files in this directory
+SRCS = # lstopo.c
+
+# Subdirectories containing source files
+SUBDIRS = 

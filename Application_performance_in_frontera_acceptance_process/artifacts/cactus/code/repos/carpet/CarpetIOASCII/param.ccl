@@ -1,0 +1,408 @@
+# Parameter definitions for thorn CarpetIOASCII
+
+
+
+shares: IO
+
+USES STRING out_dir
+
+USES KEYWORD out_criterion
+USES CCTK_INT out_every
+USES CCTK_REAL out_dt
+
+
+
+USES CCTK_INT out_xline_yi
+USES CCTK_INT out_xline_zi
+USES CCTK_INT out_yline_xi
+USES CCTK_INT out_yline_zi
+USES CCTK_INT out_zline_xi
+USES CCTK_INT out_zline_yi
+
+USES CCTK_REAL out_xline_y
+USES CCTK_REAL out_xline_z
+USES CCTK_REAL out_yline_x
+USES CCTK_REAL out_yline_z
+USES CCTK_REAL out_zline_x
+USES CCTK_REAL out_zline_y
+
+
+
+USES CCTK_INT out_xyplane_zi
+USES CCTK_INT out_xzplane_yi
+USES CCTK_INT out_yzplane_xi
+
+USES CCTK_REAL out_xyplane_z
+USES CCTK_REAL out_xzplane_y
+USES CCTK_REAL out_yzplane_x
+
+
+
+USES BOOLEAN new_filename_scheme
+USES BOOLEAN strict_io_parameter_check
+USES KEYWORD out_fileinfo
+USES KEYWORD verbose
+USES STRING out_group_separator
+
+
+
+private:
+
+
+# this affects a static variable (created_files in ioascii.cc) which controls
+# file truncation and thus it should not change during a single segment
+BOOLEAN one_file_per_group "Write one file per group instead of per variable" STEERABLE = RECOVER
+{
+} "no"
+
+
+
+BOOLEAN output_all_timelevels "Output all timelevels instead of only the current" STEERABLE = ALWAYS
+{
+} "no"
+
+
+
+BOOLEAN separate_grids "Separate grid levels in the output file by additional empty lines" STEERABLE = ALWAYS
+{
+} "yes"
+
+BOOLEAN separate_components "Separate grid components in the output file by additional empty lines" STEERABLE = ALWAYS
+{
+} "no"
+
+
+
+BOOLEAN compact_format "Use a more compact output format with fewer columns and lines" STEERABLE = ALWAYS
+{
+} "no"
+
+
+
+BOOLEAN use_grid_coordinates "Use grid coordinate grid functions to obtain coordinate locations" STEERABLE = ALWAYS
+{
+} "no"
+
+
+
+INT out_precision "How many digits to output floating-point numbers with" STEERABLE = ALWAYS
+{
+  0:* :: "Number of precision digits"
+} 15
+
+
+
+CCTK_STRING out0D_dir "Name of 0D ASCII output directory, overrides IO::out_dir" STEERABLE = ALWAYS
+{
+  "^$" :: "Empty: use IO::out_dir"
+  ".+" :: "Not empty: directory name"
+} ""
+
+CCTK_STRING out1D_dir "Name of 1D ASCII output directory, overrides IO::out_dir" STEERABLE = ALWAYS
+{
+  "^$" :: "Empty: use IO::out_dir"
+  ".+" :: "Not empty: directory name"
+} ""
+
+CCTK_STRING out2D_dir "Name of 2D ASCII output directory, overrides IO::out_dir" STEERABLE = ALWAYS
+{
+  "^$" :: "Empty: use IO::out_dir"
+  ".+" :: "Not empty: directory name"
+} ""
+
+CCTK_STRING out3D_dir "Name of 3D ASCII output directory, overrides IO::out_dir" STEERABLE = ALWAYS
+{
+  "^$" :: "Empty: use IO::out_dir"
+  ".+" :: "Not empty: directory name"
+} ""
+
+
+
+CCTK_STRING out0D_vars "Variables to output in 0D ASCII file format" STEERABLE = ALWAYS
+{
+  "" :: "List of group or variable names"
+} ""
+
+CCTK_STRING out1D_vars "Variables to output in 1D ASCII file format" STEERABLE = ALWAYS
+{
+  "" :: "List of group or variable names"
+} ""
+
+CCTK_STRING out2D_vars "Variables to output in 2D ASCII file format" STEERABLE = ALWAYS
+{
+  "" :: "List of group or variable names"
+} ""
+
+CCTK_STRING out3D_vars "Variables to output in 3D ASCII file format" STEERABLE = ALWAYS
+{
+  "" :: "List of group or variable names"
+} ""
+
+
+
+KEYWORD out0D_criterion "Criterion to select 0D ASCII output intervals, overrides out_every" STEERABLE = ALWAYS
+{
+  "default"   :: "Use IO::out_criterion"
+  "never"     :: "Never output"
+  "iteration" :: "Output every so many iterations"
+  "divisor"   :: "Output if iteration mod divisor == 0."
+  "time"      :: "Output every that much coordinate time"
+} "default"
+
+KEYWORD out1D_criterion "Criterion to select 1D ASCII output intervals, overrides out_every" STEERABLE = ALWAYS
+{
+  "default"   :: "Use IO::out_criterion"
+  "never"     :: "Never output"
+  "iteration" :: "Output every so many iterations"
+  "divisor"   :: "Output if (iteration % out_every) == 0."
+  "time"      :: "Output every that much coordinate time"
+} "default"
+
+KEYWORD out2D_criterion "Criterion to select 2D ASCII output intervals, overrides out_every" STEERABLE = ALWAYS
+{
+  "default"   :: "Use IO::out_criterion"
+  "never"     :: "Never output"
+  "iteration" :: "Output every so many iterations"
+  "divisor"   :: "Output if (iteration % out_every) == 0."
+  "time"      :: "Output every that much coordinate time"
+} "default"
+
+KEYWORD out3D_criterion "Criterion to select 3D ASCII output intervals, overrides out_every" STEERABLE = ALWAYS
+{
+  "default"   :: "Use IO::out_criterion"
+  "never"     :: "Never output"
+  "iteration" :: "Output every so many iterations"
+  "divisor"   :: "Output if (iteration % out_every) == 0."
+  "time"      :: "Output every that much coordinate time"
+} "default"
+
+
+
+CCTK_INT out0D_every "How often to do 0D ASCII output, overrides out_every" STEERABLE = ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+  -1:0 :: "No output"
+  -2   :: "Use IO::out_every"
+} -2
+
+CCTK_INT out1D_every "How often to do 1D ASCII output, overrides out_every" STEERABLE = ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+  -1:0 :: "No output"
+  -2   :: "Use IO::out_every"
+} -2
+
+CCTK_INT out2D_every "How often to do 2D ASCII output, overrides out_every" STEERABLE = ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+  -1:0 :: "No output"
+  -2   :: "Use IO::out_every"
+} -2
+
+CCTK_INT out3D_every "How often to do 3D ASCII output, overrides out_every" STEERABLE = ALWAYS
+{
+  1:*  :: "Output every so many time steps"
+  -1:0 :: "No output"
+  -2   :: "Use IO::out_every"
+} -2
+
+
+
+REAL out0D_dt "How often to do 0D ASCII output, overrides IO::out_dt" STEERABLE = ALWAYS
+{
+  (0:* :: "In intervals of that much coordinate time"
+   0   :: "As often as possible"
+  -1   :: "Disable output"
+  -2   :: "Default to IO::out_dt"
+} -2
+
+REAL out1D_dt "How often to do 1D ASCII output, overrides IO::out_dt" STEERABLE = ALWAYS
+{
+  (0:* :: "In intervals of that much coordinate time"
+   0   :: "As often as possible"
+  -1   :: "Disable output"
+  -2   :: "Default to IO::out_dt"
+} -2
+
+REAL out2D_dt "How often to do 2D ASCII output, overrides IO::out_dt" STEERABLE = ALWAYS
+{
+  (0:* :: "In intervals of that much coordinate time"
+   0   :: "As often as possible"
+  -1   :: "Disable output"
+  -2   :: "Default to IO::out_dt"
+} -2
+
+REAL out3D_dt "How often to do 3D ASCII output, overrides IO::out_dt" STEERABLE = ALWAYS
+{
+  (0:* :: "In intervals of that much coordinate time"
+   0   :: "As often as possible"
+  -1   :: "Disable output"
+  -2   :: "Default to IO::out_dt"
+} -2
+
+
+
+CCTK_INT out0D_point_xi "x-index (counting from 0) for 0D points" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+CCTK_INT out0D_point_yi "y-index (counting from 0) for 0D points" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+CCTK_INT out0D_point_zi "z-index (counting from 0) for 0D points" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+
+CCTK_REAL out0D_point_x "x coordinate for 0D points" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+CCTK_REAL out0D_point_y "y coordinate for 0D points" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+CCTK_REAL out0D_point_z "z coordinate for 0D points" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+
+
+
+BOOLEAN out1D_x "Do 1D IOASCII output in the x-direction" STEERABLE = ALWAYS
+{
+} "yes"
+BOOLEAN out1D_y "Do 1D IOASCII output in the y-direction" STEERABLE = ALWAYS
+{
+} "yes"
+BOOLEAN out1D_z "Do 1D IOASCII output in the z-direction" STEERABLE = ALWAYS
+{
+} "yes"
+
+CCTK_INT out1D_xline_yi "y-index (counting from 0) for 1D lines in x-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+CCTK_INT out1D_xline_zi "z-index (counting from 0) for 1D lines in x-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+
+CCTK_INT out1D_yline_xi "x-index (counting from 0) for 1D lines in y-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+CCTK_INT out1D_yline_zi "z-index (counting from 0) for 1D lines in y-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+
+CCTK_INT out1D_zline_xi "x-index (counting from 0) for 1D lines in z-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+CCTK_INT out1D_zline_yi "y-index (counting from 0) for 1D lines in z-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+
+CCTK_REAL out1D_xline_y "y coordinate for 1D lines in x-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+CCTK_REAL out1D_xline_z "z coordinate for 1D lines in x-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+
+CCTK_REAL out1D_yline_x "x coordinate for 1D lines in y-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+CCTK_REAL out1D_yline_z "z coordinate for 1D lines in y-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+
+CCTK_REAL out1D_zline_x "x coordinate for 1D lines in z-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+CCTK_REAL out1D_zline_y "y coordinate for 1D lines in z-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+
+
+
+BOOLEAN out2D_xy "Do 2D IOASCII output in the xy-direction" STEERABLE = ALWAYS
+{
+} "yes"
+BOOLEAN out2D_xz "Do 2D IOASCII output in the xz-direction" STEERABLE = ALWAYS
+{
+} "yes"
+BOOLEAN out2D_yz "Do 2D IOASCII output in the yz-direction" STEERABLE = ALWAYS
+{
+} "yes"
+
+CCTK_INT out2D_xyplane_zi "z-index (counting from 0) for 2D planes in xy-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+
+CCTK_INT out2D_xzplane_yi "y-index (counting from 0) for 2D planes in xz-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+
+CCTK_INT out2D_yzplane_xi "x-index (counting from 0) for 2D planes in yz-direction" STEERABLE = ALWAYS
+{
+  0:* :: ""
+} 0
+
+CCTK_REAL out2D_xyplane_z "z coordinate for 2D planes in xy-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+
+CCTK_REAL out2D_xzplane_y "y coordinate for 2D planes in xz-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+
+CCTK_REAL out2D_yzplane_x "x coordinate for 2D planes in yz-direction" STEERABLE = ALWAYS
+{
+  *:* :: ""
+} 0
+
+
+
+BOOLEAN output_symmetry_points "Output symmetry points (assuming that there are nghostzones symmetry points)" STEERABLE = ALWAYS
+{
+} "yes"
+
+BOOLEAN output_ghost_points "Output ghost points" STEERABLE = ALWAYS
+{
+} "yes"
+
+BOOLEAN output_boundary_points "Output outer boundary points (assuming that there are nghostzones boundary points)" STEERABLE = ALWAYS
+{
+} "yes"
+
+BOOLEAN out3D_ghosts "Output ghost zones (DEPRECATED)" STEERABLE = ALWAYS
+{
+} "yes"
+
+BOOLEAN out3D_outer_ghosts "Output outer boundary zones (assuming that there are nghostzones boundary points) (DEPRECATED)" STEERABLE = ALWAYS
+{
+} "yes"
+
+
+
+# These parameters are here for historic reasons only.
+# They might go away in the future.  Do not use them.
+
+BOOLEAN out1D_d "Do output along the diagonal" STEERABLE = ALWAYS
+{
+} "yes"

@@ -1,0 +1,36 @@
+# Main make.code.defn file for thorn MoL
+# $Header$
+
+# Source files in this directory
+SRCS = 	AB.c \
+	ChangeType.c \
+	Counter.c \
+	Euler.c \
+	GenericRK.c \
+	ICN.c \
+	IndexArrays.c \
+	InitialCopy.c \
+	Operators.c \
+	ParamCheck.c \
+	ScratchSpace.c \
+	RK2.c \
+	RK2-central.c \
+	RK2-MR-2_1.c \
+	RK4-MR-2_1.c \
+	RK4-RK2.c \
+	RK3.c \
+	RK4.c \
+	RK45.c \
+	RK65.c \
+	RK87.c \
+	Registration.c \
+	RKCoefficients.c \
+	RHSNaNCheck.c \
+	SandR.c \
+	SetTime.c \
+	Startup.c \
+	StepSize.c
+
+# Subdirectories containing source files
+SUBDIRS = 
+

@@ -1,0 +1,3 @@
+# Configuration definitions for thorn CarpetRegrid2
+
+REQUIRES Carpet CarpetLib

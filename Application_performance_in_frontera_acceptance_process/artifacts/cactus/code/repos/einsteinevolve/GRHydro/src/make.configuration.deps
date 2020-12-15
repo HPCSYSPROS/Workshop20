@@ -1,0 +1,21 @@
+# Compile rules for the utilities
+
+$(UTIL_DIR)$(DIRSEP)%: $(BUILD_DIR)$(DIRSEP)GRHydro$(DIRSEP)%.o $(BUILD_DIR)$(DIRSEP)GRHydro$(DIRSEP)%-main.o
+	@echo 'Creating $* in $(UTIL_DIR) from $<'
+	-$(MKDIR) $(MKDIRFLAGS) $(UTIL_DIR) 2>/dev/null
+	$(CXX) $(CREATEEXE)$(OPTIONSEP)$@ $(DEBUG_LD) $(LDFLAGS) $(EXTRAFLAGS) $^ $(GENERAL_LIBRARIES)
+
+$(BUILD_DIR)$(DIRSEP)GRHydro$(DIRSEP)%.o: $(PACKAGE_DIR)$(DIRSEP)EinsteinEvolve$(DIRSEP)GRHydro$(DIRSEP)src$(DIRSEP)util$(DIRSEP)%.f90
+	@echo 'Compiling $<'
+	-$(MKDIR) $(MKDIRFLAGS) $(BUILD_DIR)$(DIRSEP)GRHydro 2>/dev/null
+	$(F90) $< $(filter-out $(F90_OPENMP_FLAGS),$(F90FLAGS)) -I$(CONFIG) -I$(BINDINGS_DIR)$(DIRSEP)include -I$(FLESH_DIR)$(DIRSEP)include -I$(CCTK_HOME)$(DIRSEP)arrangements $(SYS_INC_DIRS:%=-I%) $(FCOMPILEONLY)$(OPTIONSEP)$@
+
+$(BUILD_DIR)$(DIRSEP)GRHydro$(DIRSEP)%.c: $(PACKAGE_DIR)$(DIRSEP)EinsteinEvolve$(DIRSEP)GRHydro$(DIRSEP)src$(DIRSEP)util$(DIRSEP)%.c
+	@echo 'Preprocessing $<'
+	-$(MKDIR) $(MKDIRFLAGS) $(BUILD_DIR)$(DIRSEP)GRHydro 2>/dev/null
+	{ if test $(C_LINE_DIRECTIVES) = 'yes'; then echo '#line 1 "'$<'"'; fi; cat $<; } | $(PERL) -s $(C_FILE_PROCESSOR) -line_directives=$(C_LINE_DIRECTIVES) -source_file_name=$< $(CONFIG) > $@
+
+$(BUILD_DIR)$(DIRSEP)GRHydro$(DIRSEP)%.o: $(BUILD_DIR)$(DIRSEP)GRHydro$(DIRSEP)%.c
+	@echo 'Compiling $<'
+	-$(MKDIR) $(MKDIRFLAGS) $(BUILD_DIR)$(DIRSEP)GRHydro 2>/dev/null
+	$(CC) $< $(filter-out $(C_OPENMP_FLAGS),$(CFLAGS)) -I$(CONFIG) -I$(BINDINGS_DIR)$(DIRSEP)include -I$(FLESH_DIR)$(DIRSEP)include -I$(CCTK_HOME)$(DIRSEP)arrangements $(SYS_INC_DIRS:%=-I%) $(CCOMPILEONLY)$(OPTIONSEP)$@

@@ -1,0 +1,58 @@
+/* *
+ * ***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+ * ***  The Board of Trustees of the University of Illinois.
+ * ***  All rights reserved.
+ * **
+ * =====================================================================================
+ *
+ *       Filename:  ComputeMoaMgr.ci
+ *
+ *    Description:  
+ *
+ *        Version:  Stub File
+ *        Created:  03/08/2012 03:55:27 PM
+ *       Revision:  
+ *       Compiler:  charm++ 
+ *
+ *         Author:  Christopher B Harrison, Ph.D.
+ *         Email:   charris5@gmail.com, char1@illinois.edu, char@ks.uiuc.edu
+ *        Company:  
+ *
+ * =====================================================================================
+ */
+
+module ComputeMoaMgr {
+
+  group ComputeMoaMgr {
+
+    entry ComputeMoaMgr(void);
+    entry void initialize(CkQdMsg *);
+    entry void initWorkers(CkQdMsg *);
+    entry void startWorkers(CkQdMsg *);
+
+    entry void recvMoaData(const MoaData &);
+
+    entry void recvQ(int nq, double q[nq]);
+
+    entry void recvB(int K2_start, int K2_end, int K3_start, int K3_end, int K1_len, int K2_len, int K3_len, double bm1[K1_len], double bm2[K2_len], double bm3[K3_len], int order);
+
+    entry void recvSGrid(int ns, double sg[ns]);
+
+  };
+
+  array [1D] MoaS {
+    entry MoaS(Moa3Grid &qh, Moa3Grid &bh);
+    entry [threaded] void compute();
+  };
+
+#ifdef CHARM_HAS_MSA
+  include "msa/msa.h";
+
+  group MSA_CacheGroup<double, DefaultEntry<double>,
+        MSA_DEFAULT_ENTRIES_PER_PAGE>;
+
+  array [1D] MSA_PageArray<double, DefaultEntry<double>,
+        MSA_DEFAULT_ENTRIES_PER_PAGE>;
+#endif
+};
+

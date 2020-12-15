@@ -1,0 +1,8 @@
+NAMD_ARCH = Cygwin
+CHARMARCH = net-cygwin
+
+CXX = g++ -I/usr/include/w32api 
+CXXOPTS = -O3 -Wall -march=pentiumpro -ffast-math
+CC = gcc
+COPTS = -O3 -march=pentiumpro -ffast-math
+

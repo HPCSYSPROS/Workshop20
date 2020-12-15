@@ -1,0 +1,176 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                          %
+%              (C) Copyright 1995 The Board of Trustees of the             %
+%                          University of Illinois                          %
+%                           All Rights Reserved                            %
+%								  	   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\section{Introduction}
+\label{section:intro}
+
+\NAMD\ is a parallel molecular dynamics program for UNIX 
+platforms designed for high-performance 
+simulations in structural biology.  This document describes how to use 
+\NAMD, its features, and the platforms on which it runs.
+The document is divided into several sections:
+\begin{description}
+\item[Section \ref{section:intro}] gives an overview of \NAMD.
+\item[Section \ref{section:start}] lists the basics for getting started.
+\item[Section \ref{section:files}] describes \NAMD\ file formats.
+\item[Section \ref{section:psfgen}] explains PSF file generation with psfgen.
+\item[Section \ref{section:forcefield}] presents the potential functions,
+non-bonded interactions, and full electrostatics.
+\item[Section \ref{section:gbis}] explains Generalized Born implicit solvent simulations. 
+\item[Section \ref{section:dynamics}] lists standard minimization
+and dynamics parameters.
+\item[Section \ref{section:performance}] lists performance tuning parameters.
+\item[Section \ref{section:userdef}] explains user defined forces.
+% \item[Section \ref{section:fenergy}] discusses free energy of
+conformation change calculations.
+\item[Section \ref{section:colvars}] describes collective
+variable-based calculations.
+\item[Section \ref{section:alchemy}] explains alchemical free energy calculations.
+\item[Section \ref{section:accel}] presents accelerated sampling methods.
+\item[Section \ref{section:analysis}] lists runtime analysis options.
+\item[Section \ref{section:xplorequiv}] provides hints for X-PLOR users.
+\item[Section \ref{section:sample}] provides sample configuration files.
+\item[Section \ref{section:run}] gives details on running \NAMD.
+\item[Section \ref{section:avail}] gives details on installing \NAMD.
+\end{description}
+
+
+\subsection{\NAMD\ and molecular dynamics simulations}
+
+Molecular dynamics (MD) simulations compute atomic trajectories by solving
+equations of motion numerically using empirical force fields, such as the 
+CHARMM force field, that approximate the actual atomic force in 
+biopolymer systems. Detailed information about MD simulations can be found in
+several books such as 
+\mycite{(Allen and Tildesley),(McCammon and Harvey)}{ALLE87,MCCA87}. 
+In order to conduct MD simulations, various computer programs have been 
+developed including
+X-PLOR \mycite{(Br\"unger, 1992)}{BRUN92b} and 
+CHARMM \mycite{(Brooks \ETAL, 1983)}{BROO83}.
+These programs were originally developed for serial machines. 
+Simulation of large molecules, however, require enormous computing power. 
+One way to achieve such simulations is to utilize parallel computers. In recent 
+years, distributed memory parallel computers have been offering
+cost-effective computational power.  \NAMD\ was designed to run efficiently
+on such parallel 
+machines for simulating large molecules. 
+\NAMD\ is particularly well suited to the increasingly popular Beowulf-class PC clusters, which are quite similar to the workstation clusters for which is was originally designed.
+Future versions of \NAMD\ will also make efficient use of clusters of multi-processor workstations or PCs.
+\prettypar
+\NAMD\ has several important features: 
+
+\begin{itemize}
+
+\item{\bf Force Field Compatibility}\\
+The force field used by \NAMD\ is the same as that used by the programs 
+CHARMM \mycite{(Brooks \ETAL, 1983)}{BROO83} and X-PLOR 
+\mycite{(Br\"unger, 1992)}{BRUN92b}.  This force field includes local 
+interaction terms consisting of bonded interactions between 2, 3, and 4 atoms 
+and pairwise interactions including electrostatic and van der Waals forces.
+This commonality allows simulations to migrate between these three programs.
+
+\item{\bf Efficient Full Electrostatics Algorithms}\\
+\NAMD\ incorporates the Particle Mesh Ewald (PME) algorithm,
+which takes the full electrostatic interactions into account.
+This algorithm reduces the computational complexity of electrostatic
+force evaluation from $O(N^2)$ to $O(N \log N)$.
+
+\item{\bf Multiple Time Stepping}\\
+The velocity Verlet integration method
+\mycite{M. P. Allen and D. J. Tildesley, 1987}{ALLE87}
+is used to advance the positions and velocities of the atoms in time.
+To further reduce the cost of the evaluation of 
+long-range electrostatic forces, 
+a multiple time step scheme is employed.  The local
+interactions (bonded, van der Waals and electrostatic interactions within a
+specified distance) are calculated at each time step.  The longer range
+interactions (electrostatic interactions beyond the specified distance) are
+only computed less often.
+This amortizes the cost of computing the electrostatic forces over several timesteps.
+A smooth splitting function is used to separate a quickly varying short-range portion of the electrostatic interaction from a more slowly varying long-range component.
+It is also possible to employ an intermediate timestep for the short-range non-bonded interactions, performing only bonded interactions every timestep.
+
+
+\item{\bf Input and Output Compatibility}\\
+The input and output file formats used by \NAMD\ are identical to those
+used by CHARMM and X-PLOR.  Input formats include coordinate files in PDB format
+\mycite{(Bernstein \ETAL, 1977)}{BERN77}, structure files in X-PLOR PSF format, 
+and energy parameter files in either ~CHARMM or X-PLOR formats.
+Output formats include PDB coordinate files and binary DCD trajectory files.
+These similarities assure that the molecular dynamics trajectories from \NAMD\ 
+can be read by CHARMM or X-PLOR and that the user can exploit the many 
+analysis algorithms of the latter packages.
+
+\item{\bf Dynamics Simulation Options}\\
+MD simulations may be carried out using several options, including
+\begin{itemize}
+  \item Constant energy dynamics,
+  \item Constant temperature dynamics via
+  \begin{itemize}
+    \item Velocity rescaling,
+    \item Velocity reassignment,
+    \item Langevin dynamics,
+  \end{itemize}
+  \item Periodic boundary conditions,
+  \item Constant pressure dynamics via
+  \begin{itemize}
+    \item Berendsen pressure coupling,
+    \item Nos\'{e}-Hoover Langevin piston,
+  \end{itemize}
+  \item Energy minimization,
+  \item Fixed atoms,
+  \item Rigid waters,
+  \item Rigid bonds to hydrogen,
+  \item Harmonic restraints,
+  \item Spherical or cylindrical boundary restraints.
+\end{itemize}
+
+\item{\bf Easy to Modify and Extend}\\
+Another primary design objective for \NAMD\ is extensibility and 
+maintainability. In order to achieve this, it is designed in an 
+object-oriented style with C++. Since molecular dynamics is a new field,
+new algorithms and techniques are continually being developed.
+\NAMD's modular design allows one to integrate and test new algorithms 
+easily.  If you are contemplating a particular modification to \NAMD\
+you are encouraged to contact the developers for guidance.
+
+\item{\bf Interactive MD simulations}\\
+A system undergoing simulation in \NAMD\ may be viewed and
+altered with \VMD; for instance, forces can be applied to a set of atoms
+to alter or rearrange part of the molecular structure.  For more information
+on \VMD, see {\tt http://www.ks.uiuc.edu/Research/vmd/}.  
+
+\item{\bf Load Balancing}\\
+An important factor in parallel applications is the equal distribution
+of computational load among the processors. In parallel molecular simulation,
+a spatial decomposition that evenly distributes the computational load
+causes the region of space mapped to each processor to become very irregular, 
+hard to compute and difficult to generalize to the evaluation of many different
+types of forces.  \NAMD\ addresses this problem by using a simple uniform 
+spatial decomposition where the entire model is split into uniform cubes of 
+space called {\em patches}. An initial load balancer assigns patches
+and the calculation of interactions among the atoms within them
+to processors such that the computational load is balanced as much as possible.
+During the simulation, an incremental load balancer monitors the load
+and performs necessary adjustments.
+
+\end{itemize}
+
+\subsection{Acknowledgments}
+
+NAMD development is supported by
+the National Institutes of Health (NIH 9P41GM104601)
+and relies on computational resources funded by
+the National Science Foundation and the Department of Energy.
+\prettypar
+The authors would particularly like to thank the members of the
+Theoretical and Computational Biophysics Group, past and present, who have helped
+tremendously in making suggestions, pushing for new features, and
+testing bug-ridden code.
+

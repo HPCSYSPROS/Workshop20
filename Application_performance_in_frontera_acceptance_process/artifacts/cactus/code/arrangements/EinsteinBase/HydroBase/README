@@ -1,0 +1,50 @@
+Cactus Code Thorn HydroBase
+Author(s)    : Tanja Bode
+               Roland Haas
+               Frank Löffler
+               Erik Schnetter
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+This thorn should be the interface between all hydro codes and the
+spacetime codes.
+
+For more information see the documentation in the ThornGuide.
+
+2. Publications
+
+The variables provided by this thorn are those of the Valencia formulation of GRHD:
+@ARTICLE{1997ApJ...476..221B,
+   author = {{Banyuls}, F. and {Font}, J.~A. and {Ibanez}, J.~M.~A. and {Marti}, J.~M.~A. and 
+	{Miralles}, J.~A.},
+    title = "{Numerical $\{$3+1$\}$ General Relativistic Hydrodynamics: A Local Characteristic Approach}",
+  journal = {\apj},
+ keywords = {HYDRODYNAMICS, METHODS: NUMERICAL, RELATIVITY, SHOCK WAVES},
+     year = 1997,
+    month = feb,
+   volume = 476,
+    pages = {221-+},
+      doi = {10.1086/303604},
+   adsurl = {http://adsabs.harvard.edu/abs/1997ApJ...476..221B},
+  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+
+@ARTICLE{2006ApJ...637..296A,
+   author = {{Ant{\'o}n}, L. and {Zanotti}, O. and {Miralles}, J.~A. and 
+	{Mart{\'{\i}}}, J.~M. and {Ib{\'a}{\~n}ez}, J.~M. and {Font}, J.~A. and 
+	{Pons}, J.~A.},
+    title = "{Numerical 3+1 General Relativistic Magnetohydrodynamics: A Local Characteristic Approach}",
+  journal = {\apj},
+   eprint = {arXiv:astro-ph/0506063},
+ keywords = {Methods: Numerical, Magnetohydrodynamics: MHD, Relativity},
+     year = 2006,
+    month = jan,
+   volume = 637,
+    pages = {296-312},
+      doi = {10.1086/498238},
+   adsurl = {http://adsabs.harvard.edu/abs/2006ApJ...637..296A},
+  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}

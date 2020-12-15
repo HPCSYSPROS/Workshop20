@@ -1,0 +1,216 @@
+# -*-conf-*-
+
+sync-sources   = <<EOT
+.gitignore
+cactus.config
+EOT
+
+sync-parfiles  = <<EOT
+parfiles
+EOT
+
+# Defaults for all machines
+[default]
+user            = YOUR_LOGIN 
+email           = YOUR@EMAIL.ADDRESS
+allocation      = YOUR_ALLOCATION
+
+# Correct user names and email addresses
+[bassi]
+user            = mthomas
+[is]
+user            = mthomas
+[beast]
+user            = mthomasr
+[franklin]
+user            = mthomas
+[gauss]
+user            = lsu-mthomas
+[hlrb2]
+user            = lu78kog
+[hopper]
+user            = mthomas
+[mileva]
+user            = lsu-mthomas
+[prism]
+user            = mthomas
+[q]
+user            = mthomas
+[tgsdsc]
+user            = ux452368
+[sicortex]
+user            = hou-sbrandt
+[sicortex1]
+user            = hou-sbrandt
+[sicortex2]
+user            = hou-sbrandt
+[wilson]
+user            = mthomas
+[ranger]
+user            = mtho142
+sourcebasedir   = /work/01434/mtho142
+basedir         = /work/01434/mtho142/simulations
+scratchdir      = /work/01434/mtho142/scratch
+
+# Special corrections for some machines
+[sicortex]
+sourcebasedir   = /home/@USER@/eschnett
+basedir         = /home/@USER@/eschnett/simulations
+scratchdir      = /home/@USER@/eschnett/scratch
+
+[sicortex1]
+sourcebasedir   = /home/@USER@/eschnett
+basedir         = /home/@USER@/eschnett/simulations
+scratchdir      = /home/@USER@/eschnett/scratch
+
+[sicortex2]
+sourcebasedir   = /home/@USER@/eschnett
+basedir         = /home/@USER@/eschnett/simulations
+scratchdir      = /home/@USER@/eschnett/scratch
+
+
+
+# Thorn lists for all machines
+[abe]
+thornlist       = einstein-abe.th
+[ac]
+thornlist       = einstein-ac.th
+[athena]
+thornlist       = einstein-athena.th
+[bassi]
+thornlist       = einstein-bassi.th
+[beast]
+thornlist       = einstein-beast.th
+[belladonna]
+thornlist       = einstein-belladonna.th
+[bethe]
+thornlist       = einstein-bethe.th
+[bluedawg]
+thornlist       = einstein-ducky.th
+[bp]
+thornlist       = einstein-bp.th
+[catbert]
+thornlist       = einstein-catbert-intel.th
+[celeritas]
+thornlist       = einstein-celeritas.th
+[cobalt]
+thornlist       = einstein-cobalt.th
+[damiana]
+thornlist       = einstein-damiana.th
+[damiana2]
+thornlist       = einstein-damiana.th
+[ducky]
+thornlist       = einstein-ducky.th
+[ducky-globus]
+thornlist       = einstein-ducky.th
+[eric]
+thornlist       = einstein-eric-new.th
+[franklin]
+thornlist       = einstein-franklin.th
+[gauss]
+thornlist       = einstein-gauss.th
+[genius]
+thornlist       = einstein-genius.th
+[hlrb2]
+thornlist       = einstein-hlrb2.th
+[hopper]
+thornlist       = einstein-hopper.th
+[intrepid]
+thornlist       = einstein-intrepid-xlc.th
+[is]
+thornlist       = einstein-numrel-intel.th
+[kraken]
+thornlist       = einstein-kraken.th
+user            = mthomas
+[lacumba]
+thornlist       = einstein-ducky.th
+[lincoln]
+thornlist       = einstein-lincoln.th
+[lonestar]
+thornlist       = einstein-lonestar.th
+[louie]
+thornlist       = einstein-eric-new.th
+[mercury]
+thornlist       = einstein-mercury.th
+[mileva]
+thornlist       = einstein-mileva.th
+[neptune]
+thornlist       = einstein-ducky.th
+[nmi]
+thornlist       = einstein-nmi.th
+[numrel01]
+user            = mthomas
+thornlist       = einstein-numrel-intel.th
+[numrel02]
+user            = mthomas
+thornlist       = einstein-numrel-intel.th
+[numrel03]
+user            = mthomas
+thornlist       = einstein-numrel-intel.th
+[numrel04]
+user            = mthomas
+thornlist       = einstein-numrel-intel.th
+[numrel05]
+user            = mthomas
+thornlist       = einstein-numrel-intel.th
+[numrel06]
+user            = mthomas
+thornlist       = einstein-numrel-intel.th
+[numrel07]
+user            = mthomas
+thornlist       = einstein-numrel-intel.th
+[numrel08]
+user            = mthomas
+thornlist       = einstein-numrel-intel.th
+[numrel09]
+user            = mthomas
+thornlist       = einstein-numrel-intel.th
+[numrel10]
+user            = mthomas
+thornlist       = einstein-numrel-intel.th
+[oliver]
+thornlist       = einstein-eric-new.th
+[painter]
+thornlist       = einstein-eric.th
+[pelican]
+thornlist       = einstein-pelican.th
+[peyote]
+thornlist       = einstein-peyote-mpich.th
+[philip]
+thornlist       = einstein-philip-mpich.th
+[poseidon]
+thornlist       = einstein-eric-new.th
+[prism]
+thornlist       = einstein-prism.th
+[q]
+thornlist       = einstein-q.th
+[queenbee]
+thornlist       = einstein-eric-new.th
+[ranger]
+thornlist       = einstein-ranger.th
+[santaka]
+thornlist       = einstein-santaka.th
+[sicortex]
+thornlist       = einstein-sicortex.th
+[sicortex1]
+thornlist       = no-such-thornlist.th
+[sicortex2]
+thornlist       = no-such-thornlist.th
+[spider]
+thornlist       = no-such-thornlist.th
+[steele]
+thornlist       = einstein-steele.th
+[surveyor]
+thornlist       = einstein-intrepid-xlc.th
+[tezpur]
+thornlist       = einstein-eric.th
+[tgsdsc]
+thornlist       = einstein-tgsdsc.th
+[tungsten]
+thornlist       = einstein-tungsten.th
+[wilson]
+thornlist       = einstein-wilson.th
+[vip]
+thornlist       = einstein-vip.th
+[zeke]
+thornlist       = einstein-ducky.th

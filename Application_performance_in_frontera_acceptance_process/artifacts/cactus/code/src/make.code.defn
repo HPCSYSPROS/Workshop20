@@ -1,0 +1,3 @@
+# $Header$
+SRCS =
+SUBDIRS = IO comm util main schedule gnu piraha

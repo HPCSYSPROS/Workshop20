@@ -1,0 +1,335 @@
+Cactus::cctk_run_title = "Static black hole"
+
+Cactus::cctk_full_warnings         = yes
+Cactus::highlight_warning_messages = no
+Cactus::cctk_timer_output          = full
+
+#Cactus::terminate       = immediately
+#Cactus::terminate       = time
+#Cactus::cctk_final_time = 1.0
+Cactus::terminate       = never
+
+
+
+ActiveThorns = "DGEMM"
+
+ActiveThorns = "Formaline"
+
+ActiveThorns = "LocalInterp AEILocalInterp"
+
+ActiveThorns = "Slab"
+
+ActiveThorns = "TGRtensor"
+
+
+
+ActiveThorns = "SphericalSurface"
+
+SphericalSurface::nsurfaces = 1
+SphericalSurface::maxntheta = 39
+SphericalSurface::maxnphi   = 76
+
+SphericalSurface::ntheta      [0] = 39
+SphericalSurface::nphi        [0] = 76
+SphericalSurface::nghoststheta[0] = 2
+SphericalSurface::nghostsphi  [0] = 2
+
+
+
+ActiveThorns = "IOUtil"
+
+IO::out_dir = $parfile
+
+
+
+ActiveThorns = "Carpet CarpetLib CarpetInterp CarpetReduce CarpetSlab"
+
+Carpet::domain_from_coordbase = yes
+Carpet::max_refinement_levels = 20
+
+driver::ghost_size              = 2
+Carpet::use_outer_buffer_zones  = yes
+Carpet::num_integrator_substeps = 3
+
+Carpet::prolongation_order_space = 3
+Carpet::prolongation_order_time  = 2
+
+Carpet::convergence_level = 0
+#Carpet::convergence_level = 2
+
+Carpet::init_each_timelevel = yes
+
+CarpetLib::fast_recomposing = yes
+
+
+
+ActiveThorns = "NaNChecker"
+
+NaNChecker::check_every = 524288
+NaNChecker::check_vars = "
+        ADMBase::metric
+"
+
+
+
+ActiveThorns = "Boundary CartGrid3D CoordBase ReflectionSymmetry SymBase"
+
+CoordBase::domainsize = minmax
+
+CoordBase::xmin =   0.0
+CoordBase::ymin =   0.0
+CoordBase::zmin =   0.0
+CoordBase::xmax =  96.0
+CoordBase::ymax =  96.0
+CoordBase::zmax =  96.0
+CoordBase::dx   =   1.6
+CoordBase::dy   =   1.6
+CoordBase::dz   =   1.6
+
+CoordBase::boundary_size_x_lower     = 2
+CoordBase::boundary_size_y_lower     = 2
+CoordBase::boundary_size_z_lower     = 2
+CoordBase::boundary_shiftout_x_lower = 1
+CoordBase::boundary_shiftout_y_lower = 1
+CoordBase::boundary_shiftout_z_lower = 1
+
+CartGrid3D::type = coordbase
+
+ReflectionSymmetry::reflection_x   = yes
+ReflectionSymmetry::reflection_y   = yes
+ReflectionSymmetry::reflection_z   = yes
+ReflectionSymmetry::avoid_origin_x = no
+ReflectionSymmetry::avoid_origin_y = no
+ReflectionSymmetry::avoid_origin_z = no
+
+
+
+ActiveThorns = "CarpetRegrid2"
+
+CarpetRegrid2::regrid_every = 524288
+
+CarpetRegrid2::num_centres = 1
+
+CarpetRegrid2::num_levels_1 = 6
+CarpetRegrid2::position_x_1 = 0.0
+CarpetRegrid2::position_y_1 = 0.0
+CarpetRegrid2::position_z_1 = 0.0
+CarpetRegrid2::radius_1[ 1] = 48.0
+CarpetRegrid2::radius_1[ 2] = 24.0
+CarpetRegrid2::radius_1[ 3] = 12.0
+CarpetRegrid2::radius_1[ 4] =  6.0
+CarpetRegrid2::radius_1[ 5] =  3.0
+
+
+
+ActiveThorns = "ADMBase ADMCoupling ADMMacros CoordGauge SpaceMask StaticConformal TmunuBase"
+
+ADMMacros::spatial_order = 4
+
+
+
+ActiveThorns = "Exact"
+
+ADMBase::initial_data  = exact
+ADMBase::initial_lapse = exact
+ADMBase::initial_shift = exact
+
+Exact::exact_model = Kerr/Kerr-Schild
+Exact::Kerr_KerrSchild__mass    = 1.0
+Exact::Kerr_KerrSchild__spin    = 0.0
+Exact::Kerr_KerrSchild__epsilon = 0.5
+
+
+
+ActiveThorns = "Time"
+
+Time::dtfac = 0.25
+
+
+
+ActiveThorns = "MoL"
+
+MoL::ODE_Method = RK3
+
+
+
+ActiveThorns = "BSSN_MoL"
+
+ADMBase::evolution_method = ADM_BSSN
+
+ADM_BSSN::stencil_size = 2
+ADM_BSSN::advection    = center4
+ADM_BSSN::bound        = newrad
+
+ADMBase::lapse_evolution_method = 1+log
+ADM_BSSN::lapsesource           = modified
+ADM_BSSN::harmonic_f            = 2.0
+ADM_BSSN::lapse_advection_coeff = 1.0
+ADM_BSSN::force_lapse_positive  = yes
+
+ADMBase::shift_evolution_method        = gamma0
+ADM_BSSN::ShiftGammaCoeff              = 0.75
+ADM_BSSN::BetaDriver                   = 2.0
+ADM_BSSN::gamma_driver_advection_coeff = 1.0
+
+
+
+ActiveThorns = "Dissipation"
+
+Dissipation::vars = "
+        ADM_BSSN::ADM_BSSN_phi
+        ADM_BSSN::ADM_BSSN_metric
+        ADM_BSSN::ADM_BSSN_curv
+        ADM_BSSN::ADM_BSSN_K
+        ADM_BSSN::ADM_BSSN_gamma
+        ADMBase::lapse
+        ADMBase::shift
+"
+
+
+
+ActiveThorns = "ADMConstraints"
+
+
+
+ActiveThorns = "AHFinderDirect"
+
+AHFinderDirect::find_every   = 524288
+AHFinderDirect::move_origins = yes
+
+AHFinderDirect::geometry_interpolator_name = "Lagrange polynomial interpolation"
+AHFinderDirect::geometry_interpolator_pars = "order=4"
+AHFinderDirect::surface_interpolator_name  = "Lagrange polynomial interpolation"
+AHFinderDirect::surface_interpolator_pars  = "order=4"
+
+AHFinderDirect::which_surface_to_store_info[1] = 0
+
+
+
+ActiveThorns = "IsolatedHorizon"
+
+IsolatedHorizon::verbose              = yes
+IsolatedHorizon::interpolator         = "Lagrange polynomial interpolation"
+IsolatedHorizon::interpolator_options = "order=4"
+
+IsolatedHorizon::surface_index[0] = 0
+
+
+
+ActiveThorns = "CarpetIOBasic"
+
+IOBasic::outInfo_every      = 524288
+IOBasic::outInfo_reductions = "norm2"
+IOBasic::outInfo_vars       = "
+        ADMConstraints::ham
+        IsolatedHorizon::ih_spin[0]
+        IsolatedHorizon::ih_radius[0]
+"
+
+
+
+ActiveThorns = "CarpetIOScalar"
+
+IOScalar::outScalar_every = 524288
+IOScalar::outScalar_vars  = "
+        ADMBase::metric
+        ADMBase::curv
+        ADMBase::lapse
+        ADMBase::shift
+        ADMConstraints::hamiltonian
+        ADMConstraints::momentum
+        SphericalSurface::sf_radius
+        IsolatedHorizon::ih_shapes
+        IsolatedHorizon::ih_coordinates
+        IsolatedHorizon::ih_tetrad_l
+        IsolatedHorizon::ih_tetrad_n
+        IsolatedHorizon::ih_tetrad_m
+        IsolatedHorizon::ih_newman_penrose
+        IsolatedHorizon::ih_weyl_scalars
+        IsolatedHorizon::ih_twometric
+        IsolatedHorizon::ih_killing_vector
+        IsolatedHorizon::ih_killed_twometric
+        IsolatedHorizon::ih_invariant_coordinates
+        IsolatedHorizon::ih_multipole_moments
+        IsolatedHorizon::ih_3determinant
+"
+
+
+
+ActiveThorns = "CarpetIOASCII"
+
+IOASCII::out0D_every = 524288
+IOASCII::out0D_vars  = "
+        ADMBase::metric
+        ADMBase::curv
+        ADMBase::lapse
+        ADMBase::shift
+        ADMConstraints::hamiltonian
+        ADMConstraints::momentum
+        SphericalSurface::sf_valid
+        SphericalSurface::sf_info
+        SphericalSurface::sf_radius
+        SphericalSurface::sf_origin
+        SphericalSurface::sf_coordinate_descriptors
+        IsolatedHorizon::ih_state
+        IsolatedHorizon::ih_grid_int
+        IsolatedHorizon::ih_grid_real
+        IsolatedHorizon::ih_shapes
+        IsolatedHorizon::ih_coordinates
+        IsolatedHorizon::ih_tetrad_l
+        IsolatedHorizon::ih_tetrad_n
+        IsolatedHorizon::ih_tetrad_m
+        IsolatedHorizon::ih_newman_penrose
+        IsolatedHorizon::ih_weyl_scalars
+        IsolatedHorizon::ih_twometric
+        IsolatedHorizon::ih_killing_vector
+        IsolatedHorizon::ih_killed_twometric
+        IsolatedHorizon::ih_scalars
+        IsolatedHorizon::ih_invariant_coordinates
+        IsolatedHorizon::ih_multipole_moments
+        IsolatedHorizon::ih_3determinant
+"
+
+IOASCII::out1D_every = 524288
+IOASCII::out1D_vars  = "
+        ADMBase::metric
+        ADMBase::curv
+        ADMBase::lapse
+        ADMBase::shift
+        ADMConstraints::hamiltonian
+        ADMConstraints::momentum
+        SphericalSurface::sf_radius
+        IsolatedHorizon::ih_weyl_scalars
+        IsolatedHorizon::ih_killing_vector
+        IsolatedHorizon::ih_killed_twometric
+        IsolatedHorizon::ih_3determinant
+"
+
+IOASCII::out2D_every = 524288
+IOASCII::out2D_vars  = "
+        SphericalSurface::sf_radius
+"
+
+
+
+Activethorns = "CarpetIOHDF5"
+
+IOHDF5::out_every = 52428800
+IOHDF5::out_vars  = "
+        ADMBase::metric
+        ADMBase::curv
+        ADMBase::lapse
+        ADMBase::shift
+        ADMConstraints::hamiltonian
+        ADMConstraints::momentum
+"
+
+IOHDF5::checkpoint   = yes
+IO::checkpoint_dir   = $parfile
+IO::checkpoint_every = 52428800
+
+
+
+ActiveThorns = "TimerReport"
+
+TimerReport::out_every = 5242880

@@ -1,0 +1,54 @@
+# Makefile for Libraries for QCD programs
+#
+# T3E version
+#  DO NOT USE WITH DOUBLE PRECISION VERSION!! (Until we have double
+#     precision assembly code)
+
+MAKEFILE = Make_t3e
+
+# See Make_RS6K for IBM RS6000 assembly code
+# See Make_vanilla for generic code
+# See Make_alpha for  DEC alpha assembly code
+
+CFLAGS =  -O -DFAST -DT3E
+
+CC = cc
+
+#install .t3e (assembler code) in the suffixes list
+.SUFFIXES:
+.SUFFIXES: .1o .t3e .c .y .l .s
+
+# compile t3e assembly language routines
+.t3e.1o:
+	cam -C cray-t3e -P -o $*.1o $*.t3e 
+
+#Assembler routines
+m_mat_nn.1o: m_mat_nn.t3e
+m_mat_an.1o: m_mat_an.t3e
+m_mat_na.1o: m_mat_na.t3e
+addmat.1o: addmat.t3e
+s_m_a_mat.1o: s_m_a_mat.t3e
+
+m_amv_4dir.1o: m_amv_4dir.t3e
+m_amv_4dir_2.1o: m_amv_4dir_2.t3e
+m_mv_s_4dir.1o: m_mv_s_4dir.t3e
+s_m_a_vec.1o: s_m_a_vec.t3e
+su3_rdot.1o: su3_rdot.t3e
+msq_su3vec.1o: msq_su3vec.t3e
+sub4vecs.1o: sub4vecs.t3e
+
+cs_m_a_wvec.1o: cs_m_a_wvec.t3e
+m_amat_hwvec.1o: m_amat_hwvec.t3e
+m_mat_hwvec.1o: m_mat_hwvec.t3e
+grow4wvecs.1o: grow4wvecs.t3e
+wp_grow.1o: wp_grow.t3e
+wp_grow_a.1o: wp_grow_a.t3e
+wp_shrink.1o: wp_shrink.t3e
+wp_shrink4.1o: wp_shrink4.t3e
+
+# Prefetch
+prefetch.1o:prefetch32.t3e
+	cam -C cray-t3e -P -o prefetch.1o prefetch32.t3e
+
+include Make_template
+

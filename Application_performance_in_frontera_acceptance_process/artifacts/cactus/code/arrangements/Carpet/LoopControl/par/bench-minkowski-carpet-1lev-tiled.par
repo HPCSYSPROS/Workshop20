@@ -1,0 +1,126 @@
+Cactus::cctk_run_title    = "Benchmark of McLachlan using Carpet on unigrid"
+Cactus::cctk_timer_output = "full"
+
+Cactus::cctk_itlast = 100
+
+
+
+ActiveThorns = "CycleClock Fortran hwloc MPI"
+
+
+
+ActiveThorns = "IOUtil"
+
+IO::out_dir = $parfile
+
+
+
+ActiveThorns = "InitBase"
+
+
+
+ActiveThorns = "LoopControl"
+
+LoopControl::verbose     = no
+LoopControl::veryverbose = no
+LoopControl::selftest    = no
+
+LoopControl::initial_setup = "tiled"
+
+
+
+ActiveThorns = "Carpet CarpetLib CarpetReduce"
+
+Carpet::domain_from_coordbase = yes
+
+driver::ghost_size = 3
+
+Carpet::init_fill_timelevels = yes
+
+#CarpetLib::print_timestats_every = 1
+CarpetLib::print_memstats_every  = 100
+
+
+
+ActiveThorns = "Boundary CartGrid3D CoordBase SymBase"
+
+CoordBase::domainsize = "minmax"
+CoordBase::xmin       = 0.0
+CoordBase::ymin       = 0.0
+CoordBase::zmin       = 0.0
+CoordBase::xmax       = 1.0
+CoordBase::ymax       = 1.0
+CoordBase::zmax       = 1.0
+
+CoordBase::spacing  = "numcells"
+CoordBase::ncells_x = 30
+CoordBase::ncells_y = 30
+CoordBase::ncells_z = 30
+
+CartGrid3D::type           = "coordbase"
+CartGrid3D::avoid_originx  = no
+CartGrid3D::avoid_originy  = no
+CartGrid3D::avoid_originz  = no
+
+CoordBase::boundary_size_x_lower = 3
+CoordBase::boundary_size_y_lower = 3
+CoordBase::boundary_size_z_lower = 3
+CoordBase::boundary_size_x_upper = 3
+CoordBase::boundary_size_y_upper = 3
+CoordBase::boundary_size_z_upper = 3
+
+
+
+ActiveThorns = "MoL NaNChecker Time"
+
+MoL::ODE_Method             = "RK4"
+MoL::MoL_Intermediate_Steps = 4
+MoL::MoL_Num_Scratch_Levels = 1
+
+Time::dtfac = 0.4
+
+
+
+ActiveThorns = "ADMBase ADMCoupling ADMMacros CoordGauge StaticConformal"
+
+ADMBase::initial_data    = "Cartesian Minkowski"
+ADMBase::initial_lapse   = "one"
+ADMBase::initial_shift   = "zero"
+ADMBase::initial_dtlapse = "zero"
+ADMBase::initial_dtshift = "zero"
+
+
+
+ActiveThorns = "GenericFD ML_BSSN ML_BSSN_Helper TmunuBase"
+
+ADMBase::evolution_method       = "ML_BSSN"
+ADMBase::lapse_evolution_method = "ML_BSSN"
+ADMBase::shift_evolution_method = "ML_BSSN"
+
+ML_BSSN::my_boundary_condition = "Minkowski"
+
+ML_BSSN::harmonicN       = 1      # 1+log
+ML_BSSN::harmonicF       = 2.0    # 1+log
+ML_BSSN::ShiftGammaCoeff = 0.75
+ML_BSSN::BetaDriver      = 0.5
+
+
+
+ActiveThorns = "CarpetIOBasic"
+
+IOBasic::outInfo_every = 100
+IOBasic::outInfo_vars  = "ADMBase::alp"
+
+
+
+#ActiveThorns = "CarpetIOASCII"
+#
+#IOASCII::out0D_every = 100
+#IOASCII::out0D_vars  = "Carpet::timing"
+
+
+
+ActiveThorns = "TimerReport"
+
+TimerReport::output_all_timers = yes
+TimerReport::all_timers_clock  = "cycle"

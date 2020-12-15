@@ -1,0 +1,5 @@
+# Main make.code.defn file for thorn LocalInterp
+# $Header$
+
+# Source files in this directory
+SRCS = Startup.c Operator.c Interpolate.cc

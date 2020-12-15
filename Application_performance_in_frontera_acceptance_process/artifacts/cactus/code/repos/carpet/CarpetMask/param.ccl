@@ -1,0 +1,68 @@
+# Parameter definitions for thorn CarpetMask
+
+
+
+BOOLEAN verbose "Produce screen output" STEERABLE=always
+{
+} "no"
+
+
+
+# The exclusion parameters are re-interpreted after each regridding,
+# and are therefore marked as "always steerable".
+
+
+
+# Exclude coordinate spheres
+
+CCTK_REAL excluded_centre_x[10] "x coordinate of excluded region" STEERABLE=always
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL excluded_centre_y[10] "y coordinate of excluded region" STEERABLE=always
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL excluded_centre_z[10] "z coordinate of excluded region" STEERABLE=always
+{
+  *:* :: ""
+} 0.0
+
+CCTK_REAL excluded_radius[10] "radius of excluded region" STEERABLE=always
+{
+  -1.0  :: "do not exlude this region"
+  0.0:* :: ""
+} -1.0
+
+BOOLEAN exclude_exterior[10] "exclude the exterior of this radius, otherwise the interior" STEERABLE=always
+{
+} no
+
+
+
+# Exclude spherical surfaces
+
+CCTK_INT excluded_surface[10] "index of excluded surface" STEERABLE=always
+{
+  -1  :: "do not exclude"
+  0:* :: ""
+} -1
+
+CCTK_REAL excluded_surface_factor[10] "shrink factor of excluded surface" STEERABLE=always
+{
+  0:* :: ""
+} 1.0
+
+
+
+SHARES: SphericalSurface
+
+USES CCTK_INT nsurfaces
+
+USES BOOLEAN symmetric_z
+USES BOOLEAN symmetric_y
+USES BOOLEAN symmetric_x
+USES CCTK_INT maxntheta
+USES CCTK_INT maxnphi

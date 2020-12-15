@@ -1,0 +1,9 @@
+NAMD_ARCH = Linux-mips64el
+CHARMARCH = mpi-linux-mips64
+
+FLOATOPTS = -O3 -mips64 -march=5kf -mtune=5kf
+CXX = g++ -G0 -DSOCKLEN_T=socklen_t -I$(CHARM_LOC)/include
+CXXOPTS = $(FLOATOPTS)
+CXXNOALIASOPTS = $(FLOATOPTS)
+CC = gcc -G0 
+COPTS = $(FLOATOPTS) 

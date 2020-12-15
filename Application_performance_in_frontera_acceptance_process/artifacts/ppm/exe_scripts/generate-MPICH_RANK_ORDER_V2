@@ -1,0 +1,29 @@
+#!/bin/csh -f
+#
+# Given total MPI tasks and number I/O tasks
+# Example: 33024 256
+#
+# Generate rank list interleaving 4 I/O servers
+# 0-511,32768-32771,
+# 512-1023,32772-32775,
+# ...
+
+@ tasks = $1
+@ iotasks = $2
+
+# generate MPICH_RANK_ORDER file with 
+# groups of $k / 4 ranks, then 4 ioserver tasks.
+
+@ n = 0
+@ io = $tasks - $iotasks
+@ step = 4 * $io / $iotasks
+
+rm -f MPICH_RANK_ORDER
+
+while ( $n < $tasks - $iotasks )
+@ nn = $n + $step - 1
+@ io2 = $io + 3
+echo $n"-"$nn","$io"-"$io2 >>MPICH_RANK_ORDER
+@ n = $n + $step
+@ io = $io + 4
+end

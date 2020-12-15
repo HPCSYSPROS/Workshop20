@@ -1,0 +1,117 @@
+# Parameter definitions for thorn ADMBase
+# $Header$
+
+restricted:
+
+KEYWORD initial_data "Initial metric and extrinsic curvature datasets"
+{
+  "Cartesian Minkowski" :: "Minkowski values in cartesian coordinates"
+} "Cartesian Minkowski"
+
+KEYWORD initial_lapse "Initial lapse value"
+{
+  "one" :: "Uniform lapse"
+} "one"
+
+KEYWORD initial_shift "Initial shift value"
+{
+  "none" :: "Shift is inactive"
+  "zero" :: "Shift is zero"
+} "zero"
+
+KEYWORD initial_dtlapse "Initial dtlapse value"
+{
+  "none"   :: "Dtlapse is inactive"
+  "zero"   :: "Dtlapse is zero"
+} "none"
+
+KEYWORD initial_dtshift "Initial dtshift value"
+{
+  "none"   :: "Dtshift is inactive"
+  "zero"   :: "Dtshift is zero"
+} "none"
+
+
+
+KEYWORD evolution_method "The metric an extrinsic curvature evolution method"
+{
+  "none"       :: "The metric and extrinsic curvature are not evolved"
+  "static"     :: "The metric and extrinsic curvature are not evolved"
+  "ID-apply-regrid" :: "The metric and extrinsic curvature are not evolved and initial data is used to fill in new grid points after regridding"
+  "ID-apply-always" :: "The metric and extrinsic curvature are not evolved and initial data is used to fill in new grid points before each step and after grid changes"
+} "static"
+
+KEYWORD lapse_evolution_method "The lapse evolution method"
+{
+  "static"     :: "lapse is not evolved"
+  "ID-apply-regrid" :: "lapse is not evolved and initial data is used to fill in new grid points after regridding"
+  "ID-apply-always" :: "lapse is not evolved and initial data is used to fill in new grid points before each step and after grid changes"
+} "static"
+
+KEYWORD shift_evolution_method "The shift evolution method"
+{ 
+  "static"     :: "shift is not evolved"
+  "ID-apply-regrid" :: "shift is not evolved and initial data is used to fill in new grid points after regridding"
+  "ID-apply-always" :: "shift is not evolved and initial data is used to fill in new grid points before each step and after grid changes"
+} "static"
+
+KEYWORD dtlapse_evolution_method "The dtlapse evolution method"
+{
+  "static"     :: "dtlapse is not evolved"
+  "ID-apply-regrid" :: "dtlapse is not evolved and initial data is used to fill in new grid points after regridding"
+  "ID-apply-always" :: "dtlapse is not evolved and initial data is used to fill in new grid points before each step and after grid changes"
+} "static"
+
+KEYWORD dtshift_evolution_method "The dtshift evolution method"
+{ 
+  "static"     :: "shift is not evolved"
+  "ID-apply-regrid" :: "dtshift is not evolved and initial data is used to fill in new grid points after regridding"
+  "ID-apply-always" :: "dtshift is not evolved and initial data is used to fill in new grid points before each step and after grid changes"
+} "static"
+
+
+
+STRING admbase_boundary_condition "Boundary condition for ADMBase variables"
+{
+  "" :: "must be a registered boundary condition"
+} "flat"
+
+
+
+KEYWORD metric_type "The semantics of the metric variables (physical, static conformal, etc)"
+{
+  "physical" :: "metric and extrinsic curvature are the physical ones"
+} "physical"
+
+KEYWORD lapse_prolongation_type "The kind of boundary prolongation for the lapse"
+{
+  "Lagrange" :: "standard prolongation (requires several time levels)"
+  "none"     :: "no prolongation (use this if you do not have enough time levels active)"
+} "Lagrange"
+
+KEYWORD shift_prolongation_type "The kind of boundary prolongation for the shift"
+{
+  "Lagrange" :: "standard prolongation (requires several time levels)"
+  "none"     :: "no prolongation (use this if you do not have enough time levels active)"
+} "Lagrange"
+
+KEYWORD metric_prolongation_type "The kind of boundary prolongation for the metric and extrinsic curvature"
+{
+  "Lagrange" :: "standard prolongation (requires several time levels)"
+  "none"     :: "no prolongation (use this if you do not have enough time levels active)"
+} "Lagrange"
+
+INT lapse_timelevels "Number of time levels for the lapse" STEERABLE=recover
+{
+  0:3 :: ""
+} 1
+
+INT shift_timelevels "Number of time levels for the shift" STEERABLE=recover
+{
+  0:3 :: ""
+} 1
+
+INT metric_timelevels "Number of time levels for the metric and extrinsic curvature" STEERABLE=recover
+{
+  0:3 :: ""
+} 1

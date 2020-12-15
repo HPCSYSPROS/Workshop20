@@ -1,0 +1,6 @@
+# Interface definition for thorn TensorTypes
+# $Header$
+
+IMPLEMENTS: TensorTypes
+
+INCLUDES HEADER: tensortypes.h IN tensortypes.h

@@ -1,0 +1,439 @@
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+% The author of the documentation
+\author{Erik Schnetter \textless schnetter@uni-tuebingen.de\textgreater\\
+        Christian D. Ott \textless cott@aei.mpg.de\textgreater\\
+        Thomas Radke \textless tradke@aei.mpg.de\textgreater}
+
+% The title of the document (not necessarily the name of the Thorn)
+\title{CarpetIOHDF5}
+
+% the date your document was last changed, if your document is in CVS, 
+% please use:
+\date{1 December 2004}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+\ifx\ThisThorn\undefined
+\newcommand{\ThisThorn}{{\it CarpetIOHDF5}}
+\else
+\renewcommand{\ThisThorn}{{\it CarpetIOHDF5}}
+\fi
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+Thorn \ThisThorn\ provides HDF5-based output to the {\em Carpet} mesh
+refinement driver in {\em Cactus}.
+This document explains \ThisThorn's usage and contains a specification
+of the HDF5 file format that was adapted from John Shalf's FlexIO library.
+\end{abstract}
+
+
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+
+Having encountered various problems with the Carpet I/O thorn
+{\bf CarpetIOFlexIO} and the underlying FlexIO library,
+Erik Schnetter decided to write this thorn \ThisThorn\ which bypasses
+any intermediate binary I/O layer and outputs in HDF5\footnote{Hierarchical
+Data Format version 5, see {\tt http://hdf.ncsa.uiuc.edu/whatishdf5.html}
+for details} file format directly.
+
+\ThisThorn\ provides output for the {\em Carpet} Mesh Refinement driver
+within the Cactus Code. Christian D. Ott added  a file reader (analogous to
+Erik Schnetter's implementation present in {\bf CarpetIOFlexIO}) 
+as well as checkpoint/recovery functionality to \ThisThorn.
+Thomas Radke has taken over maintainence of this I/O thorn and is continuously
+working on fixing known bugs and improving the code functionality and
+efficiency.
+
+The \ThisThorn\ I/O method can output any type of CCTK grid variables
+(grid scalars, grid functions, and grid arrays of arbitrary dimension);
+data is written into separate files named {\tt "<varname>.h5"}.
+It implements both serial and full parallel I/O --
+data files can be written/read either by processor 0 only or by all processors.
+Such datafiles can be used for further postprocessing (eg. visualization with
+OpenDX or DataVault%%%
+\footnote{%%%
+         See our visualization page at
+	 \url{http://www.cactuscode.org/Visualization/}
+	 for details.
+	 }%%%
+) or fed back into Cactus via the filereader capabilities of thorn
+{\bf IOUtil}.
+
+This document aims at giving the user a first handle on how to use
+\ThisThorn. It also documents the HDF5 file layout used.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\ThisThorn\ Parameters}
+
+Parameters to control the \ThisThorn\ I/O method are:
+
+\begin{itemize}
+  \item {\tt IOHDF5::out\_every} (steerable)\\
+        How often to do periodic \ThisThorn\ output. If this parameter is set
+        in the parameter file, it will override the setting of the shared
+        {\tt IO::out\_every} parameter. The output frequency can also be set
+        for individual variables using the {\tt out\_every} option in an option
+        string appended to the {\tt IOHDF5::out\_vars} parameter.
+
+  \item {\tt IOHDF5::out\_dt} (steerable)\\
+        output in intervals of that much coordinate time (overwrites {\tt IO::out\_dt})
+
+  \item {\tt IOHDF5::out\_criterion} (steerable)\\
+        criterion to select output intervals (overwrites {\tt IO::out\_criterion})
+
+  \item {\tt IOHDF5::out\_vars} (steerable)\\
+        The list of variables to output using the \ThisThorn\ I/O method.
+        The variables must be given by their fully qualified variable or group
+        name. The special keyword {\it all} requests \ThisThorn\ output for
+        all variables. Multiple names must be separated by whitespaces.
+
+        Each group/variable name can have an option string attached in which you
+        can specify a different output frequency for that individual variable,
+	a set of individual refinement levels to be output, the compression
+        level, or an individual output mode, e.g.
+\begin{verbatim}
+  IOHDF5::out_vars = "wavetoy::phi{ out_every = 4 refinement_levels = { 1 2 } }"
+\end{verbatim}
+        Option strings currently supported by \ThisThorn\ are: {\tt out\_every,
+        out\_unchunked}, {\tt refinement\_levels}, and {\tt compression\_level}.
+
+  \item {\tt IOHDF5::out\_dir}\\
+        The directory in which to place the \ThisThorn\ output files.
+        If the directory doesn't exist at startup it will be created.
+        If parallel output is enabled and the directory name contains the
+        substring {\tt "\%u"} it will be substituted by the processor ID.
+        By this means each processor can have its own output directory.\\
+        If this parameter is set to an empty string \ThisThorn\ output will go
+        to the standard output directory as specified in {\tt IO::out\_dir}.
+
+  \item {\tt IOHDF5::compression\_level (steerable)}\\
+        Compression level to use for writing HDF5 datasets.
+        Automatic {\tt gzip} dataset compression can be enabled by setting
+        this integer parameter to values between 1 and 9 (inclusive),
+        with increasing values requesting higher compression rates (at the cost
+        of additional runtime for outputting HDF5 data); a value of zero
+        (which is the default setting for this parameter) disables compression.
+        The output compression level can also be set
+        for individual variables using the {\tt compression\_level} option in
+        an option string appended to the {\tt IOHDF5::out\_vars} parameter.
+
+  \item {\tt IO::out\_single\_precision (steerable)}\\
+        whether to output double-precision data in single precision
+
+\end{itemize}
+
+
+\section{Serial versus Parallel Output}
+
+According to the ouptput mode parameter settings of ({\tt IO::out\_mode},
+{\tt IO::out\_unchunked},\newline{\tt IO::out\_proc\_every}) of thorn
+{\bf IOUtil}, thorn \ThisThorn\ will output distributed grid variables either
+
+\begin{itemize}
+  \item in serial from processor 0 into a single unchunked file
+\begin{verbatim}
+  IO::out_mode      = "onefile"
+  IO::out_unchunked = "yes"
+\end{verbatim}
+
+  \item in serial from processor 0 into a single chunked file
+\begin{verbatim}
+  IO::out_mode      = "onefile"
+  IO::out_unchunked = "no"
+\end{verbatim}
+
+  \item in parallel, that is, into separate chunked files (one per processor)
+        containing the individual processors' patches of the
+        distributed grid variable
+\begin{verbatim}
+  IO::out_mode      = "proc"
+\end{verbatim}
+\end{itemize}
+
+{\em Unchunked} means that an entire Cactus grid array (gathered across all
+processors) is stored in a single HDF5 dataset whereas {\em chunked} means
+that all the processor-local patches of this array are stored as separate
+HDF5 datasets (called {\it chunks}).
+Consequently, for unchunked data all interprocessor ghostzones are excluded
+from the output.  In contrast, for chunked data the interprocessor ghostzones
+\emph{are} included in the output.
+
+When visualising chunked datasets, they probably need to be recombined
+for a global view on the data. This needs to be done within the visualisation
+tool (see also below), Cactus itself does not provide its own recombiner
+utility program for \ThisThorn's output files.
+
+The default is to output distributed grid variables in parallel, each processor
+writing a file
+{\tt \textless varname\textgreater.file\_\textless processor ID\textgreater.h5}.
+The chunked/unchunked mode can also be set individually in a key/value
+option string (with the key {\tt out\_unchunked} and possible string values
+{\tt "true|false|yes|no"}) appended to a group/variable name in the
+{\tt out\_vars} parameter, eg.
+\begin{verbatim}
+  IOHDF5::out_vars = "wavetoy::phi{out_unchunked = 'true'}  grid::coordinates"
+\end{verbatim}
+will cause the variable {\tt phi} to be output into a single unchunked file
+whereas other variables will still be output into separate chunked files
+(assuming the output mode is left to its default).
+Grid scalars
+and {\tt DISTRIB = CONST} grid arrays are always output as unchunked data
+on processor 0 only.
+
+Parallel output in a parallel simulation will ensure maximum I/O
+performance. Note that changing the output mode to serial I/O might only be
+necessary if the data analysis and visualisation tools cannot deal with
+chunked output files. Cactus itself, as well as many of the tools to
+visualise Carpet HDF5 data
+(see \url{http://www.cactuscode.org/Visualization}),
+can process both chunked and unchunked data. For instance, to visualise parallel
+output datafiles with DataVault, you would just send all the individual files
+to the DV server: {\tt hdf5todv phi.file\_*.h5}. In OpenDX the {\tt
+ImportCarpetIOHDF5} module can be given any filename from the set of parallel
+chunked files; the module will determine the total number of files in the set
+automatically and read them all.
+
+
+\section{Using the flesh I/O API to produce HDF5 output}
+
+Periodic output of grid variables is usually specified via I/O parameters
+in the parameter file and then automatically triggered by the flesh scheduler
+at each iteration step after analysis. If output should also be triggered
+at a different time, one can do that from within an application thorn by
+invoking one of the {\tt CCTK\_OutputVar*()} I/O routines provided
+by the flesh I/O API (see chapter B8.2 ``IO'' in the Cactus Users Guide).
+In this case, the application thorn routine which calls {\tt CCTK\_OutputVar*()}
+must be scheduled in level mode.
+
+It should be noted here that -- due to a restriction in the naming scheme of
+objects in an HDF5 data file -- \ThisThorn\ can output a given grid variable
+with given refinement level only once per timestep. Attempts of application
+thorns to trigger the output of the same variable multiple times during an iteration
+will result in a runtime warning and have no further effect.
+If output for a variable is required also for intermediate timesteps
+this can be achieved by calling {\tt CCTK\_OutputVarAs*()} with a different
+{\tt alias} name; output for the same variable is then written into
+different HDF5 files based on the {\tt alias} argument.
+
+
+\section{Checkpointing \& Recovery and Importing Data}
+
+Thorn \ThisThorn\ can also be used to create HDF5 checkpoint files and
+to recover from such files later on. In addition it can read HDF5 datafiles
+back in using the generic filereader interface described in the thorn
+documentation of {\bf IOUtil}.
+
+Checkpoint routines are scheduled at several timebins so that you can save
+the current state of your simulation after the initial data phase,
+during evolution, or at termination. Checkpointing for thorn \ThisThorn\ 
+is enabled by setting the parameter {\tt IOHDF5::checkpoint = "yes"}.
+
+A recovery routine is registered with thorn {\bf IOUtil} in order to restart
+a new simulation from a given HDF5 checkpoint.
+The very same recovery mechanism is used to implement a filereader
+functionality to feed back data into Cactus.
+
+Checkpointing and recovery are controlled by corresponding checkpoint/recovery
+parameters of thorn {\bf IOUtil} (for a description of these parameters please
+refer to this thorn's documentation).
+
+
+\section{CarpetIOHDF5 Utility Programs}
+
+\subsection{{\tt hdf5toascii\_slicer}}
+
+This utility program extracts 1D lines and 2D slices from 3D HDF5
+datasets produced by \ThisThorn\ and outputs them in {\tt CarpetIOASCII} format
+(suitable to be further processed by gnuplot).
+
+The {\tt hdf5toascii\_slicer} program is contained in the {\tt src/utils/}
+subdirectory of thorn \ThisThorn. It is built with
+\begin{verbatim}
+  make <configuration>-utils
+\end{verbatim}
+where the executable ends up in the subdirectory {\tt exe/<configuration>/}.
+
+For details on how to use the {\tt hdf5toascii\_slicer} program,
+run it with no command-line options (or with the {\tt --help} option).
+
+{\tt hdf5toascii\_slicer} can be used on either chunked or unchunked
+data:
+\begin{itemize}
+\item	If the HDF5 data is unchunked, then {\tt hdf5toascii\_slicer}
+	will output unchunked ASCII data.
+\item	If the HDF5 data is chunked, then {\tt hdf5toascii\_slicer}
+	will output chunked ASCII data reflecting whatever subset of
+	the HDF5 files are provided.  That is, for example, the command
+	\begin{verbatim}
+	hdf5toascii_slicer my_variable.file_2.h5 my_variable.file_4.h5
+	\end{verbatim}
+	will output ASCII data only for that part of the Carpet grid
+	which lived on processors~2 and~4.  It's probably more useful
+	to use the command
+	\begin{verbatim}
+	hdf5toascii_slicer my_variable.file_*.h5
+	\end{verbatim}
+	which will output ASCII data for the entire Carpet grid.
+\end{itemize}
+
+
+\subsection{{\tt hdf5\_extract}}
+
+This utility program extracts selected datasets from any given HDF5 output file
+which may be useful when only certain parts (eg. a specific
+timestep) of large files are required (eg. for copying to some other
+location for further processing).
+
+The {\tt hdf5\_extract} program is contained in the {\tt src/utils/}
+subdirectory of thorn {\tt CactusPUGHIO/IOHDF5}. It is built with
+\begin{verbatim}
+  make <configuration>-utils
+\end{verbatim}
+where the executable ends up in the subdirectory {\tt exe/<configuration>/}.
+
+
+\section{Example Parameter File Excerpts}
+
+\subsection{Serial (unchunked) Output of Grid Variables}
+
+\begin{verbatim}
+  # how often to output and where output files should go
+  IO::out_every = 2
+  IO::out_dir   = "wavetoy-data"
+
+  # request output for wavetoy::psi at every other iteration for timelevel 0,
+  #                for wavetoy::phi every 4th iteration with timelevels 1 and 2
+  IOHDF5::out_vars = "wavetoy::phi{ out_every = 4 refinement_levels = { 1 2 } }
+                      wavetoy::psi"
+
+  # we want unchunked output
+  # (because the visualisation tool cannot deal with chunked data files)
+  IO::out_mode      = "onefile"
+  IO::out_unchunked = 1
+\end{verbatim}
+
+\subsection{Parallel (chunked) Output of Grid Variables}
+
+\begin{verbatim}
+  # how often to output
+  IO::out_every = 2
+
+  # each processor writes to its own output directory
+  IOHDF5::out_dir = "wavetoy-data-proc%u"
+
+  # request output for wavetoy::psi at every other iteration for timelevel 0,
+  #                for wavetoy::phi every 4th iteration with timelevels 1 and 2
+  IOHDF5::out_vars = "wavetoy::phi{ out_every = 4 refinement_levels = { 1 2 } }
+                      wavetoy::psi"
+
+  # we want parallel chunked output (note that this already is the default)
+  IO::out_mode = "proc"
+\end{verbatim}
+
+\subsection{Checkpointing \& Recovery}
+
+\begin{verbatim}
+  # say how often we want to checkpoint, how many checkpoints should be kept,
+  # how the checkpoints should be named, and they should be written to
+  IO::checkpoint_every = 100
+  IO::checkpoint_keep  = 2
+  IO::checkpoint_file  = "wavetoy"
+  IO::checkpoint_dir   = "wavetoy-checkpoints"
+
+  # enable checkpointing for CarpetIOHDF5
+  IOHDF5::checkpoint = "yes"
+
+  #######################################################
+
+  # recover from the latest checkpoint found
+  IO::recover_file = "wavetoy"
+  IO::recover_dir  = "wavetoy-checkpoints"
+  IO::recover      = "auto"
+\end{verbatim}
+
+\subsection{Importing Grid Variables via Filereader}
+
+\begin{verbatim}
+  # which data files to import and where to find them
+  IO::filereader_ID_files = "phi psi"
+  IO::filereader_ID_dir   = "wavetoy-data"
+
+  # what variables and which timestep to read
+  # (if this parameter is left empty, all variables and timesteps found
+  #  in the data files will be read)
+  IO::filereader_ID_vars  = "WaveToyMoL::phi{ cctk_iteration = 0 }
+                             WaveToyMoL::psi"
+\end{verbatim}
+
+
+\iffalse
+\section{CarpetIOHDF5's HDF5 file layout}
+
+The HDF5 file layout of {\bf CarpetIOHDF5} is quite simple.
+There are no groups besides the standard HDF5 root data object group:
+
+Each dataset is named according to this template:
+
+\begin{verbatim}
+  <group::varname> it=<cctk_iteration> tl=<timelevel> [ml=<mglevel>] [m=<map>]
+  [rl=<reflevel>] [c=<component>]}
+\end{verbatim}
+
+where optional parts only contribute to the name if they vary (if there is
+more than one multigrid level, map, refinement level, component respectively).
+
+Each HDF5 dataset has the following attributes associated with it:
+
+\begin{itemize}
+  \item {\tt level} : Carpet::reflevel
+  \item {\tt origin} : 1-D array of length vdim. \\
+        origin[d] = CCTK\_ORIGIN\_SPACE(d) + cctk\_lbnd[d] * delta[d]
+  \item {\tt delta} : 1-D array of length vdim. \\
+        delta[d] = CCTK\_DELTA\_SPACE(d)
+  \item {\tt time} : cctk\_time
+  \item {\tt timestep} : cctk\_iteration
+  \item {\tt iorigin} : 1-D array of length vdim. \\ iorigin[d] = (Carpet::ext.lower() / Carpet::ext.stride())[d]
+  \item {\tt name} : CCTK\_FullName(variable index)
+  \item {\tt cctk\_bbox} : 1-D array of length 2*Carpet::dim. cctk\_box
+  \item {\tt cctk\_nghostzones} : 1-D array of length Carpet::dim. cctk\_nghostzones
+  \item {\tt carpet\_mglevel} : Carpet::mglevel
+  \item {\tt carpet\_reflevel} : Carpet::reflevel
+\end{itemize}
+
+
+\subsection{Attributes needed by the file reader}
+
+The number of attributes needed by the CarpetIOHDF5 file reader is much smaller then the total
+number of attributes attached to each dataset:
+
+\begin{itemize}
+  \item {\tt name}
+  \item {\tt level}
+  \item {\tt iorigin}
+\end{itemize}
+
+\fi
+
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

@@ -1,0 +1,88 @@
+# Schedule definitions for thorn CoreCollapseControl
+
+
+STORAGE: rho_max rho_max_index global_rho_max in_prebounce alp_min global_alp_min in_preBH
+STORAGE: force_check
+STORAGE: bounce, bouncetime
+STORAGE: global_entropy_max, local_entropy_max
+
+if (find_fragments)
+{
+   STORAGE: fragment_props
+   STORAGE: fragments_found
+   
+   schedule CoreCollapseControl_Find_Fragments_Rho_Max AT CCTK_POSTSTEP
+   {
+     LANG: C
+   } "Search for density maxima and locate fragments."
+   
+   schedule CoreCollapseControl_Set_Fragment_Props AT CCTK_POSTSTEP AFTER CoreCollapseControl_Find_Fragments_Rho_Max
+   {
+     LANG: C
+     OPTIONS: GLOBAL
+   } "Set Fragment props."
+}
+
+
+  schedule CoreCollapseControl_OutputControl AT CCTK_POSTSTEP AFTER (CoreCollapseControl_PMRGetRhoMax,CoreCollapseControl_LocalSMax)
+  {
+    LANG: C
+    OPTIONS: GLOBAL
+  } "Get rho_max"
+  schedule CoreCollapseControl_OutputControlRecover AT CCTK_POST_RECOVER_VARIABLES AFTER MoL_PostStep
+  {
+    LANG: C
+    OPTIONS: GLOBAL
+  } "Force new settings after recovery"
+  schedule CoreCollapseControl_OutputControl AT PostInitial 
+  {
+    LANG: C
+    OPTIONS: GLOBAL
+  } "Force new settings after recovery"
+
+
+schedule CoreCollapseControl_PMRGetRhoMax AT CCTK_POSTSTEP
+{
+  LANG: C
+  OPTIONS: GLOBAL
+} "Get rho_max"
+
+if(CCTK_EQUALS(bounce_criterion,"entropy")) {
+
+  schedule CoreCollapseControl_LocalSMax AT CCTK_POSTSTEP 
+  {
+    LANG: C
+  } "Get local max entropy within 100 M"
+
+  schedule CoreCollapseControl_GlobalSMax AT CCTK_POSTSTEP AFTER CoreCollapseControl_LocalSMax
+  {
+    LANG: C
+    OPTIONS: GLOBAL
+  } "Get max entropy"
+}
+
+schedule CoreCollapseControl_PMRInit AT CCTK_WRAGH
+{
+  LANG: C
+  OPTIONS: GLOBAL
+} "Initialize stuff"
+
+
+if(handle_PMR) {
+  schedule CoreCollapseControl_PMRStartup AT STARTUP
+  {
+    LANG: C
+  } "Startup banner"
+  
+  schedule CoreCollapseControl_PMRCheckRegrid AT CCTK_POSTSTEP AFTER (CoreCollapseControl_PMRGetRhoMax, CoreCollapseControl_Find_Fragments_Rho_Max, CoreCollapseControl_Set_Fragment_Props)
+  {
+    LANG: C
+    OPTIONS: GLOBAL
+  } "Check if we need to tell CarpetRegrid2 to regrid"
+}
+
+schedule CoreCollapseControl_ParamCheck AT CCTK_PARAMCHECK after GRHydro_ParamCheck
+{
+  LANG: C
+  OPTIONS: GLOBAL
+} "Check consistency of CoreCollapseControl parameters"

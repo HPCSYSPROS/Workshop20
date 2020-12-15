@@ -1,0 +1,39 @@
+# Parameter definitions for thorn TriggerTermination
+# $Header: /home/cvs/cccc/CCCCThorns/TriggerTerminationManual/param.ccl,v 1.4 2006/06/30 03:20:29 schnetter Exp $
+
+private:
+
+INT on_remaining_walltime "When to trigger termination in MINUTES" STEERABLE = ALWAYS
+{
+  0   :: "Don't trigger termination"
+  1:* :: "So many minutes before your job walltime is over"
+} 0
+
+CCTK_REAL max_walltime "Walltime in HOURS allocated for this job" STEERABLE = ALWAYS
+{
+  0.0:* :: "Should be positive, right"
+} 0.0
+
+BOOLEAN termination_from_file "Use termination file; specified by termination_filename" STEERABLE = ALWAYS
+{
+} "no"
+
+STRING termination_file "Termination file name (either full path or relative to IO::out_dir)" STEERABLE = ALWAYS
+{
+ ".*" ::  "Termination file"
+} "/tmp/cactus_terminate"
+
+INT check_file_every "Check termination file every n timesteps" STEERABLE = ALWAYS
+{
+  1:* :: "Should be greater than or equal to one"
+} 1
+
+INT output_remtime_every_minutes "Output remaining time every n minutes" STEERABLE = ALWAYS
+{
+  0   :: "No output"
+  1:* :: "Positive..."
+} 60
+
+shares: IO
+
+uses STRING out_dir

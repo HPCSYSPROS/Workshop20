@@ -1,0 +1,1670 @@
+# Schedule definitions for thorn GRHydro
+# $Header$
+
+#######################################################################
+### We leave the storage on all the time for the variables required ###
+### by MoL. There is probably a better way of doing this.           ###
+#######################################################################
+
+#################################################
+### Storage for MoL execution flag            ###
+#################################################
+
+STORAGE: execute_MoL_Step
+STORAGE: execute_MoL_PostStep
+
+# Set execution flags initially to "True"
+SCHEDULE GRHydro_Reset_Execution_Flags AT CCTK_BASEGRID
+{
+  LANG: C
+  OPTIONS: GLOBAL
+} "Initially set execution flags to 'YEAH, Execute'!"
+
+# When using MoL with multirate, we need to set execution flags for each MoL step!
+if (use_MoL_slow_multirate_sector)
+{
+   SCHEDULE GRHydro_Set_Execution_Flags IN MoL_Step AFTER MoL_DecrementCounter BEFORE MoL_PostStepModify
+   {
+      LANG: C
+      OPTIONS: LEVEL
+   } "Check if we need to execute RHS / Post-step calculation"
+   
+   SCHEDULE GRHydro_Reset_Execution_Flags IN MoL_StartStep AFTER MoL_SetCounter
+   {
+      LANG: C
+      OPTIONS: LEVEL
+   } "Reset execution flags to 'YEAH, Execute'!"
+   
+   SCHEDULE GRHydro_Reset_Execution_Flags IN MoL_Evolution AFTER MoL_FinishLoop
+   {
+      LANG: C
+      OPTIONS: LEVEL
+   } "Reset execution flags to 'YEAH, Execute'!"
+}
+
+
+
+#################################################
+### Storage for the extra timelevels for the  ###
+### use of MoL with Einstein                  ###
+#################################################
+
+STORAGE:dens[timelevels]
+STORAGE:tau[timelevels]
+STORAGE:scon[timelevels]
+if (number_of_particles)
+{
+  STORAGE:particles[timelevels]
+}
+if(CCTK_Equals(Y_e_evolution_method,"GRHydro"))
+{
+  STORAGE: Y_e_con[timelevels]	
+  STORAGE: Y_e_con_rhs, Y_e_con_flux, Y_e_plus, Y_e_minus
+  STORAGE: HydroBase::Y_e[timelevels]
+}
+if(CCTK_Equals(temperature_evolution_method,"GRHydro"))
+{
+  STORAGE: tempplus, tempminus
+  STORAGE: HydroBase::temperature[timelevels]
+  STORAGE: HydroBase::entropy[timelevels]
+}
+if(CCTK_Equals(Bvec_evolution_method,"GRHydro"))
+{
+  STORAGE: HydroBase::Bvec[timelevels]	
+  STORAGE: GRHydro::Bcons[timelevels]	
+  STORAGE: Bconsrhs
+  if (clean_divergence)
+  {
+    STORAGE:psidc[timelevels]
+  }
+} else if(CCTK_Equals(Bvec_evolution_method,"GRHydro_Avec")) {
+  STORAGE: HydroBase::Bvec[timelevels]
+  STORAGE: HydroBase::Avec[timelevels]
+  STORAGE: GRHydro::Bcons[timelevels]
+  STORAGE: Bconsrhs
+  if (CCTK_Equals(Avec_gauge,"Lorenz")) 
+  {
+    STORAGE: HydroBase::Aphi[timelevels]
+  } 
+}
+STORAGE:evolve_MHD
+STORAGE:evolve_Y_e
+STORAGE:evolve_temper
+STORAGE:GRHydro_reflevel
+STORAGE:InLastMoLPostStep
+STORAGE:sdetg
+STORAGE:densrhs
+STORAGE:taurhs
+STORAGE:srhs
+if(CCTK_Equals(Bvec_evolution_method,"GRHydro"))
+{
+  STORAGE:Bconsrhs
+  if (clean_divergence)
+  {
+    STORAGE:psidcrhs
+    STORAGE:whichpsidcspeed 
+  }
+  if (track_divB)
+  {
+    STORAGE:divB
+  }
+  if (calculate_bcom)
+  {
+    STORAGE:GRHydro::bcom[timelevels]
+    STORAGE:GRHydro::bcom0[timelevels]
+    STORAGE:GRHydro::bcom_sq[timelevels]
+  }
+} else if(CCTK_Equals(Bvec_evolution_method,"GRHydro_Avec")) {
+  STORAGE:Avecrhs
+  STORAGE:evolve_Lorenz_gge
+  if (CCTK_Equals(Avec_gauge,"Lorenz"))
+  {
+    STORAGE:Aphirhs
+  }
+  if (track_divB)
+  {
+    STORAGE:divB
+  }
+  if (calculate_bcom)
+  {
+    STORAGE:GRHydro::bcom[timelevels]
+    STORAGE:GRHydro::bcom0[timelevels]
+    STORAGE:GRHydro::bcom_sq[timelevels]
+  }
+}
+if(CCTK_Equals(entropy_evolution_method,"GRHydro"))
+{
+  STORAGE: HydroBase::entropy[timelevels]	
+  STORAGE: GRHydro::entropycons[timelevels]	
+  STORAGE: entropyrhs
+}
+STORAGE:evolve_MHD
+STORAGE:evolve_Y_e
+STORAGE:evolve_temper
+STORAGE:evolve_entropy
+STORAGE:GRHydro_reflevel
+STORAGE:InLastMoLPostStep
+STORAGE:densrhs
+STORAGE:taurhs
+STORAGE:srhs
+STORAGE:GRHydro_eos_scalars
+STORAGE:GRHydro_minima
+STORAGE:GRHydro_scalars
+#STORAGE:fluxweightvolume
+#STORAGE:cell_surface
+if (number_of_particles)
+{
+  STORAGE:particle_rhs
+  STORAGE:particle_arrays
+}
+
+if (evolve_tracer)
+{
+  STORAGE:GRHydro_tracers[timelevels]
+  STORAGE:GRHydro_cons_tracers[timelevels]
+  STORAGE:GRHydro_tracer_rhs
+}
+
+# FIXME: make temporary storage in FluxTerms or remove altogether, rename to be
+# _not_ Evec which will likely collide with a future HydroBase electric field
+# variable
+if (transport_constraints)
+{
+  STORAGE:Evec
+}
+
+# leave this here for compatibility with older code, should not be used anymore
+# and go out at some point
+schedule group GRHydro_Initial IN HydroBase_Initial
+{
+} "GRHydro initial data group"
+
+if(CCTK_Equals(Bvec_evolution_method,"GRHydro") || CCTK_Equals(Bvec_evolution_method,"GRHydro_Avec"))
+{
+  if (clean_divergence)
+  {
+    schedule GRHydro_InitDivergenceClean IN HydroBase_Initial
+    {
+      LANG: Fortran
+    } "Set psi for divergence cleaning initially to zero"
+  }
+  if (track_divB)
+  {
+    schedule GRHydro_DivBInit IN HydroBase_Initial
+    {
+      LANG: Fortran
+    } "Set divB initially to zero"
+  }
+}
+
+if(CCTK_Equals(Bvec_evolution_method,"GRHydro_Avec") && CCTK_Equals(initial_Bvec,"Bvec_from_Avec") )
+{
+#    schedule GRHydro_BvecfromAvec AT CCTK_POSTINITIAL
+    schedule GRHydro_BvecfromAvec IN HydroBase_Initial
+    {
+      LANG: Fortran
+    } "Populate Bvec from Avec"
+#   SCHEDULE group HydroBase_Boundaries AT CCTK_POSTINITIAL AFTER GRHydro_PoloidalMagFieldM AFTER GRHydro_BvecfromAvec
+    SCHEDULE group HydroBase_Boundaries IN HydroBase_Initial AFTER GRHydro_PoloidalMagFieldM AFTER GRHydro_Bvec_from_Avec
+    {
+    } "Call boundary conditions after magnetic field initial data setup"
+}
+
+#################################################
+### Storage for the extra timelevels for the  ###
+### use of MoL with Einstein                  ###
+#################################################
+
+STORAGE: ADMBase::metric[timelevels], ADMBase::curv[timelevels]
+STORAGE: ADMBase::lapse[timelevels]
+if (!CCTK_Equals(initial_shift,"none")) 
+{
+  STORAGE: ADMBase::shift[timelevels]
+  if (CCTK_Equals(shift_evolution_method,"Comoving"))
+  {
+    STORAGE: GRHydro_coords[timelevels]
+    STORAGE: GRHydro_coords_rhs
+
+    schedule GRHydro_SetUpCoords IN HydroBase_Initial
+    {
+      LANG: Fortran
+    } "Set up the coordinates for use with the comoving shift"
+
+    schedule GRHydro_EvolveCoords IN GRHydroRHS
+    {
+      LANG: Fortran
+    } "Evolve the coordinates for the comoving shift"
+
+    schedule GRHydro_ComovingShift IN HydroBase_PostStep AFTER HydroBase_Con2Prim
+    {
+      LANG: Fortran
+    } "Comoving shift"
+
+  }           
+}
+
+##############################################
+### Storage for local tensor quantities    ###
+##############################################
+
+# the official test is to test Coordinates::general_coordinates, however
+# at schedule time, this is not yet set or accessible if we really insist on
+# running with Coordinates but with a Cartesian (trivial) coordinate system
+# _and_ we really want to safe this memory then it has to be turned off at
+# runtime via CCTK_GroupStorageDecrease
+if(CCTK_IsImplementationActive("Coordinates")) {
+  STORAGE: lvel[timelevels]
+  if(CCTK_Equals(Bvec_evolution_method,"GRHydro") ||
+     CCTK_Equals(Bvec_evolution_method,"GRHydro_Avec")) {
+     STORAGE: lBvec[timelevels]
+  }
+  STORAGE: local_metric[timelevels]
+  STORAGE: local_extrinsic_curvature
+  STORAGE: local_shift
+}
+
+##############################################
+### Storage for the conformal state scalar ###
+##############################################
+
+STORAGE: conformal_state
+
+
+###############################################
+### Storage for the H viscosity temporaries ###
+###############################################
+
+if (apply_H_viscosity)
+{
+   STORAGE: H_viscosity_temps
+}
+
+###############################
+### Register startup banner ###
+###############################
+
+# Hack for C2PK
+
+#SCHEDULE nuc_eosK_C_ReadTable AT CCTK_BASEGRID
+#{
+#    LANG: C
+#    OPTIONS: global
+#} "Read EOS HDF5 table"
+
+schedule GRHydro_Startup AT WRAGH
+{
+  LANG: Fortran
+} "Startup banner"
+
+#########################################
+### Register the masks with SpaceMask ###
+#########################################
+
+schedule GRHydro_RegisterMask AT STARTUP
+{
+  LANG: C
+} "Register the hydro masks"
+
+
+####################################
+### Check the parameters are ok. ###
+####################################
+
+schedule GRHydro_ParamCheck AT PARAMCHECK
+{
+  LANG: Fortran
+} "Check parameters"
+
+if(CCTK_IsImplementationActive("Coordinates")) {
+  schedule GRHydro_check_Jacobian_state AT BASEGRID AFTER (TmunuBase_SetStressEnergyState Coordinates_SetGlobalCoords_Group)
+  {
+    LANG: C
+    OPTIONS: GLOBAL
+  } "Test state of Jacobians"
+}
+
+######################################
+### Standard symmetry registration ###
+######################################
+
+schedule GRHydro_InitSymBound AT BASEGRID AFTER (ADMBase_SetShiftStateOn,ADMBase_SetShiftStateOff)
+{
+  LANG: Fortran
+} "Schedule symmetries and check shift state"
+
+##########################################################
+### Schedule the flux weighting calculation at initial ###
+##########################################################
+
+# schedule GRHydro_Weights AT CCTK_INITIAL
+# {
+#   LANG: C
+# } "Set up the weighting terms for the fluxes"
+
+
+#################################
+### Set the handle for the EOS ###
+##################################
+
+schedule GRHydro_EOSHandle AT CCTK_INITIAL before HydroBase_Initial
+{
+  LANG: C
+  OPTIONS: global
+} "Set the EOS number"
+
+schedule GRHydro_EOSHandle AT CCTK_POST_RECOVER_VARIABLES
+{
+  LANG: C
+  OPTIONS: global
+} "Set the EOS number"
+
+####################################
+### Setup of rho minima scalars  ###
+####################################
+
+schedule GRHydro_Rho_Minima_Setup  AT CCTK_Initial BEFORE HydroBase_Initial
+{
+  LANG: Fortran
+} "Set up minimum for the rest-mass density in the atmosphere (before intial data)"
+
+if (rho_abs_min_after_recovery > 0.0)
+{
+  schedule GRHydro_Change_Rho_Minimum_At_Recovery AT CCTK_POST_RECOVER_VARIABLES
+  {
+    LANG: Fortran
+  } "Set up minimum for the rest-mass density in the atmosphere (before intial data)"
+}
+
+
+if (CCTK_IsThornActive("PUGH" ))
+{
+   schedule GRHydro_Rho_Minima_Setup_Final_PUGH AT CCTK_PostInitial BEFORE (MoL_PostStepModify MoL_PostStep)
+   {
+     LANG: C
+   } "Set the value of the rest-mass density of the atmosphere which will be used during the evolution (PUGH)"
+}
+else if (CCTK_IsThornActive("Carpet"))
+{
+   schedule GRHydro_Rho_Minima_Setup_Final AT CCTK_PostPostInitial BEFORE Con2Prim
+   {
+     LANG: C
+   } "Set the value of the rest-mass density of the atmosphere which will be used during the evolution"
+}
+
+schedule GRHydro_SqrtSpatialDeterminant AT CCTK_INITIAL AFTER (HydroBase_Initial,GRHydroTransformADMToLocalBasis) BEFORE HydroBase_Prim2ConInitial
+{
+  LANG: Fortran
+} "Calculate sdetg"
+
+if(CCTK_Equals(Bvec_evolution_method,"GRHydro"))
+{
+
+  if (CCTK_IsThornActive("PUGH" ))
+  {
+     schedule GRHydro_InitialAtmosphereResetM AT CCTK_PostInitial BEFORE (MoL_PostStepModify MoL_PostStep) AFTER GRHydro_Rho_Minima_Setup_Final_PUGH
+     {
+       LANG: Fortran
+     } "Use mask to enforce atmosphere at initial time"
+  }
+  else if (CCTK_IsThornActive("Carpet"))
+  {
+     schedule GRHydro_InitialAtmosphereResetM AT CCTK_PostPostInitial BEFORE Con2Prim AFTER GRHydro_Rho_Minima_Setup_Final
+     {
+       LANG: Fortran
+     } "Use mask to enforce atmosphere at initial time"
+  }
+
+} else if(CCTK_Equals(Bvec_evolution_method,"GRHydro_Avec")) {
+
+  if (CCTK_IsThornActive("PUGH" ))
+  {
+     schedule GRHydro_InitialAtmosphereResetAM AT CCTK_PostInitial BEFORE (MoL_PostStepModify MoL_PostStep) AFTER GRHydro_Rho_Minima_Setup_Final_PUGH
+     {
+       LANG: Fortran
+     } "Use mask to enforce atmosphere at initial time"
+  }
+  else if (CCTK_IsThornActive("Carpet"))
+  {
+     schedule GRHydro_InitialAtmosphereResetAM AT CCTK_PostPostInitial BEFORE Con2Prim AFTER GRHydro_Rho_Minima_Setup_Final
+     {
+       LANG: Fortran
+     } "Use mask to enforce atmosphere at initial time"
+  }
+
+} else {
+
+  if (CCTK_IsThornActive("PUGH" ))
+  {
+     schedule GRHydro_InitialAtmosphereReset AT CCTK_PostInitial BEFORE (MoL_PostStepModify MoL_PostStep) AFTER GRHydro_Rho_Minima_Setup_Final_PUGH
+     {
+       LANG: Fortran
+     } "Use mask to enforce atmosphere at initial time"
+  }
+  else if (CCTK_IsThornActive("Carpet"))
+  {
+     schedule GRHydro_InitialAtmosphereReset AT CCTK_PostPostInitial BEFORE Con2Prim AFTER GRHydro_Rho_Minima_Setup_Final
+     {
+       LANG: Fortran
+     } "Use mask to enforce atmosphere at initial time"
+  }
+
+}
+
+
+# this is a temporary hack, because carpet does allow only one loop over the levels for Basegrid-Iniital-Postinitial
+# so we must compute GRHydro_rho_min at postpostinitial and the constraints after this (and afer C2P)
+#  schedule GROUP ADMConstraintsGroup at CCTK_POSTINITIAL after (MoL_PostStep MoL_PostInitial)
+  schedule GROUP ADMConstraintsGroup at CCTK_POSTPOSTINITIAL
+  {
+  } "Evaluate ADM constraints, and perform symmetry boundary conditions"
+
+###########################################################################
+### Setup and remove the coefficient arrays for ENO/WENO reconstruction ###
+###########################################################################
+
+if (CCTK_Equals(recon_method,"eno")) 
+{
+
+  schedule GRHydro_ENOSetup AT CCTK_Basegrid
+  {
+    OPTIONS: global
+    LANG:Fortran
+  } "Coefficients for ENO reconstruction"
+
+  schedule GRHydro_ENOShutdown AT CCTK_Terminate BEFORE Driver_Terminate
+  {
+    OPTIONS: global
+    LANG:Fortran
+  } "Deallocate ENO coefficients"
+
+}
+
+if (CCTK_Equals(recon_method,"weno") || CCTK_Equals(recon_method,"weno-z"))
+{
+
+  schedule GRHydro_WENOSetup AT CCTK_Basegrid
+  {
+    OPTIONS: global
+    LANG:Fortran
+  } "Coefficients for WENO reconstruction"
+
+  schedule GRHydro_WENOShutdown AT CCTK_Terminate BEFORE Driver_Terminate
+  {
+    OPTIONS: global
+    LANG:Fortran
+  } "Deallocate WENO coefficients"
+
+}
+
+
+######################################################################
+### This routine is a bit strangely situated, as it's really to do ###
+### with initial data. There may be a better place for it later.   ###
+### What it does is reset the hydrodynamical quantities if we have ###
+### changed the EoS between constructing the initial model and     ###
+### evolving. Essentially, we assume that the polytropic EoS that  ###
+### we are using for the atmosphere is correct, and reset eps      ###
+### given the values for rho. We then can call the primitive to    ###
+### conservative routine to get the pressure.                      ###
+######################################################################
+if (EoS_Change)
+{
+  if (CCTK_Equals(EoS_Change_type,"Gamma"))
+  {
+    schedule GRHydro_EoSChangeGamma AT CCTK_Initial AFTER HydroBase_Initial BEFORE GRHydro_IVP
+    { 
+      LANG: Fortran
+    } "Reset the specific internal energy if the EoS changes between ID and evolution"
+  }
+  if (CCTK_Equals(EoS_Change_type,"K"))
+  {
+    schedule GRHydro_EoSChangeK AT CCTK_Initial AFTER HydroBase_Initial BEFORE GRHydro_IVP
+    { 
+      LANG: Fortran
+    } "Reset the hydro variables if the EoS (K) changes between ID and evolution"
+  }
+  if (CCTK_Equals(EoS_Change_type,"GammaKS"))
+  {
+      schedule GRHydro_EoSChangeGammaK_Shibata AT CCTK_Initial AFTER HydroBase_Initial BEFORE GRHydro_IVP
+      { 
+        LANG: Fortran
+        SYNC: dens
+        SYNC: tau
+        SYNC: scon
+        SYNC: hydrobase::w_lorentz
+        SYNC: hydrobase::rho
+        SYNC: hydrobase::press
+        SYNC: hydrobase::eps
+        SYNC: hydrobase::vel
+        SYNC: lvel
+        SYNC: hydrobase::temperature
+        SYNC: hydrobase::entropy
+        SYNC: hydrobase::Y_e
+        SYNC: Y_e_con
+      } "Reset the hydro variables if the EoS Gamma and K change between ID and evolution"
+  }
+}
+
+#####################################
+### Setup of dens minima scalars  ###
+#####################################
+# commented out, since unused for a long time
+#schedule GRHydro_Dens_Minima_Setup AT CCTK_Postinitial
+#{
+#  LANG: Fortran
+#} "Set up and check minima for dens"
+
+#################################################
+### Standard registration of variables to MoL ###
+#################################################
+
+schedule GRHydro_Register IN MoL_Register
+{
+  LANG: C
+} "Register variables for MoL"
+
+####################################################
+### Setup of any scalars for efficiency purposes ###
+####################################################
+
+schedule GRHydro_Scalar_Setup IN MoL_PreStep
+{
+  LANG: Fortran
+} "Set up and check scalars for efficiency"
+
+schedule GRHydro_Scalar_Setup IN CCTK_POSTINITIAL
+{
+  LANG: Fortran
+} "Set up and check scalars for efficiency"
+
+################################################
+### We might want to switch off evolution... ###
+################################################
+
+if (CCTK_EQUALS(evolution_method, "GRHydro")) {
+
+STORAGE:GRHydro_atmosphere_mask
+STORAGE:GRHydro_atmosphere_mask_real
+STORAGE:GRHydro_atmosphere_descriptors
+
+schedule GRHydro_SetupMask AT CCTK_Initial BEFORE HydroBase_Initial
+{
+  LANG: Fortran
+} "Initialize the atmosphere mask"
+
+# alternatively drop support for wk_atmosphere and schedule GRHydro_SetupMask
+# only in CCTK_BaseGrid
+schedule GRHydroCopyIntegerMask AT CCTK_POST_RECOVER_VARIABLES BEFORE MoL_PostStep
+{
+  LANG: Fortran
+} "Initialize the real valued atmosphere mask after checkpoint recovery"
+
+# If using mesh refinement
+schedule GRHydro_SetupMask AT POSTREGRID BEFORE MoL_PostStep AFTER (MaskOne,MaskZero)
+{
+  LANG: Fortran
+} "Initialize the atmosphere mask"
+
+schedule GRHydro_SetupMask AT POSTREGRIDINITIAL BEFORE MoL_PostStep AFTER (MaskOne,MaskZero)
+{
+  LANG: Fortran
+} "Initialize the atmosphere mask"
+
+# Early atmosphere reset. This will not capture relative atmosphere settings (rho_rel_min) which
+# is scheduled later. However, this will ensure that all time and refinement levels are handled
+# correctly for rho_abs_min set.
+schedule GRHydro_InitialAtmosphereReset AT CCTK_Initial AFTER HydroBase_Initial BEFORE HydroBase_Prim2ConInitial AFTER GRHydro_SqrtSpatialDeterminant 
+{
+  LANG: Fortran
+} "Use mask to enforce atmosphere at initial time"
+
+if (wk_atmosphere)
+{
+  schedule GRHydro_InitAtmosMask AT CCTK_PostInitial
+  {
+    LANG: Fortran
+  } "Set the atmosphere mask"
+
+  schedule GRHydro_InitAtmosMask AT POSTREGRID AFTER GRHydro_SetupMask BEFORE MoL_PostStep
+  {
+    LANG: Fortran
+  } "Set the atmosphere mask"
+
+  schedule GRHydro_InitAtmosMask AT POSTREGRIDINITIAL AFTER GRHydro_SetupMask BEFORE HydroBase_PostStep
+  {
+    LANG: Fortran
+  } "Set the atmosphere mask"
+}
+
+# If using mesh refinement
+
+
+#####################################################################
+### The group to calculate the update term for MoL. This contains ###
+### the calculation of the source terms and the flux update.      ###
+#####################################################################
+
+
+if(CCTK_IsImplementationActive("Coordinates")) {
+  schedule GRHydroTransformPrimToLocalBasis AT INITIAL AFTER (HydroBase_Initial, ADMBase_PostInitial) BEFORE HydroBase_Prim2ConInitial
+  {
+     LANG: C
+  } "Transform primitive vars to local tensor basis."
+
+
+  schedule GRHydroTransformADMToLocalBasis AT INITIAL AFTER HydroBase_Initial BEFORE GRHydroTransformPrimToLocalBasis
+  {
+     LANG: C
+  } "Transform ADM metric, extr. curv. and shift to local tensor basis."
+
+
+  schedule GRHydroTransformADMToLocalBasis IN ADMBase_SetADMVars IF GRHydro::execute_MoL_Step
+  {
+     LANG: C
+  } "Transform metric and shift to local tensor basis."
+
+
+  schedule GRHydroTransformPrimToGlobalBasis IN HydroBase_PostStep AFTER HydroBase_Con2Prim IF GRHydro::execute_MoL_PostStep
+  {
+     LANG: C
+  } "Transform primitive vars to global tensor basis."
+}
+
+
+schedule group GRHydroRHS IN HydroBase_RHS IF GRHydro::execute_MoL_Step
+{
+  STORAGE:GRHydro_scalars
+} "Calculate the update terms"
+
+#============================================
+# Uncomment the following lines for debugging
+#
+# schedule GRHydro_Scalar_Setup AT CCTK_Initial
+# {
+#   LANG: Fortran
+# } "Set up and check scalars for efficiency"
+# 
+# schedule group GRHydroRHS AT CCTK_Analysis
+# {
+#   STORAGE:GRHydro_scalars
+#   TRIGGERS: densrhs
+#   TRIGGERS: srhs
+#   TRIGGERS: taurhs
+# if(CCTK_Equals(Bvec_evolution_method,"GRHydro"))
+#   {
+#     TRIGGERS: Bvecrhs
+#   }  
+# } "Calculate the update terms"
+# 
+# STORAGE:GRHydro_fluxes
+# STORAGE:GRHydro_con_bext
+# STORAGE:GRHydro_prim_bext
+# if(CCTK_Equals(Bvec_evolution_method,"GRHydro"))
+#   {
+#     STORAGE:GRHydro_MHD_con_bext
+#   }  
+# STORAGE:EOS_temps
+# 
+# if(CCTK_Equals(Bvec_evolution_method,"GRHydro"))
+#   {
+#     schedule Primitive2ConservativeCellsM AT CCTK_POSTINITIAL AFTER GZPatchSystem_cxform BEFORE MoL_PostStep
+#     {
+#       LANG: Fortran
+#     } "Convert to conserved variables - MHD version"
+# } else {
+#    schedule Primitive2ConservativeCells AT CCTK_POSTINITIAL AFTER GZPatchSystem_cxform BEFORE MoL_PostStep
+#    {
+#      LANG: Fortran
+#    } "Convert to conserved variables"
+#  }
+#
+#==============================================
+
+if (number_of_particles)
+{
+  schedule GRHydroParticleInitial AT CCTK_Initial BEFORE HydroBase_Initial
+  {
+    OPTIONS: GLOBAL
+    LANG: Fortran
+  } "Initial data for the particle arrays"
+
+  schedule GRHydroParticleRHS IN GRHydroRHS
+  {
+    OPTIONS: GLOBAL
+    LANG: Fortran
+  } "Update terms for the particles"
+}
+
+####################################################################
+### Do the source terms first, as this does not require the loop ###
+### over the different directions                                ###
+####################################################################
+
+if(use_cxx_code) {
+  schedule SourceTerms IN GRHydroRHS BEFORE FluxTerms
+  {
+    LANG: C 
+  } "Source term calculation"
+} else {
+  if(CCTK_Equals(Bvec_evolution_method,"GRHydro"))
+  {
+    schedule SourceTermsM IN GRHydroRHS BEFORE FluxTerms 
+    {
+      LANG: Fortran
+    } "Source term calculation - MHD version"
+  } else if(CCTK_Equals(Bvec_evolution_method,"GRHydro_Avec")) {
+    schedule SourceTermsM IN GRHydroRHS BEFORE FluxTerms
+    {
+      LANG: Fortran
+    } "Source term calculation - Vector Potential MHD version"
+  } else {
+    schedule SourceTerms IN GRHydroRHS BEFORE FluxTerms
+    {
+      LANG: Fortran
+    } "Source term calculation"
+  }
+}
+#################################################################
+### Initial setup for the loop over the different directions. ###
+#################################################################
+
+schedule GRHydroStartLoop IN GRHydroRHS BEFORE FluxTerms
+{
+  LANG: Fortran
+  OPTIONS: level
+} "Set the flux_direction variable"
+
+###################################################################
+### The group to calculate the update terms from the fluxes. We ###
+### do this as a loop over each direction to reduce coding and  ###
+### hopefully to reduce bugs. The parameter flux_direction runs ###
+### from (3->0) corresponding to (z->x) and stopping. At each   ###
+### step in the loop the data is reconstructed and then the     ###
+### fluxes are computed by the Riemann solve.                   ###
+###################################################################
+
+#######################################################
+### Switch between RSA FV and flux split FD methods ###
+#######################################################
+
+if (CCTK_Equals(method_type, "RSA FV"))
+{
+   	
+  if (evolve_tracer)
+  {  
+    if(CCTK_Equals(Bvec_evolution_method,"GRHydro"))
+    {
+    
+      schedule group FluxTerms IN GRHydroRHS WHILE GRHydro::flux_direction
+      {
+        STORAGE:GRHydro_prim_bext
+        STORAGE:GRHydro_con_bext
+        STORAGE:GRHydro_fluxes
+        STORAGE:GRHydro_MHD_con_bext
+        STORAGE:GRHydro_MHD_prim_bext
+        STORAGE:GRHydro_MHD_psidc_bext
+        STORAGE:GRHydro_entropy_prim_bext
+        STORAGE:GRHydro_entropy_con_bext
+        STORAGE:GRHydro_Bfluxes
+        STORAGE:GRHydro_psifluxes
+        STORAGE:GRHydro_entropyfluxes
+        STORAGE:GRHydro_tracer_cons_bext
+        STORAGE:GRHydro_tracer_prim_bext
+        STORAGE:GRHydro_tracer_flux
+      } "Calculation of intercell fluxes"
+    } else if(CCTK_Equals(Bvec_evolution_method,"GRHydro_Avec") && CCTK_Equals(Avec_gauge,"Algebraic")) {
+
+      schedule group FluxTerms IN GRHydroRHS WHILE GRHydro::flux_direction
+      {
+        STORAGE:GRHydro_prim_bext
+        STORAGE:GRHydro_con_bext
+        STORAGE:GRHydro_fluxes
+        STORAGE:GRHydro_MHD_con_bext
+        STORAGE:GRHydro_MHD_prim_bext
+        STORAGE:GRHydro_MHD_psidc_bext
+        STORAGE:GRHydro_entropy_prim_bext
+        STORAGE:GRHydro_entropy_con_bext
+        STORAGE:GRHydro_Bfluxes
+        STORAGE:GRHydro_psifluxes
+	STORAGE:GRHydro_Avec_bext
+        STORAGE:GRHydro_Avecfluxes
+        STORAGE:GRHydro_tracer_cons_bext
+        STORAGE:GRHydro_tracer_prim_bext
+        STORAGE:GRHydro_tracer_flux
+      } "Calculation of intercell fluxes"
+
+    } else if(CCTK_Equals(Bvec_evolution_method,"GRHydro_Avec") && CCTK_Equals(Avec_gauge,"Lorenz")) {
+
+      schedule group FluxTerms IN GRHydroRHS WHILE GRHydro::flux_direction
+      {
+        STORAGE:GRHydro_prim_bext
+        STORAGE:GRHydro_con_bext
+        STORAGE:GRHydro_fluxes
+        STORAGE:GRHydro_MHD_con_bext
+        STORAGE:GRHydro_MHD_prim_bext
+	STORAGE:GRHydro_Avec_bext
+	STORAGE:GRHydro_Aphi_bext
+        STORAGE:GRHydro_Avecfluxes
+	STORAGE:GRHydro_Aphifluxes
+        STORAGE:GRHydro_tracer_cons_bext
+        STORAGE:GRHydro_tracer_prim_bext
+        STORAGE:GRHydro_tracer_flux
+      } "Calculation of intercell fluxes"
+
+    } else {
+      schedule group FluxTerms IN GRHydroRHS WHILE GRHydro::flux_direction
+      {
+        STORAGE:GRHydro_prim_bext
+        STORAGE:GRHydro_con_bext
+        STORAGE:GRHydro_fluxes
+        STORAGE:GRHydro_tracer_cons_bext
+        STORAGE:GRHydro_tracer_prim_bext
+        STORAGE:GRHydro_tracer_flux
+      } "Calculation of intercell fluxes"
+
+    }
+  }
+  else
+  {
+    if(CCTK_Equals(Bvec_evolution_method,"GRHydro"))
+    {
+      schedule group FluxTerms IN GRHydroRHS WHILE GRHydro::flux_direction
+      {
+        STORAGE:GRHydro_prim_bext
+        STORAGE:GRHydro_con_bext
+        STORAGE:GRHydro_fluxes
+        STORAGE:GRHydro_MHD_con_bext
+        STORAGE:GRHydro_MHD_prim_bext
+        STORAGE:GRHydro_MHD_psidc_bext
+        STORAGE:GRHydro_entropy_con_bext
+        STORAGE:GRHydro_entropy_prim_bext
+        STORAGE:GRHydro_Bfluxes
+        STORAGE:GRHydro_psifluxes
+        STORAGE:GRHydro_entropyfluxes
+      } "Calculation of intercell fluxes"
+    } else if(CCTK_Equals(Bvec_evolution_method,"GRHydro_Avec"))  {
+
+      schedule group FluxTerms IN GRHydroRHS WHILE GRHydro::flux_direction
+      {
+        STORAGE:GRHydro_prim_bext
+        STORAGE:GRHydro_con_bext
+        STORAGE:GRHydro_fluxes
+        STORAGE:GRHydro_MHD_con_bext
+        STORAGE:GRHydro_MHD_prim_bext
+        STORAGE:GRHydro_Avec_bext
+        STORAGE:GRHydro_Aphi_bext
+        STORAGE:GRHydro_Avecfluxes
+        STORAGE:GRHydro_Aphifluxes
+      } "Calculation of intercell fluxes"
+
+    } else {
+      schedule group FluxTerms IN GRHydroRHS WHILE GRHydro::flux_direction
+      {
+        STORAGE:GRHydro_prim_bext
+        STORAGE:GRHydro_con_bext
+        STORAGE:GRHydro_fluxes
+      } "Calculation of intercell fluxes"
+    }
+  }
+    
+##############################################################
+### This is a wrapper call to the reconstruction routines. ###
+##############################################################
+
+  if (CCTK_Equals(GRHydro_eos_type,"General")) {
+
+    if (use_cxx_code) {
+       
+       schedule Reconstruction_cxx IN FluxTerms AS Reconstruct
+       {
+          LANG: C
+       } "Reconstruct the functions at the cell boundaries"
+    
+    } else {
+
+       schedule Reconstruction IN FluxTerms AS Reconstruct
+       {
+          LANG: Fortran
+       } "Reconstruct the functions at the cell boundaries"
+    
+    }
+  }
+  else if (CCTK_Equals(GRHydro_eos_type,"Polytype")) {
+    
+    schedule ReconstructionPolytype IN FluxTerms AS Reconstruct
+    {
+      LANG: Fortran
+    } "Reconstruct the functions at the cell boundaries"
+  }
+  
+  if (set_trivial_rp_grid_function)
+  {
+    schedule Set_Trivial_Riemann_Problem_Grid_Function \
+    IN FluxTerms AFTER Reconstruct
+    {
+      LANG: C
+      SYNC: GRHydro_trivial_rp_gf_group
+    } "Set the gridfunction for the trp (for debugging only)"
+  }
+  
+######################################################
+### This is a wrapper call to the Riemann solvers. ###
+######################################################
+
+  if (CCTK_Equals(GRHydro_eos_type,"General")) {
+    if(CCTK_Equals(Bvec_evolution_method,"GRHydro"))
+    {
+      schedule RiemannSolveM IN FluxTerms AFTER Reconstruct AS Riemann
+      {
+        LANG: Fortran
+        STORAGE: EOS_temps
+      } "Solve the local Riemann problems - MHD version"
+    } else if(CCTK_Equals(Bvec_evolution_method,"GRHydro_Avec")) {
+      schedule RiemannSolveAM IN FluxTerms AFTER Reconstruct AS Riemann
+      {
+        LANG: Fortran
+        STORAGE: EOS_temps
+      } "Solve the local Riemann problems - Vector Potential MHD version"
+    } else {
+      schedule RiemannSolve IN FluxTerms AFTER Reconstruct AS Riemann
+      {
+        LANG: Fortran
+        STORAGE: EOS_temps
+      } "Solve the local Riemann problems"
+    }    
+  }
+  else if (CCTK_Equals(GRHydro_eos_type,"Polytype")) {
+    
+    schedule RiemannSolvePolytype IN FluxTerms AFTER Reconstruct AS Riemann
+    {
+      LANG: Fortran
+      STORAGE: EOS_temps
+    } "Solve the local Riemann problems"
+  }
+  
+}
+else if (CCTK_Equals(method_type, "Flux split FD"))
+{
+
+
+##########################################
+###  MHD not implemented yet for Flux split FD !!!
+##########################################
+  STORAGE:fs_alpha
+
+  if (evolve_tracer)
+  {
+
+    schedule group FluxTerms IN GRHydroRHS WHILE GRHydro::flux_direction 
+    {
+      STORAGE: GRHydro_fluxes
+      STORAGE: GRHydro_tracer_flux
+    } "Calculation of intercell fluxes"
+
+    schedule GRHydro_FSAlpha IN FluxTerms BEFORE GRHydro_SplitFlux
+    {
+      LANG: Fortran
+    } "Compute the maximum characteristic speeds"
+
+    schedule GRHydro_SplitFlux IN FluxTerms AS Reconstruct
+    {
+      LANG: Fortran
+      STORAGE: flux_splitting
+      STORAGE: GRHydro_tracer_flux_splitting
+      SYNC: GRHydro_fluxes
+    } "Compute the fluxes using WENO5 FD + Lax-Friedrichs splitting"
+
+  }
+  else
+  {
+
+    schedule group FluxTerms IN GRHydroRHS WHILE GRHydro::flux_direction 
+    {
+      STORAGE: GRHydro_fluxes
+    } "Calculation of intercell fluxes"
+
+    schedule GRHydro_FSAlpha IN FluxTerms BEFORE GRHydro_SplitFlux
+    {
+      LANG: Fortran
+    } "Compute the maximum characteristic speeds"
+
+    schedule GRHydro_SplitFlux IN FluxTerms AS Reconstruct
+    {
+      LANG: Fortran
+      STORAGE: flux_splitting
+      SYNC: GRHydro_fluxes
+    } "Compute the fluxes using WENO5 FD + Lax-Friedrichs splitting"
+
+  }
+
+}
+
+###########################################################
+### After calculating the fluxes, calculate the update. ###
+###########################################################
+
+schedule UpdateCalculation IN FluxTerms AFTER Riemann AS UpdateCalcul
+{
+  LANG: Fortran
+} "Calculate the update term from the fluxes"
+  
+#################################
+### Advance the loop counter. ###
+#################################
+
+schedule GRHydroAdvanceLoop IN FluxTerms AFTER UpdateCalcul
+{
+  LANG: Fortran
+  OPTIONS: level
+} "Decrement the flux_direction variable"
+
+###########################################################
+### If we're in the atmosphere or inside the excision   ###
+### region then we don't want to do any updating (in    ###
+### fact if we're inside the excision region we don't   ###
+### want to calculate the fluxes, but we'll worry about ###
+### that later). Just zero the update terms where       ###
+### certain conditions are violated.                    ###
+###########################################################
+
+schedule GRHydroUpdateAtmosphereMask IN GRHydroRHS AFTER FluxTerms
+{
+  LANG: Fortran
+} "Alter the update terms if inside the atmosphere region"
+
+###############################################################
+### After we've done the update, there's a few things to do ###
+###############################################################
+
+# This should not be used anymore and be removed after some time
+schedule group GRHydro_PostStep IN HydroBase_PostStep
+{
+} "Post step tasks for GRHydro"
+
+#################################################################
+### After MoL has updated the conserved variables, we need to ###
+### convert back to primitive variables. This is a wrapper    ###
+### over the entire grid.                                     ###
+#################################################################
+
+########################################################
+### Find the refinement level that is being computed ###
+########################################################
+
+schedule GRHydro_RefinementLevel IN MoL_PostStep BEFORE HydroBase_PostStep
+{
+  LANG: Fortran
+} "Calculate current refinement level"
+
+schedule GRHydro_RefinementLevel IN FluxTerms BEFORE Reconstruct
+{
+  LANG: Fortran
+} "Calculate current refinement level"
+
+########################### Sqrt(detg) #################
+
+# recompute root of metric determinant whenever metric is updated we could alse
+# abuse ADMBase_SetADMVars the way GRHydroTransformADMToLocalBasis does. Abuse
+# since the group description says to "Set the ADM variables before this group,
+# and use them afterwards" it does not say to schedule anything in it.
+# If we ever face trouble with the current placement we will ignore the
+# description and do so anyway.
+schedule GRHydro_SqrtSpatialDeterminant IN HydroBase_Con2Prim BEFORE Con2Prim IF GRHydro::execute_MoL_Step
+{
+  LANG: Fortran
+} "Calculate sdetg"
+
+schedule GRHydro_SqrtSpatialDeterminant AT CCTK_POST_RECOVER_VARIABLES
+{
+  LANG: Fortran
+} "Calculate sdetg"
+
+
+#debug
+###schedule GRHydro_Debug IN HydroBase_PostStep
+###{
+###  LANG: Fortran
+###} "debug"
+
+schedule GRHydro_RefinementLevel AT CCTK_PostStep
+{
+  LANG: Fortran
+} "Calculate current refinement level (for the check of the C2P mask)"
+
+schedule GRHydro_RefinementLevel AT POSTREGRIDINITIAL 
+{
+  LANG: Fortran
+} "Calculate current refinement level"
+
+schedule GRHydro_RefinementLevel AT INITIAL BEFORE HydroBase_Initial
+{
+  LANG: Fortran
+} "Calculate current refinement level"
+
+
+if (CCTK_Equals(GRHydro_eos_type,"General")) 
+{
+
+  if(CCTK_Equals(Bvec_evolution_method,"GRHydro"))
+  {
+#    schedule Conservative2PrimitiveK IN HydroBase_Con2Prim AS Con2Prim IF GRHydro::execute_MoL_PostStep
+#    {
+#      LANG: C 
+#    } "Convert back to primitive variables (general) - MHD version"
+    schedule Conservative2PrimitiveM IN HydroBase_Con2Prim AS Con2Prim IF GRHydro::execute_MoL_PostStep
+    {
+      LANG: Fortran
+    } "Convert back to primitive variables (general) - MHD version"
+  
+    schedule Primitive2ConservativeCellsM IN HydroBase_Prim2ConInitial
+    {
+      LANG: Fortran
+    } "Convert initial data given in primive variables to conserved variables - MHD version"
+  } else if(CCTK_Equals(Bvec_evolution_method,"GRHydro_Avec")) 
+  {
+    schedule GRHydro_BvecfromAvec IN HydroBase_Con2Prim IF GRHydro::execute_MoL_PostStep
+    {
+      LANG: Fortran
+    } "Populate Bvec from Avec"
+    SCHEDULE group HydroBase_Boundaries IN HydroBase_Con2Prim AFTER GRHydro_BvecfromAvec IF GRHydro::execute_MoL_PostStep
+    {
+    } "Call boundary conditions after magnetic field initial data setup"
+    schedule GRHydro_BvecfromAvec2 IN HydroBase_Con2Prim IF GRHydro::execute_MoL_PostStep
+    {
+      LANG: Fortran
+    } "Populate Bvec from Avec"
+    schedule Conservative2PrimitiveAM IN HydroBase_Con2Prim AS Con2Prim AFTER HydroBase_Boundaries AFTER GRHydro_BvecfromAvec2 IF GRHydro::execute_MoL_PostStep
+    {
+      LANG: Fortran
+    } "Convert back to primitive variables (general) - MHD with Avec version"
+    schedule Primitive2ConservativeCellsAM IN HydroBase_Prim2ConInitial
+    {
+      LANG: Fortran
+    } "Convert initial data given in primive variables to conserved variables - MHD with Avec version"
+  } else {
+    schedule Conservative2Primitive IN HydroBase_Con2Prim AS Con2Prim IF GRHydro::execute_MoL_PostStep
+    {
+      LANG: Fortran
+    } "Convert back to primitive variables (general)"
+  
+    schedule Primitive2ConservativeCells IN HydroBase_Prim2ConInitial
+    {
+      LANG: Fortran
+    } "Convert initial data given in primive variables to conserved variables"
+  }
+
+}
+else if (CCTK_Equals(GRHydro_eos_type,"Polytype")) 
+{
+  
+  if(CCTK_Equals(Bvec_evolution_method,"GRHydro"))
+  {
+    schedule Conservative2PrimitivePolytypeM IN HydroBase_Con2Prim AS Con2Prim IF GRHydro::execute_MoL_PostStep
+    {
+      LANG: Fortran
+    } "Convert back to primitive variables (polytype) - MHD version"
+  
+    schedule Primitive2ConservativePolyCellsM IN HydroBase_Prim2ConInitial
+    {
+      LANG: Fortran
+    } "Convert initial data given in primive variables to conserved variables - MHD version"
+  } else if(CCTK_Equals(Bvec_evolution_method,"GRHydro_Avec")) {
+    schedule Conservative2PrimitivePolytypeAM IN HydroBase_Con2Prim AS Con2Prim IF GRHydro::execute_MoL_PostStep
+    {
+      LANG: Fortran
+    } "Convert back to primitive variables (polytype) - MHD with Avec version"
+  
+    schedule Primitive2ConservativePolyCellsAM IN HydroBase_Prim2ConInitial
+    {
+      LANG: Fortran
+    } "Convert initial data given in primive variables to conserved variables - MHD with Avec version"
+  } else {
+    schedule Conservative2PrimitivePolytype IN HydroBase_Con2Prim AS Con2Prim IF GRHydro::execute_MoL_PostStep
+    {
+      LANG: Fortran
+    } "Convert back to primitive variables (polytype)"
+  
+    schedule Primitive2ConservativePolyCells IN HydroBase_Prim2ConInitial
+    {
+      LANG: Fortran
+    } "Convert initial data given in primive variables to conserved variables"
+  }
+}
+
+#################################################################
+### Having finished all the updates, we apply the boundary    ###
+### conditions and synchronize the conservative and primitive ###
+### variables. All other grid functions are reset only in the ###
+### interior of the grid and are totally reset at every step, ###
+### and so synchronization is not necessary.                  ###
+#################################################################
+
+#schedule GRHydro_Boundaries IN HydroBase_PostStep AFTER Con2Prim
+
+if (evolve_tracer)
+{
+  STORAGE:GRHydro_tracers[timelevels]
+  STORAGE:GRHydro_cons_tracers[timelevels]
+  STORAGE:GRHydro_tracer_rhs
+}
+
+# This should not be used anymore and should be removed after some time
+schedule group Do_GRHydro_Boundaries IN HydroBase_Boundaries
+{
+} "GRHydro Boundary conditions group"
+
+
+# Synchronize the atmosphere mask before doing other boundaries!
+schedule group GRHydro_AtmosphereMaskBoundaries IN HydroBase_PostStep BEFORE (HydroBase_Boundaries,GRHydro_PrimitiveInitialGuessesBoundaries)
+{
+} "Apply boundary conditions to primitives"
+
+schedule GRHydro_SelectAtmosphereMaskBoundaries IN GRHydro_AtmosphereMaskBoundaries
+{
+  LANG: Fortran
+  OPTIONS: LEVEL
+  SYNC: GRHydro_atmosphere_mask_real
+} "Select atmosphere mask for boundary conditions"
+
+schedule group ApplyBCs AS GRHydro_ApplyAtmosphereMaskBCs in GRHydro_AtmosphereMaskBoundaries AFTER GRHydro_SelectAtmosphereMaskBoundaries
+{
+} "Apply boundary conditions to real-valued atmosphere mask"
+
+
+# Now synchronize other evolution variables
+if (!sync_conserved_only)
+{
+   schedule GRHydro_Boundaries IN HydroBase_Select_Boundaries AS GRHydro_Bound IF GRHydro::execute_MoL_PostStep
+   {
+      LANG: Fortran
+      OPTIONS: LEVEL
+      SYNC: dens
+      SYNC: tau
+      SYNC: scon
+      SYNC: HydroBase::w_lorentz
+      SYNC: HydroBase::rho
+      SYNC: HydroBase::press
+      SYNC: HydroBase::eps
+      SYNC: HydroBase::vel
+      SYNC: Bcons
+      SYNC: entropycons
+      SYNC: HydroBase::Bvec
+      SYNC: HydroBase::Avec
+      SYNC: psidc
+      SYNC: GRHydro_cons_tracers
+      SYNC: GRHydro_tracers
+      SYNC: hydrobase::temperature
+      SYNC: hydrobase::entropy
+      SYNC: hydrobase::Y_e
+      SYNC: Y_e_con
+      SYNC: lvel
+      SYNC: lBvec
+   } "Select GRHydro boundary conditions"
+}
+else
+{
+    schedule GRHydro_Boundaries IN HydroBase_Select_Boundaries AS GRHydro_Bound IF GRHydro::execute_MoL_PostStep
+    {
+      LANG: Fortran
+      OPTIONS: LEVEL
+      SYNC: dens
+      SYNC: tau
+      SYNC: scon
+      SYNC: Bcons
+      SYNC: entropycons
+      SYNC: psidc
+      SYNC: GRHydro_cons_tracers
+      SYNC: Y_e_con
+    } "Select GRHydro boundary conditions"
+
+    # after a regrid Cactus relies on the boundary thorns to fill in the outer
+    # and symmetry boundaries (we need valid data for the initial guess in Con2Prim)
+    schedule group GRHydro_PrimitiveBoundaries IN CCTK_POSTREGRID BEFORE MoL_PostStep
+    {
+    } "Apply boundary conditions to all primitives"
+    schedule group GRHydro_PrimitiveBoundaries IN CCTK_POSTREGRIDINITIAL BEFORE MoL_PostStep
+    {
+    } "Apply boundary conditions to all primitives"
+    
+    # Primitive sync is always necessary to provide initial guesses for Con2Prim in the buffer zones via prolongation.
+    # Buffer zones are not guaranteed to have the correct values! Prolongation happens only in the last MoL poststep
+    # so we only need to sync in the last MoL post step.
+    schedule group GRHydro_PrimitiveInitialGuessesBoundaries IN HydroBase_PostStep BEFORE HydroBase_Boundaries IF GRHydro::InLastMoLPostStep
+    {
+    } "Apply boundary conditions to those primitives used as initial guesses"
+    
+
+    if(CCTK_IsImplementationActive("Coordinates")) {
+    
+      # Via prolongation, we only need to sync variables used for initial guesses!
+      # With MP, we only need to sync primitives in LOCAL tensor base!!
+      schedule GRHydro_SelectPrimitiveInitialGuessesBoundaries IN GRHydro_PrimitiveInitialGuessesBoundaries
+      {
+	 LANG: Fortran
+	 OPTIONS: LEVEL
+#         SYNC: HydroBase::w_lorentz      # not used as initial guess and hence not needed!
+         SYNC: HydroBase::press          # con2prim_ptPolytype uses this for its initial guess
+#         SYNC: HydroBase::vel            # not needed; lvel is used as initial guess instead
+#         SYNC: HydroBase::Bvec           # not needed; lBvec is used as initial guess instead
+#         SYNC: hydrobase::entropy        # not used as initial guess and hence not needed!
+#         SYNC: hydrobase::Y_e            # not used as initial guess and hence not needed!
+#         SYNC: GRHydro_tracers           # not used as initial guess and hence not needed!
+         SYNC: HydroBase::rho
+	 SYNC: HydroBase::eps
+	 SYNC: hydrobase::temperature
+	 SYNC: lvel
+	 SYNC: lBvec
+      } "Select initial guess primitive variables for boudary conditions"
+      
+      # After regridding, we better sync every primitive!
+      # With MP, we only need to sync primitives in LOCAL tensor base!!
+      schedule GRHydro_SelectPrimitiveBoundaries IN GRHydro_PrimitiveBoundaries
+      {
+	 LANG: Fortran
+	 OPTIONS: LEVEL
+#         SYNC: HydroBase::w_lorentz   # don't need that since computed in Con2Prim which runs in postregrid!
+         SYNC: HydroBase::press          # con2prim_ptPolytype uses this for its initial guess
+#         SYNC: HydroBase::vel         # not needed; obtained from lvel everywhere in post regrid after Con2Prim
+#         SYNC: HydroBase::Bvec        # not needed; obtained from lBvec everywhere in post regrid after Con2Prim
+         SYNC: hydrobase::entropy
+         SYNC: hydrobase::Y_e
+         SYNC: GRHydro_tracers
+         SYNC: HydroBase::rho
+	 SYNC: HydroBase::eps
+	 SYNC: hydrobase::temperature
+	 SYNC: lvel
+	 SYNC: lBvec
+      } "Select primitive variables for boundary conditions"
+    }
+    else
+    {
+      # Via prolongation, we only need to sync variables used for initial guesses!
+      # Without MP, we only need to sync primitives in GLOBAL tensor base!!
+      schedule GRHydro_SelectPrimitiveInitialGuessesBoundaries IN GRHydro_PrimitiveInitialGuessesBoundaries
+      {
+	 LANG: Fortran
+	 OPTIONS: LEVEL
+#         SYNC: HydroBase::w_lorentz      # not used as initial guess and hence not needed!
+         SYNC: HydroBase::press          # con2prim_ptPolytype uses this for its initial guess
+#         SYNC: hydrobase::entropy        # not used as initial guess and hence not needed!
+#         SYNC: hydrobase::Y_e            # not used as initial guess and hence not needed!
+#         SYNC: lvel
+#         SYNC: lBvec
+#         SYNC: GRHydro_tracers           # not used as initial guess and hence not needed!
+	 SYNC: HydroBase::rho
+	 SYNC: HydroBase::eps
+	 SYNC: HydroBase::vel
+	 SYNC: HydroBase::Bvec
+	 SYNC: hydrobase::temperature
+      } "Select initial guess primitive variables for boudary conditions"
+    
+      # After regridding, we better sync every primitive!
+      # Without MP, we only need to sync primitives in GLOBAL tensor base!!
+      schedule GRHydro_SelectPrimitiveBoundaries IN GRHydro_PrimitiveBoundaries
+      {
+	 LANG: Fortran
+	 OPTIONS: LEVEL
+#         SYNC: HydroBase::w_lorentz      # don't need that since computed in Con2Prim which runs in postregrid!
+         SYNC: HydroBase::press          # con2prim_ptPolytype uses this for its initial guess
+         SYNC: hydrobase::entropy
+         SYNC: hydrobase::Y_e
+         SYNC: GRHydro_tracers
+	 SYNC: HydroBase::rho
+	 SYNC: HydroBase::eps
+	 SYNC: HydroBase::vel
+	 SYNC: HydroBase::Bvec
+	 SYNC: hydrobase::temperature
+      } "Select primitive variables for boundary conditions"
+    
+    }
+    
+    schedule group ApplyBCs AS GRHydro_ApplyPrimitiveInitialGuessBCs in GRHydro_PrimitiveInitialGuessesBoundaries AFTER GRHydro_SelectPrimitiveInitialGuessesBoundaries
+    {
+    } "Apply boundary conditions to initial guess primitive variables"
+
+    schedule group ApplyBCs AS GRHydro_ApplyPrimitiveBCs in GRHydro_PrimitiveBoundaries AFTER GRHydro_SelectPrimitiveBoundaries
+    {
+    } "Apply boundary conditions to all primitive variables"
+
+}  # sync_conserved_only
+
+
+#SCHEDULE GRHydro_TestSync in HydroBase_PostStep AFTER HydroBase_Boundaries BEFORE HydroBase_Con2Prim
+#{
+#  LANG: C
+#  OPTIONS: LEVEL
+#} "Sync test variables"
+
+#SCHEDULE GROUP Bla in HydroBase_PostStep AFTER HydroBase_Boundaries AFTER HydroBase_Con2Prim
+#{
+#} "bla"
+
+#SCHEDULE GRHydro_TestSync in Bla
+#{
+#  LANG: C
+#  OPTIONS: LEVEL
+#} "Sync test variables"
+
+#SCHEDULE GRHydro_TestSync in CCTK_POSTRESTRICT AFTER Refluxing_CorrectState BEFORE MoL_PostStep
+#{
+#  LANG: C
+#  OPTIONS: LEVEL
+#} "Sync test variables"
+
+#SCHEDULE GRHydro_TestSync in CCTK_POSTREGRID AFTER Refluxing_Reset
+#{
+#  LANG: C
+#  OPTIONS: LEVEL
+#} "Sync test variables"
+
+
+############################################################
+### Compute first differences of rho for mesh refinement ###
+############################################################
+
+# commented out (2006.08.22) since unused, for the time being
+#STORAGE:DiffRho
+
+#schedule GRHydro_DiffRho IN HydroBase_PostStep AFTER GRHydro_ApplyBCs
+#{
+#  LANG: Fortran
+#} "Compute relative differences in rho"
+
+
+# older version
+# schedule GRHydro_DiffRho AT POSTREGRID
+# {
+#   LANG: Fortran
+# } "Compute relative differences in rho"
+
+################################################################
+### Some actions are only required in the very last MoL sub- ###
+### step but cannot be moved into PseudoEvolution since they ###
+### affect other routines in PostStep. A prime example is    ###
+### AmosphereReset which forms an operator split RHS.        ###
+################################################################
+
+schedule GRHydro_SetLastMoLPostStep IN MoL_PostStep
+{
+  LANG: C
+  OPTIONS: level
+} "Set grid scalar InLastMoLPostStep if this is the last MoL PostStep call"
+# there used to be a comment along the lines "You did not see this abuse of
+# MoL. Nothing to see here. Move along." Consider such a comment to be present
+# again.
+schedule GRHydro_ClearLastMoLPostStep IN MoL_Step AFTER MoL_PostStep
+{
+  LANG: C
+  OPTIONS: level
+} "Reset InLastMoLPostStep to zero"
+schedule GRHydro_ClearLastMoLPostStep IN CCTK_WRAGH
+{
+  LANG: C
+  OPTIONS: global-early
+} "Initialize InLastMoLPostStep to zero"
+
+################################################################
+### If a point has been marked as requiring resetting to the ###
+### atmosphere, this is where we do it.                      ###
+###                                                          ###
+### This is executed in the last MoL_PosStep                 ###
+################################################################
+
+# First (right after sync) we need to convert real (and synchronized mask) to an integer mask!
+schedule GRHydroPostSyncAtmosphereMask IN HydroBase_PostStep AFTER GRHydro_AtmosphereMaskBoundaries
+{
+  LANG: Fortran
+} "Set integer atmosphere mask from synchronized real atmosphere mask"
+
+# Afterwards, reset mask!
+if (CCTK_Equals(Bvec_evolution_method,"GRHydro"))
+{
+  schedule GRHydro_AtmosphereResetM IN HydroBase_PostStep AFTER GRHydroPostSyncAtmosphereMask BEFORE (HydroBase_Boundaries,GRHydro_PrimitiveInitialGuessesBoundaries) IF GRHydro::InLastMoLPostStep
+  {
+    LANG: Fortran
+  } "Reset the atmosphere - MHD version"
+} else if (CCTK_Equals(Bvec_evolution_method,"GRHydro_Avec")) {
+  schedule GRHydro_AtmosphereResetAM IN HydroBase_PostStep AFTER GRHydroPostSyncAtmosphereMask BEFORE (HydroBase_Boundaries,GRHydro_PrimitiveInitialGuessesBoundaries) IF GRHydro::InLastMoLPostStep
+  {
+    LANG: Fortran
+  } "Reset the atmosphere - MHD with Avec version"
+} else {
+  schedule GRHydro_AtmosphereReset IN HydroBase_PostStep AFTER GRHydroPostSyncAtmosphereMask BEFORE (HydroBase_Boundaries,GRHydro_PrimitiveInitialGuessesBoundaries) IF GRHydro::InLastMoLPostStep
+  {
+    LANG: Fortran
+  } "Reset the atmosphere"
+}
+
+
+} # end of  if (CCTK_EQUALS(hydrobase::evolution_method, "GRHydro"))
+  
+if (set_trivial_rp_grid_function)
+{
+  STORAGE: GRHydro_trivial_rp_gf_group
+}
+
+if (ppm_mppm_debug_eigenvalues)
+{
+  STORAGE: GRHydro_mppm_eigenvalues
+}
+
+# Check that rho >= GRHydro_rho_min
+if (Check_Rho_Minimum)
+{
+  schedule GRHydro_Check_Rho_Minimum AT ANALYSIS
+  {
+    LANG: Fortran
+    TRIGGERS: HydroBase::rho
+    TRIGGERS: HydroBase::press
+    TRIGGERS: HydroBase::eps
+  } "Check whether somewhere rho(i,j,k) < GRHydro_rho_min and produce a WARNING"
+  
+  schedule GRHydro_RefinementLevel AT ANALYSIS BEFORE GRHydro_Check_Rho_Minimum
+  {
+    LANG: Fortran
+    TRIGGERS: HydroBase::rho
+    TRIGGERS: HydroBase::press
+    TRIGGERS: HydroBase::eps
+  } "Calculate current refinement level"
+}
+
+# set and check a mask containing the failures of C2P; if they occur at points overwritten by finer grids, they can be ignored.
+
+STORAGE: GRHydro_C2P_failed[1]
+
+schedule reset_GRHydro_C2P_failed AT BASEGRID
+{
+  LANG: Fortran
+} "Initialise the mask function that contains the points where C2P has failed (at BASEGRID)"
+
+schedule reset_GRHydro_C2P_failed AT CCTK_PRESTEP
+{
+  LANG: Fortran
+} "Reset the mask function that contains the points where C2P has failed (at PRESTEP)"
+
+schedule sync_GRHydro_C2P_failed AT CCTK_EVOL AFTER MoL_Evolution
+{
+  LANG: Fortran
+  SYNC: GRHydro_C2P_failed
+} "Syncronise the mask function that contains the points where C2P has failed"
+
+schedule check_GRHydro_C2P_failed AT CCTK_POSTSTEP AFTER GRHydro_RefinementLevel
+{
+  LANG: Fortran
+} "Check the mask function that contains the points where C2P has failed and report an error in case a failure is found"
+
+
+if (CCTK_Equals(Bvec_evolution_method,"GRHydro") || CCTK_Equals(Bvec_evolution_method,"GRHydro_Avec"))
+{
+  schedule GRHydro_TmunuM IN AddToTmunu
+  {
+    LANG: Fortran
+  } "Compute the energy-momentum tensor - MHD version"
+# bcom is already calculated in GRHydro_TmunuM. 
+# When Tmunu is not calculated, then the following 
+# routine is used to evaluate bcom, if requested.
+  if (calculate_bcom){
+    schedule GRHydro_CalcBcom IN HydroBase_PostStep AFTER GRHydroTransformPrimToGlobalBasis
+    {
+      LANG: Fortran
+    } "Compute comoving magnetic field, pressure, etc..."
+  }
+} else {
+  schedule GRHydro_Tmunu IN AddToTmunu 
+  {
+    LANG: Fortran
+ } "Compute the energy-momentum tensor"
+}
+
+#the following is necessary because TmunuBase does not have enough schedule
+
+schedule GROUP SetTmunu AT POSTPOSTINITIAL AFTER Con2Prim BEFORE ADMConstraintsGroup
+{
+} "Calculate the stress-energy tensor"
+
+# Calculate divergence in PseudoEvolution
+
+if(track_divB)
+{
+  # bit of a misnomer. Currently only contains divB
+  schedule group GRHydroAnalysis IN MoL_PseudoEvolution
+  {
+  } "Calculate analysis quantities"
+
+  schedule GRHydro_Analysis_Init IN GRHydroAnalysis
+  {
+    LANG: Fortran
+  } "Initialize variables"
+
+  schedule GRHydro_CalcDivB IN GRHydroAnalysis AFTER GRHydro_Analysis_Init
+  {
+    LANG: Fortran
+  } "Calculate divB"
+}                           
+
+
+if (constrain_to_1D) {
+  SCHEDULE ConstrainSconTo1D in MoL_PostStepModify
+  {
+    LANG: FORTRAN
+    OPTION: LOCAL
+  } "Constrain conserved fluid velocity to radial direction"
+}
+
+
+if (apply_H_viscosity) {
+  if (use_cxx_code) {
+  SCHEDULE H_viscosity_calc_cs_cc in GRHydroRHS BEFORE FluxTerms
+  {
+    LANG: C
+    OPTION: LOCAL
+    } "Compute local temporaries for H viscosity - C++ version"
+  } else {
+    SCHEDULE H_viscosity in GRHydroRHS BEFORE FluxTerms
+    {
+      LANG: FORTRAN
+      OPTION: LOCAL
+  } "Compute local temporaries for H viscosity"
+  }
+}
+

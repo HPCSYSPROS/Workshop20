@@ -1,0 +1,40 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+module CollectionMaster {
+  message CollectVectorMsg {
+    AtomID aid[];
+    Vector data[];
+    FloatVector fdata[];
+  };
+
+  message [packed] DataStreamMsg;
+
+  message CollectVectorVarMsg{
+    AtomID aid[];
+    Vector data[];
+    FloatVector fdata[];
+  };
+
+  chare CollectionMaster
+  {
+    entry CollectionMaster(void);
+    entry void receivePositions(CollectVectorMsg *);
+    entry void receiveVelocities(CollectVectorMsg *);
+    entry void receiveForces(CollectVectorMsg *);
+    entry void receiveDataStream(DataStreamMsg *);
+
+    entry void receiveOutputPosReady(int seq);
+    entry void receiveOutputVelReady(int seq);
+    entry void receiveOutputForceReady(int seq);
+    entry void startNextRoundOutputPos(double totalT);
+    entry void startNextRoundOutputVel(double totalT);
+    entry void startNextRoundOutputForce(double totalT);
+    entry void wrapCoorFinished();
+    
+  };
+}
+

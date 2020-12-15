@@ -1,0 +1,14 @@
+
+CUDADIR=/usr/local/cuda-7.5
+CUDAINCL=-I$(CUDADIR)/include
+CUBDIR=.rootdir/cub
+CUBINCL=-I$(CUBDIR)
+CUDALIB=-L$(CUDADIR)/lib64 -lcudart -lrt -lcufft
+CUDASODIR=$(CUDADIR)/lib64
+LIBCUDARTSO=
+CUDAFLAGS=-DNAMD_CUDA
+CUDAOBJS=$(CUDAOBJSRAW)
+CUDA=$(CUDAFLAGS) -I. $(CUDAINCL) $(CUBINCL)
+CUDACC=$(CUDADIR)/bin/nvcc -O3 --maxrregcount 48 $(CUDAGENCODE) $(CUDA)
+CUDAGENCODE=-gencode arch=compute_35,code=sm_35 -gencode arch=compute_35,code=compute_35 -gencode arch=compute_50,code=sm_50 -gencode arch=compute_50,code=compute_50
+

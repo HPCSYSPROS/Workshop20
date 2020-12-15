@@ -1,0 +1,24 @@
+$Header$
+
+Things to do on this thorn:
+- support excision, i.e. there should be a way to tell the interpolator
+  about an excision mask, and either
+  * have it return an error if the default-centering interpolator molecule
+    would use data from an excised region, or preferably
+  * properly implement the  excision_off_centering_tolerance
+    and  excision_extrapolation_tolerance  parameters  as
+    documented in the thorn guide
+
+- make casts from datatype to CCTK_REAL explicit in
+  GeneralizedPolynomial-Uniform fetch routines
+- clean up the horrible inefficiency of the Hermite interpolator
+  (cf Erik Schnetter's E-mails and CactusBase/1366)
+
+- allow scalar  boundary_{off_centering,extrapolation}_tolerance
+  values in the parameter table (to mean using this value for each ibndry)
+
+- maybe change the defaults so off-centering is forbidden unless
+  the user explicitly asks for it to be allowed?
+
+- implement a "silent" parameter like in PUGHInterp?
+  alternatively, print warning msgs for some error returns?

@@ -1,0 +1,7 @@
+This directory is for restart lattices for the Crossroads/NERSC-9 benchmarks. 
+The lattices are very large in size, nearly a TB for the 72x72x72x144 problem, 
+and are not directly distributed with the source. You can find them here:
+
+http://portal.nersc.gov/project/m888/apex/MILC_lattices/
+
+

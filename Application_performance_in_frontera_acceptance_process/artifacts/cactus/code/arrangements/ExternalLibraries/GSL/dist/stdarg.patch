@@ -1,0 +1,12 @@
+diff -ru gsl-1.16-orig/test/results.c gsl-1.16/test/results.c
+--- gsl-1.16-orig/test/results.c	2013-07-17 13:04:26.000000000 -0700
++++ gsl-1.16/test/results.c	2015-04-28 13:24:11.901318472 -0700
+@@ -29,7 +29,7 @@
+ #ifdef STDC_HEADERS
+ #include <stdarg.h>
+ #else
+-#include <varargs.h>
++#include <stdarg.h>
+ #endif
+ #endif
+ 

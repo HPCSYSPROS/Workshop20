@@ -1,0 +1,2237 @@
+% /*@@
+%   @file      Appendices.tex
+%   @date      27 Jan 1999
+%   @author    Tom Goodale, Gabrielle Allen, Gerd Lanferman, Thomas Radke
+%   @desc
+%              Appendices for the Cactus User's Guide
+%   @enddesc
+%   @version   $Header$
+% @@*/
+
+\begin{cactuspart}{Appendices}{}{$Revision$}
+\label{part:Appendices}
+\renewcommand{\thepage}{\Alph{part}\arabic{page}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Glossary}
+\label{sec:glossary}
+
+\begin{Lentry}
+
+\item[alias function]
+  See \textit{function aliasing}.
+\item[AMR]
+  \textit{Automatic Mesh Refinement}
+\item[analysis]
+\item[API]
+  \textit{Applications Programming Interface}, the interface provided by
+  some software component to programmers who use the component. 
+  An API usually consists of subroutine/function calls, but may also include
+  structure definitions and definition of constant values.
+  The Cactus Reference Manual documents most of the Cactus flesh APIs.
+\item[arrangement]
+  A collection of thorns, stored in a subdirectory of the Cactus
+  \verb|arrangements| directory.  See Section~\ref{sec:arrangements}.
+\item[autoconf]
+  A GNU program which builds a configuration script which can be used
+  to make a Makefile.
+\item[boundary zone]
+  A boundary zone is a set of points at the edge of a grid, interpreted as
+  the boundary of the physical problem, and which contains boundary data,
+  e.g.\ Dirichlet conditions or von Neumann conditions.
+  (See also \textit{symmetry zone}, \textit{ghost zone}.)
+\item[Cactus]
+Distinctive and unusual plant, which is adapted to extremely arid and hot environments, showing a wide range of anatomical and physiological features which conserve water. Cacti stems have expanded into green succulent structures containing the chlorophyll necessary for life and growth, while the leaves have become the spines for which cacti are so well known.\footnote{%%%
+http://en.wikipedia.org/wiki/Cactus
+       }%%%
+\item[CCTK]
+  \textit{Cactus Computational Tool Kit} (The Cactus flesh and computational
+  thorns).
+\item[CCL]
+  The \textit{Cactus Configuration Language}, this is the language that
+  the thorn configuration files are written in.
+  See Section~\ref{sec:Appendix.ccl}.
+\item[configuration]
+  The combination of a set of thorns, and all the Cactus configure
+  options which affect what binary will be produced when compiling
+  Cactus.  For example, the choice of compilers (Cactus \verb|CC|,
+  \verb|CXX|, \verb|CUCC|, and \verb|F90| configure options) and the
+  compiler optimization settings (\verb|OPTIMISE|/\verb|OPTIMIZE| and
+  \verb|*_OPTIMISE_FLAGS| configure options) are part of a
+  configuration (these flags change what binary is produced), but the
+  Cactus \verb|VERBOSE| and \verb|WARN| configure options aren't part
+  of a configuration (they don't change what binary will be produced).
+  See Section~\ref{sec:configurations}.
+\item[checkout]
+  Get a copy of source code from SVN.  See Section~\ref{sec:checkout}.
+\item[checkpoint]
+  Save the entire state of a Cactus run to a file, so that the run can be
+  restarted at a later time.
+  See Sections~\ref{sec:checkpointing}, \ref{chap:cp_recovery_methods}.
+\item[computational grid]
+  A discrete finite set of spatial points in $\Re^n$
+  (typically, $1 \le n \le 3$).
+  Historically, Cactus has required these points to be uniformly spaced
+  (uniformly spaced grid), but now, Cactus
+  supports non-uniform spacings (non-uniformly spaced grid), and mesh refinement.
+
+  The grid consists of the physical domain and the boundary and symmetry
+  points.
+
+  See \textit{grid functions} for the typical use of grid points.
+\item[convergence]
+  Important, but often neglected.
+\item[CST]
+  The \textit{Cactus Specification Tool}, which is the set of Perl
+  scripts which parse the thorns' \texttt{.ccl} files, and generates the
+  code that binds the thorn source files with the flesh.
+\item[SVN]
+  \textit{Subversion} is the favoured code
+  distribution system for Cactus.
+  See Sections~\ref{sec:checkout},\ref{sec:Appendix.svn}.
+\item[domain decomposition]
+  The technique of breaking up a large computational problem into parts
+  that are easier to solve.  In Cactus, it refers especially to a decomposition
+  wherein the parts are solved in parallel on separate computer processors.
+\item[driver]
+  A special kind of thorn which creates and handles grid hierarchies 
+  and grid variables.
+  Drivers are responsible for memory management for grid variables,
+  and for all parallel operations, in response to requests from the
+  scheduler.
+  See Section~\ref{sec:parallelisation}.
+\item[evolution]
+  An iteration interpreted as a step through time.  Also, a particular Cactus
+  schedule bin for executing routines when evolution occurs.
+\item[flesh]
+  The Cactus routines which hold the thorns together, allowing them to 
+  communicate and scheduling things to happen with them. This is what you
+  get if you check out Cactus from our SVN repository.
+\item[friend] Interfaces that are \textit{friends}, share their collective
+  set of protected grid variables.
+  See Section~\ref{sec:Appendix.interface}~\ref{subsec:interface_ccl}.
+\item[function aliasing]
+  The process of referring to a function to be provided by an interface
+  independently of which thorn actually contains the function, or what
+  language the function is written in.  The function is called an
+  \textit{alias function}.  See Section~\ref{sec:function_aliasing},
+  \ref{subsec:Appendix.interface.function_aliasing}.
+\item[GA]
+  Shorthand for a \textit{grid array}.
+\item[GF]
+  Shorthand for a \textit{grid function}.
+\item[gmake]
+  GNU version of the {\tt make} utility.
+\item[ghost zone] 
+  A set of points added for parallelisation purposes to a block of a
+  grid lying on one processor, corresponding to points on the boundary
+  of an adjoining block of the grid lying on another processor.
+  Points from the boundary of the one block are copied (via an
+  inter-processor communication mechanism) during synchronisation
+  to the corresponding ghost zone of the other block, and vice versa.
+  In single processor runs there are no ghost zones.
+  Contrast with symmetry or boundary zones.
+  See Section~\ref{sec:ghost_size}.
+\item[grid]
+  Short for \textit{computational grid}.
+\item[grid array]
+  A \textit{grid variable} whose global size need not be that of the
+  computational grid; instead, the size is declared explicitly in an
+  \verb|interface.ccl| file.  
+\item[grid function]
+  A \textit{grid variable} whose global size is the size of the
+  computational grid.  (See also \textit{local array}.)
+  From another perspective,
+  \textit{grid functions} are functions (of any of the Cactus
+  data types (see Section~\ref{sect-ThornWriting/DataTypes})
+  defined on the domain of grid points.
+  Typically, grid functions are used to discretely approximate functions
+  defined on the domain $\Re^n$, with \textit{finite differencing}
+  used to approximate partial derivatives.
+\item[grid hierarchy]
+  A \textit{computational grid}, and the \textit{grid variables} associated
+  with it.
+\item[grid point]
+  A spatial point in the \textit{computational grid}.
+\item[grid scalar]
+  A \textit{grid variable} with index zero,
+  i.e. just a number on each processor.
+\item[grid variable]
+  A variable which is passed through the flesh interface, either between 
+  thorns or between routines of the same thorn.
+  This implies the variable is related to the computational grid, as opposed
+  to being an internal variable of the thorn or one of its routines. 
+  \textit{grid scalar}, \textit{grid function}, and \textit{grid array}
+  are all examples of \textit{grid variables}. 
+  See Sections~\ref{sec:cactus_variables-groups},
+  \ref{subsec:Appendix.interface-variables}
+\item[GNATS]
+  The GNU program we use for reporting and tracking bugs, comments and
+  suggestions.
+\item[GNU]
+  \textit{GNU's Not Unix}: a freely-distributable code project.  
+  See \url{http://www.gnu.org/}.
+\item[GV]
+  Shorthand for \textit{grid variable}.
+\item[handle]
+  A signed integer value $>= 0$ passed by many Cactus routines and
+  used to represent a dynamic data or code object.
+\item[HDF5]
+  \textit{Hierarchical Data Format} version~5, an API, subroutine library, and
+  file format for storing structured data.  An HDF5 file can
+  store both data (for example, Cactus grid variables), and meta data
+  (data describing the other data, for example, Cactus coordinate
+  systems).
+  See Section~\ref{subsec:cowiexpa}, also
+  \url{https://www.hdfgroup.org/HDF5/}.
+\item[implementation]
+  Defines the interface that a thorn presents to the rest of a Cactus program.
+  See Section~\ref{sec:implementations}.
+\item[inherit] A thorn that \textit{inherits} from another implementation
+  can access all the other implementation's public variables.
+  See Section~\ref{sec:Appendix.interface}, \ref{subsec:interface_ccl}.
+\item[interface]
+\item[interpolation]
+  Given a set of grid variables and interpolation points (points in the
+  grid coordinate space, which are typically distinct from the grid points),
+  interpolation is the act of producing values for the grid variables 
+  at each interpolation point over the entire grid hierarchy.  
+  (Contrast with \textit{local interpolation}.)
+\item[local array]
+  An array that is declared in thorn code, but not declared in the thorn's
+  \verb|interface.ccl|, as opposed to a \textit{grid array}.
+\item[local interpolation]
+  Given a set of grid variables and interpolation points (points in the
+  grid coordinate space ,which are typically distinct from the grid points),
+  interpolation is the act of producing values for the grid variables
+  at each interpolation point on a particular grid.  
+  (Contrast with \textit{interpolation}.)
+\item[Makefile]
+  The default input file for \texttt{make} (or \texttt{gmake}).  Includes
+  rules for building targets.
+\item[make] A system for building software.  It uses rules involving
+  dependencies of one part of software on another, and information of what
+  has changed since the last build, to determine what parts need to be
+  built.
+\item[MPI]
+  \textit{Message Passing Interface}, an API and software library for sending
+  messages between processors in a multiprocessor system.
+  See Section~\ref{subsec:cowiexpa}.
+\item[multi-patch]
+\item[mutual recursion]
+  See \textit{recursion, mutual}.
+\item[NUL character]
+  The C programming language uses a ``NUL character'' to terminate
+  character strings.  A NUL character has the integer value zero, but
+  it's useful to write it as \verb|'\0'|, to emphasize to human readers
+  that this has type \verb|char| rather than \verb|int|.
+\item[null pointer, NULL pointer]
+  C defines a ``null pointer'', often (slightly incorrectly) called
+  a ``NULL pointer'', which is guaranteed not to point to any object.
+  You get a null pointer by converting the integer constant 0 to a
+  pointer type, e.g.\ \verb|int* ptr = 0;|.%%%
+\footnote{%%%
+       Note that if you have an expression which
+       has the value zero, but which isn't an
+       integer constant, converting this to a
+       pointer type is \emph{not} guaranteed to
+       give a NULL pointer, e.g.:\\
+       {\tt int i = 0;}\\
+       {\tt int* ptr = i;     /* ptr is NOT guaranteed to be a NULL pointer! */}\\
+       }%%%
+
+  Many programmers prefer to use the predefined macro \verb|NULL|
+  (defined in \verb|<stdlib.h>|, \verb|<stdio.h>|, and possibly other
+  system header files) to create null pointers,
+  e.g.\ \verb|int* ptr = NULL;|, to emphasize to human readers that
+  this is a null \emph{pointer} rather than ``just'' the integer zero.
+
+  Note that it is explicitly \emph{not} defined whether a null pointer
+  is represented by a bit pattern of all zero bits---this varies from
+  system to system, and there are real-world systems where null pointers
+  are, in fact, \emph{not} represented this way.
+
+  For further information, see the section ``Null pointers''
+  in the (excellent) {\tt comp.lang.c FAQ}, available online at
+  \url{http://www.eskimo.com/~scs/C-faq/top.html}.
+\item[parallelisation]
+  The process of utilising multiple computer processors to work on different
+  parts of a computational problem at the same time, in order to obtain a
+  solution of the problem more quickly.  Cactus achieves parallelisation
+  by means of \textit{domain decomposition}.
+\item[parameter]
+  A variable that controls the run time behaviour of the Cactus executable.
+  Parameters have default values which can be set in a
+  \textit{parameter file}. (See Chapter~\ref{chap:Cactus_parameters}).
+  The flesh has parameters; thorn parameters are made available to the rest
+  of Cactus by describing them in the thorn's 
+  {\tt param.ccl} file (See Appendix~\ref{sec:Appendix.param}).
+\item[parameter file]
+  (Also called \textit{par file}.) A text file used as the input of a
+  Cactus program, specifying initial values of thorn parameters.
+  See Section~\ref{sec:Parameter_File}.
+\item[processor topology]
+\item[PUGH]
+  The default driver thorn for Cactus which uses MPI.
+  See Section~\ref{sec:required_software}.
+\item[PVM]
+  \textit{Parallel Virtual Machine}, provides interprocessor communication.
+  See Section~\ref{sec:required_software}.
+\item[recursion, mutual]
+  See \textit{mutual recursion}.
+\item[reduction]
+  Given a set of grid variables on a computational grid, \textit{reduction} 
+  is the process of producing values for the variables on a proper subset of
+  points from the grid.
+\item[scheduler]
+  The part of the Cactus flesh that determines the order and circumstances
+  in which to execute Cactus routines.  Thorn functions and schedule groups 
+  are registered with the flesh via the thorn's {\tt schedule.ccl} file to
+  be executed in a certain schedule bin, before or after another function 
+  or group executes, and so forth.
+  See section~\ref{sec:Appendix.schedule}~\ref{chap:scheduling},
+\item[schedule bin]
+  One of a set of special timebins pre-defined by Cactus.
+  See Section \ref{sec:Appendix.schedule_bins} for a list.
+\item[schedule group]
+  A timebin defined by a thorn, in its {\tt schedule.ccl} file (see
+  Appendix \ref{sec:Appendix.schedule}).
+  Each schedule group must be defined to occur in a Cactus schedule bin or
+  another schedule group.  
+  See Chapter~\ref{chap:scheduling}, \ref{scheduling:schedule_bins}.
+\item[shares] An implementation may \textit{share} restricted parameters
+  with another implementation, which means the other implementation can
+  get the parameter values, and if the parameters are steerable, it can
+  change them.
+  See Section~\ref{sec:Appendix.param} \ref{subsec:param_ccl}.
+\item[steerable parameter]
+  A parameter which can be changed at any time after the program has been
+  initialised.  See Section~\ref{sec:Cactus_parameters.steerable}.
+\item[symmetry operation]
+  A grid operation that is a manifestation of a geometrical symmetry,
+  especially rotation or reflection.
+\item[symmetry zone]
+  A set of points laying at the edge of the computational grid and
+  containing data obtained by some symmetry operation from
+  another part of the same grid.
+  (Contrast with \textit{boundary zone}, \textit{ghost zone}.)
+\item[synchronisation]
+  The process of copying information from the outer part of a 
+  computational interior on one processor to the corresponding ghost zone 
+  (see) on another processor.  Also refers to a special Cactus timebin
+  corresponding to the occurrence of this process. 
+  See Section~\ref{sec:ghost_size}.
+\item[TAGS]
+  See Section~\ref{sec:Appendix.tags}.
+\item[target]
+  A \textit{make target} is the name of a set of rules for 
+  \texttt{make} (or \texttt{gmake}).  When the target is included in the
+  command line for \texttt{make}, the rules are executed, usually to
+  build some software.
+\item[test suite]
+  See Sections~\ref{sec:testing}, \ref{sec:adding_test_suite}.
+\item[thorn]
+  A collection of subroutines defining a Cactus interface.  
+  See Chapters~\ref{chap:thorn_concepts}, \ref{chap:thorn_anatomy}.
+\item[ThornList]
+  A file used by the Cactus CST to determine which thorns to compile 
+  into a Cactus executable
+  (see Section~\ref{sec:gmtafobuanadco}, \ref{sec:cointh}). 
+  Can also be used to determine which thorns
+  to check out from SVN. (see Section~\ref{sec:checkout}).
+  A ThornList for each Cactus configuration lies in the configuration
+  subdirectory of the Cactus {\tt configs} directory.
+\item[time bin]
+  A time interval in the duration of a Cactus run wherein the flesh 
+  runs specified routines.  See \textit{scheduler}, \textit{schedule bin}.
+\item[time level]
+\item[timer]
+  A Cactus API for reporting time.  See Section~\ref{sec:timers}.
+\item[trigger]
+\item[unigrid]
+\item[wrapper]
+
+\end{Lentry}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Configuration File Syntax}
+\label{sec:Appendix.ccl}
+
+\section{General Concepts}
+
+Each thorn is configured by three compulsory and one optional files in the
+top level thorn directory:
+\begin{itemize}
+\item{} {\tt interface.ccl}
+\item{} {\tt param.ccl}
+\item{} {\tt schedule.ccl}
+\item{} {\tt configuration.ccl} (optional)
+\end{itemize}
+These files are written in the \textit{Cactus Configuration Language} which is
+case insensitive.
+
+% A note on optional arguments and square brackets:  If e.g.\ a variable or
+% include file is provided by this thorn, then the corresponding
+% section of the (in this case) interface.ccl is not optional.  Thus
+% these sections are not enclosed in [] as a whole (though parts of them can of
+% course be enclosed in []).
+
+\section{interface.ccl}
+\label{sec:Appendix.interface}
+
+The interface configuration file consists of:
+\begin{itemize}
+\item A header block giving details of the thorn's relationship with
+other thorns.
+\item A block detailing which include files are used from other
+thorns, and which include files are provided by this thorn.
+\item Blocks detailing aliased functions provided or used by this thorn.
+\item A series of blocks listing the thorn's global variables.
+\end{itemize}
+(For a more extensive discussion of Cactus variables, see Chapter
+\ref{chap:cactus_variables}.)
+
+\subsection{Header Block}
+The header block has the form:
+\begin{alltt}
+implements: <\var{implementation}>
+inherits: <\var{implementation}>, <\var{implementation}>
+friend: <\var{implementation}>, <\var{implementation}>
+\end{alltt}
+where
+\begin{itemize}
+\item{} The implementation name must be unique among all thorns, except
+        between thorns which have the same public and protected variables and
+        global and restricted parameters.
+\item{} Inheriting from another implementation makes all that implementation's
+        public variables available to your thorn. At least one thorn
+        providing any inherited implementation must be present at compile time.
+        A thorn cannot inherit from itself. Inheritance is transitive
+	(if $A$ inherits from $B$, and $B$ inherits from $C$, then
+	$A$ also implicitly inherits from $C$),
+	but not commutative.
+% FIXME: Jonathan and Thomas aren't sure if this is true!
+%	(if $A$ inherits from $B$, then $B$ can't inherit from $A$)
+\item{} Being a friend of another implementation makes all that
+        implementation's protected variables available to your thorn.
+	At least one thorn providing an implementation for each friend
+	must be present at compile time.
+	A thorn cannot be its own friend.
+% FIXME: what does "associative" mean here???
+	Friendship is associative,
+	commutative
+% FIXME: Jonathan and Thomas aren't sure whether B *must* be declared this way
+%        or is *implicitly* declared this way
+%	(if $A$ is a friend of $B$, then $B$ is also a friend of $A$),
+	and transitive (i.e.~if $A$ is a friend of $B$,
+	and $B$ is a friend of $C$, then $A$ is implicitly a friend of $C$).
+\end{itemize}
+
+\subsection{Include Files}
+The include file section has the form:
+\begin{alltt}
+USES INCLUDE [SOURCE|HEADER]: <\var{file_name}>
+INCLUDE[S] [SOURCE|HEADER]: <\var{file_to_include}> in <\var{file_name}>
+\end{alltt}
+The former is used when a thorn wishes to use an include file from
+another thorn.  The latter indicates that this thorn adds the code in
+\texttt{<\var{file\_to\_include}>} to the include file \texttt{<\var{file\_name}>}.  If
+the include file is described as \verb|SOURCE|, the included code is
+only executed if the providing thorn is active.
+Both default to \verb|HEADER|.
+
+\subsection{Function Aliasing}
+\label{subsec:Appendix.interface.function_aliasing}
+If any aliased function is to be used or provided by the thorn, then
+the prototype must be declared with the form:
+\begin{alltt}
+<\var{return_type}> FUNCTION <\var{alias}>(<\var{arg1_type}> <\var{intent1}> [ARRAY] <\var{arg1}>, ...)
+\end{alltt}
+The \texttt{<\var{return\_type}>} must be either \verb|void|,
+\verb|CCTK_INT|, \verb|CCTK_REAL|, \verb|CCTK_COMPLEX|,
+\verb|CCTK_POINTER|, or \verb|CCTK_POINTER_TO_CONST|.  The keyword
+\verb|SUBROUTINE| is equivalent to \verb|void FUNCTION|. The name of
+the aliased function \texttt{<\var{alias}>} must contain at least one
+uppercase and one lowercase letter and follow the C standard for
+function names.  The type of each argument,
+\texttt{<\var{arg*\_type}>}, must be either \verb|CCTK_INT|,
+\verb|CCTK_REAL|, \verb|CCTK_COMPLEX|, \verb|CCTK_POINTER|,
+\verb|CCTK_POINTER_TO_CONST|, or \verb|STRING|.  All string arguments
+must be the last arguments in the list.  The intent of each argument,
+\texttt{<\var{intent*}>}, must be either \verb|IN|, \verb|OUT|, or
+\verb|INOUT|.  An argument may only be modified if it is declared to
+have intent \verb|OUT| or \verb|INOUT|.  If the argument is an array
+then the prefix \verb|ARRAY| must also be given.
+
+If the argument \texttt{<\var{arg*}>} is a function pointer, then the argument
+itself (which will preceded by the return type) should be
+\begin{alltt}
+CCTK_FPOINTER <\var{function_arg1}>(<\var{arg1_type}> <\var{intent1}> <\var{arg1}>, ...)
+\end{alltt}
+Function pointers may not be nested. 
+
+If an aliased function is to be required, then the block
+\begin{alltt}
+REQUIRES FUNCTION <\var{alias}>
+\end{alltt}
+is required.
+
+If an aliased function is to be (optionally) used, then the block
+\begin{alltt}
+USES FUNCTION <\var{alias}>
+\end{alltt}
+is required.
+
+If a function is provided, then the block
+\begin{alltt}
+PROVIDES FUNCTION <\var{alias}> WITH <\var{provider}> LANGUAGE <\var{providing_language}>
+\end{alltt}
+is required. As with the alias name, \texttt{<\var{provider}>} must contain at
+least one uppercase and one lowercase letter, and follow the C standard
+for function names. Currently, the only supported values of
+\texttt{<\var{providing\_language}>} are \verb|C| and \verb|Fortran|.
+
+
+\subsection{Variable Blocks}
+\label{subsec:Appendix.interface-variables}
+The thorn's variables are collected into groups. This is not only
+for convenience, but for collecting like variables together.
+Storage assignment, communication assignment, and ghostzone synchronization
+take place for groups only.
+
+The thorn's variables are defined by:
+
+\begin{alltt}
+[<\var{access}>:]
+
+<\var{data_type}> <\var{group_name}>[[<\var{number}>]] [TYPE=<\var{group_type}>] [DIM=<\var{dim}>]
+[TIMELEVELS=<\var{num}>]
+[SIZE=<\var{size in each direction}>] [DISTRIB=<\var{distribution_type}>]
+[GHOSTSIZE=<\var{ghostsize}>]
+[TAGS=<\var{string}>]  ["<\var{group_description}>"]
+[\{
+ [ <\var{variable_name}>[,]<\var{variable_name}>
+   <\var{variable_name}> ]
+\} ["<\var{group_description}>"] ]
+\end{alltt}
+%
+(The options {\t TYPE}, {\t DIM}, etc.,\ following {\t <\var{group\_name}>}
+must all appear on one line.)  Note that the beginning brace (\{) must
+sit on a line by itself; the ending brace (\}) must be preceded by a
+carriage return.
+%
+\begin{itemize}
+\item{} {\t \var{access}} defines which thorns can use the following
+        groups of variables. {\t \var{access}} can be either
+        {\t public}, {\t protected} or {\t private}.
+\item{} {\t \var{data\_type}} defines the data type of the variables in the
+group.  Supported data types are {\t CHAR}, {\t BYTE}, {\t INT}, {\t REAL}, and
+{\t COMPLEX}. 
+\item{} {\t \var{group\_name}} must be an alphanumeric name (which may also
+contain underscores) which is unique across group and variable names
+within the scope of the thorn. A group name is compulsory.
+\item{} {\t [\var{number}]}, if present, indicates that this is a
+  \emph{vector} group.  The number can be any valid arithmetical
+  expression consisting of integers or integer-valued parameters.
+  Each variable in that group appears as a one-dimensional array of
+  grid variables.  When the variable is accessed in the code, then the
+  last index is the member-index, and any other indices are the normal
+  spatial indices for a group of this type and dimension.
+\item{} {\t TYPE} designates the kind of variables held by the group.
+The choices are {\t GF}, {\t ARRAY} or {\t SCALAR}. This field is
+optional, with the default variable type being {\t SCALAR}.
+\item{} {\t DIM} defines the spatial dimension of the {\t ARRAY} or
+{\t GF}.  The default value is {\t DIM=3}.
+\item{} {\t TIMELEVELS} defines the number of timelevels a group has if
+        the group is of type {\t ARRAY} or {\t GF}, and can take any positive
+        value. The default is one timelevel.
+\item{} {\t SIZE} defines the number grid-points an {\tt ARRAY} has in each direction.
+        This should be a comma-separated list of valid arithmetical
+        expressions consisting of integers or integer-valued parameters.
+\item{} {\t DISTRIB} defines the processor decomposition of an {\tt ARRAY}.
+        {\tt DISTRIB=DEFAULT} distributes {\tt SIZE} grid-points
+        across all processors. {\tt DISTRIB=CONSTANT} implies that
+        {\tt SIZE} grid-points should be allocated on each
+        processor. The default value is {\tt DISTRIB=DEFAULT}.
+\item{} {\t GHOSTSIZE} defines number of ghost zones in each dimension
+of an {\tt ARRAY}.  It defaults to zero.
+\item{} {\t TAGS} defines an optional string which is used to create a
+	set of key-value pairs associated with the group. The keys are case
+	independent.  The string (which must be deliminated by single or
+	double quotes) is interpreted by the function
+	{\t Util\_TableSetFromString()}, which is described in the
+        Reference Manual.\\
+        Currently the CST parser and the flesh do not evaluate any information
+        passed in an optional {\t TAGS} string. Thorns may do so by
+        querying the key/value table information for a group by using
+        {\t CCTK\_GroupTagsTable()} and the
+        appropriate {\t Util\_TableGet*()} utility functions
+        (see the ReferenceManual for detailed descriptions).\\
+        For a list of currently supported {\t TAGS} key-value table information,
+        please refer to the corresponding chapter in the documentation of the
+        \verb|CactusDoc| arrangement. (Section \ref{sec:OtherGmakeTargetsDoc} on
+        page \pageref{sec:OtherGmakeTargetsDoc} explains how to build this
+        documentation).
+\item{} The (optional) block following the group declaration line,
+contains a list of variables contained in the group. All variables in
+a group have the same data type, variable type, dimension and
+distribution. The list
+can be separated by spaces, commas, or new lines. The variable names
+must be unique within the scope of the thorn.  A variable can only be
+a member of one group. The block must be delimited by brackets on new
+lines.  If no block is given after a group declaration line, a
+variable with the same name as the group is created. Apart from this case, 
+a group name cannot be the same as the name of any variable seen by this thorn.
+\item{} An optional description of the group can be given on the last
+line.  If the variable block is omitted, this description can be given
+at the end of the declaration line.
+\end{itemize}
+
+The process of sharing code among thorns using include files is
+discussed in Section~\ref{sec:includefiles}.
+
+\section{param.ccl}
+\label{sec:Appendix.param}
+
+The parameter configuration file consists of a list of
+\textit{parameter object specification items} (OSIs) giving the type and
+range of the parameter separated by optional
+\textit{parameter data scoping items} (DSIs), which detail access to the
+parameter.  (For a more extensive discussion of Cactus parameters, see Chapter
+\ref{chap:Cactus_parameters}.)
+
+\subsection{Parameter Data Scoping Items}
+
+\begin{alltt}
+<\var{access}>:
+\end{alltt}
+
+The keyword {\t \var{access}} designates that all parameter object specification
+items, up to the next parameter data scoping item, are in the same
+protection or scoping class. {\tt \var{access}} can take the values:
+\begin{Lentry}
+\item[{\tt global}] all thorns have access to global parameters
+\item[{\tt restricted}] other thorns can have access to these
+                           parameters, if they specifically request
+                           it in their own param.ccl
+\item[{\tt private}] only your thorn has access to private parameters
+\item[{\tt shares}] in this case, an {\t implementation} name must
+follow the colon. It declares that all the parameters in the following
+scoping block are restricted variables from the specified {\tt
+implementation}.  (Note: only one implementation can be specified
+on this line.)
+\end{Lentry}
+
+
+\subsection{Parameter Object Specification Items}
+\label{subsec:Appendix.param.specification_items}
+
+\begin{alltt}
+[EXTENDS|USES] <\var{parameter type}> <\var{parameter name}>[[<\var{len}>]] "<\var{parameter description}>" 
+[AS <\var{alias}>] [STEERABLE=<NEVER|ALWAYS|RECOVER>] 
+[ACCUMULATOR=<\var{expression}>] [ACCUMULATOR-BASE=<\var{parameter name}>]
+\{
+  <\var{parameter values}>
+\} <\var{default value}>
+\end{alltt}
+where the options {\t AS}, {\t STEERABLE}, etc., following {\t <\var{parameter description}>},
+must all appear in one line.
+  Note that the beginning brace ({\t\{}) must
+sit on a line by itself; the ending brace ({\t\}}) must be at the
+beginning of a line followed by \var{<default value>} on that same line.
+
+\begin{itemize}
+\item
+  The \var{parameter values} depend on the \var{parameter type}, which may
+  be one of the following:
+  \begin{Lentry}
+  \item[{\t INT}]
+    The specification of \texttt{\var{parameter value}}s takes the form of one
+    or more lines, each of the form
+    \begin{alltt}
+      \var{<range description>} [::"\var{<comment describing this range>}"]
+    \end{alltt}
+    Here, a \var{<range description>} specifies a set of integers,
+    and has one of the following forms:
+    \begin{alltt}
+      *                           \# means any integer
+      \var{<integer>}                   \# means only \var{<integer>}
+      \var{<lower bound>}:\var{<upper bound>} \# means all integers in the range
+                                  \# from \var{<lower bound>} to \var{<upper bound>}
+      \var{<lower bound>}:\var{<upper bound>}:\var{<positive step>}
+                                  \# means all integers in the range
+                                  \# from \var{<lower bound>} to \var{<upper bound>}
+                                  \# in steps of \var{<positive step>}
+    \end{alltt}
+    where \var{<lower bound>} has one of the forms
+    \begin{alltt}
+      \var{<empty field>}   \# means no lower limit
+      *               \# means no lower limit
+      \var{<integer>}       \# means a closed interval starting at \var{<integer>}
+      [\var{<integer>}      \# also means a closed interval starting at \var{<integer>}
+      (\var{<integer>}      \# means an open interval starting at \var{<integer>}
+    \end{alltt}
+    and \var{<upper bound>} has one of the forms
+    \begin{alltt}
+      \var{<empty field>}   \# means no upper limit
+      *               \# means no upper limit
+      \var{<integer>}       \# means a closed interval ending at \var{<integer>}
+      \var{<integer>}]      \# also means a closed interval ending at \var{<integer>}
+      \var{<integer>})      \# means an open interval ending at \var{<integer>}
+    \end{alltt}
+
+  \item[{\t REAL}]
+    The range specification is the same as with integers, except that here,
+    no \var{step} implies a continuum of values.  Note that numeric
+    constants should be expressed as in C (e.g.\ {\t 1e-10}).  Note
+    also that one cannot use the Cactus types such as {\t CCTK\_REAL4}
+    to specify the precision of the parameter; parameters always have
+    the default precision.
+
+  \item[{\t KEYWORD}]
+    Each entry in the list of acceptable values for a keyword has the
+    form
+    \begin{alltt}
+      <\var{keyword value}>, <\var{keyword value}> :: "<\var{description}>"
+    \end{alltt}
+    Keyword values should be enclosed in double quotes.  The double
+    quotes are mandatory if the keyword contains spaces.
+
+  \item[{\t STRING}]
+    Allowed values for strings should be specified using regular
+    expressions. To allow any string, the regular expression {\tt ""}
+    should be used.  (An empty regular expression matches anything.)
+    Regular expressions and string values should be enclosed in double
+    quotes.  The double quotes are mandatory if the regular expression
+    or the string value is empty or contains spaces.
+
+  \item[{\t BOOLEAN}]
+  No \texttt{\var{parameter values}} should be specified for a boolean
+    parameter. The default value for a boolean can be
+    \begin{itemize}
+    \item True: {\t 1}, {\t yes}, {\t y}, {\t t}, {\t true}
+    \item False: {\t 0}, {\t no}, {\t n}, {\t f}, {\t false}
+    \end{itemize}
+    Boolean values may optionally be enclosed in double quotes.
+
+  \end{Lentry}
+
+\item
+  The \var{parameter name} must be unique within the scope of the
+  thorn.
+
+\item
+  The \var{default value} must match one of the ranges given in the
+  \var{parameter type}
+
+\item
+  A thorn can declare that it {\t EXTENDS} a parameter of another
+  thorn. This allows it to declare additional acceptable values.  By
+  default, it is acceptable for two thorns to declare the same value as
+  acceptable.
+
+\item
+  If the thorn wants to simply use a parameter from another thorn,
+  without declaring additional values, use {\t USES} instead.
+
+\item
+{\tt [\var{len}]} (where {\tt \var{len}} is an integer), if present,
+  indicates that this is an \textit{array} parameter of {\tt \var{len}}
+  values of the specified type. (Note that the notation used above for the
+  parameter specification breaks down here, as there must be square brackets
+  around the length).
+
+\item
+  \var{alias} allows a parameter to appear under a different name in this
+  thorn, other than its original name in another thorn.  The name, as seen in
+  the parameter file, is unchanged.
+
+\item
+  {\t STEERABLE} specifies when a parameter value may be changed.  By
+  default, parameters may not be changed after the parameter file has
+  been read, or on restarting from checkpoint.  This option relaxes
+  this restriction, specifying that the parameter may be changed at
+  recovery time from a parameter file or at any time using the flesh
+  routine {\tt CCTK\_ParameterSet}---see the Reference Guide.
+
+  The value {\tt RECOVERY} is used in checkpoint/recovery situations,
+  and indicates that the parameter may be altered until the value is
+  read in from a recovery par file, but not after.
+
+\item
+  {\t ACCUMULATOR} specifies that this is an \textit{accumulator}
+  parameter.  Such parameters cannot be set directly, but are set by
+  other parameters who specify this one as an {\tt ACCUMULATOR-BASE}.
+  The expression is a two-parameter arithmetical expression of $x$ and
+  $y$.  Setting the parameter consists of evaluating this expression
+  successively, with $x$ being the current value of the parameter (at
+  the first iteration this is the default value), and $y$ the value of
+  the setting parameter.  This procedure is repeated, starting from
+  the default value of the parameter, each time one of the setting
+  parameters changes.
+
+\item
+  {\t ACCUMULATOR-BASE} specifies the name of an {\tt ACCUMULATOR}
+  parameter which this parameter sets.
+
+\end{itemize}
+
+\section{schedule.ccl}
+\label{sec:Appendix.schedule}
+
+(A more extensive discussion of Cactus scheduling is provided in Chapter
+\ref{chap:scheduling}.)
+A schedule configuration file consists of:
+\begin{itemize}
+
+\item{} \textit{Assignment statements} to switch on storage for
+  grid variables for the entire duration of program execution.
+
+\item{} \textit{Schedule blocks} to schedule a subroutine from a thorn
+  to be called at specific times during program execution in a given manner.
+
+\item {} \textit{Conditional statements} for both assignment statements and
+  schedule blocks to allow them to be processed depending on parameter values.
+
+\end{itemize}
+
+\subsection{Assignment Statements}
+
+\textit{Assignment statements}, currently only assign storage.
+
+These lines have the form:
+\begin{alltt}
+[STORAGE: <\var{group}>[\var{timelevels}], <\var{group}>[\var{timelevels}]]
+\end{alltt}
+
+If the thorn is active, storage will be allocated, for the given groups,
+for the duration of program execution (unless storage is explicitly
+switched off by some call to {\tt CCTK\_DisableGroupStorage} within a
+thorn). 
+
+The storage line includes the number of timelevels to activate storage
+for, this number can be from 1 up to the maximum number or timelevels
+for the group, as specified in the defining {\tt interface.ccl}
+file. If the maximum number of timelevels is 1 (the default), this
+number may be omitted. Alternatively \var{timelevels} can be the name of a
+parameter accessible to the thorn. The parameter name is the same as used in C
+routines of the thorn, fully qualified parameter names of the form
+\texttt{\var{thorn}::\var{parameter}} are not allowed. In this case 0 (zero)
+\var{timelevels} can be requested, which is equivalent to the {\tt STORAGE}
+statement being absent.
+
+The behaviour of an assignment statement is independent of its
+position in the schedule file (so long as it is outside a schedule
+block). 
+
+\subsection{Schedule Blocks}
+
+Each \textit{schedule block} in the file {\t schedule.ccl} must have the syntax
+
+\begin{alltt}
+schedule [GROUP] <\var{function name}|\var{group name}> AT|IN <\var{time}> \verb|\|
+     [AS <\var{alias}>] \verb|\|
+     [WHILE <\var{variable}>] [IF <\var{variable}>] \verb|\|
+     [BEFORE|AFTER <\var{function name}>|(<\var{function name}> <\var{function name}> ...)] \verb|\|
+\{
+  [LANG: <\var{language}>]
+  [OPTIONS:       <\var{option}>,<\var{option}>...]
+  [TAGS:          <\var{keyword=value}>,<\var{keyword=value}>...]
+  [STORAGE:       <\var{group}>[\var{timelevels}],<\var{group}>[\var{timelevels}]...]
+  [READS:         <\var{group}>,<\var{group}>...]
+  [WRITES:        <\var{group}>,<\var{group}>...]
+  [TRIGGER:       <\var{group}>,<\var{group}>...]
+  [SYNCHRONISE:   <\var{group}>,<\var{group}>...]
+  [OPTIONS:       <\var{option}>,<\var{option}>...]
+\} "\var{Description of function}"
+\end{alltt}
+
+\begin{Lentry}
+  \item[{\tt GROUP}] Schedule a schedule group with the same options
+  as a schedule function.  The schedule group will be created if it doesn't exist.
+
+  \item[{\tt <\var{function name}|\var{group name}>}] The name of a function or a
+  schedule group to be scheduled.  Function and schedule group names
+  are case sensitive.
+
+  \item[{\tt <\var{group}>}] A group of grid variables. Variable groups
+  inherited from other thorns may be used, but they must then be fully
+  qualified with the implementation name.
+
+  \item[{\tt AT}] Functions can be scheduled to run at the Cactus
+  schedule bins, for example, {\tt CCTK\_EVOL}, and {\tt CCTK\_STARTUP}. A
+  complete list and description of these is provided in
+  Appendix~\ref{sec:Appendix.schedule_bins}.  The initial letters
+  {\tt CCTK\_} are optional. Grid variables cannot be used in the
+  {\tt CCTK\_STARTUP} and {\tt CCTK\_SHUTDOWN} timebins.
+
+  \item[{\tt IN}] Schedules a function or schedule group to run in a
+  schedule group, rather than in a Cactus timebin.
+
+  \item[{\tt AS}] Provides an alias for a function or schedule group
+  which should be used for scheduling before, after or in.  This can
+  be used to provide thorn independence for other thorns scheduling
+  functions, or schedule groups relative to this one.
+
+  \item[{\tt WHILE}] Executes a function or schedule group until the given
+    variable (which must be a fully qualified integer grid scalar) has
+    the value zero.
+
+  \item[{\tt IF}] Executes a function or schedule group only if the given
+    variable (which must be a fully qualified integer grid scalar) has
+    a non-zero value.
+
+  \item[{\tt BEFORE/AFTER}] Takes a function name, a function alias,
+  a schedule group name, or a parentheses-enclosed whitespace-separated
+  list of these.  (Any names that are not provided by an active thorn
+  are ignored.)  Note that a single schedule block may have multiple
+  {\tt BEFORE/AFTER} clauses.
+  See Section~\ref{chap:scheduling}
+  (``Scheduling'') in the Cactus Users' Guide for more information
+  about {\tt BEFORE/AFTER} clauses.
+
+  \item[{\tt LANG}] The code language for the function (either {\tt C} or {\tt
+    FORTRAN}). No language should be specified for a schedule group.
+
+  \item[\texttt{OPTIONS}] Schedule options are used for mesh
+    refinement and multi-block simulations, and they determine
+    ``where'' a routine executes. Possible options are:
+    \begin{description}
+    \item[\texttt{meta}]
+    \item[\texttt{meta\_early}]
+    \item[\texttt{meta\_late}]
+    \item[\texttt{global}]
+    \item[\texttt{global\_early}]
+    \item[\texttt{global\_late}]
+    \item[\texttt{level}]
+    \item[\texttt{singlemap}]
+    \item[\texttt{local}] (default, may be omitted)
+    \end{description}
+    (Only one of these options may be used.)
+    These options can be combined with the following:
+    \begin{description}
+    \item[\texttt{loop\_meta}]
+    \item[\texttt{loop\_global}]
+    \item[\texttt{loop\_level}]
+    \item[\texttt{loop\_singlemap}]
+    \item[\texttt{loop\_local}]
+    \end{description}
+    (At most one of the \texttt{loop\_...} options may be used.)
+
+  \item[\texttt{TAGS}] Schedule tags. These tags must have the form
+    \texttt{keyword=value}, and must be in a syntax accepted by
+    \texttt{Util\_TableCreateFromString}.
+
+  \item[{\tt STORAGE}] List of variable groups which should have storage
+  switched on for the duration of the function or schedule group.
+  Each group must specify how many timelevels to activate storage for,
+  from 1 up to the maximum number for the group as specified in the
+  defining {\tt interface.ccl} file. If the maximum is 1 (the default)
+  this number may be omitted. Alternatively \var{timelevels} can be the
+  name of a parameter accessible to the thorn. The parameter name is the
+  same as used in C routines of the thorn, fully qualified parameter names
+  of the form \texttt{\var{thorn}::\var{parameter}} are not allowed. In this
+  case 0 (zero) \var{timelevels} can be requested, which is equivalent to
+  the {\tt STORAGE} statement being absent.
+
+\item[\texttt{READS}] \texttt{READS} is used to declare which grid
+  variables are read by the routine. This information is used e.g.\ to
+  determine which variables need to be copied between host and device
+  for OpenCL or CUDA kernel. This information can also be used to
+  ensure that all variables that are read have previously been written
+  by another routine.
+
+\item[\texttt{WRITES}] \texttt{WRITES} is used to declare which grid
+  variables are written by the routine. This information is used e.g.\ to
+  determine which variables need to be copied between host and device
+  for OpenCL or CUDA kernel. This information can also be used to
+  ensure that all variables that are read have previously been written
+  by another routine.
+
+  \item[{\tt TRIGGER}] List of grid variables or groups to be used as
+  triggers for causing an {\tt ANALYSIS} function or group to be
+  executed.  Any schedule block for an analysis function or analysis
+  group may contain a {\tt TRIGGER} line.
+
+  \item[{\tt SYNCHRONISE}] List of groups to be synchronised, as soon
+    as the function or schedule group is exited.
+
+  \item[{\tt OPTIONS}] List of additional options (see below) for the scheduled function or group of functions
+
+\end{Lentry}
+
+\subsubsection{Allowed Options}
+
+\label{app:allopts}
+
+Cactus understands the following options.  These options are
+interpreted by the driver, not by Cactus.  The current set of options
+is useful for Berger-Oliger mesh refinement which has subcycling in
+time, and for multi-patch simulations in which the domain is split
+into several distinct patches.  Given this, the meanings of the
+options below is only tentative, and their exact meaning needs to be
+obtained from the driver documentation.  The standard driver PUGH
+ignores all options.
+
+Option names are case-insensitive.  There can be several options given
+at the same time.
+
+\begin{Lentry}
+  
+\item[{\tt META}] This routine will only be called once, even if
+  several simulations are performed at the same time.  This can be
+  used, for example, to initialise external libraries, or to set up
+  data structures that live in global variables.
+  
+\item[{\tt META-EARLY}] This option is identical to to {\tt META}
+  option with the exception that the routine will be called together
+  with the routines on the first subgrid.
+  
+\item[{\tt META-LATE}] This option is identical to to {\tt META}
+  option with the exception that the routine will be called together
+  with the routines on the last subgrid.
+  
+\item[{\tt GLOBAL}] This routine will only be called once on a grid
+  hierarchy, not for all subgrids making up the hierarchy.  This can
+  be used, for example, for analysis routines which use global
+  reduction or interpolation routines, rather than the local subgrid
+  passed to them, and hence should only be called once.
+  
+\item[{\tt GLOBAL-EARLY}] This option is identical to to {\tt GLOBAL}
+  option with the exception that the routine will be called together
+  with the routines on the first subgrid.
+  
+\item[{\tt GLOBAL-LATE}] This option is identical to to {\tt GLOBAL}
+  option with the exception that the routine will be called together
+  with the routines on the last subgrid.
+  
+\item[{\tt LEVEL}] This routine will only be called once on any
+  ``level'' of the grid hierarchy.  That is, it will only be called
+  once for any set of sub-grids which have the same
+  \texttt{cctk\_levfac} numbers.
+  
+\item[{\tt SINGLEMAP}] This routine will only be called once on any of
+  the ``patches'' that form a ``level'' of the grid hierarchy.
+  
+\item[{\tt LOCAL} (this is the default)] This routine will be called
+  on every ``component''.
+
+\end{Lentry}
+
+When the above options are used, it is often the case that a certain
+routine should, e.g.\ be called at the time for a \texttt{GLOBAL}
+routine, but should actually loop over all ``components''.  The
+following set of options allows this:
+
+\begin{Lentry}
+  
+\item[{\tt LOOP-META}] Loop once.
+  
+\item[{\tt LOOP-GLOBAL}] Loop over all simulations.
+  
+\item[{\tt LOOP-LEVEL}] Loop over all ``levels''.
+  
+\item[{\tt LOOP-SINGLEMAP}] Loop over all ``patches''.
+  
+\item[{\tt LOOP-LOCAL}] Loop over all ``components''.
+
+\end{Lentry}
+
+For example, the specification
+\begin{alltt}
+  OPTIONS: global loop-local
+\end{alltt}
+schedules a routine at the time when a \texttt{GLOBAL} routine is
+scheduled, and then calls the routine in a loop over all
+``components''.
+
+
+\subsection{Conditional Statements}
+
+Any schedule block or assignment statements can be optionally
+surrounded by conditional {\t if-elseif-else}
+constructs using the parameter data base. These can be nested,
+and have the general form:
+
+\begin{alltt}
+if (<\var{conditional-expression}>)
+\{
+  [<\var{assignments}>]
+  [<\var{schedule blocks}>]
+\}\end{alltt}
+
+<\var{conditional-expression}> can be any valid C construct evaluating
+to a truth value.
+Such conditionals are evaluated only at program startup, and are used
+to pick between different static schedule options.  For dynamic
+scheduling, the {\tt SCHEDULE WHILE} construction should be used.
+
+Conditional constructs cannot be used inside a schedule block.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{configuration.ccl}
+\label{sec:Appendix.configuration.ccl}
+
+[{\bf NOTE:} The configuration.ccl is still relatively new, and not
+all features listed below may be fully implemented or functional.]
+
+A configuration.ccl file defines {\bf capabilities} which a thorn
+either provides or requires, or may use if available.  Unlike {\bf
+implementations}, only one thorn providing a particular capability may
+be compiled into a configuration at one time.  Thus, this mechanism may
+be used to, for example: provide access to external libraries; provide
+access to functions which other thorns must call, but are too complex
+for function aliasing; or to split a thorn into several thorns, all of
+which require some common (not aliased) functions.
+
+A configuration options file can contain any number of the following
+sections:
+
+\begin{itemize}
+
+\item
+
+\begin{alltt}
+PROVIDES <\var{Capability}>
+\{
+  SCRIPT <\var{Configuration script}>
+  [VERSION <\var{Version String}>]
+  LANG <\var{Language}>
+  [OPTIONS [<option>[,<option>]...]]
+\}
+\end{alltt}
+
+Informs the CST that this thorn provides a given capability, and that
+this capability has a given detection script which may be used to
+configure it (e.g. running an autoconf script or detecting an external
+library's location).  The script should output configuration
+information on its standard output---the syntax is described below
+in Section \ref{sec:Appendix.configuration.ccl.configscript}.  The
+script may also indicate the failure to detect a capability by
+returning a non-zero exit code;  this will stop the build after the
+CST stage.
+
+All capabilities have an optional version attached to them, so that other
+thorns can depend on such a specific version. Version strings can only contain
+letters, numbers, or ``.+-:'' (dot, plus, minus, colon), and have to start with
+a number. Specifying a version number is optional. If none is given, ``0.0.1''
+is assumed.
+
+Scripts can be in any language.  If an interpreter is needed to run
+the script, for example \verb|Perl|, this should be indicated by the
+\verb|LANG| option.
+
+The specified options are checked for in the original configuration,
+and any options passed on the command line (including an `options'
+file) at compile time when the thorn is added, or if the CST is
+rerun.  These options need be set only once, and will be remembered
+between builds.
+
+\item
+
+\begin{alltt}
+REQUIRES  <\var{Capability}> [(\var{Comparison operator} \var{Version string})]
+\end{alltt}
+
+Informs the CST that this thorn requires a certain capability to be
+present.  If no thorn providing the capability is in the ThornList,
+the build will stop after the CST stage.
+
+Optionally, thorns can depend on a capability version. This has to be enclosed in
+parentheses, following the capability name. Inside the parenthesis, first a comparison
+operator determines the kind of dependency on the requested capability version, which
+has to be attached without spaces. Valid operators and their meaning are:
+\begin{itemize}
+ \item[$<<$] Requesting capability strictly older than given version
+ \item[$<=$] Requesting capability older or equal to given version
+ \item[$=$]  Requesting capability exactly equal to given version
+ \item[$>=$] Requesting capability newer or equal to given version
+ \item[$>>$] Requesting capability strictly newer than given version.
+\end{itemize}
+Version strings are compared from left to right. First the initial part of each
+string consisting entirely of digits is determined. The integer values of
+these two parts are compared. If a difference is found it is returned. Then the
+initial part of the remainder of each string which consists entirely of
+non-digit characters is determined. The two parts are compared lexically, and
+any difference found is returned as the result of the comparison. The lexical
+comparison is a comparison of ASCII values. These two steps (comparing and
+removing initial non-digit strings and initial digit strings) are repeated
+until a difference is found or both strings are exhausted. Spaces inside the
+parentheses are allowed, except inside the operator or version string.
+
+Example:
+
+\begin{alltt}
+REQUIRES ExampleCapability (>=2.43.2dev-1)
+\end{alltt}
+
+
+\item
+
+\begin{alltt}
+OPTIONAL <\var{Capability}>
+\{
+  DEFINE <\var{macro}>
+\}
+\end{alltt}
+
+Informs the CST that this thorn may use a certain capability, if a
+thorn providing it is in the ThornList.  If present, the preprocessor
+macro, \verb|macro|, will be defined and given the value ``1''.
+
+\end{itemize}
+
+\subsection{Configuration Scripts}
+\label{sec:Appendix.configuration.ccl.configscript}
+
+The configuration script may tell the CST to add certain features to
+the Cactus environment---either to the make system or to header
+files included by thorns.  It does this by outputting lines to its
+standard output:
+
+\begin{itemize}
+
+% [[How about the MESSAGE field?]]
+
+\item
+
+\begin{alltt}
+BEGIN DEFINE 
+<text>
+END DEFINE
+\end{alltt}
+
+Places a set of definitions in a header file which will be included by
+all thorns using this capability (either through an OPTIONAL or
+REQUIRES entry in their configuration.ccl files).
+
+\item
+
+\begin{alltt}
+INCLUDE_DIRECTORY  <directory>
+\end{alltt}
+
+Adds a directory to the include path used for compiling files in
+thorns using this capability.
+
+\item
+
+\begin{alltt}
+BEGIN MAKE_DEFINITION 
+<text>
+END MAKE_DEFINITION
+\end{alltt}
+
+Adds a makefile definition into the compilation of all thorns using
+this capability.
+
+\item
+
+\begin{alltt}
+BEGIN MAKE_DEPENDENCY 
+<text>
+END MAKE_DEPENDENCY 
+\end{alltt}
+
+Adds makefile dependency information into the compilation of all
+thorns using this capability.
+
+\item
+
+\begin{alltt}
+LIBRARY <library>
+\end{alltt}
+
+Adds a library to the final cactus link.
+
+\item
+
+\begin{alltt}
+LIBRARY_DIRECTORY <library>
+\end{alltt}
+
+Adds a directory to the list of directories searched for libraries at
+link time.
+
+\end{itemize}
+
+No other lines should be output by the script.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Utility Routines}
+
+\section{Introduction}
+
+As well as the high-level \verb|CCTK_|* routines, Cactus also
+provides a set of lower-level \verb|Util_|* utility routines, which
+are mostly independent of the rest of Cactus.  This chapter gives a
+general overview of programming with these utility routines.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Key/Value Tables}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Motivation}
+
+Cactus functions may need to pass information through a generic
+interface.  In the past, we have used various ad hoc means to do this,
+and we often had trouble passing "extra" information that wasn't
+anticipated in the original design.  For example, for periodic output
+of grid variables,
+\verb|CCTK_OutputVarAsByMethod()| requires that
+any parameters (such as hyperslabbing parameters) be appended as an option
+string to the variable's character string name.  Similarly, elliptic
+solvers often need to pass various parameters, but we haven't had a
+good way to do this.
+
+Key/value tables (\textit{tables} for short) provide a clean solution
+to these problems.  They're implemented by the \verb|Util_Table|*
+functions (described in detail in the Reference Manual).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{The Basic Idea}
+
+Basically, a table is an object which maps strings to almost arbitrary
+user-defined data.  (If you know Perl, a table is very much like a
+Perl hash table.  Alternatively, if you know Unix shells, a table is
+like the set of all environment variables.  As yet another analogy,
+if you know Awk, a table is like an Awk associative array.)%%%
+\footnote{%%%
+	 However, the present Cactus tables implementation
+	 is optimized for a relatively small number of
+	 distinct keys in any one table.  It will still
+	 work OK for huge numbers of keys, but it will be
+	 slow.
+	 }%%%
+
+More formally, a table is an object which stores a set of \textit{keys}
+and a corresponding set of \textit{values}.  We refer to a (key,value)
+pair as a table \textit{entry}.
+
+Keys are C-style null-terminated character strings, with the slash
+character `{\tt /}' reserved for future expansion.%%%
+\footnote{%%%
+	 Think of hierarchical tables for storing
+	 tree-like data structures.%%%
+	 }%%%
+
+Values are 1-dimensional arrays of any of the usual Cactus data types,
+described in Section~\ref{sect-ThornWriting/DataTypes}.
+A string can be stored by treating it as a 1-dimensional array of
+\verb|CCTK_CHAR| (there's an example of this below).
+
+The basic ``life cycle'' of a table looks like this:
+\begin{enumerate}
+\item	Some code creates it with \verb|Util_TableCreate()|
+	or \verb|Util_TableClone()|.
+\item	Some code (often the same piece of code, but maybe some
+	other piece) sets entries in it using one or more of
+	the \verb|Util_TableSet*()|, \verb|Util_TableSet*Array()|,
+	\verb|Util_TableSetGeneric()|, \verb|Util_TableSetGenericArray()|,
+	and/or \verb|Util_TableSetString()| functions.
+\item	Some other piece or pieces of code can get (copies of)
+	the values which were set, using one or more of the
+	\verb|Util_TableGet*()|, \verb|Util_TableGet*Array()|,
+	\verb|Util_TableGetGeneric()|, \verb|Util_TableGetGenericArray()|,
+	and/or \verb|Util_TableGetString()| functions.
+\item	When everyone is through with a table, some (single)
+	piece of code should destroy it with \verb|Util_TableDestroy()|.
+\end{enumerate}
+
+There are also convenience functions \verb|Util_TableSetFromString()|
+to set entries in a table based on a parameter-file-style string,
+and \verb|Util_TableCreateFromString()| to create a table and then
+set entries in it based on a parameter-file-style string.
+
+As well, there are ``table iterator'' functions \verb|Util_TableIt*()|
+to allow manipulation of a table even if you don't know its keys.
+
+A table has an integer ``flags word'' which may be used to specify
+various options, via bit flags defined in \verb|util_Table.h|.
+For example, the flags word can be used to control whether keys
+should be compared as case sensitive or case insensitive strings.
+See the detailed function description of \verb|Util_TableCreate()|
+in the Reference Manual for a list
+of the possible bit flags and their semantics.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{A Simple Example}
+\label{Tables_Simple_Example}
+
+Here's a simple example (in C)%%%
+\footnote{%%%
+	 All (or almost all) of the table routines
+	 are also usable from Fortran.  See the full
+	 descriptions in the Reference Manual
+	 for details.
+	 }%%%
+{} of how to use a table:
+\begin{verbatim}
+#include "util_Table.h"
+#include "cctk.h"
+
+/* create a table and set some entries in it */
+int handle = Util_TableCreate(UTIL_TABLE_FLAGS_DEFAULT);
+Util_TableSetInt(handle, 2, "two");
+Util_TableSetReal(handle, 3.14, "pi");
+
+...
+
+/* get the values from the table */
+CCTK_INT two_value;
+CCTK_REAL pi_value;
+Util_TableGetInt(handle, &two_value, "two");    /* sets two_value = 2 */
+Util_TableGetReal(handle, &pi_value, "pi");     /* sets pi_value = 3.14 */
+\end{verbatim}
+
+Actually, you shouldn't write code like this---in the real world
+errors sometimes happen, and it's much better to catch them close to
+their point of occurrence, rather than silently produce garbage results
+or crash your program.  So, the \emph{right} thing to do is to always
+check for errors.  To allow this, all the table routines return a status,
+which is zero or positive for a successful return, but negative if
+and only if some sort of error has occurred.%%%
+\footnote{%%%
+	 Often (as in the examples here) you don't care
+	 about the details of which error occurred.  But if
+	 you do, there are various error codes defined in
+	 {\t util\_Table.h} and {\t util\_ErrorCodes.h};
+	 the detailed function descriptions in
+	 the Reference Manual
+	 say which error codes each function can return.
+	 }%%%
+{}  So, the above example should be rewritten like this:
+
+\begin{verbatim}
+#include "util_Table.h"
+
+/* create a table and set some entries in it */
+int handle = Util_TableCreate(UTIL_TABLE_FLAGS_DEFAULT);
+if (handle < 0)
+        CCTK_WARN(CCTK_WARN_ABORT, "couldn't create table!");
+
+/* try to set some table entries */
+if (Util_TableSetInt(handle, 2, "two") < 0)
+        CCTK_WARN(CCTK_WARN_ABORT, "couldn't set integer value in table!");
+if (Util_TableSetReal(handle, 3.14, "pi") < 0)
+        CCTK_WARN(CCTK_WARN_ABORT, "couldn't set real value in table!");
+
+...
+
+/* try to get the values from the table */
+CCTK_INT two_value;
+CCTK_REAL pi_value;
+if (Util_TableGetInt(handle, &two_value, "two") < 0)
+        CCTK_WARN(CCTK_WARN_ABORT, "couldn't get integer value from table!");
+if (Util_TableGetReal(handle, &pi_value, "pi") < 0)
+        CCTK_WARN(CCTK_WARN_ABORT, "couldn't get integer value from table!");
+
+/* if we get to here, then two_value = 2 and pi_value = 3.14 */
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Arrays as Table Values}
+
+As well as a single numbers (or characters or pointers), tables can
+also store 1-dimensional arrays of numbers (or characters or pointers).%%%
+\footnote{%%%
+	 Note that the table makes (stores) a \emph{copy} of the array
+	 you pass in, so it's somewhat inefficient to store a large array
+	 (e.g.~a grid function) this way.  If this is a problem, consider
+	 storing a \texttt{CCTK\_POINTER} (pointing to the array) in the table
+	 instead.  (Of course, this requires that you ensure that the array still exists whenever that \texttt{CCTK\_POINTER} is used.)
+	 }%%%
+
+For example (continuing the previous example):
+\begin{verbatim}
+static const CCTK_INT a[3] = { 42, 69, 105 };
+if (Util_TableSetIntArray(handle, 3, a, "my array") < 0)
+        CCTK_WARN(CCTK_WARN_ABORT, "couldn't set integer array value in table!");
+
+...
+
+CCTK_INT blah[10];
+int count = Util_TableGetIntArray(handle, 10, blah, "my array");
+if (count < 0)
+        CCTK_WARN(CCTK_WARN_ABORT, "couldn't get integer array value from table!");
+/* now count = 3, blah[0] = 42, blah[1] = 69, blah[2] = 105, */
+/*     and all remaining elements of blah[] are unchanged */
+\end{verbatim}
+As you can see, a table entry remembers the length of any array
+value that has been stored in it.%%%
+\footnote{%%%
+	 In fact, actually \emph{all} table values are
+	 arrays---setting or getting a single value is
+	 just the special case where the array length is 1.
+	 }%%%
+{}
+
+If you only want the first few values of a larger array, just pass
+in the appropriate length of your array,
+that's OK:
+\begin{verbatim}
+CCTK_INT blah2[2];
+int count = Util_TableGetIntArray(handle, 2, blah2, "my array");
+if (count < 0)
+        CCTK_WARN(CCTK_WARN_ABORT, "couldn't get integer array value from table!");
+/* now count = 3, blah2[0] = 42, blah2[1] = 69 */
+\end{verbatim}
+You can even ask for just the first value:
+\begin{verbatim}
+CCTK_INT blah1;
+int count = Util_TableGetInt(handle, &blah1, "my array");
+if (count < 0)
+        CCTK_WARN(CCTK_WARN_ABORT, "couldn't get integer array value from table!");
+/* now count = 3, blah1 = 42 */
+\end{verbatim}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Character Strings}
+
+One very common thing you might want to store in a table is a
+character string.  While you could do this by explicitly storing
+an array of \verb|CCTK_CHAR|, there are also routines
+specially for conveniently setting and getting strings:
+\begin{verbatim}
+if (Util_TableSetString(handle, "black holes are fun", "bh") < 0)
+        CCTK_WARN(CCTK_WARN_ABORT, "couldn't set string value in table!");
+
+...
+char buffer[50];
+if (Util_TableGetString(handle, 50, buffer, "bh") < 0)
+        CCTK_WARN(CCTK_WARN_ABORT, "couldn't get string value from table!");
+
+/* now buffer[] contains the string "black holes are fun" */
+\end{verbatim}
+
+\verb|Util_TableGetString()| guarantees that the string is
+terminated by a null character (`\verb|\0|'), and also returns an
+error if the string is too long for the buffer.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Convenience Routines}
+
+There are also convenience routines for the common case of setting
+values in a table based on a string.
+
+For example, the following code sets up exactly the same table as the
+example in Section \ref{Tables_Simple_Example}:
+
+\begin{verbatim}
+#include <util_Table.h>
+
+/* create a table and set some values in it */
+int handle = Util_TableCreate(UTIL_TABLE_FLAGS_DEFAULT);
+if (handle < 0)
+        CCTK_WARN(CCTK_WARN_ABORT, "couldn't create table!");
+
+/* try to set some table entries */
+if (Util_TableSetFromString(handle, "two=2 pi=3.14") != 2)
+        CCTK_WARN(CCTK_WARN_ABORT, "couldn't set values in table!");
+\end{verbatim}
+
+There is also an even higher-level convenience function
+\verb|Util_TableCreateFromString()|: this creates a table with the
+case insensitive flag set (to match Cactus parameter file semantics),
+then (assuming no errors occurred) calls \verb|Util_TableSetFromString()|
+to set values in the table.
+
+For example, the following code sets up a table (with the case insensitive flag
+set) with four entries: an integer number ({\tt two}), a real number ({\tt
+pi}), a string ({\tt buffer}), and an integer array with three elements ({\tt
+array}):
+
+\begin{verbatim}
+#include <util_Table.h>
+
+int handle = Util_TableCreateFromString(" two    = 2 "
+                                        " pi     = 3.14 "
+                                        " buffer = 'Hello World' "
+                                        " array  = { 1 2 3 }");
+if (handle < 0)
+        CCTK_WARN(CCTK_WARN_ABORT, "couldn't create table from string!");
+\end{verbatim}
+
+Note that this code passes a single string to
+\verb|Util_TableCreateFromString()|%%%
+\footnote{C automatically concatenates
+adjacent character string constants separated only by whitespace.}, 
+which then gets parsed into key/value pairs, with the key separated from its
+corresponding value by an equals sign.
+
+Values for numbers are converted into integers ({\tt CCTK\_INT}) if possible
+(no decimal point appears in the value), otherwise into reals ({\tt CCTK\_REAL}).
+Strings must be enclosed in either single or double quotes. String values in
+single quotes are interpreted literally, strings in double quotes may contain
+character escape codes which then will be interpreted as in C.
+Arrays must be enclosed in curly braces, array elements must be single numbers
+of the same type (either all integer or all real).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Table Iterators}
+\label{sect-UtilityRoutines/tables/table-iterators}
+
+In the examples up to now, the code, which wanted to get values from
+the table, knew what the keys were.  It's also useful to be able to
+write generic code which can operate on a table without knowing the
+keys.  ``Table iterators'' (``iterators'', for short) are used for this.
+
+An iterator is an abstraction of a pointer to a particular table entry.
+Iterators are analogous to the \verb|DIR *| pointers used by the POSIX
+\verb|opendir()|, \verb|readdir()|, \verb|closedir()|, and similar
+functions, to Perl hash tables' \verb|each()|, \verb|keys()|,
+and \verb|values()|, and to the C++ Standard Template Library's
+forward iterators.
+
+At any time, the entries in a table may be considered to be in some
+arbitrary (implementation-defined) order; an iterator may be used to
+walk through some or all of the table entries in this order.  This
+order is guaranteed to remain unchanged for any given table, so long
+as no changes are made to that table, \ie{} so long as no
+\verb|Util_TableSet*()|, \verb|Util_TableSet*Array()|,
+\verb|Util_TableSetGeneric()|, \verb|Util_TableSetGenericArray()|,
+\verb|Util_TableSetString()|, or \verb|Util_TableDeleteKey()| calls
+are made on that table (making such calls on other tables doesn't
+matter).  The order may change if there is any change in the table,
+and it may differ even between different tables with identical key/value
+contents (including those produced by \verb|Util_TableClone()|).%%%
+\footnote{%%%
+	 For example, if tables were implemented by hashing,
+	 the internal order could be that of the hash buckets,
+	 and the hash function could depend on the internal
+	 table address.
+	 }%%%
+{}
+
+Any change in the table also invalidates all iterators pointing
+anywhere in the table; using any such iterator is an error.
+Multiple iterators may point into the same table; they all use the
+same order, and (unlike in Perl) they're all independent.
+
+The detailed function description
+in the Reference Manual
+for \verb|Util_TableItQueryKeyValueInfo()| has an example of
+using an iterator to print out all the entries in a table.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Multithreading and Multiprocessor Issues}
+
+At the moment, the table functions are \emph{not} thread-safe
+in a multithreaded environment. 
+%% However, this should change in
+%%the not-too-distant future: then all the table functions will default
+%to being thread-safe.  That is, user code will be able call these
+%%functions concurrently from multiple threads, with the table functions
+%%automatically doing any necessary locking.%%%
+%%\footnote{%%%
+%	 For the implementation, this means that we will need a
+%	 reader/writer lock for each table and for each iterator:
+%	 any number of threads will be able to concurrently read
+%	 the data structure, but any write will require exclusive
+%	 access.
+%	 }%%%
+%{}  (We may add a flags-word bit to suppress this for maximum
+%performance if you know you won't be making concurrent calls from
+%multiple threads.)
+
+Note that tables and iterators are process-wide, i.e. all
+threads see the same tables and iterators (think of them as like the
+Unix current working directory, with the various routines which modify
+the table or change iterators acting like a Unix \verb|chdir()| system
+call).
+
+In a multiprocessor environment, tables are always processor-local.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{Metadata about All Tables}
+
+Tables do not \emph{themselves} have names or other
+attributes.  However, we may add some special
+``system tables'' to be used by Cactus itself to store this sort of
+information for those cases where it's needed. For example, we may add support for a
+``checkpoint me'' bit in a table's flags word, so that if you want a
+table to be checkpointed, you just need to set this bit.
+In this case, the table will probably get a system generated name in
+the checkpoint dump file.  But if you want the table to have some
+other name in the dump file, then you need to tell the checkpointing
+code that, by setting an appropriate entry in a checkpoint table.
+(You would find the checkpoint table by looking in a special
+``master system table'' that records handles of other interesting tables.)
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\chapter{Schedule Bins}
+\label{sec:Appendix.schedule_bins}
+
+Using the {\tt schedule.ccl} files, thorn functions can be scheduled to run 
+in the different timebins which are executed by the Cactus flesh. This chapter
+describes these standard timebins, and shows the flow of program execution
+through them.
+
+Scheduled functions must be declared as
+\begin{Lentry}
+
+\item[In C:]
+\begin{verbatim}
+#include "cctk_Arguments.h"
+void MyFunction (CCTK_ARGUMENTS);
+\end{verbatim}
+
+\item[In C++:]
+\begin{verbatim}
+#include "cctk_Arguments.h"
+extern "C" void MyFunction (CCTK_ARGUMENTS);
+\end{verbatim}
+
+\item[In Fortran:]
+\begin{verbatim}
+#include "cctk_Arguments.h"
+subroutine MyFunction (CCTK_ARGUMENTS)
+   DECLARE_CCTK_ARGUMENTS
+end
+\end{verbatim}
+\end{Lentry}
+
+Exceptions are the functions that are scheduled in the bins {\tt
+CCTK\_STARTUP}, {\tt CCTK\_RECOVER\_PARAMETERS}, and {\tt
+CCTK\_SHUTDOWN}.  They do not take arguments,
+and they return an integer.  They must be declared as
+\begin{Lentry}
+
+\item[In C:]
+\begin{verbatim}
+int MyFunction (void);
+\end{verbatim}
+
+\item[In C++]
+\begin{verbatim}
+extern "C" int MyFunction ();
+\end{verbatim}
+
+\item[In Fortran:]
+\begin{verbatim}
+integer function MyFunction ()
+end
+\end{verbatim}
+\end{Lentry}
+
+The return value in {\tt CCTK\_STARTUP} and {\tt CCTK\_SHUTDOWN} is
+unused, and might in the future be used to indicate whether an error
+occurred.  You should return 0.
+
+The return value in {\tt CCTK\_RECOVER\_PARAMETERS} should be zero,
+positive, or negative, indicating that no parameters were recovered,
+that parameters were recovered successfully, or that an error
+occurred, respectively.  Routines in this bin are executed in alphabetical
+order, according to the owning thorn's name, until one returns a positive
+value.  All later routines are ignored.  Schedule clauses \texttt{BEFORE}, 
+\texttt{AFTER}, \texttt{WHILE}, \texttt{IF}, etc., are ignored.
+
+
+\begin{Lentry}
+
+\item[{\tt CCTK\_RECOVER\_PARAMETERS}]
+        Used by thorns with relevant I/O methods as the point 
+        to read parameters when recovering from checkpoint files.
+        Grid variables are not available in this timebin.  Scheduling
+	in this timebin is special (see above).
+
+\item[{\tt CCTK\_STARTUP}] 
+        Run before any grids are constructed, this is 
+        the timebin, for example, where grid independent information 
+        (e.g.\ output methods, reduction operators) is registered. 
+        Note that since no grids are setup at this point, grid 
+        variables cannot be used in routines scheduled here.
+
+\item[{\tt CCTK\_WRAGH}]
+        This timebin is executed when all parameters are known, but
+        before the driver thorn constructs the grid.  It should only
+        be used to set up information that is needed by the driver.
+
+\item[{\tt CCTK\_PARAMCHECK}] 
+        This timebin is for thorns to check the validity of
+        parameter combinations. This bin is also executed before the
+        grid hierarchy is made, so that routines scheduled here only
+        have access to the global grid size and the parameters.
+
+\item[{\tt CCTK\_PREREGRIDINITIAL}]
+        This timebin is used in mesh refinement settings.  It is
+        ignored for unigrid runs.  This bin is executed whenever the
+        grid hierarchy is about to change during evolution; compare
+        {\tt CCTK\_PREREGRID}.  Routines that decide the
+        new grid structure should be scheduled in this bin.
+
+\item[{\tt CCTK\_POSTREGRIDINITIAL}]
+        This timebin is used in mesh refinement settings.  It is
+        ignored for unigrid runs.  This bin is executed whenever the
+        grid hierarchy or patch setup has changed during evolution;
+        see {\tt CCTK\_POSTREGRID}.  It is, e.g.
+        necessary to re-apply the boundary conditions or recalculate
+        the grid points' coordinates after every changing the grid
+        hierarchy.
+
+\item[{\tt CCTK\_BASEGRID}]
+        This timebin is executed very early after a driver thorn
+        constructs grid; this bin should only be used to set up
+        coordinate systems on the newly created grids.
+
+\item[{\tt CCTK\_INITIAL}] 
+        This is the place to set up any required initial data. This timebin
+        is not run when recovering from a checkpoint file.
+
+\item[{\tt CCTK\_POSTINITIAL}]
+        This is the place to modify initial data, or to calculate data
+        that depend on the initial data.  This timebin is also not run
+        when recovering from a checkpoint file.
+        
+\item[{\tt CCTK\_POSTRESTRICTINITIAL}]
+        This timebin is used only in mesh refinement settings.  It is
+        ignored for unigrid runs.  This bin is executed after each
+        restriction operation while initial data are set up; compare
+        {\tt CCTK\_POSTRESTRICT}.  It is,
+        e.g. necessary to re-apply the
+        boundary conditions after every restriction operation.
+
+\item[{\tt CCTK\_POSTPOSTINITIAL}]
+        This is the place to modify initial data, or to calculate data
+        that depend on the initial data.  This timebin is executed
+        after the recursive initialisation of finer grids if there is
+        a mesh refinement hierarchy, and it is also not run
+        when recovering from a checkpoint file.
+
+\item[{\tt CCTK\_RECOVER\_VARIABLES}]
+        Used by thorns with relevant I/O methods as the point 
+        to read in all the grid variables when recovering from 
+        checkpoint files.
+        
+\item[{\tt CCTK\_POST\_RECOVER\_VARIABLES}]
+        This timebin exists for scheduling any functions which need 
+        to modify grid variables after recovery.
+
+\item[{\tt CCTK\_CPINITIAL}]
+        Used by thorns with relevant I/O methods as the point to checkpoint
+        initial data if required.
+
+\item[{\tt CCTK\_CHECKPOINT}]
+        Used by thorns with relevant I/O methods as the point to checkpoint
+        data during the iterative loop when required.
+
+\item[{\tt CCTK\_PREREGRID}]
+        This timebin is used in mesh refinement settings.  It is
+        ignored for unigrid runs.  This bin is executed whenever the
+        grid hierarchy is about to change during evolution; compare
+        {\tt CCTK\_PREREGRIDINITIAL}.  Routines that decide the
+        new grid structure should be scheduled in this bin.
+
+\item[{\tt CCTK\_POSTREGRID}]
+        This timebin is used in mesh refinement settings.  It is
+        ignored for unigrid runs.  This bin is executed whenever the
+        grid hierarchy or patch setup has changed during evolution;
+        see {\tt CCTK\_POSTREGRIDINITIAL}.  It is, e.g.
+        necessary to re-apply the boundary conditions or recalculate
+        the grid points' coordinates after every changing the grid
+        hierarchy.
+                
+\item[{\tt CCTK\_PRESTEP}]
+        The timebin for scheduling any routines which need to be 
+        executed before any routines in the main evolution step. This 
+        timebin exists for thorn writers convenience, the {\tt BEFORE}, 
+        {\tt AFTER}, etc., functionality of the {\tt schedule.ccl} file
+        should allow all functions to be scheduled in the main {\tt CCTK\_EVOL}
+        timebin.
+        
+\item[{\tt CCTK\_EVOL}]
+        The timebin for the main evolution step.
+        
+\item[{\tt CCTK\_POSTRESTRICT}]
+        This timebin is used only in mesh refinement settings.  It is
+        ignored for unigrid runs.  This bin is executed after each
+        restriction operation during evolution; compare {\tt
+          CCTK\_POSTRESTRICTINITIAL}.  It is, e.g. necessary to
+        re-apply the
+        boundary conditions after every restriction operation.
+
+\item[{\tt CCTK\_POSTSTEP}]
+        The timebin for scheduling any routines which need to be 
+        executed after all the routines in the main evolution step. This 
+        timebin exists for thorn writers convenience, the {\tt BEFORE}, 
+        {\tt AFTER}, etc.,\ functionality of the {\tt schedule.ccl} file
+        should allow all functions to be scheduled in the main {\tt CCTK\_EVOL}
+        timebin.
+
+\item[{\tt CCTK\_ANALYSIS}]
+        The {\tt ANALYSIS} timebin is special, in that it is closely coupled 
+        with output, and routines which are scheduled here are typically
+        only executed if output of analysis variables is required. 
+        Routines which perform analysis should be independent of the main 
+        evolution loop (that is, it should not matter for the results
+        of a simulation whether routines in this timebin are executed or 
+        not). 
+
+\item[{\tt CCTK\_TERMINATE}]
+        Called after the main iteration loop when Cactus terminates. 
+        Note that sometime, in this timebin, a driver thorn should be 
+        destroying the grid hierarchy and removing grid variables. 
+
+\item[{\tt CCTK\_SHUTDOWN}]
+        Cactus final shutdown routines, after the grid hierarchy has been 
+        destroyed. Grid variables are no longer available.
+
+\end{Lentry}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Flesh Parameters}
+
+The flesh parameters are defined in the file {\tt src/param.ccl}.
+
+\section{Private Parameters}
+
+Here, the default value is shown in square brackets, while curly braces show allowed parameter values.
+
+\begin{Lentry}
+
+\item[{\tt allow\_mixeddim\_gfs}]
+Allow use of GFs from different dimensions [{\tt no}]
+
+\item [{\tt cctk\_brief\_output}]
+Give only brief output [{\tt no}]
+
+\item[{\tt cctk\_full\_warnings}]
+Give detailed information for each warning statement [{\tt yes}]
+
+\item [{\tt cctk\_run\_title}]
+Description of this simulation [{\tt ""}]
+
+\item [{\tt cctk\_show\_banners}]
+Show any registered banners for the different thorns [{\tt yes}]
+
+\item [{\tt cctk\_show\_schedule}]
+Print the scheduling tree to standard output [{\tt yes}]
+
+\item[{\tt cctk\_strong\_param\_check}]
+Die on parameter errors in {\tt CCTK\_PARAMCHECK} [{\tt yes}]
+
+\item[{\tt cctk\_timer\_output}]
+Give timing information [{\tt off}] \{{\tt off, full}\}
+
+\item[{\tt recovery\_mode}]
+How to behave when recovering from a checkpoint [{\tt strict}] \{{\tt strict, relaxed}\}
+
+\item[{\tt highlight\_warning\_messages}]
+Highlight CCTK warning messages [{\tt yes}]
+
+\item[{\tt info\_format}]
+Specifies the content and format of \code{CCTK\_INFO()}/\code{CCTK\_VInfo()}
+messages. [{\tt basic}]
+% don't want lines broken in the middle of one of the keywords!!
+\{%%%
+\hbox{{\tt "basic"}},
+\hbox{{\tt "numeric time stamp"}},
+\hbox{{\tt "human-readable time stamp"}},\\
+\hbox{{\tt "full time stamp"}}%%%
+\}
+
+\end{Lentry}
+
+\section{Restricted Parameters}
+
+\begin{Lentry}
+
+\item [{\tt cctk\_final\_time}] Final time for evolution, overridden by
+{\tt cctk\_itlast} unless it is positive [{\tt -1.0}]
+
+\item[{\tt cctk\_initial\_time}]
+Initial time for evolution [{\tt 0.0}]
+
+\item [{\tt cctk\_itlast}]
+Final iteration number [{\tt 10}]
+
+\item [{\tt max\_runtime}]
+Terminate evolution loop after a certain elapsed runtime (in minutes); set to zero to disable this termination condition [{\tt 0}]
+
+\item [{\tt terminate}]
+Condition on which to terminate evolution loop [{\tt iteration}] \{{\tt never, iteration, time, runtime, any, all}\}
+
+\item [{\tt terminate\_next}]
+Terminate on next iteration ? [{\tt no}]
+
+\end{Lentry}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Using TRAC}
+\label{sec:Appendix.trac}
+
+TRAC is a web-based tool for tracking bug reports and feature
+requests.  Cactus bugs and feature requests are handled using the TRAC
+system hosted by the Einstein Toolkit consortium at
+\url{http://trac.einsteintoolkit.org}.  Click on {\em New Ticket} to
+create a new ticket in the system.
+
+Here, we briefly describe the main categories when creating a Cactus
+problem report.
+\begin{Lentry}
+\item[{\bf Summary}] A brief and informative subject line.
+
+\item[{\bf Description}] Describe your problem precisely, if you get a
+  core dump, include the stack trace, and if possible give the minimal
+  number of thorns, this problems occurs with.  Describe how to
+  reproduce the problem if it is not clear.  Note that the description
+  field (and the comments) allow a wiki-style syntax.  This means that
+  blocks of code or error messages should be surrounded by \{\{\{
+  ... \}\}\} in order to avoid the text being interpreted as wiki
+  markup.  Click on the WikiFormatting link to learn more about the
+  available markup.
+
+\item[{\bf Type}] Choose {\em defect} for cases where there is clearly
+something wrong and {\em enhancement} for a feature request.
+
+\item[{\bf Priority}] Pick whichever level is appropriate.  {\em
+  Blocker} for issues that stop you using the code, {\em critical} for
+  very serious problems, {\em major} for things which should
+  definitely be addressed, {\em minor} for things which would be good
+  to fix but not essential, and {\em optional} for very low priority
+  items.  If in doubt, choose either {\em major} or {\em minor}.
+
+\item[{\bf Milestone}] This is used by the maintainers to indicate an
+  intention to fix the problem before a particular release of Cactus.
+
+\item[{\bf Component}] Use {\em Cactus} for problems related to the
+  Cactus flesh or one of the thorns in one of the Cactus arrangements
+  (those in arrangements with names starting ``Cactus'').
+
+\item[{\bf Version}] The Cactus release you are using. You can find
+  this out, for example, from an executable by typing {\tt
+    cactus\_<config> -v}. % FIXME: We don't list Cactus versions in
+                          % TRAC, only ET versions.
+
+\item[{\bf Keywords}] Here you can enter a space-separated list of
+  keywords which might be useful for people searching for specific
+  types of tickets.  For example, you could enter the thorn name if
+  the problem is with a specific thorn, the keyword {\em testsuite} if
+  the ticket is related to a test failure, or the keyword {\em
+    documentation} if the problem is related to the documentation.
+
+\item[{\bf CC}] Email addresses of people who should be emailed on any
+  change to the ticket, such as a comment being added.
+
+\item[{\bf Email or username}] Your email address, so we can get in
+  contact with you.
+\end{Lentry}
+
+If you have an account on the computer systems at CCT, you can log in
+to the TRAC system in order to be recognised.  Otherwise, your
+comments will appear as ``anonymous''.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Using SVN}
+\label{sec:Appendix.svn}
+SVN is a version control system, which allows you to  keep
+old versions of files (usually source code), log of
+when, and why changes occurred, and who made them,  etc.
+SVN does not just operate on one file at a
+time or one directory at a time,  but
+operates  on  hierarchical collections of directories consisting of
+version controlled files.  SVN helps to  manage
+releases  and  to control the concurrent editing of source
+files among multiple  authors. SVN can be obtained from
+\url{http://subversion.apache.org}, but is usually available on workstations, or
+can be easily installed using a package manager.
+
+An SVN \textit{repository} located on a \textit{server} contains a
+hierarchy of directory and files, and any subdirectory can be checked
+out independently.  The Cactus flesh and the Cactus arrangements are
+organized as repositories on the server {\tt svn.cactuscode.org}.  You
+can browse the contents of this repository using a web browser at the
+URL \url{http://svn.cactuscode.org}.
+
+You do not need to know about SVN in order to download or update
+Cactus using the GetComponents script, though you must have SVN
+installed.  In order to contribute changes to Cactus files or your own
+thorns, which may also be stored in SVN, you will need a basic
+understanding of SVN.  For more information about 
+
+\section{Essential SVN Commands}
+
+Assuming that you have checked out Cactus using the GetComponents
+script, the following commands are the minimum you will need in order
+to work with SVN in Cactus.
+
+\begin{Lentry}
+
+\item[{\bf svn update}]
+Execute  this  command  from  \emph{within}  your  working
+directory  when  you  wish  to  update your
+copies of source  files  from  changes  that  other
+developers have made to the source in the repository.
+Merges are performed automatically when possible, a warning is issued
+if manual  resolution  is  required  for conflicting  changes. 
+
+\item[{\bf svn add} {\tt file}]
+Use this command to enroll new files in SVN records
+of your working directory.  The files will be added
+to the  repository  the  next  time  you  run  `{\tt svn
+commit}'.
+
+\item[{\bf svn commit} {\tt file}]
+Use this command to add your local changes to the source to
+the repository and, thereby, making it publically available to
+checkouts and updates by other users. You cannot commit a
+newly created file unless you have \emph{added} it.
+
+\item[{\bf svn diff} {\tt file}]
+Show differences between a file in your working directory
+and  a file in the source repository, or between two revisions in
+source repository.  (Does not change either repository or working
+directory.) For example, to see the difference between versions
+{\tt 1.8} and {\tt 1.9} of a file {\tt foobar.c}:
+
+{\tt
+\begin{verbatim}
+svn diff -r 1.8 1.9 foobar.c
+\end{verbatim}
+}
+
+\item[{\bf svn remove} {\tt file}]
+Remove files from the source repository, pending  an {\tt svn commit} on
+the same files.
+
+\item[{\bf svn status} {[}file{]}]
+This command returns the current status of your local copy relative to
+the repository: e.g.\ it indicates local modifications and possible
+updates.
+
+\end{Lentry}
+
+For more information about using SVN, you can read the documentation
+provided at \url{http://svnbook.red-bean.com}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Using Tags}
+\label{sec:Appendix.tags}
+Finding your way around in the Cactus structure can be pretty
+difficult to handle. To make life easier there is support for \textit{tags},
+which lets you browse the code easily from within Emacs/XEmacs or {\tt vi}.
+A tags database can be generated with {\tt gmake}:
+
+\section{Tags with Emacs}
+
+The command {\tt gmake TAGS} will create a database for a routine reference
+table to be used within Emacs. This database can be accessed within
+Emacs if you add either of the following lines to your {\tt .emacs} file:\\
+{\tt (setq tags-file-name "CACTUS\_HOME/TAGS")} XOR \\
+{\tt (setq tag-table-alist '(("CACTUS\_HOME" . "CACTUS\_HOME/TAGS")))}\\
+where {\tt CACTUS\_HOME} is your Cactus directory.\\
+
+You can now easily navigate your Cactus flesh and Toolkits by searching for
+functions or ``tags'':
+\begin{enumerate}
+\item \textbf{ Alt.} will find a tag
+\item \textbf{ Alt,} will find the next matching tag
+\item \textbf{ Alt*} will go back to the last matched tag
+\end{enumerate}
+If you add the following lines to your {\tt .emacs} file, the
+files found with tags will opened in \emph{read-only} mode:
+\begin{verbatim}
+(defun find-tag-readonly (&rest a)
+  (interactive)
+  (call-interactively `find-tag a)
+  (if (eq nil buffer-read-only) (setq buffer-read-only t))  )
+
+(defun find-tag-readonly-next (&rest a)
+  (interactive)
+  (call-interactively `tags-loop-continue a)
+  (if (eq nil buffer-read-only) (setq buffer-read-only t))  )
+
+(global-set-key [(control meta \.)] 'find-tag-readonly)
+(global-set-key [(control meta \,)] 'find-tag-readonly-next)
+\end{verbatim}
+The key strokes to use when you want to browse in read-only mode are:
+\begin{enumerate}
+\item \textbf{CTRL Alt.} will find a tag and open the file in read-only mode
+\item \textbf{CTRL Alt,} will find the next matching tag in read-only mode
+\end{enumerate}
+
+\section{Tags with \code{vi}}
+
+The commands available are highly dependent upon the version of \code{vi}, but
+the following is a selection of commands which may work.
+
+
+\begin{enumerate}
+
+\item \textbf{vi -t tag}
+Start {\tt vi} and position the cursor at the file and line where `tag' is defined.
+
+\item \textbf{Control-{]}}
+Find the tag under the cursor.
+
+\item \textbf{:ta tag}
+Find a tag.
+
+\item \textbf{:tnext}
+Find the next matching tag.
+
+\item \textbf{:pop}
+Return to previous location before jump to tag.
+
+\item \textbf{Control-T}
+Return to previous location before jump to tag (not widely implemented).
+
+\end{enumerate}
+
+\vspace{1.1cm}
+
+\emph{Note: Currently some of the \texttt{CCTK\_FILEVERSION()} macros
+at the top of every source file don't have a trailing semicolon, which
+confuses the \texttt{etags} and \texttt{ctags} programs, so tags does not
+find the first subroutine in any file with this problem.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{cactuspart}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "UsersGuide"
+%%% End: 

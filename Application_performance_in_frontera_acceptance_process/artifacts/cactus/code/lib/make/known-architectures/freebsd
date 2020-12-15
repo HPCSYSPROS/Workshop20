@@ -1,0 +1,43 @@
+#! /bin/sh
+# /*@@
+#   @file    freebsd
+#   @date    Tue 20 Jan 2004
+#   @author  Thomas Radke
+#   @desc
+#            generic known-architectures file for all versions of FreeBSD
+#   @enddesc
+#   @version $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/known-architectures/freebsd,v 1.1 2004-01-20 13:08:10 tradke Exp $
+# @@*/
+
+if test "$CCTK_CONFIG_STAGE" = "preferred-compilers" ; then
+
+:
+
+else
+
+  # Fortran code needs g2c library
+  : ${LIBS='g2c m'}
+
+  ARFLAGS=-ruc
+  USE_RANLIB=yes
+  RANLIBFLAGS=
+
+  # Cache stuff
+  # there doesn't seem to be any way to find out the cache size under OpenBSD
+  if test -z "$L2_CACHELINE_BYTES" ; then
+    L2_CACHELINE_BYTES=0
+    echo "Setting L2_CACHELINE_BYTES to $L2_CACHELINE_BYTES"
+  fi
+
+  if test -z "$L2_CACHE_SIZE" ; then
+    L2_CACHE_SIZE="0*1024"
+    echo "Setting L2_CACHE_SIZE to $L2_CACHE_SIZE bytes"
+  fi
+
+
+  # MPI stuff
+  #
+  # FreeBSD has no native MPI, so we don't set any NATIVE_MPI_XXX variables.
+  # This is caught by lib/make/extras/MPI/NATIVE then.
+
+fi

@@ -1,0 +1,129 @@
+# Parameter definitions for flesh
+# $Header$
+
+
+private:
+
+STRING cctk_run_title "Description of this simulation" STEERABLE=RECOVER
+{
+  ".*" :: "Any string"
+} ""
+
+KEYWORD cctk_timer_output  "Provide output from timers" STEERABLE=RECOVER
+{
+  "off"  :: "No timer output"
+  "full" :: "Detailed timer output"
+} "off"
+
+# FIXME: this should be deprecated in favor of a new  warn_format
+#        parameter analogous to  info_format
+BOOLEAN cctk_full_warnings "Give detailed information for each warning statement" STEERABLE=ALWAYS
+{
+} "no"
+
+BOOLEAN highlight_warning_messages "Highlight CCTK warning messages ?" STEERABLE=ALWAYS
+{
+} "yes"
+
+KEYWORD info_format "What information do CCTK_INFO() and CCTK_VInfo() print?"
+{
+# This is the traditional Cactus INFO output.
+"basic" :: "INFO (ThornName): message"
+
+# This prefixes each line with a numeric wall-clock time stamp, in
+# units of seconds, followed by a tab ("\t") character.  The time stamp
+# might be either an integer or a floating-point number, depending
+# on the timing resolution available.  The time stamp is placed at
+# the start of the line, and delimited by a tab character, to make
+# it easy to use various data analysis tools on the resulting output.
+"numeric time stamp" :: "numeric_timestamp\tINFO (ThornName): message"
+
+# This prefixes each line with a human-readable time stamp in the
+# format returned by  ctime(3) , followed by a ": ".
+"human-readable time stamp" :: \
+    "human readable timestamp: INFO (ThornName): message"
+
+# This prefixes each line with a numeric wall-clock time stamp, in
+# units of seconds, followed by a tab ("\t") character, followed by
+# a human-readable time stamp in the format returned by  ctime(3) ,
+# followed by a ": ".
+"full time stamp" :: \
+    "numeric_timestamp\thuman readable timestamp: INFO (ThornName): message"
+} "basic"
+
+BOOLEAN cctk_strong_param_check "Die on parameter errors in CCTK_PARAMCHECK"
+{
+} "yes"
+
+BOOLEAN cctk_show_schedule "Print the scheduling tree to standard output"
+{
+} "yes"
+
+BOOLEAN cctk_show_banners "Show any registered banners for the different thorns"
+{
+} "yes"
+
+BOOLEAN cctk_brief_output "Give only brief output"
+{
+} "no"
+
+BOOLEAN allow_mixeddim_gfs "Allow use of GFs from different dimensions"
+{
+} "no"
+
+KEYWORD recovery_mode "How to behave when recovering from a checkpoint" STEERABLE=RECOVER
+{
+  "strict"  :: "All CCTK variables must be recovered successfully, no INITIAL timebins will be scheduled"
+  "relaxed" :: "Recover variables if possible, after INITIAL timebins have been scheduled"
+} "strict"
+
+# these options are intended to help debugging schedule files. Do not rely on
+# them to ensure any particular ordering.
+KEYWORD schedule_sort_mode "How to behave when no explicit ordering is prescribed between itemse" STEERABLE=RECOVER
+{
+  "none"       :: "no special ordering is enforced"
+  "ascending"  :: "sorted alphabetically by thorn name and item name"
+  "descending" :: "sorted in reverse alphabetical order by thorn name and item name"
+} "none"
+
+BOOLEAN schedule_sort_warnings "Output warnings if a schedule item refers to a non-existing item for ordering"
+{
+} "no"
+
+restricted:
+
+BOOLEAN terminate_next "Terminate on next iteration?" STEERABLE=ALWAYS
+{
+} "no"
+
+KEYWORD terminate "Condition on which to terminate evolution loop" STEERABLE=ALWAYS
+{
+  "never"     :: "Never terminate"
+  "iteration" :: "Take termination condition from iteration number"
+  "time"      :: "Take termination condition from coordinate time"
+  "runtime"   :: "Take termination condition from elapsed runtime"
+  "any"       :: "Take termination condition from any of iteration number, coordinate time, or elapsed runtime"
+  "all"       :: "Take termination condition from all of iteration number, coordinate time, and elapsed runtime"
+  "either"    :: "Take termination condition from either iteration number or coordinate time (DEPRECATED IN BETA14)"
+  "both"      :: "Take termination condition from both iteration number and coordinate time (DEPRECATED IN BETA14)"
+} "iteration"
+
+REAL cctk_initial_time "Initial time for evolution"
+{
+  : :: "Anything"
+} 0.0
+
+REAL cctk_final_time "Final time for evolution" STEERABLE=ALWAYS
+{
+  : :: "Anything"
+} -1.0
+
+INT cctk_itlast "Final iteration number" STEERABLE = ALWAYS
+{
+  : :: "Any integer"
+} 10
+
+REAL max_runtime "Terminate evolution loop after a certain elapsed runtime (in minutes)" STEERABLE = ALWAYS
+{
+  0.0: :: "Zero disables maximum runtime condition"
+} 0.0

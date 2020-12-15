@@ -1,0 +1,14 @@
+Cactus Code Thorn Timers
+Author(s)    : Erik Schnetter <schnetter@gmail.com>
+Maintainer(s): Erik Schnetter <schnetter@gmail.com>
+Licence      : n/a
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Provide various kinds of timers:
+
+CactusTimer:    C++ wrapper around standard Cactus timers
+CactusTimerSet: knows about all CactusTimers that were ever created
+Timer:          hierarchical set of CactusTimers
+TimerTree:      helper class for Timer

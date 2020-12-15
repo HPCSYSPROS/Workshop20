@@ -1,0 +1,12 @@
+# /*@@
+#   @file    make.config.deps.in
+#   @date    Sun Sep 25 2005
+#   @author  Erik Schnetter
+#   @desc
+#            Make definition file for a configuration
+#            Defines dependencies, etc.
+#
+#            Should be run through autoconf to produce make.config.deps
+#   @enddesc
+#   @version $Header$
+# @@*/

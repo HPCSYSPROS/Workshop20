@@ -1,0 +1,98 @@
+
+# $Header:$
+
+Cactus::cctk_initial_time = 0
+Cactus::cctk_itlast = 1024
+
+
+
+ActiveThorns = "IOUtil Carpet CarpetLib CycleClock CarpetRegrid CarpetInterp CarpetReduce LoopControl CarpetSlab InitBase"
+
+driver::global_nx = 3240
+driver::global_ny = 10
+driver::global_nz = 10
+driver::ghost_size = 2
+
+#Carpet::verbose = yes
+#Carpet::veryverbose = yes
+Carpet::max_refinement_levels = 3
+Carpet::prolongation_order_space = 3
+Carpet::prolongation_order_time = 2
+#Carpet::init_3_timelevels = yes
+Carpet::init_each_timelevel = yes
+InitBase::initial_data_setup_method="init_single_level"
+
+#CarpetLib::output_bboxes = yes
+
+CarpetRegrid::refinement_levels = 2
+CarpetRegrid::refined_regions = manual-gridpoint-list
+CarpetRegrid::gridpoints = "[[ ([330,4,4]:[966,12,12]:[2,2,2]) ]]"
+CarpetRegrid::outerbounds = "[[ [[0,0],[1,1],[1,1]] ]]"
+
+
+
+ActiveThorns = "LocalInterp NaNChecker Slab"
+
+
+ActiveThorns = "Boundary CoordBase SymBase CartGrid3D Periodic"
+
+grid::domain = full
+grid::type = byrange
+grid::xmin = -0.00625
+grid::ymin = -0.00625
+grid::zmin = -0.00625
+grid::xmax = +1.003125
+grid::ymax = +0.00625
+grid::zmax = +0.00625
+
+Periodic::periodic = yes
+
+
+
+ActiveThorns = "Time MoL"
+
+Time::dtfac = 0.25
+
+MoL::ODE_Method = ICN
+
+#MoL::ODE_Method = RK2
+#MoL::MoL_Intermediate_Steps = 2
+
+
+
+ActiveThorns = "IDScalarWaveMoL WaveToyMoL"
+
+IDScalarWaveMoL::wave_number[0] = 1.0
+
+
+
+#ActiveThorns = "Dissipation"
+#
+#Dissipation::epsdis = 0.1
+#Dissipation::timelevel = "n+1"
+#Dissipation::vars = "WaveToyMoL::scalarevolve"
+
+
+
+ActiveThorns = "CarpetIOBasic CarpetIOASCII SystemStatistics CarpetIOScalar"
+
+IO::out_dir = $parfile
+
+IOBasic::outInfo_every = 256
+IOBasic::outInfo_reductions          = "minimum maximum"
+IOBasic::outInfo_vars = "SystemStatistics::maxrss_mb SystemStatistics::driver_grid_structure"
+ 
+IOScalar::one_file_per_group         = yes
+IOScalar::outScalar_every            = 256
+IOScalar::outScalar_reductions       = "minimum maximum average"
+IOScalar::outScalar_vars             = "SystemStatistics::process_memory_mb SystemStatistics::driver_memory"
+
+#IOASCII::output_all_timelevels = yes
+
+IOASCII::out1D_every = 256
+IO::out_yline_x = 0.5
+IO::out_zline_x = 0.5
+IOASCII::out1D_vars = "WaveToyMoL::scalarevolve IDScalarWaveMoL::scalarevolveerror"
+
+#IOASCII::out3D_every = 256
+#IOASCII::out3D_vars = "WaveToyMoL::scalarevolve IDScalarWaveMoL::scalarevolveerror"

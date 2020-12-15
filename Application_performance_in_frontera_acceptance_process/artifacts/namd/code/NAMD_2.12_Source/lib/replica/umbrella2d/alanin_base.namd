@@ -1,0 +1,24 @@
+# shared simulation options for replica exchange
+
+timestep	1.0
+
+structure	alanin.psf
+coordinates	alanin.pdb
+
+margin		10.0
+stepspercycle	100
+parameters	alanin.params
+exclude		scaled1-4
+1-4scaling	0.4
+switching 	on
+switchdist	7.0
+cutoff		8.0
+pairlistdist 	10.0
+
+colvars         on
+colvarsConfig   colvars.conf
+
+langevin on
+langevinDamping 10.0
+langevinTemp $temperature
+

@@ -1,0 +1,52 @@
+# Interface definition for thorn CartesianCoordinates
+
+implements: Coordinates
+inherits: Grid
+
+CCTK_INT FUNCTION                         \
+    MultiPatch_GetMap                     \
+        (CCTK_POINTER_TO_CONST IN cctkGH) 
+PROVIDES FUNCTION MultiPatch_GetMap       \
+    WITH CartesianCoordinates_GetMap      \
+    LANGUAGE C
+
+public:
+
+int general_coordinates type=SCALAR tags='checkpoint="no"' \
+  "Compute derivatives for generalised coordinates, involving a non-trivial Jacobian"
+
+int interpolate_boundary_points type=SCALAR tags='checkpoint="no"' \
+  "Interpolate to points which are on both an inter-patch boundary and an outer boundary"
+
+int jacobian_state type=SCALAR tags='checkpoint="no"' \
+  "State of storage for jacobian"
+
+int jacobian_derivative_state type=SCALAR tags='checkpoint="no"' \
+  "State of storage for derivative of jacobian"
+
+int inverse_jacobian_state type=SCALAR tags='checkpoint="no"' \
+  "State of storage for inverse jacobian"
+
+int volume_form_state type=SCALAR tags='checkpoint="no"' \
+  "State of storage for volume form"
+
+
+real jacobian type=GF timelevels=1 tags='checkpoint="no" prolongation="none"'
+{
+  J11, J12, J13, J21, J22, J23, J31, J32, J33
+} "Jacobian d[global]/d[local] of the coordinate transformation"
+
+real inverse_jacobian type=GF timelevels=1 tags='checkpoint="no" prolongation="none"'
+{
+  iJ11, iJ12, iJ13, iJ21, iJ22, iJ23, iJ31, iJ32, iJ33
+} "Jacobian J_(ik) = dx^i/da^k of the inverse coordinate transformation (a: local, x: global)"
+
+real jacobian2 type=GF timelevels=1 tags='checkpoint="no" prolongation="none"'
+{
+  dJ111, dJ112, dJ113, dJ122, dJ123, dJ133,
+  dJ211, dJ212, dJ213, dJ222, dJ223, dJ233,
+  dJ311, dJ312, dJ313, dJ322, dJ323, dJ333,
+} "Derivative of the Jacobian  d^2[global]/d[local]^2"
+	
+
+real volume_form type=GF timelevels=1 tags='checkpoint="no" prolongation="none"' "Determinant of Jacobian and nominal grid mask"

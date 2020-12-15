@@ -1,0 +1,65 @@
+/*@@
+  @header   CHR1_guts.h
+  @date     Jun 98
+  @author   Gabrielle Allen
+  @desc
+  Macro to calculate Christoffel symbols of the first kind. 
+
+  That is CHR1_cab = 1/2 (g_ac,b + gbc,a - gab,c)
+
+  @enddesc
+@@*/
+
+#ifndef CHR1_GUTS
+#define CHR1_GUTS
+
+#include "DG_guts.h"
+
+#ifdef FCODE 
+
+      CHR1_XXX = DXDG_DXDGXX*0.5
+      CHR1_XXY = DYDG_DYDGXX*0.5
+      CHR1_XXZ = DZDG_DZDGXX*0.5
+      CHR1_XYY = -DXDG_DXDGYY*0.5 + DYDG_DYDGXY
+      CHR1_XYZ = (-DXDG_DXDGYZ + DYDG_DYDGXZ + DZDG_DZDGXY)*0.5
+      CHR1_XZZ = -DXDG_DXDGZZ*0.5 + DZDG_DZDGXZ
+      CHR1_YXX = DXDG_DXDGXY - DYDG_DYDGXX*0.5
+      CHR1_YXY = DXDG_DXDGYY*0.5
+      CHR1_YXZ = ( DXDG_DXDGYZ - DYDG_DYDGXZ + DZDG_DZDGXY)*0.5
+      CHR1_YYY = DYDG_DYDGYY*0.5
+      CHR1_YYZ = DZDG_DZDGYY*0.5
+      CHR1_YZZ = -DYDG_DYDGZZ*0.5 + DZDG_DZDGYZ
+      CHR1_ZXX =  DXDG_DXDGXZ - DZDG_DZDGXX*0.5
+      CHR1_ZXY = ( DXDG_DXDGYZ + DYDG_DYDGXZ - DZDG_DZDGXY)*0.5
+      CHR1_ZXZ = DXDG_DXDGZZ*0.5
+      CHR1_ZYY = DYDG_DYDGYZ - DZDG_DZDGYY*0.5
+      CHR1_ZYZ = DYDG_DYDGZZ*0.5
+      CHR1_ZZZ = DZDG_DZDGZZ*0.5
+
+#endif
+
+#ifdef CCODE
+
+      CHR1_XXX = DXDG_DXDGXX*0.5;
+      CHR1_XXY = DYDG_DYDGXX*0.5;
+      CHR1_XXZ = DZDG_DZDGXX*0.5;
+      CHR1_XYY = -DXDG_DXDGYY*0.5 + DYDG_DYDGXY;
+      CHR1_XYZ = (-DXDG_DXDGYZ + DYDG_DYDGXZ + DZDG_DZDGXY)*0.5;
+      CHR1_XZZ = -DXDG_DXDGZZ*0.5 + DZDG_DZDGXZ;
+      CHR1_YXX = DXDG_DXDGXY - DYDG_DYDGXX*0.5;
+      CHR1_YXY = DXDG_DXDGYY*0.5;
+      CHR1_YXZ = ( DXDG_DXDGYZ - DYDG_DYDGXZ + DZDG_DZDGXY)*0.5;
+      CHR1_YYY = DYDG_DYDGYY*0.5;
+      CHR1_YYZ = DZDG_DZDGYY*0.5;
+      CHR1_YZZ = -DYDG_DYDGZZ*0.5 + DZDG_DZDGYZ;
+      CHR1_ZXX =  DXDG_DXDGXZ - DZDG_DZDGXX*0.5;
+      CHR1_ZXY = ( DXDG_DXDGYZ + DYDG_DYDGXZ - DZDG_DZDGXY)*0.5;
+      CHR1_ZXZ = DXDG_DXDGZZ*0.5;
+      CHR1_ZYY = DYDG_DYDGYZ - DZDG_DZDGYY*0.5;
+      CHR1_ZYZ = DYDG_DYDGZZ*0.5;
+      CHR1_ZZZ = DZDG_DZDGZZ*0.5;
+
+#endif
+
+#endif
+

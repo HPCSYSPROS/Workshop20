@@ -1,0 +1,44 @@
+!DESC "Octant evolution with radiation boundaries"
+
+# $Id: test_rad.par,v 1.2 2002/10/24 21:11:53 schnetter Exp $
+#
+# /*@@
+#   @file      test_rad.par
+#   @date      Saturday 18th September
+#   @author    Gabrielle Allen
+#   @desc
+#   Wavetoy parameter file demonstrating radiation boundaries in Octant
+#   @enddesc
+# @@*/          
+
+ActiveThorns = "boundary idscalarwavec time wavetoyc carpet carpetlib carpetreduce cartgrid3d coordbase symbase ioutil iobasic carpetioascii"
+ 
+time::dtfac = 0.5
+
+idscalarwave::initial_data = "gaussian"
+idscalarwave::sigma = 2.8
+idscalarwave::radius = 5
+
+wavetoyc::bound = "radiation"
+
+grid::type = "BySpacing"
+grid::domain = "octant"
+grid::dxyz = 0.6
+
+driver::global_nx = 15
+driver::global_ny = 15
+driver::global_nz = 15
+
+cactus::cctk_itlast = 10
+
+IOBasic::outScalar_every = 1
+IOBasic::outScalar_vars = "wavetoy::phi"
+
+IOASCII::out1D_every = 1
+IOASCII::out1D_z = "no"
+IOASCII::out1D_y = "no"
+IOASCII::out1D_d = "no"
+IOASCII::out1D_vars = "wavetoy::phi "
+
+IO::out_dir       = "test_rad"
+IO::out_fileinfo = "none"

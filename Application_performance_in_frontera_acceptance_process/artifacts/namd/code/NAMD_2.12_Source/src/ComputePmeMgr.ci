@@ -1,0 +1,230 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+module ComputePmeMgr {
+  message PmeGridMsg {
+    int zlist[];
+    char fgrid[];
+    float qgrid[];
+  };
+  message PmeTransMsg {
+    float qgrid[];
+  };
+  message PmeSharedTransMsg;
+  message PmeUntransMsg{
+    float qgrid[];
+  };
+  message PmeSharedUntransMsg;
+
+  group PmePencilMap : CkArrayMap {
+    entry PmePencilMap(int i_a, int i_b, int n_b, int n, int d[n]);
+  };
+
+  message PmePencilInitMsg;
+
+  message PmeAckMsg;
+
+  message PmeEvirMsg {
+    PmeReduction evir[];
+  };
+
+  initproc void Pme_init();
+
+  array [3D] PmeZPencil {
+    entry PmeZPencil();
+    entry void recvGrid(PmeGridMsg *);
+    entry void recvUntrans(PmeUntransMsg *);
+    entry void recvAck(PmeAckMsg *);
+    entry void dummyRecvGrid(int pe, int done = 0);
+    entry void init(PmePencilInitMsg *initmsg) {
+      atomic {
+	// CkPrintf("z pencil init %d %d %d on %d\n",
+	// thisIndex.x, thisIndex.y, thisIndex.z, CkMyPe());
+	base_init(initmsg); delete initmsg;
+	work_zlist.resize(initdata.grid.dim3);
+	fft_init();
+	// now count how many nodes send us data
+	imsg = 0; grid_msgs.resize(0);
+      }
+      while ( ! imsg ) {
+        when dummyRecvGrid(int pe, int done) atomic {
+          if ( done ) imsg = 1;
+          else {
+            grid_msgs.add(0);  // increment size
+            // CkPrintf("pencil %d %d on node %d receive from node %d\n",
+	    // thisIndex.x, thisIndex.y, CkMyPe(), pe);
+          }
+        }
+      }
+      // atomic { CkPrintf("pencil %d %d receiving from %d nodes\n",
+      //       thisIndex.x, thisIndex.y, grid_msgs.size()); }
+
+      // ready to go
+      while ( 1 ) {
+        atomic { hasData = 0; }
+        for ( imsg=0; imsg < grid_msgs.size(); ++imsg ) {
+          when recvGrid(PmeGridMsg *msg) atomic "recv_grid" {
+            if ( msg->hasData ) hasData = 1;
+            recv_grid(msg); grid_msgs[imsg] = msg;
+          }
+        }
+	if ( hasData ) {
+	  atomic "forward_fft" { forward_fft(); }
+	}
+        atomic "send_trans" { send_trans(); }
+	if ( hasData ) {
+	  for ( imsg=0; imsg < initdata.zBlocks; ++imsg ) {
+	    when recvUntrans(PmeUntransMsg *msg) atomic "recv_untrans" {
+	      recv_untrans(msg); delete msg;
+	    }
+	  }
+	  atomic "backward_fft" { backward_fft(); }
+	}
+	atomic "send_ungrid" {
+	   send_all_ungrid();
+	}
+	if ( ! hasData ) {
+	  for ( imsg=0; imsg < initdata.zBlocks; ++imsg ) {
+	    when recvAck(PmeAckMsg *msg) atomic { delete msg; }
+	  }
+	}
+      }
+    };
+  };
+
+  array [3D] PmeYPencil {
+    entry PmeYPencil();
+    entry void recvTrans(PmeTransMsg *);
+    entry void recvUntrans(PmeUntransMsg *);
+    entry void recvAck(PmeAckMsg *msg);
+    entry void init(PmePencilInitMsg *initmsg) {
+      atomic {
+      //CkPrintf("y pencil init %d %d %d on %d\n",
+	//	thisIndex.x, thisIndex.y, thisIndex.z, CkMyPe());
+      base_init(initmsg); delete initmsg;
+      fft_init();
+      }
+      while ( 1 ) {
+        atomic { hasData = 0; }
+        for ( imsg=0; imsg < initdata.yBlocks; ++imsg ) {
+          when recvTrans(PmeTransMsg *msg) atomic "recv_trans" {
+            if ( msg->hasData ) hasData = 1;
+            needs_reply[msg->sourceNode] = msg->hasData;
+            recv_trans(msg); delete msg;
+          }
+        }
+       if ( hasData ) {
+        atomic "forward_fft" { forward_fft(); }
+       }
+        atomic "send_trans" { send_trans(); }
+       if ( hasData ) {
+        for ( imsg=0; imsg < initdata.yBlocks; ++imsg ) {
+          when recvUntrans(PmeUntransMsg *msg) atomic "recv_untrans" {
+            recv_untrans(msg); delete msg;
+          }
+        }
+        atomic "backward_fft" { backward_fft(); }
+        atomic "send_untrans0" { send_untrans(); }
+       } else {
+        atomic "send_untrans1" { send_untrans(); }
+        for ( imsg=0; imsg < initdata.yBlocks; ++imsg ) {
+	  when recvAck(PmeAckMsg *msg) atomic { delete msg; }
+        }
+       }
+      }
+    };
+  };
+
+  array [3D] PmeXPencil {
+    entry PmeXPencil();
+    entry void recvTrans(PmeTransMsg *);
+    entry void init(PmePencilInitMsg *initmsg) {
+      atomic {
+      //CkPrintf("x pencil init %d %d %d on %d\n",
+	//	thisIndex.x, thisIndex.y, thisIndex.z, CkMyPe());
+      base_init(initmsg); delete initmsg;
+      fft_init();
+      evir_init();
+      }
+      while ( 1 ) {
+        atomic { hasData = 0; }
+        for ( imsg=0; imsg < initdata.xBlocks; ++imsg ) {
+          when recvTrans(PmeTransMsg *msg) atomic "recv_trans" {
+            if ( msg->hasData ) hasData = 1;
+            needs_reply[msg->sourceNode] = msg->hasData;
+            recv_trans(msg); delete msg;
+          }
+        }
+       if ( hasData ) {
+        atomic "forward_fft" { forward_fft(); }
+        atomic "pme_kspace" { pme_kspace(); }
+        atomic "backward_fft" { backward_fft(); }
+       }
+       atomic "send_untrans" { send_untrans(); }
+      }
+    };
+  };
+
+  nodegroup NodePmeMgr {
+    entry NodePmeMgr(void);
+    entry void recvPencilMapProxies(CProxy_PmePencilMap xm, CProxy_PmePencilMap ym, CProxy_PmePencilMap zm);
+    entry [expedited] void recvTrans(PmeTransMsg *);
+    entry [expedited] void recvUntrans(PmeUntransMsg *);
+    // as of Charm++ 6.6.1 multicore builds run expedited nodegroup messages all on pe 0
+    // and it is not clear if expedited actually conveys any advantage to nodegroup messages
+    entry void sendDataHelper(int);
+    entry void sendPencilsHelper(int);
+    entry void recvUngrid(PmeGridMsg *);
+
+    // pencil comm management entries
+
+    //need exclusive segmentation of zpencils to implement recvZGrid optimally
+    entry  void recvZGrid(PmeGridMsg *);
+
+    // these are all mutually exclusive region copy ops, so safely reentrant
+    entry  void recvXTrans(PmeTransMsg *);
+    entry  void recvYTrans(PmeTransMsg *);
+    entry  void recvYUntrans(PmeUntransMsg *);
+    entry  void recvZUntrans(PmeUntransMsg *);    
+
+  };
+  group ComputePmeMgr {
+
+    entry ComputePmeMgr(void);
+
+    entry void initialize(CkQdMsg *);
+    entry void initialize_pencils(CkQdMsg *);
+    entry void activate_pencils(CkQdMsg *);
+    entry void pollChargeGridReady(void);  // CUDA
+    entry void recvChargeGridReady(void);  // CUDA
+    entry void sendDataHelper(int);
+    entry void sendPencilsHelper(int);
+    entry void recvGrid(PmeGridMsg *);
+    entry void gridCalc1(void);
+    entry void sendTransBarrier(void);
+    entry void sendTrans(void);
+    entry void recvSharedTrans(PmeSharedTransMsg *);
+    entry void recvTrans(PmeTransMsg *);
+    entry void gridCalc2(void);
+    entry void gridCalc2R(void);
+    entry void sendUntrans(void);
+    entry void recvSharedUntrans(PmeSharedUntransMsg *);
+    entry void recvUntrans(PmeUntransMsg *);
+    entry void gridCalc3(void);
+    entry void sendUngrid(void);
+    entry void recvUngrid(PmeGridMsg *);
+    entry void recvAck(PmeAckMsg *);
+    entry void ungridCalc(void);
+    entry void pollForcesReady(void);  // CUDA
+    entry void recvRecipEvir(PmeEvirMsg *);
+    entry void addRecipEvirClient(void);
+
+    entry void recvArrays(
+		CProxy_PmeXPencil, CProxy_PmeYPencil, CProxy_PmeZPencil);
+  };
+
+}
+

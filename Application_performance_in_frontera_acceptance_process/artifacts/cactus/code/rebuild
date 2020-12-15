@@ -1,0 +1,3 @@
+make distclean
+yes | make stampede2-knl-intel18-O3
+yes | sed s/yes/no/ | make stampede2-knl-intel18-O3

@@ -1,0 +1,41 @@
+#include "cctk.h"
+
+module cctk
+  use cctk_ActiveThorns
+  use cctk_Banner
+  use cctk_Comm
+  use cctk_CommandLine
+  use cctk_Complex
+  use cctk_Constants
+  use cctk_Coord
+  use cctk_DebugDefines
+  use cctk_Faces
+  use cctk_File
+  use cctk_Flesh
+  use cctk_FortranString1
+  use cctk_FortranWrappers
+  use cctk_GHExtensions
+  use cctk_GNU
+  use cctk_Groups
+  use cctk_GroupsOnGH
+  use cctk_IO
+  use cctk_IOMethods
+  use cctk_Interp
+  use cctk_Main
+  use cctk_Malloc1
+  use cctk_Math
+  use cctk_MemAlloc
+  use cctk_Misc
+  use cctk_ParamCheck
+  use cctk_Parameter
+  use cctk_Reduction
+  use cctk_Schedule
+  use cctk_Sync
+  use cctk_Termination
+  use cctk_Timers
+  use cctk_Types
+  use cctk_Version
+  use cctk_WarnLevel
+  use util_Table
+  implicit none
+end module cctk

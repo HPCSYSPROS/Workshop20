@@ -1,0 +1,66 @@
+
+STORAGE: center_of_mass_helpers[3]
+STORAGE: center_of_mass
+STORAGE: have_good_data
+
+  schedule ZelmaniCoMShift_LocalStuff IN MoL_PseudoEvolution
+  {
+    LANG: C
+  } "Perform Local mode operation"
+
+  schedule ZelmaniCoMShift_Init AT Initial
+  {
+    LANG: C
+  } "Set stuff to zero"
+
+  schedule ZelmaniCoMShift_LocalStuff AT PostRegrid
+  {
+    LANG: C
+  } "Perform Local mode operations"
+
+  schedule ZelmaniCoMShift_LocalStuff AT PostInitial
+  {
+    LANG: C
+  } "Perform Local mode operations"
+
+  schedule ZelmaniCoMShift_LocalStuff AT PostRegridInitial
+  {
+    LANG: C
+  } "Perform Local mode operations"
+
+  schedule ZelmaniCoMShift_LocalStuff AT PostRestrictInitial
+  {
+    LANG: C
+  } "Perform Local mode operation"
+
+  schedule ZelmaniCoMShift_LocalStuffRecover AT Post_Recover_Variables
+  {
+    LANG: C
+    OPTIONS: global loop-local
+  } "Perform Local mode operations"
+
+  schedule ZelmaniCoMShift_Reductions AT Post_Recover_Variables AFTER ZelmaniCoMShift_LocalStuffRecover
+  {
+    LANG: C
+    OPTIONS: global
+  } "Evaluate global quantities"
+
+
+  schedule ZelmaniCoMShift_Reductions AT POSTSTEP
+  {
+    LANG: C
+    OPTIONS: global
+  } "Evaluate global quantities"
+
+  schedule ZelmaniCoMShift_Output AT CCTK_ANALYSIS 
+  {
+    LANG: C
+    OPTIONS: global
+  } "Output Integral quantities"
+
+# This is not a good idea!
+#  schedule ZelmaniCoMShift_ChangeShift AT POSTSTEP AFTER ZelmaniCoMShift_Reductions
+#  {
+#    LANG: C
+#    OPTIONS: global loop-local
+#  } "Change Shift"

@@ -1,0 +1,22 @@
+#! /bin/sh
+
+if [ ! -n "$1" ]
+then
+  figpath="."
+else
+ figpath=$1
+fi
+
+files=`find ${figpath} -type f -name "*.pdf"`
+
+if [ -n "${files}" ]; then
+  echo "  Converting figures to postscript"
+fi
+
+for i in $files; do
+  psfilename=`echo $i | sed s/.pdf$/.ps/`
+  if [ "$i" != "documentation.pdf" ] && [ ! -e $psfilename ]; then
+    echo "   " `basename $i` " -> " `basename $psfilename`
+    pdf2ps $i $psfilename
+  fi
+done

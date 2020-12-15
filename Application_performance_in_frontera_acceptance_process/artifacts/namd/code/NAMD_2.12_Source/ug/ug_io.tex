@@ -1,0 +1,701 @@
+
+\section{Input and Output Files}
+\label{section:files}
+
+\NAMD\ was developed to be compatible with existing 
+molecular dynamics packages, 
+especially the packages X-PLOR 
+\mycite{(Br\"unger, 1992)}{BRUN92b}  
+and CHARMM \mycite{(Brooks \ETAL, 1983)}{BROO83}.  
+To achieve this compatibility,
+the set of input files which \NAMD\ uses to define 
+a molecular system are identical to the input files used by X-PLOR and CHARMM.  
+Thus it is trivial to move an existing simulation from
+X-PLOR or CHARMM to \NAMD.
+A description of these molecular system definition 
+files is given in Section \ref{section:formats}.  
+\prettypar
+In addition, the output file formats used by \NAMD\ 
+were chosen to be compatible with X-PLOR and CHARMM.  
+In this way the output from \NAMD\ can be analyzed using
+X-PLOR, CHARMM, or a variety of the other tools that have 
+been developed for the existing output file formats.  
+Descriptions of the output files formats are also given in 
+Section \ref{section:formats}.
+
+
+\subsection{File formats}
+\label{section:formats}
+
+\subsubsection{PDB files}
+The PDB (Protein Data Bank) format is used for
+coordinate, velocity, force, or other data 
+being read or written by NAMD.
+This is the standard format for coordinate data
+for most other molecular dynamics programs as well, including X-PLOR and CHARMM.
+A full description of this file format can be obtained from the PDB web site
+at {\tt http://www.rcsb.org/pdb/}.
+Positions in PDB files are stored in \AA.
+Velocities in PDB files are stored in \AA/ps and may be
+\index{units used for output}
+divided by PDBVELFACTOR=20.45482706
+to convert to the NAMD internal units used in DCD and NAMD binary files.
+Forces in PDB files are stored in kcal/mol/\AA.
+NAMD binary files (below) should be preferred to PDB files
+in most cases due to their higher precision.
+
+\subsubsection{X-PLOR format PSF files}
+
+\NAMD\ uses the same protein structure files that X-PLOR does.
+These files may be generated with psfgen, VMD, X-PLOR, or CHARMM.
+CHARMM can generate an X-PLOR format PSF file with the command
+``{\tt write psf card xplor}''.
+
+\subsubsection{CHARMM19, CHARMM22, and CHARMM27 parameter files}
+
+\NAMD\ supports CHARMM19, CHARMM22, and CHARMM27 parameter files in both
+X-PLOR and CHARMM formats.
+(X-PLOR format is the default, CHARMM format parameter files
+may be used given the parameter ``{\tt paraTypeCharmm on}''.)
+For a full description of the format of commands 
+used in these files, see the X-PLOR and CHARMM User's Manual 
+\mycite{(Br\"unger, 1992)}{BRUN92b}.  
+
+\subsubsection{DCD trajectory files}
+
+\NAMD\ produces DCD trajectory files in the same format as 
+X-PLOR and CHARMM.  
+The DCD files are single precision binary FORTRAN files, 
+so are transportable between computer architectures.  
+The file readers in NAMD and VMD can detect and
+adapt to the endianness of the machine on which the DCD
+file was written, and the utility program {\tt flipdcd}
+is also provided to reformat these files if needed.
+The exact format of these files is very ugly but supported by 
+a wide range of analysis and display programs.  
+The timestep is stored in the DCD file in NAMD internal units
+\index{units used for output}
+and must be multiplied by TIMEFACTOR=48.88821 to convert to fs.
+Positions in DCD files are stored in \AA.
+Velocities in DCD files are stored in NAMD internal
+\index{units used for output}
+units and must be multiplied by PDBVELFACTOR=20.45482706
+to convert to \AA/ps.
+Forces in DCD files are stored in kcal/mol/\AA.
+
+\subsubsection{NAMD binary files}
+
+\NAMD\ uses a trivial double-precision binary file format for
+coordinates, velocities, and forces.
+Due to its high precision this is the default output
+and restart format.
+VMD refers to these files as the ``namdbin'' format.
+The file consists of the atom count
+as a 32-bit integer followed by all three position or velocity
+components for each atom as 64-bit double-precision floating point,
+i.e., NXYZXYZXYZXYZ... where N is a 4-byte int and X, Y, and Z
+are 8-byte doubles.  If the number of atoms the file contains is
+known then the atom count can be used to determine endianness.
+The file readers in NAMD and VMD can detect and
+adapt to the endianness of the machine on which the binary
+file was written, and the utility program {\tt flipbinpdb}
+is also provided to reformat these files if needed.
+Positions in NAMD binary files are stored in \AA.
+Velocities in NAMD binary files are stored in NAMD internal
+\index{units used for output}
+units and must be multiplied by PDBVELFACTOR=20.45482706
+to convert to \AA/ps.
+Forces in NAMD binary files are stored in kcal/mol/\AA.
+
+\subsection{\NAMD\ configuration parameters}
+\label{section:file_config}
+
+\subsubsection{Input files}
+
+\begin{itemize}
+\item
+\NAMDCONF{coordinates}{coordinate PDB file}{UNIX filename}
+{\label{param:coordinates}
+%% This parameter is {\it required\/} for every simulation.  
+The PDB file containing initial position coordinate data.  
+%% This can be either an absolute or relative path name.  
+Note that path names can be either absolute or relative.  
+Only one value may be specified.}
+
+\item
+\NAMDCONF{structure}{PSF file}{UNIX filename}
+{\label{param:structure}
+%% This parameter is {\it required\/} for every simulation.
+The X-PLOR format PSF file describing the molecular 
+system to be simulated.  
+Only one value may be specified.}
+
+\item
+\NAMDCONF{parameters}{parameter file}{UNIX filename}
+{\label{param:parameters}
+A CHARMM19, CHARMM22, or CHARMM27 parameter file that defines all or part 
+of the parameters necessary for the molecular system to be simulated.  
+At least one parameter file must be specified for each simulation.  
+Multiple definitions (but only one file per definition)
+are allowed for systems that require more than one parameter file.
+The files will be read 
+in the order that they appear in the configuration file.  If duplicate
+parameters are read, a warning message is printed and the last
+parameter value read is used.  Thus, the order that files are read 
+can be important in cases where duplicate values appear in 
+separate files.}
+
+\item
+\NAMDCONFWDEF{paraTypeXplor}{Is the parameter file in X-PLOR format?}{{\tt on} or {\tt off}}{{\tt on}}
+{Specifies whether or not the parameter file(s) are in X-PLOR format.
+ X-PLOR format is the default for parameter files!
+ Caveat: The PSF file should be also constructed with X-PLOR in
+ case of an X-PLOR parameter file because X-PLOR stores information
+ about the multiplicity of dihedrals in the PSF file. See the X-PLOR
+ manual for details.}
+
+\item
+\NAMDCONFWDEF{paraTypeCharmm}{Is the parameter file in CHARMM format?}{{\tt on} or {\tt off}}{{\tt off}}
+{Specifies whether or not the parameter file(s) are in CHARMM format.
+ X-PLOR format is the default for parameter files!
+ Caveat: The information about multiplicity of dihedrals will be
+ obtained directly from the parameter file, and the full multiplicity
+ will be used (same behavior as in CHARMM). If the PSF file originates
+ from X-PLOR, consecutive multiple entries for the same dihedral 
+ (indicating the dihedral multiplicity for X-PLOR) will be ignored.}
+
+\item
+\NAMDCONF{velocities}{velocity PDB file}{UNIX filename}
+{\label{param:velocities}
+The PDB file containing the initial velocities for all 
+atoms in the simulation.  
+This is typically a restart file or final velocity file written 
+by \NAMD\ during a previous simulation.  
+Either the {\tt temperature} 
+or the {\tt velocities}/{\tt binvelocities} 
+option must be defined to determine an initial set of velocities.  
+Both options cannot be used together.}
+
+\item
+\NAMDCONF{binvelocities}{binary velocity file}{UNIX filename}
+{\label{param:binvelocities}
+The binary file containing initial velocities for all 
+atoms in the simulation.  
+A binary velocity file is created as output from \NAMD\ 
+by activating the {\tt binaryrestart} or {\tt binaryoutput} options.  
+The {\tt binvelocities} option should be used as 
+an alternative to {\tt velocities}.  
+Either the {\tt temperature} 
+or the {\tt velocities}/{\tt binvelocities} 
+option must be defined to determine an initial set of velocities.  
+Both options cannot be used together.  
+}
+
+\item
+\NAMDCONF{bincoordinates}{binary coordinate restart file}{UNIX filename}
+{
+The binary restart file containing initial position 
+coordinate data.  
+A binary coordinate restart file is created as output from \NAMD\ 
+by activating the {\tt binaryrestart} or {\tt binaryoutput} options.  
+Note that, in the current implementation at least, 
+the {\tt bincoordinates} option must be used in addition 
+to the {\tt coordinates} option, 
+but the positions specified by {\tt coordinates} will then be ignored.  
+}
+
+\item
+\NAMDCONF{cwd}{default directory}{UNIX directory name}
+{The default directory for input and output files.  
+If a value is given, all filenames that 
+do not begin with a / are assumed to be in this directory.  
+For example, if {\tt cwd} is set to {\tt /scr}, then a
+filename of {\tt outfile} would be modified to {\tt /scr/outfile}
+while a filename of {\tt /tmp/outfile} would remain unchanged.
+If no value for {\tt cwd} is specified, than all filenames are 
+left unchanged {\em but are assumed to be relative to the directory
+which contains the configuration file given on the command line}.}
+
+\end{itemize}
+
+\subsubsection{Output files}
+
+\begin{itemize}
+\item
+\NAMDCONF{outputname}{output file prefix}{UNIX filename prefix}
+{\label{param:outputname}
+%% This parameter is {\it required\/} for every simulation.
+At the end of every simulation, \NAMD\ writes two files, one 
+containing the final coordinates and another containing 
+the final velocities of all atoms in the simulation.  
+This option specifies the file prefix for these two files as
+well as the default prefix for trajectory and restart files.  
+The position coordinates will be saved to a file named as this prefix 
+with {\tt .coor} appended.  
+The velocities will be saved to a file 
+named as this prefix with {\tt .vel} appended.  
+For example, 
+if the prefix specified using this option was {\tt /tmp/output}, 
+then the two files 
+would be {\tt /tmp/output.coor} and {\tt /tmp/output.vel}.}
+
+\item
+\NAMDCONFWDEF{binaryoutput}{use binary output files?}
+{{\tt yes} or {\tt no}}{{\tt yes}}
+{
+Enables the use of binary output files.  
+If this option is not set to {\tt no}, then the final output files 
+will be written in binary rather than PDB format.  
+Binary files preserve more accuracy between \NAMD\ restarts 
+than ASCII PDB files, 
+but the binary files are not guaranteed to be transportable 
+between computer architectures. (The atom count record is used
+to detect wrong-endian files, which works for most atom counts.
+The utility program {\tt flipbinpdb} is provided
+to reformat these files if necessary.)
+}
+
+\item
+\NAMDCONFWDEF{restartname}{restart files prefix}{UNIX filename prefix}{{\it outputname}{\tt.restart}}
+{
+The prefix to use for restart filenames.  
+\NAMD\ produces restart files 
+that store the current positions and velocities of all 
+atoms at some step of the simulation.  
+This option specifies the prefix to use for restart 
+files in the same way that {\tt outputname} 
+specifies a filename prefix for the final
+positions and velocities.  
+If {\tt restartname} is defined then
+the parameter {\tt restartfreq} must also be defined.}
+
+\item
+\NAMDCONF{restartfreq}{frequency of restart file generation}{positive integer}
+{
+The number of timesteps between the generation of restart files.  
+}
+
+\item
+\NAMDCONFWDEF{restartsave}{use timestep in restart filenames?}
+{{\tt yes} or {\tt no}}{{\tt no}}
+{
+Appends the current timestep to the restart filename prefix, producing
+a sequence of restart files rather than only the last version written.
+}
+
+\item
+\NAMDCONFWDEF{binaryrestart}{use binary restart files?}
+{{\tt yes} or {\tt no}}{{\tt yes}}
+{
+Enables the use of binary restart files.  
+If this option is not set to {\tt no}, then the restart files 
+will be written in binary rather than PDB format.  
+Binary files preserve more accuracy between \NAMD\ restarts 
+than ASCII PDB files, 
+but the binary files are not guaranteed to be transportable 
+between computer architectures. (The atom count record is used
+to detect wrong-endian files, which works for most atom counts.
+The utility program {\tt flipbinpdb} is provided
+to reformat these files if necessary.)
+}
+
+\item
+\NAMDCONFWDEF{DCDfile}{coordinate trajectory output file}{UNIX filename}{{\it outputname}{\tt.dcd}}
+{
+The binary DCD position coordinate trajectory filename.  
+This file stores the trajectory of all atom position coordinates 
+using the same format (binary DCD) as X-PLOR.  
+If {\tt DCDfile} is defined, then {\tt DCDfreq} must also be defined.  
+}
+
+\item
+\NAMDCONF{DCDfreq}
+{timesteps between writing coordinates to trajectory file}
+{positive integer}
+{
+The number of timesteps between the writing of position coordinates 
+to the trajectory file.  
+The initial positions will not be included in the trajectory file.
+Positions in DCD files are stored in \AA.
+}
+
+\item
+\NAMDCONFWDEF{DCDUnitCell}{write unit cell data to dcd file?}
+{{\tt yes} or {\tt no}}{{\tt yes} if periodic cell}
+{
+If this option is set to {\tt yes}, then DCD files will contain unit
+cell information in the style of Charmm DCD files.
+By default this option is enabled if the simulation cell is periodic
+in all three dimensions and disabled otherwise.
+}
+
+\item
+\NAMDCONFWDEF{velDCDfile}{velocity trajectory output file}{UNIX filename}{{\it outputname}{\tt.veldcd}}
+{
+The binary DCD velocity trajectory filename.  
+This file stores the trajectory of 
+all atom velocities using the same format (binary DCD) as X-PLOR.  
+If {\tt velDCDfile} is defined, then {\tt velDCDfreq} must also 
+be defined.  
+}
+
+\item
+\NAMDCONF{velDCDfreq}
+{timesteps between writing velocities to trajectory file}
+{positive integer}
+{
+The number of timesteps between the writing of 
+velocities to the trajectory file.  
+The initial velocities will not be included in the trajectory file.
+Velocities in DCD files are stored in NAMD internal
+\index{units used for output}
+units and must be multiplied by PDBVELFACTOR=20.45482706
+to convert to \AA/ps.
+}
+
+\item
+\NAMDCONFWDEF{forceDCDfile}{force trajectory output file}{UNIX filename}{{\it outputname}{\tt.forcedcd}}
+{
+The binary DCD force trajectory filename.  
+This file stores the trajectory of 
+all atom forces using the same format (binary DCD) as X-PLOR.  
+If {\tt forceDCDfile} is defined, then {\tt forceDCDfreq} must also 
+be defined.  
+}
+
+\item
+\NAMDCONF{forceDCDfreq}
+{timesteps between writing force to trajectory file}
+{positive integer}
+{
+The number of timesteps between the writing of 
+forces to the trajectory file.  
+The initial forces will not be included in the trajectory file.
+Forces in DCD files are stored in kcal/mol/\AA.
+{\em In the current implementation only those forces that are
+evaluated during the timestep that a frame is written are
+included in that frame.  This is different from the behavior
+of TclForces and is likely to change based on user feedback.
+For this reason it is strongly recommended that forceDCDfreq
+be a multiple of fullElectFrequency.}
+}
+
+
+\end{itemize}
+
+\subsubsection{Standard output}
+
+NAMD logs a variety of summary information to standard output.
+The standard units used by NAMD are
+\index{units used for output}
+Angstroms for length, kcal/mol for energy,
+Kelvin for temperature, and bar for pressure.
+Wallclock or CPU times are given in seconds unless otherwise noted.
+
+\index{BOUNDARY energy}
+BOUNDARY energy is from spherical boundary conditions and harmonic restraints,
+\index{MISC energy}
+while MISC energy is from external electric fields and various steering forces.
+TOTAL is the sum of the various potential energies, and the KINETIC energy.
+\index{TOTAL2 energy}
+TOTAL2 uses a slightly different kinetic energy that is better conserved
+during equilibration in a constant energy ensemble.
+\index{TOTAL3 energy}
+TOTAL3 is another variation with much smaller short-time fluctuations that
+is also adjusted to have the same running average as TOTAL2.
+Defects in constant energy simulations are much easier to spot in TOTAL3
+than in TOTAL or TOTAL2.
+
+PRESSURE is the pressure calculated based on individual atoms, while
+\index{GPRESSURE}
+GPRESSURE incorporates hydrogen atoms into the heavier atoms to which
+they are bonded, producing smaller fluctuations.
+\index{TEMPAVG}
+\index{PRESSAVG}
+\index{GPRESSAVG}
+The TEMPAVG, PRESSAVG, and GPRESSAVG are the average of temperature and
+pressure values since the previous ENERGY output; for the first step
+in the simulation they will be identical to TEMP, PRESSURE, and GPRESSURE.
+
+\begin{itemize}
+\item
+\NAMDCONFWDEF{outputEnergies}
+{timesteps between energy output}{positive integer}{1}
+{
+The number of timesteps between each energy output of \NAMD.  
+This value
+specifies how often \NAMD\ should output the current energy 
+values to {\bf stdout} (which can be redirected to a file).  
+By default, this is done every step.  
+For long simulations, 
+the amount of output generated by \NAMD\ can be greatly reduced 
+by outputting the energies only occasionally.  
+}
+
+\item
+\NAMDCONFWDEF{mergeCrossterms}{add crossterm energy to dihedral?}{yes or no}{yes}
+{
+If crossterm (or CMAP) terms are present in the potential,
+the energy is added to the dihedral energy to avoid altering
+the energy output format.
+Disable this feature to add a separate ``CROSS'' field to the output.
+}
+
+\item
+\NAMDCONFWDEF{outputMomenta}
+{timesteps between momentum output}{nonnegative integer}{0}
+{
+The number of timesteps between each momentum output of \NAMD.
+If specified and nonzero, linear and angular momenta will be
+output to {\bf stdout}.
+}
+
+\item
+\NAMDCONFWDEF{outputPressure}
+{timesteps between pressure output}{nonnegative integer}{0}
+{
+The number of timesteps between each pressure output of \NAMD.
+If specified and nonzero, atomic and group pressure tensors
+will be output to {\bf stdout}.
+}
+
+\item
+\NAMDCONFWDEF{outputTiming}
+{timesteps between timing output}{nonnegative integer}
+{the greater of {\tt firstLdbStep} or $10 \times$ {\tt outputEnergies}}
+{
+The number of timesteps between each timing output of \NAMD.
+If nonzero, CPU and wallclock times and memory usage will be
+output to {\bf stdout}.
+These data are from node 0 only; CPU times and memory usage for other nodes
+may vary.
+}
+
+\end{itemize}
+
+
+\subsection{AMBER force field parameters}
+
+AMBER format PARM file and coordinate file can be read by NAMD,
+which allows one to use AMBER force field to carry out all types
+of simulations that NAMD has supported. NAMD can read PARM files
+in either the format used in AMBER 6 or the new format
+defined in AMBER 7. The output of
+the simulation (restart file, DCD file, etc.) will still be in
+traditional format that has been used in NAMD.
+
+\begin{itemize}
+
+\item
+\NAMDCONFWDEF{amber}{use AMBER format force field?}{yes or no}{no}
+{
+If {\tt amber} is set to on, then {\tt parmfile} must be defined,
+and {\tt structure} and {\tt parameters} should not be defined.
+}
+
+\item
+\NAMDCONF{parmfile}{AMBER format PARM file}{UNIX filename}
+{
+This file contains complete topology and parameter information of
+the system.
+}
+
+\item
+\NAMDCONF{ambercoor}{AMBER format coordinate file}{UNIX filename}
+{
+This file contains the coordinates of all the atoms. Note that
+{\tt coordinates} can also be used for PDB format coordinate
+file. When {\tt amber} is set to on, either {\tt ambercoor}
+or {\tt coordinates} must be defined, but not both.
+}
+
+\item
+\NAMDCONFWDEF{readexclusions}{Read exclusions from PARM file?}{yes or no}{yes}
+{
+PARM file explicitly gives complete exclusion (including 1-4
+exclusions) information. When {\tt readexclusions} is set to on,
+NAMD will read all exclusions from PARM file and will not add any
+more; alternatively, if {\tt readexclusions} is set to
+off, NAMD will ignore the exclusions in PARM file and will
+automatically generate them according to the
+exclusion policy specified by {\tt exclude}.
+}
+
+\item
+\NAMDCONFWDEF{scnb}{VDW 1-4 scaling factor}{decimal $\geq$ 1.0}{2.0}
+{
+Same meaning as SCNB in AMBER. Note that in NAMD, 1-4 vdw
+interactions are DIVIDED by {\tt scnb}, whereas 1-4 electrostatic
+interactions are MULTIPLIED by {\tt 1-4scaling}. So
+{\tt 1-4scaling} should be set to the inverse of SCEE value used
+in AMBER.
+}
+
+\end{itemize}
+
+\noindent Caveat:
+
+\noindent 1. Polarizable parameters in AMBER are not supported.
+
+\noindent 2. NAMD does not support the 10-12 potential terms in
+some old AMBER versions. When non-zero 10-12 parameter is
+encountered in PARM file, NAMD will terminate.
+
+\noindent 3. NAMD has several exclusion policy options, defined
+by {\tt exclude}. The way AMBER dealing with exclusions
+corresponds to the ``scaled1-4'' in NAMD. So for simulations using
+AMBER force field, one would specify ``exclude scaled1-4'' in the
+configuration file, and set {\tt 1-4scaling} to the inverse value
+of SCEE as would be used in AMBER.
+
+\noindent 4. NAMD does not read periodic box lengths in PARM or
+coordinate file. They must be explicitly specified in NAMD
+configuration file.
+
+\noindent 5. By default, NAMD applies switching functions to
+the non-bond interactions within the cutoff distance,
+which helps to improve energy conservation, while AMBER does not
+use switching functions so it simply
+truncates the interactions at cutoff. However, if ``authentic''
+AMBER cutoff simulations are desired, the switching functions
+could be turned off by specifying ``switching off'' in NAMD
+configuration file.
+
+\noindent 6. NAMD and AMBER may have different default values for
+some parameters (e.g., the tolerance of SHAKE). One should check
+other sections of this manual for accurate descriptions
+of the NAMD options.
+\newline
+
+Following are two examples of the NAMD configuration file to read
+AMBER force field and carry out simulation. They may help users
+to select proper NAMD options for AMBER force field. For the
+convenience of AMBER users, the AMBER~6 sander input files are
+given in the left for comparison, which would accomplish similar
+tasks in AMBER.
+\newline
+
+\noindent Example~1: Non-periodic boundary system, cutoff simulation
+
+\begin{verbatim}
+---AMBER----      ---NAMD---
+
+ TITLE
+ &cntrl
+  ntb=0, igb=2,   # non-periodic, use cutoff for non-bond
+  nstlim=1000,    numsteps       1000  # Num of total steps
+  ntpr=50,        outputEnergies 50  # Energy output frequency
+  ntwr=50,        restartfreq    50  # Restart file frequency
+  ntwx=100,       DCDfreq        100  # Trajectory file frequency
+  dt=0.001,       timestep       1  # in unit of fs (This is default)
+  tempi=0.,       temperature    0  # Initial temp for velocity assignment
+  cut=10.,        cutoff         10
+                  switching      off  # Turn off the switching functions
+  scee=1.2,       exclude        scaled1-4
+                  1-4scaling     0.833333  # =1/1.2, default is 1.0
+  scnb=2.0        scnb           2  # This is default
+ &end
+                  amber          on  # Specify this is AMBER force field
+                  parmfile       prmtop  # Input PARM file
+                  ambercoor      inpcrd  # Input coordinate file
+                  outputname     md  # Prefix of output files
+\end{verbatim}
+
+\noindent Example~2: Periodic boundary system, PME, NVE ensemble,
+using SHAKE algorithm
+
+\begin{verbatim}
+---AMBER----      ---NAMD---
+
+ TITLE
+ &cntrl
+  ntc=2, ntf=2,   # SHAKE to the bond between each hydrogen and it mother atom
+                  rigidBonds     all
+  tol=0.0005,     rigidTolerance 0.0005  # Default is  0.00001
+  nstlim=500,     numsteps       500  # Num of total steps
+  ntpr=50,        outputEnergies 50  # Energy output frequency
+  ntwr=100,       restartfreq    100  # Restart file frequency
+  ntwx=100,       DCDfreq        100  # Trajectory file frequency
+  dt=0.001,       timestep       1  # in unit of fs (This is default)
+  tempi=300.,     temperature    300  # Initial temp for velocity assignment
+  cut=9.,         cutoff         9
+                  switching      off  # Turn off the switching functions
+ &end
+ &ewald           PME            on  # Use PME for electrostatic calculation
+                  # Orthogonal periodic box size
+  a=62.23,        cellBasisVector1   62.23  0  0
+  b=62.23,        cellBasisVector2   0  62.23  0
+  c=62.23,        cellBasisVector3   0  0  62.23
+  nfft1=64,       PMEGridSizeX   64
+  nfft2=64,       PMEGridSizeY   64
+  nfft3=64,       PMEGridSizeZ   64
+  ischrgd=1,      # NAMD doesn't force neutralization of charge
+ &end
+                  amber          on  # Specify this is AMBER force field
+                  parmfile       FILENAME  # Input PARM file
+                  ambercoor      FILENAME  # Input coordinate file
+                  outputname     PREFIX  # Prefix of output files
+                  exclude        scaled1-4
+                  1-4scaling     0.833333  # =1/1.2, default is 1.0
+\end{verbatim}
+
+\subsection{GROMACS force field parameters}
+
+\NAMD\ has the ability to load GROMACS ASCII topology (.top) and
+coordinate (.gro) files, which allows you to run most GROMACS
+simulations in \NAMD.  All simulation output will still be in the
+traditional \NAMD\ formats.
+
+\begin{itemize}
+\item
+\NAMDCONFWDEF{gromacs}{use GROMACS format force field?}{on or off}{off}
+{
+If {\tt gromacs} is set to on, then {\tt grotopfile} must be defined,
+and {\tt structure} and {\tt parameters} should not be defined.
+}
+\item
+\NAMDCONF{grotopfile}{GROMACS format topology/parameter file}{UNIX filename}
+{
+This file contains complete topology and parameter information of
+the system.
+}
+
+\item
+\NAMDCONF{grocoorfile}{GROMACS format coordinate file}{UNIX filename}
+{
+This file contains the coordinates of all the atoms. Note that
+{\tt coordinates} can also be used for PDB format coordinate
+file. When {\tt gromacs} is set to {\tt on}, either {\tt grocoorfile}
+or {\tt coordinates} must be defined, but not both.
+}
+\end{itemize}
+
+\noindent However, \NAMD\ does not have support for many GROMACS-specific
+options:
+
+\begin{itemize}
+
+\item Dummies (fake atoms with positions generated from the positions
+of real atoms) are not supported.
+\item The GROMACS \verb^pairs^ section, where explicit 1--4 parameters
+are given between pairs of atoms, is not supported, since \NAMD\
+calculates its 1--4~interactions exclusively by type.
+\item Similarly, \verb^exclusions^ are not supported.  The biggest
+problem here is that GROMACS RB dihedrals are supposed to imply
+exclusions, but \NAMD\ does not support this.
+\item Constraints, restraints, and \verb^settles^ are not
+implemented in \NAMD.
+\item In some cases, it may not work to override some but not all of
+the parameters for a bond, atom, etc.  In this case, NAMD will
+generate an error and stop.  The parser will sometimes not tolerate
+correct GROMACS files or fail to detect errors in badly formatted
+files.
+\item \NAMD\ does not support all the types of bond potentials that
+exist in GROMACS, but approximates them with harmonic or sinusoidal
+potentials.
+\item \NAMD\ does not read periodic box lengths in the
+coordinate file. They must be explicitly specified in the \NAMD\
+configuration file.
+
+\end{itemize}
+

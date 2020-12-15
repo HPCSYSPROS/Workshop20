@@ -1,0 +1,110 @@
+# Parameter definitions for thorn SummationByParts
+# $Header$
+
+restricted:
+
+KEYWORD norm_type "Type of norm" STEERABLE=always
+{
+  "Diagonal" :: "Diagonal norm"
+  "Full restricted" :: "Full restricted norm"
+} "Diagonal"
+
+KEYWORD operator_type "Type of operator" STEERABLE=always
+{
+  "Minimal Bandwidth" :: "Minimal bandwidth (except for 8-4 which is minimal spectral radius)"
+  "Optimized" :: "Optimized for performance"
+} "Optimized"
+
+BOOLEAN sbp_1st_deriv "Should the 1st derivative operator be SBP" STEERABLE=always
+{
+} "yes"
+  
+BOOLEAN sbp_2nd_deriv "Should the 2nd derivative operator be SBP" STEERABLE=always
+{
+} "yes"
+  
+BOOLEAN sbp_upwind_deriv "Should the upwind derivative operator be SBP" STEERABLE=always
+{
+} "yes"
+  
+INT order "Order of accuracy" STEERABLE=always
+{
+  2:8:2 :: ""
+} 2
+
+BOOLEAN onesided_outer_boundaries "Evaluate derivatives within ghost zones of the outer boundary" STEERABLE=always
+{
+} "yes"
+
+BOOLEAN onesided_interpatch_boundaries "Evaluate derivatives near the local grid boundary if it is an inter-patch boundary" STEERABLE=always
+{
+} "yes"
+
+BOOLEAN use_dissipation "Should we add dissipation"
+{
+} "no"
+
+BOOLEAN use_variable_deltas "Use extra grid functions to allow for variable delta's in the dissipation operators"
+{
+} "no"
+
+BOOLEAN use_shiftout "Should we use the boundary_shift_out parameters from CoordBase to shift the stencils of derivatives and dissipation"
+{
+} "no"
+
+BOOLEAN poison_derivatives "Should we poison Dvar at boundary_shiftout perimeter when taking derivatives" STEERABLE=always
+{
+} "no"
+
+BOOLEAN poison_dissipation "Should we poison rhs at boundary_shiftout perimeter when applying dissipation" STEERABLE=always
+{
+} "no"
+
+REAL poison_value "Degree of intoxication" STEERABLE=always
+{
+  *:* :: "Anything you want"
+} 666.0
+
+# Note: scaling the dissipation operators with h reduces the order by one.
+BOOLEAN scale_with_h "Should we scale the dissipation with the grid spacing h"
+{
+} "no"
+
+KEYWORD dissipation_type "Type of dissipation operator" STEERABLE=always
+{
+  "Mattson-Svard-Nordstrom" :: "Mattson, Svaerd and Nordstroem type"
+  "Kreiss-Oliger" :: "Kreiss-Oliger modified near the boundaries"
+} "Mattson-Svard-Nordstrom"
+
+REAL epsdis "Dissipation strength" STEERABLE=always
+{
+  *:* :: "Values typical between 0 and 1"
+} 0.2
+
+REAL diss_fraction[3] "Fractional size of the transition region for the full restricted dissipation operator"
+{
+  0:0.5 :: ""
+} 0.2
+
+REAL h_scaling[3] "Scaling factor for the local grid spacing in the dissipation operators"
+{
+ 0:* :: "Positive please"
+} 1.0
+
+STRING vars "List of evolved grid functions that should have dissipation added" STEERABLE=always
+{
+  .* :: "Must be a valid list of grid functions"
+} ""
+
+BOOLEAN zero_derivs_y "set all derivatives to 0 in the y-direction"
+{
+} "no"
+
+BOOLEAN zero_derivs_z "set all derivatives to 0 in the z-direction"
+{
+} "no"
+
+# If you use this parameter be careful. You have to know what you are doing...
+BOOLEAN check_grid_sizes "Should we check grid sizes and ghost zones"
+{
+} "yes"

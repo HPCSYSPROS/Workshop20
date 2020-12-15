@@ -1,0 +1,50 @@
+--- MILC-apex_BW2017/ks_imp_rhmc/Makefile	2016-11-04 12:31:48.000000000 -0500
++++ MILC-apex_BW_SKL_CORE-AVX2_no-vec/ks_imp_rhmc/Makefile	2017-09-18 10:11:35.000000000 -0500
+@@ -35,9 +35,9 @@
+ # so you may as well compile and link everything, including the libraries, with C++
+ 
+ ifeq ($(strip ${MPP}),true)
+-  CC = cc # Cray PE
++  CC = mpicc # Cray PE
+ else
+-  CC = cc # Cray PE
++  CC = mpicc # Cray PE
+ endif
+ 
+ #CC = /usr/local/mvapich/bin/mpicc  # FNAL
+@@ -45,7 +45,7 @@
+ # 5. Compiler optimization level
+ # Choices include -g -O, etc
+ 
+-OPT              = -g -O3
++OPT              = -g -O3 -xcore-avx2 -no-vec -ipo
+ 
+ #----------------------------------------------------------------------
+ # 6. Other compiler optimization flags.  Uncomment stanza to suit.
+@@ -72,7 +72,7 @@
+ # Compiling with OpenMP?
+ 
+ #OMP = true
+-OMP = false
++OMP = true
+ 
+ #OCFLAGS = -fexpensive-optimizations -fpeephole -fstrength-reduce -march=i586  # Simone's pick for PIII/gcc version 2.95.2.1 19991024 (release)
+ #OCFLAGS = -fexpensive-optimizations -funroll-loops -fpeephole -fstrength-reduce -fschedule-insns2 -march=i586 # works best for matrix x vector
+@@ -84,7 +84,7 @@
+ # OCFLAGS = -qarch=440d # BG/L
+ 
+ #-------------- Intel icc/ecc -----------------------------------
+-#OCFLAGS = -tpp2 -static
++OCFLAGS = -static
+ 
+ #-------------- Portland Group ----------------------------
+ #OCFLAGS = -tp p6 -Munroll=c:4,n:4
+@@ -305,7 +305,7 @@
+ 
+ #LDFLAGS          = -fast     # Sun SPARC
+ #LDFLAGS          = -64 -L/usr/lib64 # SGIPC
+-LDFLAGS         += -Wl,--whole-archive,-ldmapp,--no-whole-archive
++#LDFLAGS         += -Wl,--whole-archive,-ldmapp,--no-whole-archive
+ 
+ ifeq ($(strip ${HOST}),MIC)
+   LDFLAGS += -mmic

@@ -1,0 +1,510 @@
+% *======================================================================*
+%  Cactus Thorn template for ThornGuide documentation
+%  Author: Ian Kelley
+%  Date: Sun Jun 02, 2002
+%  $Header$
+%
+%  Thorn documentation in the latex file doc/documentation.tex
+%  will be included in ThornGuides built with the Cactus make system.
+%  The scripts employed by the make system automatically include
+%  pages about variables, parameters and scheduling parsed from the
+%  relevant thorn CCL files.
+%
+%  This template contains guidelines which help to assure that your
+%  documentation will be correctly added to ThornGuides. More
+%  information is available in the Cactus UsersGuide.
+%
+%  Guidelines:
+%   - Do not change anything before the line
+%       % START CACTUS THORNGUIDE",
+%     except for filling in the title, author, date, etc. fields.
+%        - Each of these fields should only be on ONE line.
+%        - Author names should be separated with a \\ or a comma.
+%   - You can define your own macros, but they must appear after
+%     the START CACTUS THORNGUIDE line, and must not redefine standard
+%     latex commands.
+%   - To avoid name clashes with other thorns, 'labels', 'citations',
+%     'references', and 'image' names should conform to the following
+%     convention:
+%       ARRANGEMENT_THORN_LABEL
+%     For example, an image wave.eps in the arrangement CactusWave and
+%     thorn WaveToyC should be renamed to CactusWave_WaveToyC_wave.eps
+%   - Graphics should only be included using the graphicx package.
+%     More specifically, with the "\includegraphics" command.  Do
+%     not specify any graphic file extensions in your .tex file. This
+%     will allow us to create a PDF version of the ThornGuide
+%     via pdflatex.
+%   - References should be included with the latex "\bibitem" command.
+%   - Use \begin{abstract}...\end{abstract} instead of \abstract{...}
+%   - Do not use \appendix, instead include any appendices you need as
+%     standard sections.
+%   - For the benefit of our Perl scripts, and for future extensions,
+%     please use simple latex.
+%
+% *======================================================================*
+%
+% Example of including a graphic image:
+%    \begin{figure}[ht]
+% 	\begin{center}
+%    	   \includegraphics[width=6cm]{MyArrangement_MyThorn_MyFigure}
+% 	\end{center}
+% 	\caption{Illustration of this and that}
+% 	\label{MyArrangement_MyThorn_MyLabel}
+%    \end{figure}
+%
+% Example of using a label:
+%   \label{MyArrangement_MyThorn_MyLabel}
+%
+% Example of a citation:
+%    \cite{MyArrangement_MyThorn_Author99}
+%
+% Example of including a reference
+%   \bibitem{MyArrangement_MyThorn_Author99}
+%   {J. Author, {\em The Title of the Book, Journal, or periodical}, 1 (1999),
+%   1--16. {\tt http://www.nowhere.com/}}
+%
+% *======================================================================*
+
+% If you are using CVS use this line to give version information
+% $Header$
+
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+% The author of the documentation
+\author{Christian D. Ott \textless cott@tapir.caltech.edu\textgreater, \\
+Erik Schnetter \textless eschnetter@perimeterinstitute.ca\textgreater}
+
+% The title of the document (not necessarily the name of the Thorn)
+\title{EOS\_Omni}
+
+% the date your document was last changed, if your document is in CVS,
+% please use:
+%    \date{$ $Date: 2004-01-07 12:12:39 -0800 (Wed, 07 Jan 2004) $ $}
+\date{February 24, 2013}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+% Add all definitions used in this documentation here
+%   \def\mydef etc
+
+\newenvironment{equationarray}
+{\arraycolsep 0.14 em
+\begin{eqnarray}}
+{\end{eqnarray}}
+
+\newenvironment{equationarray*}
+{\arraycolsep 0.14 em
+\begin{eqnarray*}}
+{\end{eqnarray*}}
+
+\begin{abstract}
+  \noindent This thorn provides a unified EOS (Equation Of State)
+  interface and implements multiple analytic EOS, and also provides table
+  reader and interpolation routines for finite-temperature
+  microphysical EOS available from
+    \url{http://www.stellarcollapse.org}. In addition cold and barotropic
+  tabulated EOS are provided for use in initial data thorns. Currently, the
+  implemented analytic EOS are the polytropic EOS, the gamma-law EOS, and a
+  hybrid EOS consisting of a 2-piece piecewise-polytrope with a thermal,
+  gamma-law component.
+\end{abstract}
+
+
+
+\section{Introduction}
+
+Equations of State (EOS) are crucial for hydrodynamics and hydro
+codes (as well as other codes needing/providing microphysics)
+are closely coupled to EOS and call EOS routines many times for
+each grid point during the calculation of a time update.
+
+\texttt{EOS\_Omni} is presently coded for cold and hot EOS, including
+those based on microphysical models. It does currently assume nuclear
+statistical equilibrium (NSE) with rest-mass density $\rho$, specific
+internal energy $\epsilon$ (or temperature $T$), and electron fraction
+$Y_e$ being the independent variables. \texttt{EOS\_Omni} can be
+called on arrays or on single grid points.
+
+
+
+\section{Units}
+
+This thorn uses \emph{solar} units where $c = G = M_{\odot} = 1$.
+Temperatures are measured in MeV.
+
+\section{Using This Thorn}
+
+\subsection{Basic Usage}
+
+\texttt{EOS\_Omni} works via the aliased-function interface, and
+EOS functions to be used must be declared in \texttt{interface.ccl}.
+Here is an example \texttt{interface.ccl} entry:
+\begin{verbatim}
+void FUNCTION EOS_Omni_press(CCTK_INT IN eoskey,         \
+                             CCTK_INT IN havetemp,       \
+                             CCTK_REAL IN rf_precision,  \
+                             CCTK_INT IN npoints,        \
+                             CCTK_REAL IN ARRAY rho,     \
+                             CCTK_REAL INOUT ARRAY eps,  \
+                             CCTK_REAL INOUT ARRAY temp, \
+                             CCTK_REAL IN ARRAY ye,      \
+                             CCTK_REAL OUT ARRAY press   \
+                             CCTK_INT OUT ARRAY keyerr,  \
+                             CCTK_INT OUT anyerr)
+\end{verbatim}
+
+Here, 
+\begin{itemize}
+\item \texttt{eoskey} is the type of EOS to be used in this call.
+  \begin{itemize}
+    \item \texttt{eoskey = 1}: Polytropic EOS
+    \item \texttt{eoskey = 2}: Gamma-Law EOS
+    \item \texttt{eoskey = 3}: Hybrid EOS (2 Polys, 1 Gamma-Law), used
+      for stellar core collapse simulations.
+    \item \texttt{eoskey = 4}: Finite-temperature microphysical EOS
+    \item \texttt{eoskey = 5}: Cold tabulated EOS with Gamma-Law
+    \item \texttt{eoskey = 6}: Tabulated barotropic EOS
+  \end{itemize}
+\item \texttt{havetemp} determines whether the EOS is to be called as
+  a function of $(\rho,\epsilon,Y_e)$ (\texttt{havetemp = 0}), or as a
+  function of $(\rho,T,Y_e)$ (\texttt{havetemp = 1}).
+  \texttt{havetemp = 0} is the method of choice for analytic EOS during
+  evolution, but at the initial data stage one may need to set
+  \texttt{havetemp = 1} (with $T=0$) to obtain initial values for
+  $\epsilon$.  In the case of a finite-temperature EOS (that usually
+  is a function of $(\rho,T,Y_e)$), a call with \texttt{havetemp = 0}
+  will first lead to the solution of $T(\rho,\epsilon,Y_e$) via a
+  Newton-Raphson-type iteration (using the supplied value of $T$ as
+  the starting point) and will then calculate the requested dependent
+  variable as a function of $X=X(\rho,T,Y_e)$. Both $X$ and the updated
+  $T$ are returned.
+
+\item \texttt{npoints} tells the EOS how many data points are passed
+  in,
+\item \texttt{rho,eps,temp,ye,press} are obvious,
+\item \texttt{rf\_precision} is a real number telling the root finding
+  algorithm (for finding $T(\rho,\epsilon,Y_e)$) at what relative error
+  to terminate the iteration. $10^{-10}$ is a good value.
+\item \texttt{keyerr} is an array (with $n$ entries for $n$ data
+  points) containing error codes (relevant only for tabulated
+  microphysical EOS),
+\item \texttt{anyerr} is an integer $>0$ in case
+  any error occured.
+\end{itemize}
+
+\subsection{Parameter Settings}
+
+Many hydro codes require a fallback EOS in case something goes
+wrong. This is also true for the Einstein Toolkit GR hydro code
+\texttt{EinsteinEvolve/GRHydro}. If you want to use \texttt{EOS\_Omni} with
+\texttt{GRHydro}, you must set parameters for the EOS of your choice and,
+\emph{in addition}, the following parameters must be set to sensible values:
+
+\begin{verbatim}
+eos_omni::poly_gamma 
+eos_omni::poly_gamma_initial
+eos_omni::poly_k 
+\end{verbatim}
+
+The only non-obvious parameter here is \texttt{poly\_gamma\_initial}.
+In most simulations it should not be set.
+In simulations that are run with a different adiabatic index than
+what was used to set up the initial data, \texttt{poly\_gamma} should
+be the evolution value, and \texttt{poly\_gamma\_initial} should be the
+initial data value. \texttt{EOS\_Omni} then rescales \texttt{poly\_k} such
+that the \emph{cgs} value of \texttt{poly\_k} is the same for initial data and
+evolution. Since the units of \texttt{poly\_k}
+($[K] = \frac{\rm N}{\rm m^2} \left(\frac{\rm m^3}{\rm kg}\right)^{\Gamma}$)
+depend on \texttt{poly\_gamma} this is not fully trivial.
+
+Check \texttt{param.ccl} for parameters for the other EOS\@.
+
+
+
+\section{Equations of State Details}
+
+\subsection{Polytropic}
+
+The \texttt{poly} EOS is a \emph{polytropic} equation of state, which
+does not allow for changes in entropy:
+\begin{eqnarray}
+  p & = & K \rho^\gamma
+\end{eqnarray}
+where $p$ is the pressure, $\rho$ the density, $K$ the polytropic
+constant set via \texttt{poly\_k}, and $\gamma$ is the adiabatic index
+set via \texttt{poly\_gamma}.
+
+If the internal energy $\epsilon$ is to be ``calculated from the
+temperature'' (\texttt{havetemp = 1}), then this is done using the
+relation
+\begin{eqnarray}
+  \epsilon & = & \frac{K}{\gamma-1} \rho^{\gamma-1}
+\label{eq:polyeps}
+\end{eqnarray}
+(which actually ignores the temperature).
+
+Note: This polytropic EOS is also used as fall-back when other
+EOS fail.
+
+\subsection{Gamma-Law}
+
+The \texttt{gl} EOS is a \emph{gamma-law} equation of state,
+corresponding to an ideal gas:
+\begin{eqnarray}
+  p & = & (\gamma-1) \rho \epsilon
+\end{eqnarray}
+where $p$ is the pressure, $\rho$ the density, $\epsilon$ the internal
+energy, and $\gamma$ is the adiabatic index set via
+\texttt{gl\_gamma}.
+
+At the initial data stage, it may be necessary to set up initial
+values for $\epsilon$. For this, the \texttt{gl} EOS 
+implements equation (\ref{eq:polyeps}) just like the \texttt{poly}
+EOS and the parameters \texttt{poly\_gamma\_ini} and 
+\texttt{gl\_k} must be set for this.
+
+
+
+%%% The parameter \texttt{poly\_gamma\_ini} (not \texttt{gl\_gamma\_ini}!)
+%%% influences the definition of this EOS via unit conversions: $K$ is
+%%% first converted from solar units to cgs units using
+%%% \texttt{poly\_gamma\_ini}, and then converted back to solar units
+%%% using \texttt{gl\_gamma}. \textbf{TODO: confirm this.} Note that the
+%%% parameter \texttt{gl\_gamma\_ini} is actually unused. \textbf{TODO:
+%%%   confirm this.} Contrary to what the parameter name suggests, this
+%%% EOS thorn makes no distinction between initial data setup and time
+%%% evolution; if such a distinction is required, then it must be
+%%% implemented outside of this thorn.
+%%% If the internal energy $\epsilon$ is to be ``calculated from the
+%%% temperature'' (\texttt{havetemp = 1}), then this is done using the
+%%% relation
+%%% \begin{eqnarray}
+%%%   \epsilon & = & \frac{K}{\gamma-1} rho^{\gamma-1}
+%%% \end{eqnarray}
+%%% (which actually ignores the temperature). $K$ the polytropic constant
+%%% set via \texttt{gl\_k}. This is the same relation as for the
+%%% polytropic equation of state above.
+
+\subsection{Hybrid}
+
+The hybrid EOS was introduced by \cite{janka:93} for use in simplified
+simulations of stellar collapse to mimic (1) the stiffening of the
+nuclear EOS at nuclear density and (2) to include thermal pressure in
+the postbounce phase.  It consists of two polytropes characterized by
+($K_1$, $\gamma_1$) and ($K_2$, $\gamma_2$) and a thermal $\gamma-$law
+component described by $\gamma_{\mathrm{th}}$.  Polytrope 1 is soft and
+describes a gas of relativistic degenerate electrons with $\gamma_1
+\approx 4/3$.  It is used below nuclear density ($\rho_{\mathrm{nuc}}
+\approx 2\times10^{14}\,\mathrm{g\,cm}^{-3}$), and is smoothly matched to
+polytrope 2 which applies above $\rho_{\mathrm{nuc}}$, is stiff, and
+models the repulsive core of the strong force above nuclear density
+($\gamma_2 \gtrsim 2.5$).  $K_2$ is completely determined by
+$P_1(\rho_{\mathrm{nuc}}) = P_2(\rho_{\mathrm{nuc}})$ and $K_1, \gamma_1,$
+and $\gamma_2$. The full functional form of the EOS
+$P=P(\rho,\epsilon)$ with the thermal component (which takes into
+account shock heating) is given by
+\begin{equationarray}
+  P & = & \frac{\gamma - \gamma_{\rm th}}{\gamma - 1}
+  K \rho_{\rm nuc}^{\gamma_1 - \gamma}
+  \rho^{\gamma} - \frac{(\gamma_{\rm th} - 1) (\gamma - \gamma_1)}
+  {(\gamma_1 - 1) (\gamma_2 - 1)}
+  K \rho_{\rm nuc}^{\gamma_1 - 1} \rho 
+  + (\gamma_{\rm th} - 1) \rho \epsilon\,.
+  \label{eq:hybrid_eos}
+\end{equationarray}%
+
+The \texttt{EOS\_Omni} parameters for the hybrid EOS are the following:
+
+\begin{tabular}{ll}
+\texttt{hybrid\_gamma1}     & $\gamma_1$,  $\gamma_1 = 1.325$ is an appropriate choice.\\
+\texttt{hybrid\_gamma2}     & $\gamma_2$,  $\gamma_2 = 2.5$ is an appropriate choice.\\
+\texttt{hybrid\_gamma\_th}   & $\gamma_{\mathrm{th}}$, perhaps $1.5$.\\
+\texttt{hybrid\_k1}         & $K_1$, $0.4640517$ in solar units for relativistic degenerate e$^{-}$.\\
+\texttt{hybrid\_rho\_nuc}    & nuclear density, standard is $3.238607\times 10^{-4}$ in solar units.
+\end{tabular}
+
+
+
+
+
+\subsection{Finite-Temperature Nuclear EOS}
+
+Complex microphysical finite-temperature equations of state come
+usually in tabulated form. {\tt EOS\_Omni} comes with routines
+provided as part of the \texttt{nuc\_eos} package described in
+\cite{oconnor:10} and available at \\ {\tt
+  http://www.stellarcollapse.org}. A variety of EOS tables for
+application in high-density astrophysical situations (i.e. in stellar
+collapse or in compact star mergers) are also available from there
+in HDF5 format.
+
+The parameters controlling the finite-temperature nuclear EOS
+are the following:
+
+\begin{tabular}{lll}
+\texttt{nuceos\_read\_table}& BOOLEAN & Set to {\tt yes} to read table.\\
+\texttt{do\_energy\_shift}& BOOLEAN & Set to {\tt yes} to subtract the energy shift\\ 
+&& stored in the table to get correctly normalized $\epsilon$.\\
+\texttt{nuceos\_table\_name}& STRING & Path/Name of the table file.
+\end{tabular}
+
+\subsection{Cold Tabulated Nuclear EOS with Gamma Law}
+
+Many equations of state for neutron stars are generated under the
+assumption of zero temperature. This is perfectly appropriate for cold
+old neutron stars. In simulations of binary mergers, however, shocks
+will drive the temperature up, adding a thermal pressure component,
+which can be accounted for approximately with a Gamma-Law:
+$P_\mathrm{th} = (\Gamma_\mathrm{th} - 1)\rho\epsilon_\mathrm{th}$\,.
+
+{\tt EOS\_Omni} implements such an equation of state. It reads in an
+ASCII EOS table (see subdirector {\tt tables} for an example table for
+the SLy EOS \cite{douchin:01,haensel:04}, which was generated
+according to the prescription in \cite{shibata:05,corvino:10}). All
+EOS parameters are read from the ASCII file, which has the following
+format:
+
+\begin{verbatim}
+EoSType = Tabulated
+Nrho = 600    NYe = 1     NT = 1
+RhoMin = 1e-09  RhoMax = 0.01
+HeatCapacityE = 1
+GammaTh = 2
+Kappa = 1
+RhoSpacing = Log
+    1.57940636422747e-03    1.38773826035349e+00    2.62139412738900e-02
+[...]
+    2.81804006881059e+00    6.89967555695907e-01    8.30537612378975e-01
+\end{verbatim}
+
+The header completely determines the range in baryon rest mass density
+(in $c=G=M_\odot=1$ units), gives the number of zones (currently only
+{\tt NYe = 1}, {\tt NT = 1}, {\tt HeatCapacityE = 1}, and {\tt
+  RhoSpacing = Log} are supported). {\tt GammaTh} is the
+$\Gamma_\mathrm{th}$ of the thermal gamma law. The tabulated columns
+are $\epsilon$, $\Gamma$, $c_s$ (the speed of sound of the cold
+component of the EOS). The pressure is obtained via $P= \kappa
+\rho^\Gamma$, where $\kappa$ is the {\tt Kappa} scaling parameter.
+
+Generally, $P = P(\rho,\epsilon)$ in this EOS, but note that
+$\epsilon_\mathrm{th} = \epsilon - \epsilon_\mathrm{cold}$. {\tt
+  EOS\_Omni} uses linear interpolation to first find $P(\rho)$ and
+$\epsilon_\mathrm{cold}(\rho)$ and then computes the thermal component
+analytically.
+
+
+\begin{tabular}{lll}
+\texttt{coldeos\_read\_table}& BOOLEAN & Set to {\tt yes} to read table.\\
+\texttt{coldeos\_use\_thermal\_gamma\_law}& BOOLEAN & Set to {\tt yes} to use the thermal
+gamma law (default).\\
+\texttt{coldeos\_table\_name}& STRING & Path/Name of the table file.\\
+\end{tabular}
+
+
+\section{Converting Old Parameter Files}
+
+If you have a parameter file that uses the previous EOS interface in
+Cactus, you will have to convert it so that it runs with
+\texttt{EOS\_Omni}. The following describes a set of simple rules for
+this conversion.
+
+\begin{enumerate}
+\item Add \texttt{EOS\_Omni} to the thorn list. You can then remove
+  all other \texttt{EOS\_*} thorns from the thorn list (or you can
+  leave them in; they are unused).
+\item Activate \texttt{EOS\_Omni} in the parameter file: Add
+  \texttt{EOS\_Omni} to your active thorns, and do not activate any
+  other \texttt{EOS\_*} thorns.
+\item Translate all EOS parameters according to table
+  \ref{tab:paramconv}.
+\item All thorns using this EOS interface will have a parameter that
+  determines which EOS to use, typically via a string/keyword
+  parameter specifying an EOS name. Convert these names using table
+  \ref{tab:eosnames}.
+\end{enumerate}
+
+\begin{table}[h]
+  \begin{tabular}{ll|ll}
+    Old Parameter & Old Value & New Parameter & New Value\\
+    \hline
+    EOS\_Polytrope::eos\_gamma & &
+    EOS\_Omni::poly\_gamma &
+    \\
+    EOS\_Polytrope::eos\_k & &
+    EOS\_Omni::poly\_k &
+    \\
+    EOS\_Polytrope::use\_cgs & yes &
+    --- &
+    \\
+    EOS\_Polytrope::use\_cgs & no &
+    unsupported &
+    \\
+    EOS\_Polytrope::gamma\_ini & &
+    EOS\_Omni::poly\_gamma\_ini &
+    \\
+    EOS\_Ideal\_Fluid::eos\_ideal\_fluid\_gamma & &
+    EOS\_Omni::gl\_gamma &
+    \\
+    \textbf{TODO: complete this table}
+  \end{tabular}
+  \caption{Parameter conversion table}
+  \label{tab:paramconv}
+\end{table}
+
+\begin{table}[h]
+  \begin{tabular}{llll}
+    EOS    & Description                & Old Name & New Name \\\hline
+    poly   & polytropic                 & ???      & 2D\_Polytrope \\
+    gl     & gamma-law                  & ???      & Ideal\_Fluid \\
+    hybrid & hybrid                     & ???      & Hybrid \\
+    nuc    & finite-temperature nuclear & ???      & nuc\_eos
+  \end{tabular}
+  \caption{EOS name conversion table}
+  \label{tab:eosnames}
+\end{table}
+
+
+
+\begin{thebibliography}{9}
+\bibitem{janka:93} Janka, H.-T., Zwerger, T., \& Moenchmeyer, R.\ 1993, Astron. Astrophys., 268, 360 
+
+\bibitem{oconnor:10} O'Connor, E., \& Ott, C.~D.\ 2010, Class. Quantum Grav., 27, 114103 
+
+\bibitem{douchin:01} Douchin, F., \& Haensel, P.\ 2001, Astron.~Astrophys., 380, 151 
+
+\bibitem{haensel:04} Haensel, P., \& Potekhin, A.~Y.\ 2004, Astron.~Astrophys., 428, 191 
+
+\bibitem{shibata:05} Shibata, M., Taniguchi, K., \& Ury{\= u}, K.\ 2005, Phys.~Rev.~D, 71, 084021 
+
+\bibitem{corvino:10} Corvino, G., Rezzolla, L., Bernuzzi, S., De Pietri, R., 
+\& Giacomazzo, B.\ 2010, Class. Quantum Grav., 27, 114104 
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{thebibliography}
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

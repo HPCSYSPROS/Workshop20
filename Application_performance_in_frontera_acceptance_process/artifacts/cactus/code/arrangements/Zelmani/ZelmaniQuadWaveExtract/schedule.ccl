@@ -1,0 +1,77 @@
+# Schedule definitions for thorn ZelmaniQuadWaveExtract
+
+
+STORAGE: Idots extraction_helpers[3] dostuff rhomax volume
+
+  schedule ZelmaniQuadWaveExtract_Startup AT STARTUP
+  {
+    LANG: C
+  } "Startup banner"
+
+  schedule ZelmaniQuadWaveExtract_SetIntegrandPointer AT BASEGRID
+  {
+    LANG: C
+  } "Setup Pointer to Integrand function"
+
+  schedule ZelmaniQuadWaveExtract_Init AT CCTK_INITIAL
+  {
+    LANG: C
+    OPTION: global
+  } "Initialize some crap"
+
+
+  schedule ZelmaniQuadWaveExtract_CheckStatus AT CCTK_EVOL \
+        AFTER MoL_Evolution \
+  {
+    LANG: C
+    OPTION: level
+  } "Check if we need to do quadrupole wave extraction"
+
+
+  schedule ZelmaniQuadWaveExtract_LocalStuff AT CCTK_EVOL \
+	AFTER ZelmaniQuadWaveExtract_CheckStatus
+  {
+    LANG: C
+#    SYNC: extraction_helpers
+  } "Prepare locally for Idot reduction"
+
+  schedule ZelmaniQuadWaveExtract_LocalStuff AT PostRegrid
+  {
+    LANG: C
+#    SYNC: extraction_helpers
+  } "Prepare locally for Idot reduction"
+
+  schedule ZelmaniQuadWaveExtract_LocalStuff AT PostRestrictInitial AFTER Zelmani_PostStep
+  {
+    LANG: C
+#    SYNC: extraction_helpers
+  } "Prepare locally for Idot reduction"
+
+  schedule ZelmaniQuadWaveExtract_LocalStuff AT CCTK_Initial AFTER Zelmani_Initial
+  {
+    LANG: C
+#    SYNC: extraction_helpers
+  } "Prepare locally for Idot reduction"
+
+  schedule ZelmaniQuadWaveExtract_LocalStuff AT Post_Recover_Variables
+  {
+    LANG: C
+#    SYNC: extraction_helpers
+  } "Prepare locally for Idot reduction"
+
+
+  schedule ZelmaniQuadWaveExtract_Extract AT CCTK_ANALYSIS 
+  {
+    LANG: C
+    OPTIONS: global
+  } "Do global mode stuff for quadrupole wave extraction"
+
+
+  schedule ZelmaniQuadWaveExtract_Output AT CCTK_ANALYSIS \
+	AFTER ZelmaniQuadWaveExtract_Extract 
+  {
+    LANG: C
+    OPTIONS: global
+  } "Output Idot stuff"
+
+

@@ -1,0 +1,12 @@
+#!/bin/sh
+# /*@@
+#   @file    aix5.3.0.0
+#   @date    25.07.2006
+#   @author  Steve White
+#   @desc
+#            Known-architecture file for AIX 5.3.0.0
+#   @enddesc
+#   @version $Header$
+# @@*/
+
+. $srcdir/known-architectures/aix

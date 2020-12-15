@@ -1,0 +1,57 @@
+diff -Naur openbabel-2.3.2.orig/CMakeLists.txt openbabel-2.3.2/CMakeLists.txt
+--- openbabel-2.3.2.orig/CMakeLists.txt	2012-10-03 14:08:58.000000000 -0500
++++ openbabel-2.3.2/CMakeLists.txt	2017-11-18 12:55:03.000000000 -0600
+@@ -293,7 +293,7 @@
+ endif()
+ 
+ if(CMAKE_COMPILER_IS_GNUCXX)
+-  if(NOT GCC_IS_NEWER_THAN_4_0) # GCC 3.x
++  if(1) # GCC 3.x
+     find_package(Boost)
+     if(Boost_FOUND)
+       include_directories(${Boost_INCLUDE_DIRS} ${Boost_INCLUDE_DIR})
+@@ -345,10 +345,10 @@
+ 
+   # define WITH_SSE2 to enable the SSE2 instruction set.
+   # Available on Pentium 4, Athlon 64, and newer CPUs.
+-  if(CMAKE_SIZEOF_VOID_P EQUAL 8 OR WITH_SSE2)
+-    message(STATUS "Enabling the SSE2 instruction set")
+-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
+-  endif(CMAKE_SIZEOF_VOID_P EQUAL 8 OR WITH_SSE2)
++#  if(CMAKE_SIZEOF_VOID_P EQUAL 8 OR WITH_SSE2)
++#    message(STATUS "Enabling the SSE2 instruction set")
++#    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse2")
++#  endif(CMAKE_SIZEOF_VOID_P EQUAL 8 OR WITH_SSE2)
+ endif(${CMAKE_CXX_COMPILER_ID} MATCHES Intel AND UNIX)
+ 
+ #Find if OpenMP support is enabled
+diff -Naur openbabel-2.3.2.orig/test/CMakeLists.txt openbabel-2.3.2/test/CMakeLists.txt
+--- openbabel-2.3.2.orig/test/CMakeLists.txt	2012-10-03 14:08:16.000000000 -0500
++++ openbabel-2.3.2/test/CMakeLists.txt	2017-11-18 12:55:03.000000000 -0600
+@@ -64,7 +64,7 @@
+   add_test(${test}_Test ${TEST_PATH}/test_${test})
+   set_tests_properties(${test}_Test PROPERTIES
+     FAIL_REGULAR_EXPRESSION "ERROR;FAIL;Test failed"
+-    ENVIRONMENT "BABEL_DATADIR=${CMAKE_SOURCE_DIR}/data;LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib")
++    ENVIRONMENT "BABEL_DATADIR=${CMAKE_SOURCE_DIR}/data;LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib:$ENV{LD_LIBRARY_PATH}")
+ endforeach(test ${tests})
+ 
+ ############################################################
+@@ -127,7 +127,7 @@
+              ${TEST_PATH}/test_inchiwrite ${inchidata}/${test} ${inchidata}/${test}.txt)
+     set_tests_properties(inchi${test}_Test PROPERTIES
+                          FAIL_REGULAR_EXPRESSION "Not ok"
+-                         ENVIRONMENT "BABEL_DATADIR=${CMAKE_SOURCE_DIR}/data;LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib"
++                         ENVIRONMENT "BABEL_DATADIR=${CMAKE_SOURCE_DIR}/data;LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib:$ENV{LD_LIBRARY_PATH}"
+     )
+   endforeach(test ${inchitests})
+ endif(WITH_INCHI)
+@@ -141,7 +141,7 @@
+   add_test(${test}_Test ${TEST_PATH}/test_${test})
+   set_tests_properties(${test}_Test PROPERTIES
+     FAIL_REGULAR_EXPRESSION "not ok"
+-    ENVIRONMENT "BABEL_DATADIR=${CMAKE_SOURCE_DIR}/data;LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib"
++    ENVIRONMENT "BABEL_DATADIR=${CMAKE_SOURCE_DIR}/data;LD_LIBRARY_PATH=${CMAKE_BINARY_DIR}/lib:$ENV{LD_LIBRARY_PATH}"
+  )
+ endforeach(test ${old_tests})
+ 

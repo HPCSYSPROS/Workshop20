@@ -1,0 +1,3 @@
+# Configuration definitions for thorn CarpetInterp
+
+REQUIRES Carpet CarpetLib MPI

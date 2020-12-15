@@ -1,0 +1,9 @@
+NAMD_ARCH = MacOSX-x86_64
+CHARMARCH = multicore-darwin-x86_64
+
+CXX = clang++ -m64 -std=c++0x -stdlib=libc++ -fPIC -dynamic -fno-common -mmacosx-version-min=10.7 -D_REENTRANT -D_NO_MALLOC_H
+FLOATOPTS = -O3 -fomit-frame-pointer -msse3 -ffast-math
+CXXOPTS = $(FLOATOPTS)
+CC = clang -m64 -fPIC -dynamic -fno-common -mmacosx-version-min=10.7 -D_REENTRANT
+COPTS = $(FLOATOPTS)
+

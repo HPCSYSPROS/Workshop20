@@ -1,0 +1,22 @@
+Cactus Code Thorn GSL
+Author(s)    : Erik Schnetter
+Maintainer(s): Cactus team
+Licence      : GPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+Distribute the GNU Scientific Library; see
+<http://www.gnu.org/software/gsl/>.
+
+
+
+From the web site:
+
+The GNU Scientific Library (GSL) is a numerical library for C and C++
+programmers.  It is free software under the GNU General Public
+License.
+
+The library provides a wide range of mathematical routines such as
+random number generators, special functions and least-squares fitting.
+There are over 1000 functions in total with an extensive test suite.

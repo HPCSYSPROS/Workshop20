@@ -1,0 +1,6 @@
+# Source files in this directory
+SRCS = LocalStuff.c Reductions.c \
+	Output.cc ChangeShift.c
+
+# Subdirectories containing source files
+SUBDIRS = 

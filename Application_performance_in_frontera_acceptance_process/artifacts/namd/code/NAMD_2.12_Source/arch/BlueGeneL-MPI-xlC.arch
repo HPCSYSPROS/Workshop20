@@ -1,0 +1,12 @@
+NAMD_ARCH = BlueGeneL
+CHARMARCH = mpi-bluegenel-xlc
+
+# blrts_xlC is usually in /opt/ibmcmp/vacpp/7.0/bin/
+
+CXX = blrts_xlC -qstaticinline -DNO_SOCKET -DDUMMY_VMDSOCK -DNOHOSTNAME -DNO_GETPWUID -I/bgl/BlueLight/ppcfloor/bglsys/include/ -DNETWORK_PROGRESS -DUSE_TOPOMAP=1 -DPOWERPC_TANINT
+
+CXXOPTS = -O3 -Q -qarch=440 -qtune=440 -qhot -DARCH_POWERPC
+CXXNOALIASOPTS =  $(CXXOPTS) -qalias=noallptrs:notypeptr 
+
+CC = blrts_xlc
+COPTS = -O4 -qhot

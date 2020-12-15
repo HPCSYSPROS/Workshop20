@@ -1,0 +1,47 @@
+# Interface definition for thorn CoreCollapseControl
+
+implements: CoreCollapseControl
+
+inherits: CarpetRegrid2 HydroBase grid SphericalSurface
+
+USES INCLUDE HEADER: carpet.hh
+USES INCLUDE HEADER: loopcontrol.h
+
+CCTK_REAL rho_max TYPE=SCALAR "overall regrid rho_max"
+
+
+CCTK_REAL alp_min TYPE=SCALAR tags="checkpoint='yes'" "local alp_min"  
+CCTK_REAL global_alp_min TYPE=SCALAR tags="checkpoint='yes'" "overall alp_min" 
+
+CCTK_INT  rho_max_index[10] TYPE=SCALAR "which rho max value to check for each refinement center"
+
+
+CCTK_INT in_preBH TYPE=SCALAR tags="checkpoint='yes'" "is 1 when in pre-BH phase"
+
+CCTK_REAL local_entropy_max TYPE=SCALAR "max entropy within 100 M"
+
+public:
+
+CCTK_INT in_prebounce TYPE=SCALAR "is 1 when in prebounce phase"
+CCTK_INT bounce TYPE=SCALAR "is 1 when in bounce has happened"
+CCTK_INT force_check TYPE=sCALAR tags="checkpoint='no'" "force a corecollapse control check"
+CCTK_REAL bouncetime TYPE=SCALAR tags="checkpoint='yes'" "time of bounce in M"
+CCTK_REAL global_rho_max TYPE=SCALAR "overall regrid rho_max"
+CCTK_REAL global_entropy_max TYPE=SCALAR "max entropy within 100 M"
+
+CCTK_REAL fragment_props[10] TYPE=SCALAR
+{
+  fragment_rho_max,  # value of density maximum 
+  fragment_pos_x,    # position of density maximum
+  fragment_pos_y, 
+  fragment_pos_z
+} "Properties of fragments"
+
+CCTK_INT fragments_found TYPE=SCALAR "a flag whether fragments have been found once already"
+
+private:
+
+CCTK_INT FUNCTION      \
+    GetRefinementLevel \
+        (CCTK_POINTER_TO_CONST IN cctkGH)
+REQUIRES FUNCTION GetRefinementLevel

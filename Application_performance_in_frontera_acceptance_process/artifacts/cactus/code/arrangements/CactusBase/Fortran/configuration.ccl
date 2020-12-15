@@ -1,0 +1,9 @@
+# Configuration definition for thorn Fortran
+
+PROVIDES Fortran
+{
+  SCRIPT fortran.sh
+  LANG sh
+}
+
+REQUIRES Fortran

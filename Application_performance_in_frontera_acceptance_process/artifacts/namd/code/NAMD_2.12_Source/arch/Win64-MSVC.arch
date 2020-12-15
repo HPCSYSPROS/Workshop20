@@ -1,0 +1,12 @@
+NAMD_ARCH = Win64
+CHARMARCH = multicore-win64
+
+CXX = $(CHARM)/bin/unix2nt_cc -DWIN32 -DWIN64 -D__SSE2__ -DNAMD_SOCKLEN_T=int -D_NO_ALLOCA_H -D_CONSOLE -D_CRT_SECURE_NO_WARNINGS
+CC = $(CXX)
+
+CXXOPTS = -O
+CXXTHREADOPTS = 
+COPTS = -O
+
+windefault: winall
+

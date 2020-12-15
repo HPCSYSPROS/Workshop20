@@ -1,0 +1,292 @@
+# Schedule definitions for thorn ADMBase
+# $Header$
+
+STORAGE: shift_state dtlapse_state dtshift_state
+
+if (lapse_timelevels == 1)
+{
+  STORAGE: lapse[1]
+}
+else if (lapse_timelevels == 2)
+{
+  STORAGE: lapse[2]
+}
+else if (lapse_timelevels == 3)
+{
+  STORAGE: lapse[3]
+}
+
+if (! CCTK_Equals(initial_shift, "none"))
+{
+  if (shift_timelevels == 1)
+  {
+    STORAGE: shift[1]
+  }
+  else if (shift_timelevels == 2)
+  {
+    STORAGE: shift[2]
+  }
+  else if (shift_timelevels == 3)
+  {
+    STORAGE: shift[3]
+  }
+}
+
+if (! CCTK_Equals(initial_dtlapse, "none"))
+{
+  if (lapse_timelevels == 1)
+  {
+    STORAGE: dtlapse[1]
+  }
+  else if (lapse_timelevels == 2)
+  {
+    STORAGE: dtlapse[2]
+  }
+  else if (lapse_timelevels == 3)
+  {
+    STORAGE: dtlapse[3]
+  }
+}
+
+if (! CCTK_Equals(initial_dtshift, "none"))
+{
+  if (shift_timelevels == 1)
+  {
+    STORAGE: dtshift[1]
+  }
+  else if (shift_timelevels == 2)
+  {
+    STORAGE: dtshift[2]
+  }
+  else if (shift_timelevels == 3)
+  {
+    STORAGE: dtshift[3]
+  }
+}
+
+if (metric_timelevels == 1)
+{
+  STORAGE: metric[1], curv[1]
+}
+else if (metric_timelevels == 2)
+{
+  STORAGE: metric[2], curv[2]
+}
+else if (metric_timelevels == 3)
+{
+  STORAGE: metric[3], curv[3]
+}
+
+
+
+SCHEDULE ADMBase_ParamCheck at CCTK_PARAMCHECK
+{
+  LANG: C
+  OPTIONS: global
+} "Check consistency of parameters"
+
+# Schedule group for setting initial data
+
+SCHEDULE group ADMBase_InitialData at CCTK_INITIAL
+{
+} "Schedule group for calculating ADM initial data"
+
+SCHEDULE group ADMBase_InitialGauge at CCTK_INITIAL after ADMBase_InitialData
+{
+} "Schedule group for the ADM initial gauge condition"
+
+SCHEDULE group ADMBase_PostInitial at CCTK_INITIAL after (ADMBase_InitialData ADMBase_InitialGauge)
+{
+} "Schedule group for modifying the ADM initial data, such as e.g. adding noise"
+
+# Initial data for the spatial slices
+
+if (CCTK_Equals(initial_data, "Cartesian Minkowski"))
+{
+  SCHEDULE ADMBase_CartesianMinkowski in ADMBase_InitialData
+  {
+    LANG: C
+  } "Set the metric and extrinsic curvature to cartesian minkowski values"
+}
+
+# Initial data for the lapse
+
+if (CCTK_Equals(initial_lapse, "one"))
+{
+  SCHEDULE ADMBase_LapseOne in ADMBase_InitialGauge
+  {
+    LANG: C
+  } "Set the lapse to 1 at all points"
+}
+
+# Do we have storage for the shift?
+if (! CCTK_Equals(initial_shift, "none")) 
+{
+  SCHEDULE ADMBase_SetShiftStateOn at CCTK_BASEGRID
+  {
+    LANG: C
+  } "Set the shift_state variable to 1"
+}
+else
+{
+  SCHEDULE ADMBase_SetShiftStateOff at CCTK_BASEGRID
+  {
+    LANG: C
+  } "Set the shift_state variable to 0"
+}
+
+# Do we have storage for dtlapse?
+if (! CCTK_Equals(initial_dtlapse, "none")) 
+{
+  SCHEDULE ADMBase_SetDtLapseStateOn at CCTK_BASEGRID
+  {
+    LANG: C
+  } "Set the dtlapse_state variable to 1"
+}
+else
+{
+  SCHEDULE ADMBase_SetDtLapseStateOff at CCTK_BASEGRID
+  {
+    LANG: C
+  } "Set the dtlapse_state variable to 0"
+}
+
+# Do we have storage for dtshift?
+if (! CCTK_Equals(initial_dtshift, "none")) 
+{
+  SCHEDULE ADMBase_SetDtShiftStateOn at CCTK_BASEGRID
+  {
+    LANG: C
+  } "Set the dtshift_state variable to 1"
+}
+else
+{
+  SCHEDULE ADMBase_SetDtShiftStateOff at CCTK_BASEGRID
+  {
+    LANG: C
+  } "Set the dtshift_state variable to 0"
+}
+
+# Initial data for the shift
+if (CCTK_Equals(initial_shift, "zero"))
+{
+  SCHEDULE ADMBase_ShiftZero in ADMBase_InitialGauge
+  {
+    LANG: C
+  } "Set the shift to 0 at all points"
+}
+
+# Initial data for dtlapse
+if (CCTK_Equals(initial_dtlapse, "zero"))
+{
+  SCHEDULE ADMBase_DtLapseZero in ADMBase_InitialGauge
+  {
+    LANG: C
+  } "Set the dtlapse to 0 at all points"
+}
+
+# Initial data for dtshift
+if (CCTK_Equals(initial_dtshift, "zero"))
+{
+  SCHEDULE ADMBase_DtShiftZero in ADMBase_InitialGauge
+  {
+    LANG: C
+  } "Set the dtshift to 0 at all points"
+}
+
+
+
+if (CCTK_Equals(lapse_evolution_method, "static") ||
+    CCTK_Equals(lapse_evolution_method, "ID-apply-always"))
+{
+  SCHEDULE ADMBase_LapseStatic in CCTK_PRESTEP
+  {
+    LANG: C
+  } "Copy the lapse to the current time level"
+}
+
+if (CCTK_Equals(shift_evolution_method, "static") ||
+    CCTK_Equals(shift_evolution_method, "ID-apply-always"))
+{
+  SCHEDULE ADMBase_ShiftStatic in CCTK_PRESTEP
+  {
+    LANG: C
+  } "Copy the shift to the current time level"
+}
+
+if (CCTK_Equals(evolution_method, "static") ||
+    CCTK_Equals(evolution_method, "none") ||
+    CCTK_Equals(evolution_method, "ID-apply-always"))
+{
+  SCHEDULE ADMBase_Static in CCTK_PRESTEP
+  {
+    LANG: C
+  } "Copy the metric and extrinsic curvature to the current time level"
+}
+
+# FIXME: Remove this when symmetries done better 
+schedule Einstein_InitSymBound at CCTK_WRAGH
+{
+  LANG: C
+  OPTIONS: global
+} "Set up GF symmetries"
+
+# For Mesh Refinement it is possible (eg Cowling approximation) that ADMBase variables will need synchronization even when not evolved (eg when a new refined grid appears)
+if (CCTK_Equals(evolution_method, "static") || CCTK_Equals(evolution_method, "none") || CCTK_Equals(lapse_evolution_method, "static") || CCTK_Equals(shift_evolution_method, "static") || CCTK_Equals(dtlapse_evolution_method, "static") || CCTK_Equals(dtshift_evolution_method, "static") )
+{
+  SCHEDULE ADMBase_Boundaries IN MoL_PostStep BEFORE ADMBase_SetADMVars
+  {
+    LANG: C
+    OPTIONS: LEVEL
+    SYNC: lapse
+    SYNC: dtlapse
+    SYNC: shift
+    SYNC: dtshift
+    SYNC: metric
+    SYNC: curv
+  } "Select ADMBase boundary conditions - may be required for mesh refinement"
+
+  SCHEDULE GROUP ApplyBCs as ADMBase_ApplyBCs IN MoL_PostStep AFTER ADMBase_Boundaries BEFORE ADMBase_SetADMVars
+  {
+  } "Apply the boundary conditions of ADMBase"
+
+}
+
+if (CCTK_Equals(evolution_method, "ID-apply-regrid") ||
+    CCTK_Equals(evolution_method, "ID-apply-always"))
+{
+  SCHEDULE group ADMBase_InitialData at CCTK_POSTREGRID
+  {
+  } "Schedule group for calculating ADM initial data"
+
+  SCHEDULE group ADMBase_InitialData at CCTK_POSTREGRIDINITIAL
+  {
+  } "Schedule group for calculating ADM initial data"
+}
+
+if (CCTK_Equals(lapse_evolution_method, "ID-apply-regrid") ||
+    CCTK_Equals(shift_evolution_method, "ID-apply-regrid") ||
+    CCTK_Equals(dtlapse_evolution_method, "ID-apply-regrid") ||
+    CCTK_Equals(dtshift_evolution_method, "ID-apply-regrid") ||
+    CCTK_Equals(lapse_evolution_method, "ID-apply-always") ||
+    CCTK_Equals(shift_evolution_method, "ID-apply-always") ||
+    CCTK_Equals(dtlapse_evolution_method, "ID-apply-always") ||
+    CCTK_Equals(dtshift_evolution_method, "ID-apply-always"))
+{
+  SCHEDULE group ADMBase_InitialGauge at CCTK_POSTREGRID after ADMBase_InitialData BEFORE MoL_PostStep
+  {
+  } "Schedule group for the ADM initial gauge condition"
+
+  SCHEDULE group ADMBase_InitialGauge at CCTK_POSTREGRIDINITIAL after ADMBase_InitialData BEFORE MoL_PostStep
+  {
+  } "Schedule group for the ADM initial gauge condition"
+}
+
+# TODO: Rename this group to "ADMBase_HaveBeenSet"?
+SCHEDULE GROUP ADMBase_SetADMVars IN MoL_PostStep
+{
+} "Set the ADM variables before this group, and use them afterwards"
+
+SCHEDULE GROUP ADMBase_SetADMVars IN MoL_PseudoEvolution
+{
+} "Set the ADM variables before this group, and use them afterwards"

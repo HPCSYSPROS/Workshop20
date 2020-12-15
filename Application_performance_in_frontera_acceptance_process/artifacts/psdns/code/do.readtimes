@@ -1,0 +1,11 @@
+#!/bin/tcsh
+mkdir readtimes
+cd readtimes
+lfs setstripe . -c 1
+@ n = $1 - 1
+@ i = 0
+while ( $i <= $n )
+mkdir $i
+@ i = $i + 1
+end
+cd ..

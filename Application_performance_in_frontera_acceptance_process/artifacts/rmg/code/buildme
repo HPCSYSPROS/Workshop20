@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# W. Cyrus Proctor
+# 2017-11-13
+
+
+export base=`pwd`
+bash clean
+
+mkdir -p eigen
+cd eigen
+ln -s ../eigen.st2.build.gcc
+bash eigen.st2.build.gcc        2>&1 | tee eigen.st2.build.gcc.log 
+cd ..
+
+mkdir -p openbabel
+cd openbabel
+ln -s ../openbabel.st2.build.gcc
+ln -s ../patches
+bash openbabel.st2.build.gcc    2>&1 | tee openbabel.st2.build.gcc.log
+cd ..
+
+mkdir -p plplot
+cd plplot
+ln -s ../plplot.st2.build.gcc
+bash plplot.st2.build.gcc       2>&1 | tee plplot.st2.build.gcc.log
+cd ..
+
+mkdir -p rmg
+cd rmg
+ln -s ../rmg.st2.build.gcc
+bash rmg.st2.build.gcc          2>&1 | tee rmg.st2.build.gcc.log

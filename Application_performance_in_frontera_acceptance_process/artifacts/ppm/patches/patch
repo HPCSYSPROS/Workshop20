@@ -1,0 +1,54 @@
+diff -aur --no-dereference original_code/iq5120M2.h skx_code/iq5120M2.h
+--- original_code/iq5120M2.h	2017-11-15 11:12:05.000000000 -0600
++++ skx_code/iq5120M2.h	2017-11-15 11:12:05.000000000 -0600
+@@ -1,6 +1,6 @@
+ c 5120 cube, 270336 tasks, (8192 managers) 8448 nodes.
+-#define nnzteams (16+ismpi*0)
+-#define nnyteams 32
++#define nnzteams (8+ismpi*0)
++#define nnyteams 16
+ 
+ #define nntzbricks (4*nnBricksPerDimPerRank)
+ #define nntybricks (2*(nnBricksPerDimPerRank-is2D))
+diff -aur --no-dereference original_code/PPM2F-tp3-5-1-12-ICF-short-loops.F skx_code/PPM2F-tp3-5-1-12-ICF-short-loops.F
+--- original_code/PPM2F-tp3-5-1-12-ICF-short-loops.F	2017-11-15 11:12:05.000000000 -0600
++++ skx_code/PPM2F-tp3-5-1-12-ICF-short-loops.F	2017-11-15 11:12:05.000000000 -0600
+@@ -340,7 +340,9 @@
+ c                                       nnBricksPerDimPerRank must be 2.
+ ciq #define nntzbricks (4*nnBricksPerDimPerRank)
+ ciq #define nntybricks (4*(nnBricksPerDimPerRank-is2D))
+-#define nncpucores 8
++c#define nncpucores 8
++c#define nncpucores 2
++#define nncpucores 4
+ c#define nntempbqupdate max(10,2)
+ c#define nntempbq nntempbqupdate
+ #define nntempbqupdate max(5,2)
+@@ -405,7 +407,7 @@
+ c
+ #define nntxbricks nntzbricks
+ #define nnbdy 4
+-#define nnsugar 4
++#define nnsugar 8
+ c
+ c     Every node will be assigned a 2x2x2 octobrick of 8 bricks,
+ c                to be updated by nncpucores cooperatively.
+@@ -2470,7 +2472,7 @@
+ #endif
+ c
+ #if ismoms+is3D > 0
+-      if (nsugar .ne. 4)   then
++      if ( nsugar .ne. 4 .and. nsugar .ne. 8 )   then
+       write (6,*) 'I simply refuse to run if you insist that'
+       write (6,*) 'nsugar is not equal to 4.     Job killed.'
+       open (36,file='ERRORinJOB.ppm',form='formatted',
+@@ -57337,8 +57339,7 @@
+ #endif
+ c
+ c
+-! Directive disabled: Lars Fri Jun 30 11:33:06 CDT 2017
+-!!!!dir$ inlinealways unify
++!dir$ inlinealways unify
+ c
+       parameter (nsugar=nnsugar)
+       parameter (nbdy=nnbdy)

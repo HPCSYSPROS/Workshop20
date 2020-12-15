@@ -1,0 +1,77 @@
+# Main make.code.defn file for thorn SummationByParts
+# $Header$
+
+# Source files in this directory
+SRCS =  call_derivs.c \
+        call_up_derivs.c \
+        call_derivs2.c \
+        call_derivs_name.c \
+        All_Coeffs_mod.F90 \
+        Derivatives_2_1.F90 \
+        Derivatives2_2_1.F90 \
+        Derivatives_4_2.F90 \
+        Derivatives2_4_2.F90 \
+        Derivatives2_4_2_min_err_coeff.F90 \
+        Derivatives_6_3.F90 \
+        Derivatives2_6_3.F90 \
+        Derivatives_6_3_min_err_coeff.F90 \
+        Derivatives_8_4.F90 \
+        Derivatives2_8_4.F90 \
+        Derivatives_8_4_min_err_coeff.F90 \
+        Derivatives_4_3.F90 \
+        Derivatives_4_3_min_err_coeff.F90 \
+        Derivatives_6_5.F90 \
+        Derivatives_6_5_min_err_coeff.F90 \
+        Derivatives2_mixed.F90 \
+        Get_Coeff.F90 \
+        set_norm_mask.F90 \
+        GetScalProdDiag.F90 \
+        CheckGridSizes.F90 \
+        dissipation.c \
+        Dissipation_2_1.F90 \
+        Dissipation_2_1_alt.F90 \
+        Dissipation_4_2.F90 \
+        Dissipation_4_2_alt.F90 \
+        Dissipation_6_3.F90 \
+        Dissipation_6_3_alt.F90 \
+        Dissipation_8_4.F90 \
+        Dissipation_8_4_alt.F90 \
+        Dissipation_4_3_min_err_coeff.F90 \
+        Dissipation_4_3_min_err_coeff_alt.F90 \
+        Dissipation_6_5_min_err_coeff.F90 \
+        Dissipation_6_5_min_err_coeff_alt.F90 \
+        dissipation_coeff.F90 \
+        DeltaInitial.F90 \
+        get_coeffs.c \
+        get_up_coeffs.c \
+        get_coeffs2.c \
+        Coefficients_2_1.F90 \
+        Coefficients_2.F90 \
+        Coefficients2_2_1.F90 \
+        Coefficients2_2.F90 \
+        Coefficients_4_2.F90 \
+        Coefficients_4.F90 \
+        Coefficients2_4_2.F90 \
+        Coefficients2_4_2_min_err_coeff.F90 \
+        Coefficients2_4.F90 \
+        Coefficients_6_3.F90 \
+        Coefficients2_6_3.F90 \
+        Coefficients_6_3_min_err_coeff.F90 \
+        Coefficients_6.F90 \
+        Coefficients2_6.F90 \
+        Coefficients_8_4.F90 \
+        Coefficients2_8_4.F90 \
+        Coefficients_8_4_min_err_coeff.F90 \
+        Coefficients_8.F90 \
+        Coefficients2_8.F90 \
+        Coefficients_4_3.F90 \
+        Coefficients_4_3_min_err_coeff.F90 \
+        Coefficients_6_5.F90 \
+        Coefficients_6_5_min_err_coeff.F90 \
+        Poisoning.F90 \
+        get_offset.c \
+        stencil.c \
+        get_boundary_width.c
+
+# Subdirectories containing source files
+SUBDIRS = 

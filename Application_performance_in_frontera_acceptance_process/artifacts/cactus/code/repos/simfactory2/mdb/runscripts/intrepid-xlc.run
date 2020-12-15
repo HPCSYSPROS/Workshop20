@@ -1,0 +1,41 @@
+#! /bin/bash
+
+# NOTE: This file should not be executed; qsub calls the executable
+# directly.
+exit
+
+# NOTE: Node count etc. are given with qsub command; see mdb
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+#
+#
+export GMON_OUT_PREFIX=gmon.out
+
+echo "Checking:"
+pwd
+hostname
+date
+
+echo "Environment:"
+export OMP_NUM_THREADS=@NUM_THREADS@
+env | sort > SIMFACTORY/ENVIRONMENT
+
+case @(@PPN_USED@/@NUM_THREADS@)@ in
+    1) mode='smp' ;;
+    2) mode='dual';;
+    4) mode='vn'  ;;
+    *) echo 'Error: The combination PPN_USED=@PPN_USED@ NUM_THREADS=@NUM_THREADS@ is not supported.'; exit 1;;
+esac
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+cobalt-mpirun -verbose 2 -np @NUM_PROCS@ -mode "$mode" -env OMP_NUM_THREADS=${OMP_NUM_THREADS}:CACTUS_STARTTIME=${CACTUS_STARTTIME}:BG_MAPPING=TXYZ @EXECUTABLE@ -L 3 @PARFILE@
+
+echo "Stopping:"
+date
+
+echo "Done."

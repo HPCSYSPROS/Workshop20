@@ -1,0 +1,12 @@
+#! /bin/sh
+#  /*@@
+#    @file      aix4.3.0.0
+#    @date      Mon 03 Sep 2001
+#    @author    Thomas Radke
+#    @desc
+#               known-architecture file for AIX 4.3.0.0
+#    @enddesc
+#    @version   $Header$
+#  @@*/
+
+. $srcdir/known-architectures/aix

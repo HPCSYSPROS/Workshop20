@@ -1,0 +1,54 @@
+#!/bin/bash
+
+file="sim.py"
+
+dirs=". ../lib ./simfactory/lib ../simfactory/lib"
+for dir in $dirs; do
+    cmd=$(dirname "$0")"/$dir/$file"
+    if [ -f "$cmd" ]; then
+        break
+    fi
+    unset cmd
+done
+if [ -z "$cmd" ]; then
+    echo "Could not find sim.py"
+    exit 1
+fi
+
+echo $cmd
+
+echo "--------------------------------------------------------------------------------"
+echo "Checking Python source code with PyChecker:"
+found=0
+PYCHECKERS="pychecker pychecker-py26 pychecker-2.7"
+for PYCHECKER in $PYCHECKERS; do
+    if which "$PYCHECKER" 2>/dev/null 1>/dev/null; then
+        found=1
+        "$PYCHECKER" -Q "$cmd"
+        break
+    fi
+done
+
+if [ $found = 0 ]; then    
+    echo "pychecker not found (tried $PYCHECKERS)"
+fi
+
+echo "Done checking Python source code with PyChecker."
+echo "--------------------------------------------------------------------------------"
+echo "Checking Python source code with PyLint:"
+found=0
+PYLINTS="pylint pylint2.6 pylint-2.6 pylint-2.4"
+for PYLINT in $PYLINTS; do
+    if which "$PYLINT" 2>/dev/null 1>/dev/null; then
+        found=1
+        "$PYLINT" -r n $(dirname "$cmd")/*.py
+        break
+    fi
+done
+
+if [ $found = 0 ]; then    
+    echo "pylint not found (tried $PYLINTS)"
+fi
+
+echo "Done checking Python source code with PyLint."
+echo "--------------------------------------------------------------------------------"

@@ -1,0 +1,24 @@
+
+    This directory /mnt/a/u/staff/rhaas/staff/spp/Zelmani/Cactus/cactusjar.git
+    is not empty -- it contains a git repository with the Cactus source
+    trees of all previous builds, starting on Sun Sep 25 21:53:25 CDT 2016.
+
+    You can use the command "git branch" to list all configurations that
+    are stored in this repository.  The history of each branch is the
+    sequence in which the configuration was built.  The most recent
+    build is stored in the branch head, as usual.  In order to check out a
+    certain branch into a directory <name>, issue the following commands:
+            cd <somewhere_else>
+            mkdir <name>
+            cd <name>
+            git init
+            git pull /mnt/a/u/staff/rhaas/staff/spp/Zelmani/Cactus/cactusjar.git <branch>
+
+    You can also use the command "git tag -l" to list all builds that
+    are stored in this repository.  This keeps the source tree for each
+    build directly accessible.  In order to check out a certain tag into a
+    directory <name>, issue the following commands:
+            cd <somewhere_else>
+            git clone -o <name> /mnt/a/u/staff/rhaas/staff/spp/Zelmani/Cactus/cactusjar.git
+            git checkout <tag>
+    

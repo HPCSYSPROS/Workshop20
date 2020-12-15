@@ -1,0 +1,13 @@
+#! /bin/bash
+#PBS -r n
+#PBS -l walltime=@(max(900, @WALLTIME_SECONDS@))@
+#PBS -q @QUEUE@
+#PBS -l nodes=@NODES@:ppn=@PPN@
+#PBS @('@CHAINED_JOB_ID@' != '' ? '-hold_jid @CHAINED_JOB_ID@' : '')@
+#PBS -N @SHORT_SIMULATION_NAME@
+#PBS -M @EMAIL@
+#PBS -m abe
+#PBS -o @RUNDIR@/@SIMULATION_NAME@.out
+#PBS -e @RUNDIR@/@SIMULATION_NAME@.err
+cd @SOURCEDIR@
+@SIMFACTORY@ run @SIMULATION_NAME@ --machine=@MACHINE@ --restart-id=@RESTART_ID@ @FROM_RESTART_COMMAND@

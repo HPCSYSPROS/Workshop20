@@ -1,0 +1,67 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+module ComputeMsmMsaMgr {
+
+  message MsmMsaCoordMsg {
+    ComputeMsmMsaAtom coord[];
+  };
+/*
+  message MsmMsaSerialForceMsg {
+    MsmMsaSerialForce force[];
+  };
+*/
+
+  group ComputeMsmMsaMgr {
+
+    entry ComputeMsmMsaMgr(void);
+    entry void initialize(CkQdMsg *);
+    entry void initWorkers(CkQdMsg *);
+    entry void startWorkers(CkQdMsg *);
+
+    //entry void recvCoord(MsmMsaSerialCoordMsg *);
+    //entry void recvForce(MsmMsaSerialForceMsg *);
+
+    entry void recvMsmMsaData(const MsmMsaData &);
+
+    entry [threaded] void anterpolate(MsmMsaCoordMsg *);
+    entry [threaded] void interpolate(CkQdMsg *);
+  };
+
+  array [1D] MsmMsaLevel {
+    entry MsmMsaLevel(MsmMsaGrid &qh, MsmMsaGrid &eh, MsmMsaGrid &q2h, MsmMsaGrid &e2h);
+    entry MsmMsaLevel(MsmMsaGrid &qh, MsmMsaGrid &eh);  // for top level
+    entry [threaded] void compute();
+  };
+
+  array [3D] MsmMsaGridCutoff {
+    entry MsmMsaGridCutoff(int level, MsmMsaGrid &qh, MsmMsaGrid &eh);
+    entry [threaded] void compute();
+  };
+
+  array [3D] MsmMsaRestriction {
+    entry MsmMsaRestriction(int level, MsmMsaGrid &qh, MsmMsaGrid &q2h);
+    entry [threaded] void compute();
+  };
+
+  array [3D] MsmMsaProlongation {
+    entry MsmMsaProlongation(int level, MsmMsaGrid &eh, MsmMsaGrid &e2h);
+    entry [threaded] void compute();
+  };
+
+  array [1D] MsmMsaEnergy {
+    entry MsmMsaEnergy(MsmMsaGrid &qh, MsmMsaGrid &eh);
+    entry [threaded] void compute();
+  };
+
+  group MSA_CacheGroup<float, DefaultEntry<float>,
+        MSA_DEFAULT_ENTRIES_PER_PAGE>;
+
+  array [1D] MSA_PageArray<float, DefaultEntry<float>,
+        MSA_DEFAULT_ENTRIES_PER_PAGE>;
+
+};
+

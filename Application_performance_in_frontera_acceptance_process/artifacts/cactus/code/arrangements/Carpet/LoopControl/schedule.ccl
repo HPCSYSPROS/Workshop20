@@ -1,0 +1,24 @@
+# Schedule definitions for thorn LoopControl
+
+SCHEDULE lc_setup AT startup BEFORE Driver_Startup
+{
+  LANG: C
+} "Set up LoopControl"
+
+SCHEDULE lc_steer AT prestep
+{
+  LANG: C
+  OPTIONS: meta
+} "Update LoopControl algorithm preferences"
+
+SCHEDULE lc_statistics_analysis AT analysis
+{
+  LANG: C
+  OPTIONS: meta
+} "Output LoopControl statistics"
+
+SCHEDULE lc_statistics_terminate AT terminate
+{
+  LANG: C
+  OPTIONS: meta
+} "Output LoopControl statistics"

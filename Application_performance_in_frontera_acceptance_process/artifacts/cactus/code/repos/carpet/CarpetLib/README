@@ -1,0 +1,9 @@
+Cactus Code Thorn CarpetLib
+Author(s)    : Erik Schnetter <schnetter@cct.lsu.edu>
+Maintainer(s): Erik Schnetter <schnetter@cct.lsu.edu>
+Licence      : GPLv2+
+--------------------------------------------------------------------------
+
+1. Purpose
+
+This thorn contains the backend library that provides mesh refinement.

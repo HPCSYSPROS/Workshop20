@@ -1,0 +1,73 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+echo "Checking:"
+pwd
+hostname
+date
+cat ${PBS_NODEFILE} > SIMFACTORY/NODES
+
+module load intel/cs-xe-2015--binary  
+module load intelmpi/5.0.2--binary 
+module load mkl/11.2--binary
+
+echo "Environment:"
+export GMON_OUT_PREFIX=gmon.out
+export OMP_NUM_THREADS=@NUM_THREADS@
+#export OPENMPI_DIR=/usr/local/packages/openmpi/1.6.3/Intel-13.0.0
+#export MPD_NODEFILE=mpd_nodefile
+#export MV2_SRQ_SIZE=4000        # ???
+#export MV2_USE_RING_STARTUP=0
+#export MPI_NODEFILE=mpi_nodefile
+env > SIMFACTORY/ENVIRONMENT
+
+echo "Job setup:"
+echo "   Allocated:"
+echo "      Nodes:                      @NODES@"
+echo "      Cores per node:             @PPN@"
+echo "   Running:"
+echo "      MPI processes:              @NUM_PROCS@"
+echo "      OpenMP threads per process: @NUM_THREADS@"
+echo "      MPI processes per node:     @(1.0*@NUM_PROCS@/@NODES@)@"
+echo "      OpenMP threads per core:    @(1.0*(@NUM_PROCS@*@NUM_THREADS@)/(@NODES@*@PPN@))@"
+echo "      OpenMP threads per node:    @PPN_USED@"
+
+case '@PPN_USED@:@NUM_THREADS@' in
+    (16:16|8:8|4:4|2:2|1:1) options='-npernode 1 -bind-to-none';;
+    (16:8|8:4|4:2|2:1)      options='-npersocket 1 -bind-to-socket';;
+    (16:4|8:2|4:1)          options='-npersocket 2 -bind-to-socket';;
+    (16:2|8:1)              options='-npersocket 4 -bind-to-socket';;
+    (16:1|*)                options='-npersocket 8 -bind-to-core';;
+esac
+
+echo "Starting:"
+ 
+mpirun @EXECUTABLE@ -L 3 @PARFILE@  
+
+## uniq ${PBS_NODEFILE} > ${MPD_NODEFILE}
+## for node in $(cat ${MPD_NODEFILE}); do
+##     for ((proc=0; $proc<@(@PPN_USED@/@NUM_THREADS@)@; proc=$proc+1)); do
+##         echo ${node}
+##     done
+## done > ${MPI_NODEFILE}
+## export CACTUS_STARTTIME=$(date +%s)
+## 
+## if [ @RUNDEBUG@ -eq 0 ]; then
+##     time ${OPENMPI_DIR}/bin/mpirun -n @NUM_PROCS@ -hostfile ${MPI_NODEFILE} -mca I_MPI_OFA_USE_XRC 1 -mca coll_fca_enable 0 -num-sockets 2 $options -display-map -report-bindings -x MV2_ENABLE_AFFINITY=0 -x OMP_NUM_THREADS=@NUM_THREADS@ @EXECUTABLE@ -L 3 @PARFILE@
+## else
+##	OPENMPI_DIR=/usr/local/packages/openmpi/1.6.3/Intel-13.0.0
+## 	export MV2_ENABLE_AFFINIT=0
+## 	export OMP_NUM_THREADS=@NUM_THREADS@
+## 	eval `soft-dec sh add +totalview-8.10.1`
+## 	${OPENMPI_DIR}/bin/mpirun -tv -n @NUM_PROCS@ -hostfile -mca I_MPI_OFA_USE_XRC 1 -mca coll_fca_enable 0 -num-sockets 2 $options -display-map -report-bindings ${MPI_NODEFILE} @EXECUTABLE@ -L 3 @PARFILE@
+## fi
+## 
+echo "Stopping:"
+date
+
+echo "Done."

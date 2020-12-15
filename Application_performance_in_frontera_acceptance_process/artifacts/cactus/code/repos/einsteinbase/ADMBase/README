@@ -1,0 +1,10 @@
+Cactus Code Thorn ADMBase
+Author(s)    : Tom Goodale
+Maintainer(s): Cactus team
+Licence      : LGPL
+--------------------------------------------------------------------------
+
+1. Purpose
+
+This thorn provides the basic variables used to communicate between
+thorns doing General Relativity in the 3+1 formalism.

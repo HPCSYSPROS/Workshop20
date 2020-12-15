@@ -1,0 +1,43 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+mainmodule main {
+  // main - defines most of the system wide simple messages
+
+  mainchare main {
+    entry main();
+  };
+  extern module WorkDistrib;
+  extern module ReductionMgr;
+  extern module PatchMgr;
+  extern module ProxyMgr;
+  extern module Node;
+  extern module LdbCoordinator;
+  extern module ComputeMgr;
+  extern module ComputePmeMgr;
+//#ifdef NAMD_CUDA
+  extern module ComputePmeCUDAMgr;
+  extern module ComputeCUDAMgr;
+//#endif
+  #ifdef OPENATOM_VERSION
+  extern module ComputeMoaMgr;
+  #endif // OPENATOM_VERSION
+  extern module OptPmeMgr;
+  extern module ComputeExtMgr;
+  extern module ComputeQMMgr;
+  extern module ComputeGBISserMgr;
+  extern module ComputeFmmSerialMgr;
+  extern module ComputeMsmSerialMgr;
+//  extern module ComputeMsmMsaMgr;
+  extern module ComputeMsmMgr;
+  extern module CollectionMgr;
+  extern module CollectionMaster;
+  extern module BroadcastMgr;
+  extern module Sync;
+  extern module ParallelIOMgr;
+  extern module DataExchanger;
+}
+

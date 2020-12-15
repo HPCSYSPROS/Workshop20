@@ -1,0 +1,39 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+#set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+pwd
+hostname
+date
+
+. /etc/profile
+. /etc/profile.d/modules.sh
+
+echo "Environment:"
+
+export LOADLEVELER_VERSION=$LOADL_ACTIVE
+export MP_SINGLE_THREAD=no
+export OMP_NUM_THREADS=@NUM_THREADS@
+export MP_TASK_AFFINITY=core:$OMP_NUM_THREADS
+
+env | sort > SIMFACTORY/ENVIRONMENT
+
+echo "Starting:"
+
+export CACTUS_STARTTIME=$(date +%s)
+
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+
+export MP_DEBUG_NOTIMEOUT=yes
+#/usr/bin/poe @EXECUTABLE@ -L 3 @PARFILE@
+mpiexec -n @NUM_PROCS@ @EXECUTABLE@ -L 3 @PARFILE@
+
+echo "Stopping:"
+date
+
+echo "Done."

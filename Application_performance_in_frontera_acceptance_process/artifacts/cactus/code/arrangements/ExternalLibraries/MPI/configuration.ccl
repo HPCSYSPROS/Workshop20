@@ -1,0 +1,15 @@
+# Configuration definitions for thorn MPI
+
+PROVIDES MPI
+{
+  SCRIPT src/detect.pl
+  LANG perl
+  OPTIONS MPI MPI_DIR MPI_INC_DIRS MPI_LIB_DIRS MPI_LIBS MPI_INSTALL_DIR HWLOC_DIR
+}
+
+# Pass configuration options to build script
+REQUIRES MPI
+
+OPTIONAL hwloc
+{
+}

@@ -1,0 +1,29 @@
+#! /bin/sh
+# /*@@
+#   @file   hp-ux     
+#   @date      
+#   @author Gabrielle Allen  
+#   @desc 
+#   Known architecture stuff for the NCSA Exemplar
+#   @enddesc 
+#   @version $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/known-architectures/hp-ux,v 1.8 1999-10-11 16:34:46 goodale Exp $
+# @@*/
+
+if test "$CCTK_CONFIG_STAGE" = "preferred-compilers" ; then
+
+:
+
+else
+
+  : ${LIBS="cl F90 m"}
+  : ${LIBDIRS="/opt/fortran90/lib/"}
+  : ${C_DEPEND='$(CPP) -M$@ $(CPPFLAGS) $(CFLAGS)'}
+  : ${CXX_DEPEND='$(CPP) -M$@ $(CPPFLAGS) $(CXXFLAGS)'}
+  : ${F77_DEPEND='$(CPP) -M$@ $(CPPFLAGS)'}
+  : ${C_DEPEND_OUT='> /dev/null'}
+  : ${CXX_DEPEND_OUT='> /dev/null'}
+  : ${F_DEPEND='$(CPP) -M$@ $(CPPFLAGS)'}
+  : ${F_DEPEND_OUT='> /dev/null'}
+  : ${F77_DEPEND_OUT='> /dev/null; perl -p -i -e "s/\.F77\.o/\.o/g" $(basename $(@)).d '}
+
+fi

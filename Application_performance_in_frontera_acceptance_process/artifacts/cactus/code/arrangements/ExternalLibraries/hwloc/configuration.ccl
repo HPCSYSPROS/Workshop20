@@ -1,0 +1,16 @@
+# Configuration definitions for thorn hwloc
+
+REQUIRES zlib
+
+OPTIONAL pciutils
+{
+}
+
+PROVIDES hwloc
+{
+  SCRIPT src/detect.sh
+  LANG bash
+  OPTIONS HWLOC_DIR HWLOC_EXTRA_LIBS HWLOC_INSTALL_DIR
+}
+
+REQUIRES hwloc

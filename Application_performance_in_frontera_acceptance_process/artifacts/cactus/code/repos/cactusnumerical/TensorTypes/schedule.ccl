@@ -1,0 +1,12 @@
+# Schedule definitions for thorn TensorTypes
+# $Header$
+
+
+
+# Disable the check of the tensor types of all grid variables.
+# This thorn does currently not know all existing tensor types.
+
+## SCHEDULE CheckTensorTypes AT paramcheck
+## {
+##   LANG: C
+## } "Check tensor type definitions for consistency"

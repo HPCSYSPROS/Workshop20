@@ -1,0 +1,28 @@
+# Interface definition for thorn LoopControl
+
+IMPLEMENTS: LoopControl
+
+INHERITS: CycleClock
+
+INCLUDE HEADER: loopcontrol.h IN loopcontrol.h
+
+USES INCLUDE HEADER: cycleclock.h
+USES INCLUDE HEADER: vectors.h
+
+
+
+CCTK_INT FUNCTION GetNumSMTThreads()
+USES FUNCTION GetNumSMTThreads
+
+CCTK_INT FUNCTION GetCacheInfo1                            \
+    (CCTK_POINTER_TO_CONST ARRAY OUT names,                \
+     CCTK_INT              ARRAY OUT types,                \
+     CCTK_POINTER_TO_CONST ARRAY OUT sizes,                \
+     CCTK_INT              ARRAY OUT linesizes,            \
+     CCTK_INT              ARRAY OUT strides,              \
+     CCTK_INT              ARRAY OUT num_puss,             \
+     CCTK_INT                    IN  max_num_cache_levels)
+USES FUNCTION GetCacheInfo1
+
+CCTK_INT FUNCTION IO_TruncateOutputFiles(CCTK_POINTER_TO_CONST IN cctkGH)
+REQUIRES FUNCTION IO_TruncateOutputFiles

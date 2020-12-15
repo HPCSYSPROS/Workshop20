@@ -1,0 +1,29 @@
+# Interface definition for thorn GRHydroQuadWaveExtract
+
+
+implements: ZelmaniQuadWaveExtract
+
+
+inherits: HydroBase Reduce Grid Driver ADMBase Coordinates
+
+CCTK_REAL extraction_helpers TYPE=GF TIMELEVELS=3
+{
+  dIdotxx,dIdotxy,dIdotxz,dIdotyy,dIdotyz,dIdotzz,dBaryMass
+} "helper variables for extraction"
+
+
+CCTK_REAL Idots TYPE=SCALAR tags='tensortypealias="Scalar"'
+{
+	Idotxx,Idotxy,Idotxz,Idotyy,Idotyz,Idotzz,BaryMass
+} "First time derivative of the mass quadrupole tensor"
+
+
+CCTK_INT dostuff
+
+
+CCTK_REAL volume
+CCTK_REAL xsum
+
+public: 
+
+CCTK_REAL rhomax

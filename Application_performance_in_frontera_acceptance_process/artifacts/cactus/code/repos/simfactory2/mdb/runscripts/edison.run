@@ -1,0 +1,42 @@
+#! /bin/bash
+
+echo "Preparing:"
+set -x                          # Output commands
+set -e                          # Abort on errors
+
+cd @RUNDIR@-active
+
+module list
+
+echo "Checking:"
+pwd
+hostname
+date
+# TODO: This does not work
+cat ${PBS_NODES} > SIMFACTORY/NODES
+
+echo "Environment:"
+export CACTUS_NUM_PROCS=@NUM_PROCS@
+export CACTUS_NUM_THREADS=@NUM_THREADS@
+export GMON_OUT_PREFIX=gmon.out
+export OMP_NUM_THREADS=@NUM_THREADS@
+env | sort > SIMFACTORY/ENVIRONMENT
+
+# Specify the number of MPI processes per node explicitly, but only if
+# -N <= -n.
+export NODE_PROCS='@(@PPN_USED@ / @NUM_THREADS@ <= @NUM_PROCS@ ? "-N @(@PPN_USED@ / @NUM_THREADS@)@" : "")@'
+
+# Specify the number of MPI processes per socket explicitly, but only
+# if it is a whole number
+export SOCKET_PROCS='@(@PPN_USED@ % (2 * @NUM_THREADS@) == 0 ? "-S @(@PPN_USED@ / (2 * @NUM_THREADS@))@" : "")@'
+
+# Specify whether to use HyperThreading
+export CORE_PROCS='@(@PPN_USED@ % (24 * @NUM_THREADS@) == 0 ? "-j @(@PPN_USED@ / (24 * @NUM_THREADS@))@" : "")@'
+
+echo "Starting:"
+export CACTUS_STARTTIME=$(date +%s)
+aprun -cc numa_node -n @NUM_PROCS@ -d @NUM_THREADS@ ${NODE_PROCS} ${SOCKET_PROCS} ${CORE_PROCS} @EXECUTABLE@ -L 3 @PARFILE@
+echo "Stopping:"
+date
+
+echo "Done."

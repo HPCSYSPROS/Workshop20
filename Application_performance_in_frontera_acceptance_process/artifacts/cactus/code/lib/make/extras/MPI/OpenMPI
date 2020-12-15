@@ -1,0 +1,98 @@
+#! /bin/sh
+# /*@@
+#   @file    OpenMPI
+#   @date    Feb. 2, 2006
+#   @author  Tom Goodale; modified by Steve White
+#   @desc
+#            Configure Cactus to compile with the OpenMPI version of MPI.
+#   @enddesc
+#   @version $Header: /mnt/data2/cvs2svn/cvs-repositories/Cactus/lib/make/extras/MPI/OpenMPI,v 1.4 2007-05-23 14:40:40 tradke Exp $
+# @@*/
+
+echo '  OpenMPI selected'
+
+if test -z "$OPENMPI_LIB_DIR" -o -z "$OPENMPI_INC_DIR" ; then
+  if test -z "$OPENMPI_DIR" ; then
+    echo '  OpenMPI selected but no OPENMPI_DIR set. Checking some places...'
+    if test -d '/usr/include/openmpi' -a -d '/usr/lib/openmpi' ; then
+      openmpi_libs='/usr/lib/openmpi'
+      openmpi_includes='/usr/include/openmpi'
+    elif test -d '/usr/local/include/openmpi' -a -d '/usr/local/lib/openmpi' ; then
+      openmpi_libs='/usr/local/lib/openmpi'
+      openmpi_includes='/usr/local/include/openmpi'
+    else
+      CCTK_Search OPENMPI_DIR "/usr /opt/openmpi /usr/local /usr/local/openmpi /usr/local/packages/openmpi /usr/local/apps/openmpi $HOME" lib/liborte.a
+      if test -z "$OPENMPI_DIR" ; then
+        echo '  Unable to locate OpenMPI installation - please set OPENMPI_DIR or {OPENMPI_INC_DIR, OPENMPI_LIB_DIR}'
+        exit 2
+      fi
+    fi
+  fi
+
+  # set OPENMPI_INC_DIR if not already set
+  if test -z "$OPENMPI_INC_DIR" ; then
+
+    : ${openmpi_includes="$OPENMPI_DIR/include"}
+
+    # search for mpicxx.h which might be in an include subdirectory
+    if test -r "$openmpi_includes/openmpi/ompi/mpi/cxx/mpicxx.h" ; then
+      openmpi_cxx_includes="$openmpi_includes/openmpi/"
+    fi
+
+    # don't explicitly add standard include search paths
+    if test "$openmpi_includes" != '/usr/include' -a "$openmpi_includes" != '/usr/local/include'; then
+      OPENMPI_INC_DIR="$openmpi_includes"
+    fi
+    if test -n "$openmpi_cxx_includes"; then
+      OPENMPI_INC_DIR="$OPENMPI_INC_DIR $openmpi_cxx_includes"
+    fi
+
+  fi
+
+  # set OPENMPI_LIB_DIR if not already set
+  if test -z "$OPENMPI_LIB_DIR" ; then
+    openmpi_libs="$OPENMPI_DIR/lib64"
+    if test ! -d "$openmpi_libs" ; then
+      openmpi_libs="$OPENMPI_DIR/lib"
+    fi
+
+    # don't add standard library search paths
+    if test                                     \
+        "$openmpi_libs" != '/lib' -a            \
+        "$openmpi_libs" != '/lib64' -a          \
+        "$openmpi_libs" != '/usr/lib' -a        \
+        "$openmpi_libs" != '/usr/lib64' -a      \
+        "$openmpi_libs" != '/usr/local/lib' -a  \
+        "$openmpi_libs" != '/usr/local/lib64';  \
+        then
+      OPENMPI_LIB_DIR="$openmpi_libs"
+    fi
+  fi
+
+  if test -z "$OPENMPI_INC_DIR"; then
+    echo '  Using no explicit OpenMPI include path'
+  else
+    echo "  Using \"$OPENMPI_INC_DIR\" as OpenMPI include path"
+  fi
+  if test -z "$OPENMPI_LIB_DIR"; then
+    echo '  Using no explicit OpenMPI library path'
+  else
+    echo "  Using \"$OPENMPI_LIB_DIR\" as OpenMPI library path"
+  fi
+fi
+
+# which version of OpenMPI are we using ?
+if test -x "$OPENMPI_DIR/bin/ompi_info" ; then
+  version=`LD_LIBRARY_PATH=$OPENMPI_BIN_LIB_DIR:$LD_LIBRARY_PATH $OPENMPI_DIR/bin/ompi_info --parsable | grep 'ompi:version:full' | cut -c19-`
+fi
+
+MPI_LIBS='mpi mpi_cxx'
+if test "$version" = '1.1'; then
+  MPI_LIBS='mpi orte opal mpi_cxx'
+fi
+
+# if ompi_info program is available, can at least get the "prefix"
+# directory from that.
+
+MPI_INC_DIRS="$OPENMPI_INC_DIR"
+MPI_LIB_DIRS="$OPENMPI_LIB_DIR"

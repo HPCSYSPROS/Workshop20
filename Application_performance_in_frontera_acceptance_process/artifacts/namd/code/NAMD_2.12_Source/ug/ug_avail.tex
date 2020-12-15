@@ -1,0 +1,77 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                          %
+%              (C) Copyright 1995 The Board of Trustees of the             %
+%                          University of Illinois                          %
+%                           All Rights Reserved                            %
+%								  	   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{\NAMD\ Availability and Installation}
+\label{section:avail}
+
+\NAMD\ is distributed freely for non-profit use.
+\NAMD\ \NAMDVER\ is based on the Charm++ messaging system and the
+Converse communication layer ({\tt http://charm.cs.uiuc.edu/})
+which have been ported to a wide variety of parallel platforms.
+This section describes how to obtain and install \NAMD\ \NAMDVER.
+
+\subsection{How to obtain \NAMD}
+
+\NAMD\ may be downloaded from {\tt http://www.ks.uiuc.edu/Research/namd/}.
+You will be required to provide minimal registration information and
+agree to a license before receiving access to the software.
+Both source and binary distributions are available.
+
+\subsection{Platforms on which \NAMD\ will currently run}
+\NAMD\ should be portable to any parallel platform with a
+modern C++ compiler to which Charm and Converse have been ported.
+Precompiled \NAMD\ \NAMDVER\ binaries are available for
+download for the following platforms:  
+
+\begin{itemize}
+\item Windows (7, 8, 10, etc.) on x86-64 processors
+\item Mac OS X on Intel processors
+\item Linux on x86-64 processors
+\item Windows, Mac OS X, or Linux with NVIDIA GPUs (CUDA)
+\end{itemize}
+
+\NAMD\ may be compiled for the following additional platforms:
+
+\begin{itemize}
+\item Cray XT/XE/XK/XC
+\item IBM Blue Gene L/P/Q
+\item Linux or AIX on POWER processors
+\item Linux on ARM processors
+\item Linux on ARM or POWER processors with NVIDIA GPUs (CUDA)
+\item Linux on x86-64 processors with Intel Xeon Phi coprocessors (MIC)
+\end{itemize}
+
+\subsection{Installing \NAMD}
+
+A NAMD binary distribution need only be untarred or unzipped and can
+be run directly in the resulting directory.  When building from source
+code, ``make release'' will generate a
+self-contained directory and .tar.gz or .zip archive that can be moved
+to the desired installation location.  Windows and CUDA builds include
+Tcl .dll and CUDA .so files that must be in the dynamic library path.
+
+\subsection{Compiling \NAMD}
+
+We provide complete and optimized binaries for all
+common platforms to which NAMD has been ported.
+It should not be necessary for you to compile
+NAMD unless you wish to add or modify features
+or to improve performance by using an MPI library
+that takes advantage of special networking hardware.
+
+Directions for compiling NAMD are contained in the release notes,
+which are available from the NAMD web site
+{\tt http://www.ks.uiuc.edu/Research/namd/}
+and are included in all distributions.
+
+\subsection{Documentation}
+
+All available \NAMD\ documentation is available for download without
+registration via the \NAMD\ web site
+{\tt http://www.ks.uiuc.edu/Research/namd/}.
+

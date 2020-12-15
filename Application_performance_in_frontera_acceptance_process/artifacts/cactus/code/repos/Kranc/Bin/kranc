@@ -1,0 +1,80 @@
+#!/bin/bash
+
+set -e
+
+# Assume that this script is called from the Kranc/Bin directory.
+# This will not work if someone creates a symlink to the kranc script
+# somewhere else
+export KRANCDIR=$(dirname $0)/..
+
+if [ ! -r "$KRANCDIR/Tools/CodeGen" ]; then
+    echo "Cannot find Kranc (the kranc script must be run directly from the Kranc/Bin directory - symbolic links are not currently allowed)"
+    exit 1
+fi
+
+export KRANCVERBOSE=no
+export KRANCPROFILE=no
+
+echo "Using Kranc installation at $KRANCDIR"
+# It would be good to find a portable way to canonicalise KRANCDIR.
+
+while getopts "vp" flag
+do
+  case $flag in
+      "v")
+	  export KRANCVERBOSE=yes
+	  ;;
+      "p")
+	  export KRANCPROFILE=yes
+	  ;;
+  esac
+done
+
+shift $(expr $OPTIND - 1)
+
+if [ $# -eq 0 ]
+then
+    echo "Usage: $0 [-v] <script>"
+    exit 1
+fi
+
+MMASCRIPT=$1
+shift
+
+MATH_MACOS=/Applications/Mathematica.app/Contents/MacOS/MathKernel
+
+if which math >/dev/null; then
+    MATH=math
+elif [ -x $MATH_MACOS ]; then
+    MATH=$MATH_MACOS
+else
+    echo "Cannot find math executable.  Is Mathematica on your path?"
+    exit 1
+fi
+
+# If there is no licence server, Mathematica still exits with a 0 exit
+# code. In order to catch this error and exit with a nonzero code, we
+# first create a temporary directory, then remove it from within
+# Mathematica, then check to see that this happened.  If it didn't, we
+# assume there was some problem with launching Mathematica.
+
+flagdir="kranc.tmp.$$" # mktemp is not the same on Linux and Mac OS; here we assume we can write to the current directory
+mkdir $flagdir
+
+if $MATH -run "DeleteDirectory[\"$flagdir\"]; Get[\"$KRANCDIR/Tools/MathematicaMisc/RunKranc.m\"]" $MMASCRIPT </dev/null; then
+    if [ ! -d "$flagdir" ]; then
+        # Mathematica kernel started and executed DeleteDirectory
+        exit 0
+    else
+        echo "Mathematica did not start successfully"
+        rmdir "$flagdir"
+        exit 1
+    fi
+else
+    code=$?
+    if [ -d "$flagdir" ]; then
+         rmdir "$flagdir"
+         exit $code
+    fi
+    exit $code
+fi

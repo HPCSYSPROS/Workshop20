@@ -1,0 +1,350 @@
+% *======================================================================*
+%  Cactus Thorn template for ThornGuide documentation
+%  Author: Ian Kelley
+%  Date: Sun Jun 02, 2002
+%  $Header$
+%
+%  Thorn documentation in the latex file doc/documentation.tex
+%  will be included in ThornGuides built with the Cactus make system.
+%  The scripts employed by the make system automatically include
+%  pages about variables, parameters and scheduling parsed from the
+%  relevant thorn CCL files.
+%
+%  This template contains guidelines which help to assure that your
+%  documentation will be correctly added to ThornGuides. More
+%  information is available in the Cactus UsersGuide.
+%
+%  Guidelines:
+%   - Do not change anything before the line
+%       % START CACTUS THORNGUIDE",
+%     except for filling in the title, author, date, etc. fields.
+%        - Each of these fields should only be on ONE line.
+%        - Author names should be separated with a \\ or a comma.
+%   - You can define your own macros, but they must appear after
+%     the START CACTUS THORNGUIDE line, and must not redefine standard
+%     latex commands.
+%   - To avoid name clashes with other thorns, 'labels', 'citations',
+%     'references', and 'image' names should conform to the following
+%     convention:
+%       ARRANGEMENT_THORN_LABEL
+%     For example, an image wave.eps in the arrangement CactusWave and
+%     thorn WaveToyC should be renamed to CactusWave_WaveToyC_wave.eps
+%   - Graphics should only be included using the graphicx package.
+%     More specifically, with the "\includegraphics" command.  Do
+%     not specify any graphic file extensions in your .tex file. This
+%     will allow us to create a PDF version of the ThornGuide
+%     via pdflatex.
+%   - References should be included with the latex "\bibitem" command.
+%   - Use \begin{abstract}...\end{abstract} instead of \abstract{...}
+%   - Do not use \appendix, instead include any appendices you need as
+%     standard sections.
+%   - For the benefit of our Perl scripts, and for future extensions,
+%     please use simple latex.
+%
+% *======================================================================*
+%
+% Example of including a graphic image:
+%    \begin{figure}[ht]
+% 	\begin{center}
+%    	   \includegraphics[width=6cm]{MyArrangement_MyThorn_MyFigure}
+% 	\end{center}
+% 	\caption{Illustration of this and that}
+% 	\label{MyArrangement_MyThorn_MyLabel}
+%    \end{figure}
+%
+% Example of using a label:
+%   \label{MyArrangement_MyThorn_MyLabel}
+%
+% Example of a citation:
+%    \cite{MyArrangement_MyThorn_Author99}
+%
+% Example of including a reference
+%   \bibitem{MyArrangement_MyThorn_Author99}
+%   {J. Author, {\em The Title of the Book, Journal, or periodical}, 1 (1999),
+%   1--16. {\tt http://www.nowhere.com/}}
+%
+% *======================================================================*
+
+% If you are using CVS use this line to give version information
+% $Header$
+
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+% The author of the documentation
+\author{Peter Diener \textless diener@cct.lsu.edu\textgreater}
+
+% The title of the document (not necessarily the name of the Thorn)
+\title{Summation By Parts}
+
+% the date your document was last changed, if your document is in CVS,
+% please use:
+\date{$ $Date$ $}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+% Add all definitions used in this documentation here
+%   \def\mydef etc
+
+% Add an abstract for this thorn's documentation
+\begin{abstract}
+Calculate first derivates of grid functions using finite difference stencils
+that satisfy summation by parts.
+\end{abstract}
+
+% The following sections are suggestive only.
+% Remove them or add your own.
+
+\section{Introduction}
+Given a discretization $x_0\ldots x_N$ of a computational domain $x\in[a,b]$
+with gridspacing $h$ a one dimensional finite difference operator
+approximation to a first derivative, $D$, is said to satisfy summation by
+parts (SBP) with respect to a scalar product (defined by its
+coefficients $\sigma_{ij}$)
+\begin{equation}
+\langle u, v\rangle_h = h \sum_{i=0}^{N} u_i v_j \sigma_{ij}
+\end{equation}
+if the property
+\begin{equation}
+\langle u, Dv\rangle_h +\langle Du, v\rangle_h = \left . (uv)\right|^b_a
+\end{equation}
+is satisfied for all possible gridfunctions $u$ and $v$. 
+
+At a given finite difference order, there are several different ways of doing
+this depending on the structure of the scalar product. The three commonly
+considered cases are the diagonal norm, the restricted full norm and the full
+norm (see figure~\ref{fig:norm} for the structure).
+\begin{figure}[t]
+\[
+\sigma = \left ( \begin{array}{cccccc}
+           x &   &   &   &   & \\
+             & x &   &   &   & \\
+             &   & x &   &   & \\
+             &   &   & x &   & \\
+             &   &   &   & 1 & \\
+             &   &   &   &   & \ddots
+         \end{array} \right ),\mbox{\hspace{0.2em}}
+\sigma = \left ( \begin{array}{ccccccc}
+           x &   &   &   &   &   & \\
+             & x & x & x & x &   & \\
+             & x & x & x & x &   & \\
+             & x & x & x & x &   & \\
+             & x & x & x & x &   & \\
+             &   &   &   &   & 1 & \\
+             &   &   &   &   &   & \ddots
+        \end{array} \right ),\mbox{\hspace{0.2em}}
+\sigma = \left ( \begin{array}{cccccc}
+           x & x & x & x &   & \\
+           x & x & x & x &   & \\
+           x & x & x & x &   & \\
+           x & x & x & x &   & \\
+             &   &   &   & 1 & \\
+             &   &   &   &   & \ddots
+        \end{array} \right )
+\]
+\caption{The structure of the scalar product matrix in the diagonal case
+(left), the restricted full case (middle) and the full case (right) for the
+4th order interior operators. Only non-zero elements are shown.}
+\label{fig:norm}
+\end{figure}
+
+In the following we denote the order of accuracy at the boundary by $\tau$, 
+the order in the interior by $s$ and the width of the boundary 
+region\footnote{The width of the region where standard centered finite
+differences are not used.} by $r$.
+
+For the diagonal norm case it turns out that with $r=2\tau$ it is possible
+to find SBP operators with $s=2\tau$ (at least when $\tau\le 4$), i.e.\ the
+order of accuracy at the boundary is half the order in the interior. For the
+restricted full norm case $\tau = s-1$ when $r=\tau +2$ and for the full norm
+case $\tau = s-1$ when $r=\tau + 1$.
+
+The operators are named after their norm and their interior and boundary
+orders. Thus, for example, we talk about diagonal norm 6-3 operators and
+restricted full norm 4-3 operators.
+
+In the diagonal case the 2-1 and 4-3 operators are unique whereas the 6-3
+and 8-4 operators have 1 and 3 free parameters, respectively. In the restricted
+full norm case the 4-3 operators have 3 free parameters and the 6-5 operators
+have 4, while in the full norm case the number of free parameters is 1 less
+than the restricted full case.
+\section{Numerical Implementation}
+Currently this thorn implements only diagonal and restricted full norm SBP
+operators. The diagonal norm 2-1, 4-2 and 6-3 and the restricted full norm
+4-3 are the ones listed in \cite{strand93} where in the presence of free
+parameters the set of parameters giving a minimal bandwidth have been chosen.
+For the diagonal norm 8-4 case the minimal bandwidth choice are to restrictive
+with respect to the Courant factor and in this case parameters are chosen
+so as to maximize the Courant factor\footnote{This is done by choosing
+parameters that minimizes the largest eigenvalue of the amplification matrix
+for a simple 1D advection equation with a penalty method implementation of
+periodic boundary conditions as suggested in \cite{lrt05}.}. In addition the
+restricted full norm 6-5 operator has been implemented. This was calculated
+using a Mathematica script kindly provided by Jos\'{e} M.
+Mart\'{\i}n-Garc\'{\i}a.
+
+For the restricted full norm 6-5 SBP operators a compatible dissipation
+operator has been implemented as well based on \cite{msn04}.
+\section{Using This Thorn}
+The basic functionality of calculating finite difference approximations are
+performed by a set of aliased functions. In this way things are kept flexible
+in the sense that different thorns each can provide their own way of
+calculating derivatives but if they use the same calling interface the
+user can switch between different derivative schemes by simply activating
+the appropriate finite differencing thorn. Also the same derivative routines
+can be called from both C and Fortran.
+
+There are currently two different calling interfaces corresponding to different
+levels of flexibility. In the first case the fact that derivatives are
+approximated by finite differencing is completely hidden for the user. Using
+this interface the same physics thorn could in principle be used with a
+finite difference driver, a finite elements driver or a spectral driver. There
+is however a price to pay for this flexibility due to the fact that the
+operations are performed on whole grid functions at a time so that storage
+for the derivatives has to be provided. This can significantly increase the
+amount of memery required for the evolution. The alternative interface
+returns instead the finite difference coefficients and allows the user to
+calculate derivatives on a pointwise basis. This can significantly save
+memory but limits the physics thorn to use finite differences.
+\subsection{Obtaining This Thorn}
+The thorn is currently still in development and so is not generally available.
+Access can be requested by contacting the thorn maintainer.
+\subsection{Basic Usage}
+In order to use the derivative routines the appropriate declarations have 
+to be added to your thorns interface.ccl file. To use the interface that
+works on whole grid functions you have to add:
+\begin{verbatim}
+SUBROUTINE Diff_gv ( CCTK_POINTER_TO_CONST IN cctkGH, \
+                     CCTK_INT IN dir, \
+                     CCTK_REAL IN ARRAY var, \
+                     CCTK_REAL OUT ARRAY dvar, \
+                     CCTK_INT IN table_handle )
+USES FUNCTION Diff_gv
+\end{verbatim}
+Here {\tt cctkGH} is the pointer to the cactus GH, {\tt dir} is the direction
+of the derivative (0 for $x$, 1 for $y$ and 2 for $z$), {\tt var} is the grid
+function to calculate derivatives of and {\tt dvar} is the grid function where
+the derivative is to be stored and {\tt table\_handle} is an integer that
+contains a handle for a keyword table with optional parameters. If there are
+no optional paramters just pass in a negative value.
+
+To use the interface that returns the finite difference coefficients you have 
+to add:
+\begin{verbatim}
+SUBROUTINE Diff_coeff ( CCTK_POINTER_TO_CONST IN cctkGH, \
+                        CCTK_INT IN dir, \
+                        CCTK_INT IN nsize, \
+                        CCTK_INT OUT ARRAY imin, \
+                        CCTK_INT OUT ARRAY imax, \
+                        CCTK_REAL OUT ARRAY q, \
+                        CCTK_INT IN table_handle )
+\end{verbatim}
+Here, again, {\tt cctkGH} is the pointer to the cactus GH, {\tt dir} is the
+direction of the derivative, {\tt nsize} is the grid size in the direction
+you are interested in, {\tt imin} and {\tt imax} are 1D integer arrays of size
+{\tt nsize} that on return will contain the minimum and maximum index of the
+stencil in direction {\tt dir}, {\tt q} is a 2D real array of size 
+{\tt nsize}$\times${\tt nsize} that on return will contain the coefficients
+for the derivatives. The {\tt table\_handle} serves the same purpose as in
+the previous case.
+
+%\subsection{Special Behaviour}
+
+%\subsection{Interaction With Other Thorns}
+
+\subsection{Examples}
+The following piece of Fortran code, shows how to calculate derivatives of
+a grid function, f, and store the derivatives in the x-, y- and z-directions
+in the grid functions  dxf, dyf and dzf:
+\begin{verbatim}
+  call Diff_gv (cctkGH, 0, f, dxf, -1)
+  call Diff_gv (cctkGH, 1, f, dyf, -1)
+  call Diff_gv (cctkGH, 2, f, dzf, -1)
+\end{verbatim}
+In order to use the interface for doing the pointwise derivatives, the
+following Fortran90 example shows the necessary declarations and an example
+of how to calculate the derivatives:
+\begin{verbatim}
+  CCTK_REAL, dimension(:,:), allocatable :: qx, qy, qz
+  CCTK_INT, dimension(:), allocatable :: iminx, imaxx, iminy, &
+                                         imaxy, iminz, imaxz
+  CCTK_REAL :: idelx, idely, idelz
+  CCTK_INT :: i, j, k
+
+  allocate ( qx(cctk_lsh(1),cctk_lsh(1)), &
+             qy(cctk_lsh(2),cctk_lsh(2)), &
+             qz(cctk_lsh(3),cctk_lsh(3)), &
+             iminx(cctk_lsh(1)), imaxx(cctk_lsh(1)), &
+             iminy(cctk_lsh(2)), imaxy(cctk_lsh(2)), &
+             iminz(cctk_lsh(3)), imaxz(cctk_lsh(3)) )
+
+  call Diff_Coeff ( cctkGH, 0, cctk_lsh(1), iminx, imaxx, qx, -1 )
+  call Diff_Coeff ( cctkGH, 1, cctk_lsh(2), iminy, imaxy, qy, -1 )
+  call Diff_Coeff ( cctkGH, 2, cctk_lsh(3), iminz, imaxz, qz, -1 )
+
+  idelx = 1.0d0 / CCTK_DELTA_SPACE(1)
+  idely = 1.0d0 / CCTK_DELTA_SPACE(2)
+  idelz = 1.0d0 / CCTK_DELTA_SPACE(3)
+
+  do k = 1, cctk_lsh(3)
+    do j = 1, cctk_lsh(2)
+      do i = 1, cctk_lsh(1)
+        dxf(i,j,k) = idelx * sum ( qx(iminx(i):imaxx(i),i) * &
+                                     f(iminx(i):imaxx(i),j,k) )
+        dyf(i,j,k) = idely * sum ( qy(iminy(j):imaxy(j),j) * &
+                                     f(i,iminy(j):imaxy(j),k) )
+        dzf(i,j,k) = idelz * sum ( qz(iminz(k):imaxz(k),k) * &
+                                     f(i,j,iminz(k):imaxz(k)) )
+
+      end do
+    end do
+  end do
+
+  deallocate ( qx, qy, qz, iminx, imaxx, iminy, imaxy, iminz, imaxz )
+\end{verbatim}
+\subsection{Support and Feedback}
+This thorn is maintained by Peter Diener. Any questions and comments should
+be directed by e-mail to diener@cct.lsu.edu.
+
+\section{History}
+This thorn grew out of the needs of a multipatch relativity code and as
+such was initially designed to those needs. The addition of the possibility
+of passing in a handle for a keyword table was done at the request of
+Jonathan Thornburg and should make it easy to extend the thorn with
+additional features. The addition of the coefficient interface was done
+at the request of Bela Szilagyi who felt that the storage overhead was
+to large for his code. In the near future the thorn will be extended with
+second derivatives SBP operators.
+
+%\subsection{Thorn Source Code}
+%
+%\subsection{Thorn Documentation}
+
+\section{Acknowledgements}
+We thank Jos\'{e} M.\ Mart\'{\i}n-Garc\'{\i}a for very kindly providing us
+with a very well designed mathematica script to calculate the finite
+difference and scalar product coefficients.
+
+\begin{thebibliography}{9}
+\bibitem{strand93} Bo Strand, 1994, Journal of Computational Physics, 110,
+47--67.
+\bibitem{lrt05} Luis Lehner, Oscar Reula and Manuel Tiglio, in preparation.
+\bibitem{msn04} Ken Mattsson, Magnus Sv\"{a}rd and Jan Nordstr\"{o}m, 2004,
+Journal of Scientific Computing, 21, 57--79.
+
+\end{thebibliography}
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

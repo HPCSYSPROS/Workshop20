@@ -1,0 +1,14 @@
+# Parameter definitions for thorn SystemTopology
+
+KEYWORD set_thread_bindings "Set thread bindings (aka thread-CPU affinity)" STEERABLE=recover
+{
+  "yes"  :: "set bindings"
+  "no"   :: "no not modify bindings"
+  "auto" :: "depends on system architecture"
+} "auto"
+
+KEYWORD thread_layout "How to lay out threads over cores" STEERABLE=recover
+{
+  "dense" :: "Pack threads on as few NUMA nodes/cores as possible"
+  "loose" :: "Spread threads over all NUMA nodes/cores"
+} "dense"

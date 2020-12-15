@@ -1,0 +1,278 @@
+% *======================================================================*
+%  Cactus Thorn template for ThornGuide documentation
+%  Author: Ian Kelley
+%  Date: Sun Jun 02, 2002
+%  $Header$
+%
+%  Thorn documentation in the latex file doc/documentation.tex
+%  will be included in ThornGuides built with the Cactus make system.
+%  The scripts employed by the make system automatically include
+%  pages about variables, parameters and scheduling parsed from the
+%  relevant thorn CCL files.
+%
+%  This template contains guidelines which help to assure that your
+%  documentation will be correctly added to ThornGuides. More
+%  information is available in the Cactus UsersGuide.
+%
+%  Guidelines:
+%   - Do not change anything before the line
+%       % START CACTUS THORNGUIDE",
+%     except for filling in the title, author, date, etc. fields.
+%        - Each of these fields should only be on ONE line.
+%        - Author names should be separated with a \\ or a comma.
+%   - You can define your own macros, but they must appear after
+%     the START CACTUS THORNGUIDE line, and must not redefine standard
+%     latex commands.
+%   - To avoid name clashes with other thorns, 'labels', 'citations',
+%     'references', and 'image' names should conform to the following
+%     convention:
+%       ARRANGEMENT_THORN_LABEL
+%     For example, an image wave.eps in the arrangement CactusWave and
+%     thorn WaveToyC should be renamed to CactusWave_WaveToyC_wave.eps
+%   - Graphics should only be included using the graphicx package.
+%     More specifically, with the "\includegraphics" command.  Do
+%     not specify any graphic file extensions in your .tex file. This
+%     will allow us to create a PDF version of the ThornGuide
+%     via pdflatex.
+%   - References should be included with the latex "\bibitem" command.
+%   - Use \begin{abstract}...\end{abstract} instead of \abstract{...}
+%   - Do not use \appendix, instead include any appendices you need as
+%     standard sections.
+%   - For the benefit of our Perl scripts, and for future extensions,
+%     please use simple latex.
+%
+% *======================================================================*
+%
+% Example of including a graphic image:
+%    \begin{figure}[ht]
+% 	\begin{center}
+%    	   \includegraphics[width=6cm]{MyArrangement_MyThorn_MyFigure}
+% 	\end{center}
+% 	\caption{Illustration of this and that}
+% 	\label{MyArrangement_MyThorn_MyLabel}
+%    \end{figure}
+%
+% Example of using a label:
+%   \label{MyArrangement_MyThorn_MyLabel}
+%
+% Example of a citation:
+%    \cite{MyArrangement_MyThorn_Author99}
+%
+% Example of including a reference
+%   \bibitem{MyArrangement_MyThorn_Author99}
+%   {J. Author, {\em The Title of the Book, Journal, or periodical}, 1 (1999),
+%   1--16. {\tt http://www.nowhere.com/}}
+%
+% *======================================================================*
+
+% If you are using CVS use this line to give version information
+% $Header$
+
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+\usepackage{color}
+
+\begin{document}
+
+% The author of the documentation
+\author{Roland Haas \textless rhaas@tapir.caltech.edu\textgreater}
+
+% The title of the document (not necessarily the name of the Thorn)
+\title{Controlling Cactus parameters during core collapse simulations}
+
+% the date your document was last changed, if your document is in CVS,
+% please use:
+%    \date{$ $Date: 2004-01-07 12:12:39 -0800 (Wed, 07 Jan 2004) $ $}
+\date{April 04 2013}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+% Add all definitions used in this documentation here
+%   \def\mydef etc
+\newcommand{\todo}[1]{{\color{blue}TODO:#1}}
+
+% Add an abstract for this thorn's documentation
+\begin{abstract}
+Simulating a collapsing star there are often several distinct ``stages'' to
+the collapse, each of which requires slightly different settings for the
+Cactus parameters. CoreCollaspeControl provides a high level interface to
+detect which stage the collaspe is in an to steer a variety of parameters
+based on the stage. CoreCollaspeControl provides support to control
+CarpetRegrid2 by successively activating refinement levels as the collapse
+provgresses, CarpetIOScalar, CarpetIOASCII and CarpetIOHDF5 to control output
+frequency, various gravitational wave extraction thorns
+(ZelmaniQuadWaveExtract, InnerCore, ZerilliEF, WaveExtract, NPScalars) and
+analysis thorns (InnerCore, AHFinderDirect). 
+\end{abstract}
+
+% The following sections are suggestive only.
+% Remove them or add your own.
+
+\section{Introduction}
+At the begiinig of a core collaspe simulation that starts from a collapsing
+steller the star collapses smoothly gradually increasing the density and mass
+of the inner core. Eventually the nuclear equaiton of state of the
+inner core stiffens and halts the collapse. Due to inertia the core overshoots
+the new equlibrium size and bounces back into the still infalling material.
+This laucnhes a shock that travels outwards into the acreting material.
+
+CoreCollapseControl contains four main sub-parts: (1) phase detection, (2)
+output parameter steering, (3) mesh control, (4) object tracking.
+
+\subsection{Phase detection and output parameter steering}
+CoreCollapseControl defines four stages ``collapse'', ``prebounce'',
+``bounce'' and ``preBH''. 
+\begin{description}
+\item[collapse] is the initial stage of the simulation in which matter is
+acreting onto the inner core. Unless \texttt{force\_postbounce} is in effect,
+CoreCollapseControl.
+\item[prebounce] is entered once the maximum density on the grid exceeds
+\texttt{prebounce\_rho}. Upon entering this stage CoreCollapseControl steers
+ooutput frequency and criterion parameters using \texttt{preb\_*} set of
+values.
+\todo{clean up this code. it does not currently seem to have very predictable
+behaviour for 1d/2/3d output}
+\item[bounce] stage is detected if either \texttt{bounc\_ciretion} is set to
+``density'' and the maximum density on the grid exceeds \texttt{bounce\_rho} or
+if \texttt{bounce\_criterion} is set to ``entropy'' and the maximum entropy on
+the grid exceeds \texttt{bounce\_entropy}. Not output parameters are steered
+however CoreCollapseControl records the time bounce occured in the grid scalar
+\texttt{bouncetime}.
+\item[preBH] proceeds in two stages. First, once the minimum lapse on the grid
+drops below \texttt{preBH\_alpA} the output frequncy of CarpetIOHDF5 is steered
+to \texttt{preBH\_out3Dhdf5\_every}, second once the minimum lapse on the grid
+drops below \texttt{preBH\_alpB} AHFinderDirect's \texttt{find\_every}
+parameter is steered to begin looking for apparent horizons.
+\end{description}
+
+Transitioning into any of the later stages is recorded and CoreCollapseControl
+takes care not to drop into an earlier stage once a later one has been
+reached. Curerntly CoreCollapseControl reverts to the ``collapse'' stage after
+recovering from a checkpoint.
+
+\todo{it should not do so. It shoud only re-examine its triggers when they
+were changed. It should also most likely use AEIThorns::Trigger to check its
+conditions}
+
+\subsection{Progressive mesh refinement}
+CoreCollapseControl implements progressive mesh refinement of the central
+region of the simulation. CoreCollapseControl defines a list of density
+thresholds \texttt{rho\_max\_list} and enables one more level of mesh
+refinement whenever the maximum density on the grid exceeds the current
+threshold level for the first time. A switch-off time
+\texttt{switch\_off\_refinement\_after\_time} can be used to turn off all mesh
+refinemnt after a given time.
+
+\subsection{Object tracking}
+CoreCollapseControl can track up to 10 fragments by following the motion of
+high density regions. Given a set of previous fragment locations, the fragment
+positions are updated by searching for the highest density point within
+\texttt{search\_radius\_around\_old\_maximum}. CoreCollapseControl restricts
+candidate points to have densiyt higher than \texttt{rho\_max\_threshold}, and
+enforces a minimum separation of \texttt{min\_separation\_between\_maxima}
+between each fragment location. Optionally the centroid position of
+SphericalSurfaces can be set so that the fragment location can be used eg. as
+initial guesses for AHFinderDirect. CoreCollapseControl provides options to
+apply its progressive mesh refinement method to each of the tracked fragments.
+
+\section{Using This Thorn}
+To use this thorn you will have to activate HydroBase, ADMBase,
+SphericalSurface and CarpetRegrid2. All other thorns whose parameters can be
+steered are detected at runtime.
+
+\subsection{Obtaining This Thorn}
+Currently the thron is part of the Zelmani arrangement. \todo{RH: this must of
+course change}
+
+\subsection{Basic Usage}
+The typical usage case is to add more and more refinement levels to a collaspe
+simulations as the star collapses. This can be achieved by setting
+\texttt{handle\_PMR} to true and providing a list of densities (in g cm$^3$)
+in \texttt{rho\_max\_list}.
+
+\subsection{Special Behaviour}
+After recovering from a checkpoint CoreCollapseControl will re-exame the grid
+variables to decide which stage it is in. \todo{RH: this needs to change}
+
+\subsection{Interaction With Other Thorns}
+CoreCollapseControl steers parameters in 
+CarpetIOScalar, CarpetIOASCII,  CarpetIOHDF5, 
+ZelmaniQuadWaveExtract, InnerCore, ZerilliEF, WaveExtract, NPScalars,
+InnerCore, AHFinderDirect. It changes grid scalars in SphericalSurface and
+CarpetRegrid2.
+
+\subsection{Examples}
+\begin{verbatim}
+# set up grid structure for CoreCollapseControl to manage
+CarpetRegrid2::num_centres  = 1
+CarpetRegrid2::num_levels_1 = 1
+CarpetRegrid2::position_x_1 = 0
+CarpetRegrid2::position_y_1 = 0
+CarpetRegrid2::position_z_1 = 0
+
+CarpetRegrid2::radius_1[1]   = 192.0
+CarpetRegrid2::radius_1[2]   = 144.0
+CarpetRegrid2::radius_1[3]   = 98.4
+CarpetRegrid2::radius_1[4]   = 40.0
+CarpetRegrid2::radius_1[5]   = 12.0
+CarpetRegrid2::radius_1[6]  =  6.0
+CarpetRegrid2::radius_1[7]  =  3.0
+CarpetRegrid2::radius_1[8]  =  2.0
+
+# list of densities controlling when new levels are activated
+CoreCollapseControl::handle_PMR = yes
+CoreCollapseControl::rho_max_list[0] = 8.0e10
+CoreCollapseControl::rho_max_list[1] = 3.2e11
+CoreCollapseControl::rho_max_list[2] = 1.28e12
+CoreCollapseControl::rho_max_list[3] = 5.12e12
+CoreCollapseControl::rho_max_list[4] = 2.048e13
+CoreCollapseControl::rho_max_list[5] = 3.0e15
+CoreCollapseControl::rho_max_list[6] = 5.0e15
+CoreCollapseControl::rho_max_list[7] = 9.0e88
+CoreCollapseControl::check_every = 256
+Corecollapsecontrol::rho_max_every = 256
+
+# control output frequency depending on stage we are in
+CoreCollapseControl::output_control = yes
+CoreCollapseControl::prebounce_rho = 1.0e13
+CoreCollapseControl::preb_out2D_every = 256
+CoreCollapseControl::preb_out1D_every = 2048
+CoreCollapseControl::preb_out0D_every = 256
+CoreCollapseControl::preb_out3Dhdf5_every = -1
+CoreCollapseControl::preb_checkpoint_every = 2048
+CoreCollapseControl::preb_outscalar_every = 256
+CoreCollapseControl::preb_waves_every = 64
+
+CoreCollapseControl::preBH_alpA = 0.4e0
+CoreCollapseControl::preBH_alpB = 0.4e0
+CoreCollapseControl::preBH_AH_every = 64
+CoreCollapseControl::preBH_out3Dhdf5_every = -1
+\end{verbatim}
+
+\subsection{Support and Feedback}
+Support is available through the Einstein Toolkit mailing list
+\url{users@einsteintoolkit.org}. Feedback can be provided using the same
+channel.
+
+\section{History}
+Frist public version.
+
+\subsection{Acknowledgements}
+Anyone?
+
+%\begin{thebibliography}{9}
+%
+%\end{thebibliography}
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+
+\end{document}

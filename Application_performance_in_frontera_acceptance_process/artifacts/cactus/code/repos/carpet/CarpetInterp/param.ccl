@@ -1,0 +1,23 @@
+# Parameter definitions for thorn CarpetInterp
+
+BOOLEAN barriers "Insert barriers at strategic places for debugging purposes (slows down execution)" STEERABLE=always
+{
+} "no"
+
+CCTK_REAL poison "Poison value" STEERABLE=always
+{
+  *:* :: ""
+} -4.20042e+30
+
+CCTK_REAL ipoison "Integer poison value" STEERABLE=always
+{
+  *:* :: ""
+} -420042
+
+BOOLEAN tree_search "Use a tree search to find the source processor" STEERABLE=always
+{
+} "yes"
+
+BOOLEAN check_tree_search "Cross-check the result of the tree search" STEERABLE=always
+{
+} "no"

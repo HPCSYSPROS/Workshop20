@@ -1,0 +1,29 @@
+# Parameter definitions for thorn CartesianCoordinates
+
+restricted:
+
+keyword coordinate_system "Available patch systems"
+{
+  "Cartesian" :: "Standard CartGrid3D cartesian coordinates"
+} "Cartesian"
+
+private:
+
+# Choices about storage
+
+boolean store_jacobian "Store the transformation da^i/dx^k  (a: local, x: global), for compatibility with Llama/Coordinates"
+{
+} "no"
+
+boolean store_jacobian_derivative "Store the derivative of the Jacobian d^2[global]/d[local]^2, for compatibility with Llama/Coordinates"
+{
+} "no"
+
+boolean store_inverse_jacobian "Store the transformation dx^i/da^k  (a: local, x: global), for compatibility with Llama/Coordinates"
+{
+} "no"
+
+boolean store_volume_form "Store determinant of Jacobian, for compatibility with Llama/Coordinates"
+{
+} "no"
+

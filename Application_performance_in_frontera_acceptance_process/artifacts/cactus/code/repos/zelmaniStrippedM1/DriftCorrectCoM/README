@@ -1,0 +1,11 @@
+CVS info   : $Header: /numrelcvs/AEIDevelopment/DriftCorrect4/README,v 1.1 2004/02/12 22:56:33 schnetter Exp $
+
+Cactus Code Thorn DriftCorrect4
+Thorn Author(s)     : Erik Schnetter <schnetter@aei.mpg.de>
+Thorn Maintainer(s) : Erik Schnetter <schnetter@aei.mpg.de>
+--------------------------------------------------------------------------
+
+Purpose of the thorn:
+
+Lock an apparent horizon to a fixed coordinate position, using
+rotational and radial corrections.

@@ -1,0 +1,128 @@
+\documentclass{article}
+
+% Use the Cactus ThornGuide style file
+% (Automatically used from Cactus distribution, if you have a 
+%  thorn without the Cactus Flesh download this from the Cactus
+%  homepage at www.cactuscode.org)
+\usepackage{../../../../doc/latex/cactus}
+
+\begin{document}
+
+\title{CoordGauge}
+\author{Tom Goodale}
+\date{$ $Date$ $}
+
+\maketitle
+
+% Do not delete next line
+% START CACTUS THORNGUIDE
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{abstract}
+This thorn provides an infrastructure for dynamic gauge selection.
+However, at present (summer 2004) many thorns don't use this infrastructure.
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{The Infrastructure}
+
+The {\bf CoordGauge} implementation schedules five groups:
+
+\begin{verbatim}
+CoordGauge
+LapseSelect IN CoordGauge BEFORE PickCoordGauge
+LapseApply  IN CoordGauge AFTER  PickCoordGauge
+ShiftSelect IN CoordGauge BEFORE PickCoordGauge
+ShiftApply  IN CoordGauge AFTER  PickCoordGauge
+\end{verbatim}
+%
+and one function
+\begin{verbatim}
+PickCoordGauge IN CoordGauge
+\end{verbatim}
+%
+and has two public grid scalars
+\begin{verbatim}
+selected_lapse
+selected_shift
+\end{verbatim}
+%
+and two string parameters
+\begin{verbatim}
+lapse_list
+shift_list
+\end{verbatim}
+
+It also provides four aliased functions
+%
+\begin{verbatim}
+int CoordGauge_RegisterLapse("lapse-name")
+int CoordGauge_RegisterShift("shift-name")
+CoordGauge_Lapse("lapse-name")
+CoordGauge_Shift("shift-name")
+\end{verbatim}
+
+(If someone can think of better names, please say so 8-)
+
+Then each thorn which wants to apply a coordinate gauge condition
+registers itself, receiving a unique integer as an id, and schedules a
+selection routine and an application routine in the appropriate schedule
+groups.
+
+The selection routine decides if this gauge condition should be applied at
+this time, and calls the \verb|CoordGauge_Lapse/Shift| aliased function.
+(It should check that it is actually in the appropriate parameter as a
+minimum.)
+
+The \verb|PickCoordGauge| function traverses the list of lapses/shifts
+and selects the first one in the list which has called the
+\verb|CoordGauge_Lapse/Shift| aliased function and sets the
+appropriate grid scalar to the id of this one.
+
+The application routine checks to see if the grid scalar is set to its id,
+and if so, applies the gauge condition.
+
+Evolution thorns could schedule {\bf CoordGauge} at the appropriate point or
+points in their schedule.
+
+An advantage of this scheme over the current one is that it provides the
+selection routines with a full set of variables from which to decide
+whether they should apply a guage or not.  So it becomes very easy to
+choose to switch off maximal if the lapse has collapsed within a certain
+volume, etc.
+
+This is simpler than the previous scheme as there is no arbitrary 'bid'
+floating around.  It also allows us to keep the logic of the final
+selection in one place, thus allowing people to override this logic if
+they need to.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Current Status}
+
+As of summer 2004, many thorns don't use the above mechanism, instead
+they directly extend \\
+\verb|ADMBase::lapse_evolution_method| and/or
+\verb|ADMBase::shift_evolution_method|.  That is, the thorn implementing
+a coordinate condition thorn says in its \verb|param.ccl|:
+\begin{verbatim}
+EXTENDS KEYWORD lapse_evolution_method "Which lapse condition to use"
+{
+"super-duper" :: "my super-duper new lapse condition"
+} ""
+\end{verbatim}
+(and/or the equivalent for \verb|shift_evolution_method|).
+
+The thorn then schedules a routine in some suitable schedule bin/group
+(probably \verb|CCTK_PRESTEP| or \verb|MOL_PRESTEP|) to check
+\verb|ADMBase::lapse_evolution_method| and/or
+\verb|ADMBase::shift_evolution_method|, and if they're equal
+to the appropriate string, it does the coordinate condition.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Do not delete next line
+% END CACTUS THORNGUIDE
+\end{document}

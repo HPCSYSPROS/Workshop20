@@ -1,0 +1,37 @@
+RAMD and RAMD-MD simulations examples README
+--------------------------------------------
+
+***************************************************************************
+  Large input and output files have been removed from this directory.
+  The complete examples may be downloaded from the following locations:
+  http://www.ks.uiuc.edu/Research/namd/utilities/ramd-4.1-examples.tar.gz
+  http://www.ks.uiuc.edu/Research/namd/utilities/ramd-4.1-examples.zip
+***************************************************************************
+
+The examples provided are the RAMD and RAMD-MD simulations 
+of (R)-2,3-dichloropropane-1-ol (DCL) exit from the active site of haloalkane wild type dehalogenase DhaA (PDBid 1CQW),
+obtained using NAMD v2.7 on 1 processor, applying Berendsen temperature control.
+
+The simulations are based on the work described in:
+Klvana, M., Pavlova, M., Koudelakova, T., Chaloupkova, R., Dvorak, P., Prokop, Z.,Stsiapanava, A.,
+Kuty, M., Kuta-Smatanova, I., Dohnalek, J., Kulhanek, P., Wade, R.C., Damborsky, J., 2009:
+Pathways and Mechanisms for Product Release in the Engineered Haloalkane Dehalogenases 
+Explored using Classical and Random Acceleration Molecular Dynamics Simulations.
+Journal of Molecular Biology 392: 1339-1356.
+
+Please note that in the examples provided here the force constant applied on the ligand
+has been increased relative to the values used in the original paper.
+This is to encourage a faster exit of the ligand in these test runs.
+In any serious application of this technique, it is necessary to adjust the force constant to a suitable value,
+depending on the mass of the ligand and on the system under study, 
+so that the structure of the system is not disrupted by applying the additional force.
+
+For running the examples, two bash scripts are provided: run_ramd_example.sh and run_rmad-md_example.sh. 
+The scripts should be run in this directory from the command line (e.g. './run_ramd_exampl.sh >& run_ramd.log &')
+The output is stored in the 'ramd_output' and 'ramd-md_output' directories. Sample output is provided in the directory 
+'example_ramd_output' and 'example_ramd-md_output'.
+
+---
+2009-12-18
+Created by Lada Biedermannova
+Link to the RAMD project page: http://projects.eml.org/mcm/software/ramd

@@ -1,0 +1,29 @@
+# Interface definition for thorn SpaceMask
+# $Header$
+
+implements: SpaceMask
+inherits: grid
+
+USES INCLUDE: Symmetry.h
+
+# our header file "SpaceMask.h" may be #included by other thorns
+INCLUDE HEADER: SpaceMask.h in SpaceMask.h
+
+public:
+
+CCTK_INT space_mask_group type=GF tags='tensortypealias="Scalar" Prolongation="None"'
+{
+  space_mask
+}
+
+#
+# The following emask GF is kept for the sake of compatibility with
+# the existing excision thorns. Once these are translated to the new
+# mask, this function will disappear. Please don't use it for
+# anything.
+#
+real mask type = GF tags='tensortypealias="Scalar" Prolongation="None"'
+{
+  emask
+} "Mask"
+

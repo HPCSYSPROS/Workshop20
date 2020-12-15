@@ -1,0 +1,57 @@
+/**
+***  Copyright (c) 1995, 1996, 1997, 1998, 1999, 2000 by
+***  The Board of Trustees of the University of Illinois.
+***  All rights reserved.
+**/
+
+module ParallelIOMgr {
+  // Handles messages to Patch(s)
+
+  message MolInfoMsg;
+  message HydroBasedMsg;
+  message MoveInputAtomsMsg{
+    InputAtom atomList[];
+  };
+  message AtomsCntPerPatchMsg{
+    PatchID pidList[];
+    unsigned short atomsCntList[];
+    unsigned short fixedAtomsCntList[];
+  };
+  message MovePatchAtomsMsg{
+    PatchID pidList[];
+    int sizeList[];
+    FullAtom allAtoms[];
+  };
+
+  message ClusterSizeMsg;
+  message ClusterCoorMsg;
+
+  group ParallelIOMgr
+  {
+    entry ParallelIOMgr(void);
+    entry void recvAtomsMGrp(MoveInputAtomsMsg *msg);
+    entry void recvMolInfo(MolInfoMsg *msg);
+    entry void bcastMolInfo(MolInfoMsg *msg);
+    entry void recvHydroBasedCounter(HydroBasedMsg *msg);
+    entry void bcastHydroBasedCounter(HydroBasedMsg *msg);
+    entry void recvAtomsCntPerPatch(AtomsCntPerPatchMsg *msg);
+    entry void ackAtomsToHomePatchProcs();
+    entry void recvAtomsToHomePatchProcs(MovePatchAtomsMsg *msg);
+
+    entry void recvClusterSize(ClusterSizeMsg *msg);
+    entry void recvFinalClusterSize(ClusterSizeMsg *msg);
+
+    entry void receivePositions(CollectVectorVarMsg *msg);
+    entry void receiveVelocities(CollectVectorVarMsg *msg);
+    entry void receiveForces(CollectVectorVarMsg *msg);
+    entry void disposePositions(int seq, double prevT);
+    entry void disposeVelocities(int seq, double prevT);
+    entry void disposeForces(int seq, double prevT);
+    
+    entry void wrapCoor(int seq, Lattice lat);
+    entry void recvClusterCoor(ClusterCoorMsg *msg);
+    entry void recvFinalClusterCoor(ClusterCoorMsg *msg);
+
+  } ;
+}
+

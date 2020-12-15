@@ -1,0 +1,19 @@
+CVS info   : $Header$
+
+Cactus Code Thorn Dissipation
+Thorn Author(s)     : Erik Schnetter <schnetter@aei.mpg.de>
+Thorn Maintainer(s) : Erik Schnetter <schnetter@aei.mpg.de>
+--------------------------------------------------------------------------
+
+Purpose of the thorn:
+
+Add fourth order Kreiss-Oliger dissipation to the right hand side of
+evolution equations.  This thorn works only for time evolutions that
+use MoL.  I thank Scott Hawley who wrote a very similar thorn
+HawleyThorns/Dissipation for evolutions that do not use MoL; this
+thorn here is modelled after his.
+
+For a description of the artificial dissipation, see H. Kreiss and
+J. Oliger, "Methods for the Approximate Solution of Time Dependent
+Problems", vol. 10 of Global Atmospheric Research Programme (GARP):
+GARP Publication Series (GARP Publication, 1973).

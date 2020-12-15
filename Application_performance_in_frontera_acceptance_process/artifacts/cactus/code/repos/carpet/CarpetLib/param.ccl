@@ -1,0 +1,245 @@
+# Parameter definitions for thorn CarpetLib
+
+private:
+
+BOOLEAN verbose "Print info to the screen" STEERABLE=always
+{
+} "no"
+
+BOOLEAN barriers "Insert barriers at strategic places for debugging purposes (slows down execution)" STEERABLE=always
+{
+} "no"
+
+BOOLEAN commstate_verbose "Print debug info from the commstate class" STEERABLE=always
+{
+} "no"
+
+
+
+#BOOLEAN omit_prolongation_points_when_restricting "Do not restrict to points which are used to prolongate the boundary" STEERABLE=always
+#{
+#} "no"
+
+#INT proper_nesting_distance "Minimum distance (in grid points) between two level interfaces" STEERABLE=always
+#{
+#  0:* :: "any non-negative value is fine; the default value is just a guess"
+#} 4
+
+
+
+BOOLEAN use_dgfe "Use DGFE operators instead of Lagrange operators"
+{
+} "no"
+
+
+
+BOOLEAN interpolate_from_buffer_zones "Use buffer points for interpolation" STEERABLE=always
+{
+} "no"
+
+
+
+BOOLEAN use_loopcontrol_in_operators "Use LoopControl to parallelize AMR operators" STEERABLE=always
+{
+} "no"
+
+BOOLEAN use_openmp "Use OpenMP to parallelize AMR operators" STEERABLE=always
+{
+} "yes"
+
+
+
+restricted:
+
+BOOLEAN use_higher_order_restriction "Use third order cell centered restriction operators instead of first order"
+{
+} "no"
+
+INT restriction_order_space "Order of restriction operator to use with use_higher_order_restriction"
+{
+  1 :: "linear interpolation, this is Carpet's original implementation"
+  3 :: "third order accurate restriction for grid functions where prolongation is not (W)ENO"
+  5 :: "fifth order accurate restriction for grid functions where prolongation is not (W)ENO"
+} 3
+
+BOOLEAN support_staggered_operators "Provide one extra ghost point during restriction for staggered operators - EXPERIMENTAL"
+{
+} "no"
+
+
+
+private:
+
+BOOLEAN output_bboxes "Output bounding box information to the screen" STEERABLE=always
+{
+} "no"
+
+BOOLEAN check_bboxes "Check bounding box information for self-consistency" STEERABLE=always
+{
+} "yes"
+
+
+
+BOOLEAN poison_new_memory "Try to catch uninitialised data by setting newly allocated memory to values that will catch your attention" STEERABLE=always
+{
+} "no"
+
+BOOLEAN electric_fence "Surround each allocated memory block by canaries to check for out-of-bounds accesses" STEERABLE=recover
+{
+} "no"
+
+CCTK_INT fence_width "number of guard cells to use" STEERABLE=recover
+{
+  1:* :: "any number of cells"
+} 1
+
+RESTRICTED:
+
+CCTK_INT poison_value "Integer value (0..255) used to poison new timelevels (with memset)" STEERABLE=always
+{
+  0:255 :: "Must fit into a byte.  Use 0 for zero, 255 for nan, and e.g. 113 for a large value."
+} 255
+
+CCTK_INT deadbeef "A strange integer value that indicates that something has gone wrong; the integer equivalent of a nan" STEERABLE=always
+{
+  *:* :: "should be large and positive"
+} 666 # 7353315
+
+PRIVATE:
+
+
+
+# System limits
+
+INT max_core_size_MB "Maximum size of a core file, set via setrlimit" STEERABLE=recover
+{
+  -2  :: "unchanged"
+  -1  :: "unlimited"
+  0:* :: "limited"
+} -2
+
+INT max_memory_size_MB "Maximum amount of memory per MPI process, set via setrlimit" STEERABLE=recover
+{
+  -2  :: "unchanged"
+  -1  :: "unlimited"
+  0:* :: "limited"
+} -2
+
+
+
+BOOLEAN test_backtrace "Kill yourself to test the backtrace mechanism"
+{
+} "no"
+
+
+
+# Statistics
+
+INT print_timestats_every "Print timing statistics periodically" STEERABLE=always
+{
+  -1  :: "don't report"
+  0   :: "report after initialisation"
+  1:* :: "report every so many iterations"
+} -1
+
+STRING timestat_file "File name in which timestat output is collected (because stdout from the root node may not be enough)" STEERABLE=always
+{
+  "^$"   :: "empty filename: no file output"
+  "^.+$" :: "file name"
+} "carpetlib-timing-statistics"
+
+BOOLEAN use_ipm_timing_regions "Call IPM (via MPI_Pcontrol) to define regions" STEERABLE=always
+{
+} no
+
+
+
+INT print_memstats_every "Report periodically how much memory is used per process" STEERABLE=always
+{
+  -1  :: "don't report"
+  0   :: "report after setting up initial data"
+  1:* :: "report every so many iterations"
+} -1
+
+INT max_allowed_memory_MB "Maximum allowed amount of memory per process that can be allocated for grid variables (in Megabytes)" STEERABLE=always
+{
+  -1  :: "no maximum"
+  0   :: "no maximum"
+  1:* :: "abort if more memory is used"
+} 0
+
+STRING memstat_file "File name in which memstat output is collected (because stdout from the root node may not be enough)" STEERABLE=always
+{
+  "^$"   :: "empty filename: no file output"
+  "^.+$" :: "file name"
+} "carpetlib-memory-statistics"
+
+
+
+BOOLEAN combine_recompose "Recompose all grid functions of one refinement levels at once" STEERABLE=always
+{
+} "yes"
+
+
+
+# # Memory allocation parameters
+# 
+# INT avoid_arraysize_bytes "Avoid array sizes that are multiples of this" STEERABLE=recover
+# {
+#   0   :: "don't avoid anything"
+#   2:* :: ""
+# } 0
+
+
+
+# Communication experiment parameters
+
+INT message_size_multiplier "Enlarge size of transmitted messages by this factor" STEERABLE=always
+{
+  1:* :: ""
+} 1
+
+INT message_count_multiplier "Transmit messages this many times" STEERABLE=always
+{
+  1:* :: ""
+} 1
+
+
+
+# Experimental communication parameters
+
+BOOLEAN interleave_communications "Try to interleave communications with each other; each processor begins to communicate with its 'right neighbour' in rank, instead of with the root processor" STEERABLE=always
+{
+} "no"
+
+BOOLEAN barrier_between_stages "Add a barrier between the communication stages (slows down, but may make timing numbers easier to interpret)" STEERABLE=always
+{
+} "no"
+
+BOOLEAN check_communication_schedule "Check the communication schedule at run time (expensive)" STEERABLE=always
+{
+} "no"
+
+BOOLEAN combine_sends "Send data together and in order of processor ranks" STEERABLE=always
+{
+} "no"
+
+BOOLEAN use_mpi_send "Use MPI_Send instead of MPI_Isend" STEERABLE=always
+{
+} "no"
+
+BOOLEAN use_mpi_ssend "Use MPI_Ssend instead of MPI_Isend" STEERABLE=always
+{
+} "no"
+
+
+
+BOOLEAN pad_to_cachelines "Pad arrays to the cache line size (only when VECTORISE_ALIGNED_ARRAYS is set)" STEERABLE=recover
+{
+} "yes"
+
+
+
+SHARES: IO
+
+USES STRING out_dir

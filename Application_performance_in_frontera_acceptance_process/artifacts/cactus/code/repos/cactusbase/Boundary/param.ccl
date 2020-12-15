@@ -1,0 +1,38 @@
+# Parameter definitions for thorn Boundary
+# $Header$
+
+
+restricted:
+
+INT radpower "Power of decay rate in extrapolation used in radiative boundaries"
+{
+ : :: "A negative value switches off this feature"
+} -1
+
+BOOLEAN register_scalar "Register routine to handle the 'Scalar' boundary condition"
+{
+} "yes"
+
+BOOLEAN register_flat "Register routine to handle the 'Flat' boundary condition"
+{
+} "yes"
+
+BOOLEAN register_radiation "Register routine to handle the 'Radiation' boundary condition"
+{
+} "yes"
+
+BOOLEAN register_copy "Register routine to handle the 'Copy' boundary condition"
+{
+} "yes"
+
+BOOLEAN register_robin "Register routine to handle the 'Robin' boundary condition"
+{
+} "yes"
+
+BOOLEAN register_static "Register routine to handle the 'Static' boundary condition"
+{
+} "yes"
+
+BOOLEAN register_none "Register routine to handle the 'None' boundary condition"
+{
+} "yes"
