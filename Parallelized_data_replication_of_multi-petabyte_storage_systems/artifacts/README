@@ -1,0 +1,4 @@
+main.sh - Main Replication Workflow
+replication.policy - Policy used by mmapplypolicy
+replication-exec.sh - Execution script of listed candidates. 
+chgprj-exec.sh - Execution script of listed changed project directories. 

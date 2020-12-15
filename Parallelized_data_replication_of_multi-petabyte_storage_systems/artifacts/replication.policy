@@ -1,0 +1,8 @@
+RULE EXTERNAL LIST newlist exec '/gpfs/fs0/ddn/scripts/bin/replication-exec.sh' opts 'lastsnap workfileset'
+RULE EXTERNAL LIST chgprj exec '/gpfs/fs0/ddn/scripts/bin/chgprj-exec.sh' opts 'lastsnap workfileset'
+RULE 'new' LIST newlist
+    DIRECTORIES_PLUS
+    WHERE MODIFICATION_SNAPID >= prevsnapid AND FILE_SIZE < 214748364800
+RULE 'chgprj' LIST chgprj
+    DIRECTORIES_PLUS
+    WHERE MODIFICATION_SNAPID >= prevsnapid AND MODE LIKE 'd%'
