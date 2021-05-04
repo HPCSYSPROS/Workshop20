@@ -1,6 +1,7 @@
 # Parallelized Data Replication of Multi-Petabyte Storage Systems	
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4327599.svg)](https://doi.org/10.5281/zenodo.4327599)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4737878.svg)](https://doi.org/10.5281/zenodo.4737878)
+#[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4327599.svg)](https://doi.org/10.5281/zenodo.4327599)
 
 **Authors**
 * Honwai Leong, DDN
