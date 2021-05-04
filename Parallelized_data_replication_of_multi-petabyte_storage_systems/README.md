@@ -4,7 +4,7 @@
 
 **Authors**
 * Honwai Leong, DDN
-* Andrew Jankee, The University of Sydney
+* Andrew Janke, The University of Sydney
 * Daniel Richards, DDN
 * Stephen Kolmann, The University of Sydney
 
